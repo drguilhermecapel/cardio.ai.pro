@@ -14,8 +14,8 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: cardioai_test
-          POSTGRES_USER: cardioai_test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
           POSTGRES_DB: cardioai_test
         options: >-
           --health-cmd pg_isready
@@ -77,7 +77,7 @@ jobs:
     - name: Run pytest with coverage
       working-directory: ./backend
       env:
-        DATABASE_URL: postgresql+asyncpg://cardioai_test:cardioai_test@localhost:5432/cardioai_test
+        DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/cardioai_test
         REDIS_URL: redis://localhost:6379/0
         SECRET_KEY: test-secret-key-for-ci
         ENVIRONMENT: test
@@ -160,7 +160,7 @@ jobs:
       run: |
         cat > .env.test << EOF
         ENVIRONMENT=test
-        DATABASE_URL=postgresql://cardioai:cardioai_password@postgres:5432/cardioai
+        DATABASE_URL=postgresql://postgres:postgres@postgres:5432/cardioai_test
         REDIS_URL=redis://redis:6379/0
         SECRET_KEY=test-secret-key-for-integration
         CELERY_BROKER_URL=redis://redis:6379/0
