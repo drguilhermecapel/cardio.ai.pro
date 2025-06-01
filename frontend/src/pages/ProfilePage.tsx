@@ -39,14 +39,14 @@ const ProfilePage: React.FC = () => {
     confirmPassword: '',
   })
 
-  const handleInputChange = (field: keyof ProfileFormData) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: event.target.value,
-    }))
-  }
+  const handleInputChange =
+    (field: keyof ProfileFormData) =>
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      setFormData(prev => ({
+        ...prev,
+        [field]: event.target.value,
+      }))
+    }
 
   const handleUpdateProfile = async (): Promise<void> => {
     setIsLoading(true)

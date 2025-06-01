@@ -132,8 +132,9 @@ async def list_analyses(
 
     analyses, total = await ecg_service.search_analyses(filters, limit, offset)
 
+    analyses_schemas = [ECGAnalysis.from_orm(a) for a in analyses]
     return ECGAnalysisList(
-        analyses=analyses,
+        analyses=analyses_schemas,
         total=total,
         page=offset // limit + 1,
         size=limit,
@@ -176,8 +177,9 @@ async def search_analyses(
 
     analyses, total = await ecg_service.search_analyses(filters, limit, offset)
 
+    analyses_schemas = [ECGAnalysis.from_orm(a) for a in analyses]
     return ECGAnalysisList(
-        analyses=analyses,
+        analyses=analyses_schemas,
         total=total,
         page=offset // limit + 1,
         size=limit,

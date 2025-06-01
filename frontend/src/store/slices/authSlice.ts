@@ -36,11 +36,11 @@ export const login = createAsyncThunk(
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(credentials),
     })
-    
+
     if (!response.ok) {
       throw new Error('Login failed')
     }
-    
+
     return response.json()
   }
 )
@@ -61,7 +61,10 @@ const authSlice = createSlice({
     clearError: state => {
       state.error = null
     },
-    setCredentials: (state, action: PayloadAction<{ user: User; token: string; refreshToken: string }>) => {
+    setCredentials: (
+      state,
+      action: PayloadAction<{ user: User; token: string; refreshToken: string }>
+    ) => {
       const { user, token, refreshToken } = action.payload
       state.user = user
       state.token = token

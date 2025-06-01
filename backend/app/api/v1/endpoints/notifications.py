@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.notification import NotificationList
+from app.schemas.notification import Notification, NotificationList
 from app.services.notification_service import NotificationService
 from app.services.user_service import UserService
 
@@ -31,8 +31,9 @@ async def get_notifications(
         current_user.id, limit, offset, unread_only
     )
 
+    notifications_schemas = [Notification.from_orm(n) for n in notifications]
     return NotificationList(
-        notifications=notifications,
+        notifications=notifications_schemas,
         total=len(notifications),  # Simplified
         page=offset // limit + 1,
         size=limit,

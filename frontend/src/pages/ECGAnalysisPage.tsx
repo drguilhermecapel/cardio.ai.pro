@@ -10,7 +10,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-
   Select,
   MenuItem,
   FormControl,
@@ -35,7 +34,7 @@ const ECGAnalysisPage: React.FC = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [selectedPatientId, setSelectedPatientId] = useState<number | ''>('')
-  
+
   const dispatch = useAppDispatch()
   const { analyses, isLoading, error, uploadProgress } = useAppSelector(state => state.ecg)
   const { patients } = useAppSelector(state => state.patient)
@@ -55,10 +54,12 @@ const ECGAnalysisPage: React.FC = () => {
   const handleUpload = async (): Promise<void> => {
     if (selectedFile && selectedPatientId) {
       dispatch(clearError())
-      await dispatch(uploadECG({
-        patientId: selectedPatientId as number,
-        file: selectedFile,
-      }))
+      await dispatch(
+        uploadECG({
+          patientId: selectedPatientId as number,
+          file: selectedFile,
+        })
+      )
       setUploadDialogOpen(false)
       setSelectedFile(null)
       setSelectedPatientId('')
@@ -66,7 +67,9 @@ const ECGAnalysisPage: React.FC = () => {
     }
   }
 
-  const getStatusColor = (status: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  const getStatusColor = (
+    status: string
+  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
     switch (status) {
       case 'completed':
         return 'success'
@@ -81,7 +84,9 @@ const ECGAnalysisPage: React.FC = () => {
     }
   }
 
-  const getUrgencyColor = (urgency: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  const getUrgencyColor = (
+    urgency: string
+  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
     switch (urgency) {
       case 'critical':
         return 'error'
@@ -159,16 +164,9 @@ const ECGAnalysisPage: React.FC = () => {
                     <TableCell>
                       {analysis.confidence ? `${(analysis.confidence * 100).toFixed(1)}%` : 'N/A'}
                     </TableCell>
+                    <TableCell>{new Date(analysis.createdAt).toLocaleDateString()}</TableCell>
                     <TableCell>
-                      {new Date(analysis.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        size="small"
-                        startIcon={<Visibility />}
-                        onClick={() => {
-                        }}
-                      >
+                      <Button size="small" startIcon={<Visibility />} onClick={() => {}}>
                         View
                       </Button>
                     </TableCell>
@@ -180,7 +178,12 @@ const ECGAnalysisPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={uploadDialogOpen}
+        onClose={() => setUploadDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Upload ECG File</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -201,12 +204,7 @@ const ECGAnalysisPage: React.FC = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <Button
-                variant="outlined"
-                component="label"
-                fullWidth
-                sx={{ height: 56 }}
-              >
+              <Button variant="outlined" component="label" fullWidth sx={{ height: 56 }}>
                 {selectedFile ? selectedFile.name : 'Choose ECG File'}
                 <input
                   type="file"

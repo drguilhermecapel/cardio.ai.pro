@@ -64,22 +64,19 @@ export const markAsRead = createAsyncThunk(
   }
 )
 
-export const fetchUnreadCount = createAsyncThunk(
-  'notification/fetchUnreadCount',
-  async () => {
-    const response = await fetch('/api/v1/notifications/unread-count', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
+export const fetchUnreadCount = createAsyncThunk('notification/fetchUnreadCount', async () => {
+  const response = await fetch('/api/v1/notifications/unread-count', {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  })
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch unread count')
-    }
-
-    return response.json()
+  if (!response.ok) {
+    throw new Error('Failed to fetch unread count')
   }
-)
+
+  return response.json()
+})
 
 const notificationSlice = createSlice({
   name: 'notification',

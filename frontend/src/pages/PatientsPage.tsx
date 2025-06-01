@@ -59,14 +59,14 @@ const PatientsPage: React.FC = () => {
     dispatch(fetchPatients({}))
   }, [dispatch])
 
-  const handleInputChange = (field: keyof PatientFormData) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: event.target.value,
-    }))
-  }
+  const handleInputChange =
+    (field: keyof PatientFormData) =>
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      setFormData(prev => ({
+        ...prev,
+        [field]: event.target.value,
+      }))
+    }
 
   const handleGenderChange = (event: SelectChangeEvent<string>): void => {
     setFormData(prev => ({
@@ -91,18 +91,18 @@ const PatientsPage: React.FC = () => {
     dispatch(fetchPatients({}))
   }
 
-  const isFormValid = formData.patientId && formData.firstName && formData.lastName && 
-                     formData.dateOfBirth && formData.gender
+  const isFormValid =
+    formData.patientId &&
+    formData.firstName &&
+    formData.lastName &&
+    formData.dateOfBirth &&
+    formData.gender
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">Patients</Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setCreateDialogOpen(true)}
-        >
+        <Button variant="contained" startIcon={<Add />} onClick={() => setCreateDialogOpen(true)}>
           Add Patient
         </Button>
       </Box>
@@ -140,19 +140,12 @@ const PatientsPage: React.FC = () => {
                     <TableCell>
                       {patient.firstName} {patient.lastName}
                     </TableCell>
-                    <TableCell>
-                      {new Date(patient.dateOfBirth).toLocaleDateString()}
-                    </TableCell>
+                    <TableCell>{new Date(patient.dateOfBirth).toLocaleDateString()}</TableCell>
                     <TableCell>{patient.gender}</TableCell>
                     <TableCell>{patient.phone || 'N/A'}</TableCell>
                     <TableCell>{patient.email || 'N/A'}</TableCell>
                     <TableCell>
-                      <Button
-                        size="small"
-                        startIcon={<Edit />}
-                        onClick={() => {
-                        }}
-                      >
+                      <Button size="small" startIcon={<Edit />} onClick={() => {}}>
                         Edit
                       </Button>
                     </TableCell>
@@ -164,7 +157,12 @@ const PatientsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Add New Patient</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -180,11 +178,7 @@ const PatientsPage: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth required>
                 <InputLabel>Gender</InputLabel>
-                <Select
-                  value={formData.gender}
-                  onChange={handleGenderChange}
-                  label="Gender"
-                >
+                <Select value={formData.gender} onChange={handleGenderChange} label="Gender">
                   <MenuItem value="male">Male</MenuItem>
                   <MenuItem value="female">Female</MenuItem>
                   <MenuItem value="other">Other</MenuItem>

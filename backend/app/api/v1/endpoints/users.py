@@ -88,8 +88,9 @@ async def list_users(
     user_service = UserService(db)
     users = await user_service.repository.get_users(limit, offset)
 
+    users_schemas = [UserSchema.from_orm(u) for u in users]
     return UserList(
-        users=users,
+        users=users_schemas,
         total=len(users),  # Simplified - in production, get actual count
         page=offset // limit + 1,
         size=limit,

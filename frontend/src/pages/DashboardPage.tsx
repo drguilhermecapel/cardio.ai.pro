@@ -1,19 +1,6 @@
 import React, { useEffect } from 'react'
-import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  Chip,
-  LinearProgress,
-} from '@mui/material'
-import {
-  MonitorHeart,
-  People,
-  Assignment,
-  Warning,
-} from '@mui/icons-material'
+import { Grid, Card, CardContent, Typography, Box, Chip, LinearProgress } from '@mui/material'
+import { MonitorHeart, People, Assignment, Warning } from '@mui/icons-material'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchAnalyses } from '../store/slices/ecgSlice'
 import { fetchUnreadCount } from '../store/slices/notificationSlice'
@@ -76,7 +63,7 @@ const DashboardPage: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Dashboard
       </Typography>
-      
+
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
@@ -135,9 +122,7 @@ const DashboardPage: React.FC = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant="body1">
-                      Analysis #{analysis.analysisId}
-                    </Typography>
+                    <Typography variant="body1">Analysis #{analysis.analysisId}</Typography>
                     <Typography variant="body2" color="text.secondary">
                       Patient ID: {analysis.patientId}
                     </Typography>
@@ -149,8 +134,8 @@ const DashboardPage: React.FC = () => {
                         analysis.status === 'completed'
                           ? 'success'
                           : analysis.status === 'pending'
-                          ? 'warning'
-                          : 'default'
+                            ? 'warning'
+                            : 'default'
                       }
                       size="small"
                     />
@@ -163,7 +148,7 @@ const DashboardPage: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={4}>
           <Card>
             <CardContent>
@@ -183,7 +168,7 @@ const DashboardPage: React.FC = () => {
                   {completedAnalyses} of {totalAnalyses} completed
                 </Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" gutterBottom>
                   AI Model Status

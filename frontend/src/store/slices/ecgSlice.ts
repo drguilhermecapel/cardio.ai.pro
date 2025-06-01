@@ -72,22 +72,19 @@ export const fetchAnalyses = createAsyncThunk(
   }
 )
 
-export const fetchAnalysis = createAsyncThunk(
-  'ecg/fetchAnalysis',
-  async (analysisId: string) => {
-    const response = await fetch(`/api/v1/ecg/${analysisId}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
+export const fetchAnalysis = createAsyncThunk('ecg/fetchAnalysis', async (analysisId: string) => {
+  const response = await fetch(`/api/v1/ecg/${analysisId}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  })
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch analysis')
-    }
-
-    return response.json()
+  if (!response.ok) {
+    throw new Error('Failed to fetch analysis')
   }
-)
+
+  return response.json()
+})
 
 const ecgSlice = createSlice({
   name: 'ecg',
@@ -110,7 +107,7 @@ const ecgSlice = createSlice({
         state.error = null
         state.uploadProgress = 0
       })
-      .addCase(uploadECG.fulfilled, (state) => {
+      .addCase(uploadECG.fulfilled, state => {
         state.isLoading = false
         state.uploadProgress = 100
       })

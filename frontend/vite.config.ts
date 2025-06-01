@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
       },
       manifest: {
         name: 'CardioAI Pro',
@@ -22,25 +22,25 @@ export default defineConfig({
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
-      }
-    })
+            type: 'image/png',
+          },
+        ],
+      },
+    }),
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src')
-    }
+      '@': resolve(__dirname, './src'),
+    },
   },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/test/setup.ts'
-  }
+    setupFiles: './src/test/setup.ts',
+  },
 })

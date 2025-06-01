@@ -64,8 +64,9 @@ async def get_my_validations(
         current_user.id, limit, offset
     )
 
+    validations_schemas = [Validation.from_orm(v) for v in validations]
     return ValidationList(
-        validations=validations,
+        validations=validations_schemas,
         total=len(validations),  # Simplified
         page=offset // limit + 1,
         size=limit,

@@ -28,7 +28,9 @@ const ValidationsPage: React.FC = () => {
     dispatch(fetchMyValidations({}))
   }, [dispatch])
 
-  const getStatusColor = (status: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  const getStatusColor = (
+    status: string
+  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
     switch (status) {
       case 'completed':
         return 'success'
@@ -105,17 +107,14 @@ const ValidationsPage: React.FC = () => {
                         'No notes'
                       )}
                     </TableCell>
-                    <TableCell>
-                      {new Date(validation.createdAt).toLocaleDateString()}
-                    </TableCell>
+                    <TableCell>{new Date(validation.createdAt).toLocaleDateString()}</TableCell>
                     <TableCell>
                       {validation.status === 'pending' ? (
                         <Button
                           size="small"
                           variant="contained"
                           startIcon={<Assignment />}
-                          onClick={() => {
-                          }}
+                          onClick={() => {}}
                         >
                           Review
                         </Button>
@@ -124,8 +123,7 @@ const ValidationsPage: React.FC = () => {
                           size="small"
                           variant="outlined"
                           startIcon={<CheckCircle />}
-                          onClick={() => {
-                          }}
+                          onClick={() => {}}
                         >
                           View
                         </Button>

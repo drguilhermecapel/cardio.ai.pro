@@ -9,18 +9,11 @@ import {
   ListItemText,
   ListItemIcon,
   Chip,
-
   LinearProgress,
   Alert,
   IconButton,
 } from '@mui/material'
-import {
-  Notifications,
-  Warning,
-  Info,
-  CheckCircle,
-  MarkEmailRead,
-} from '@mui/icons-material'
+import { Notifications, Warning, Info, CheckCircle, MarkEmailRead } from '@mui/icons-material'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchNotifications, markAsRead } from '../store/slices/notificationSlice'
 
@@ -36,7 +29,9 @@ const NotificationsPage: React.FC = () => {
     dispatch(markAsRead(notificationId))
   }
 
-  const getPriorityColor = (priority: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  const getPriorityColor = (
+    priority: string
+  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
     switch (priority) {
       case 'critical':
         return 'error'
@@ -105,23 +100,17 @@ const NotificationsPage: React.FC = () => {
                   )
                 }
               >
-                <ListItemIcon>
-                  {getNotificationIcon(notification.notificationType)}
-                </ListItemIcon>
+                <ListItemIcon>{getNotificationIcon(notification.notificationType)}</ListItemIcon>
                 <ListItemText
                   primary={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="subtitle1">
-                        {notification.title}
-                      </Typography>
+                      <Typography variant="subtitle1">{notification.title}</Typography>
                       <Chip
                         label={notification.priority}
                         color={getPriorityColor(notification.priority)}
                         size="small"
                       />
-                      {!notification.isRead && (
-                        <Chip label="New" color="primary" size="small" />
-                      )}
+                      {!notification.isRead && <Chip label="New" color="primary" size="small" />}
                     </Box>
                   }
                   secondary={
@@ -139,10 +128,7 @@ const NotificationsPage: React.FC = () => {
             ))}
             {notifications.length === 0 && !isLoading && (
               <ListItem>
-                <ListItemText
-                  primary="No notifications"
-                  secondary="You're all caught up!"
-                />
+                <ListItemText primary="No notifications" secondary="You're all caught up!" />
               </ListItem>
             )}
           </List>

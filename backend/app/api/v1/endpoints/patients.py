@@ -96,8 +96,9 @@ async def list_patients(
 
     patients, total = await patient_service.get_patients(limit, offset)
 
+    patients_schemas = [Patient.from_orm(p) for p in patients]
     return PatientList(
-        patients=patients,
+        patients=patients_schemas,
         total=total,
         page=offset // limit + 1,
         size=limit,
@@ -119,8 +120,9 @@ async def search_patients(
         search_params.query, search_params.search_fields, limit, offset
     )
 
+    patients_schemas = [Patient.from_orm(p) for p in patients]
     return PatientList(
-        patients=patients,
+        patients=patients_schemas,
         total=total,
         page=offset // limit + 1,
         size=limit,
