@@ -54,13 +54,13 @@ class PatientRepository:
 
     async def get_patients(self, limit: int = 50, offset: int = 0) -> tuple[list[Patient], int]:
         """Get patients with pagination."""
-        count_stmt = select(func.count(Patient.id)).where(Patient.is_active == True)
+        count_stmt = select(func.count(Patient.id)).where(Patient.is_active)
         count_result = await self.db.execute(count_stmt)
         total = count_result.scalar()
 
         stmt = (
             select(Patient)
-            .where(Patient.is_active == True)
+            .where(Patient.is_active)
             .order_by(Patient.last_name, Patient.first_name)
             .limit(limit)
             .offset(offset)
@@ -87,14 +87,14 @@ class PatientRepository:
 
         count_stmt = (
             select(func.count(Patient.id))
-            .where(and_(Patient.is_active == True, or_(*conditions)))
+            .where(and_(Patient.is_active, or_(*conditions)))
         )
         count_result = await self.db.execute(count_stmt)
         total = count_result.scalar()
 
         stmt = (
             select(Patient)
-            .where(and_(Patient.is_active == True, or_(*conditions)))
+            .where(and_(Patient.is_active, or_(*conditions)))
             .order_by(Patient.last_name, Patient.first_name)
             .limit(limit)
             .offset(offset)
