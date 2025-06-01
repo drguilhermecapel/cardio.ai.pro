@@ -154,11 +154,11 @@ async def test_get_analysis_by_id_not_found(ecg_service):
 @pytest.mark.asyncio
 async def test_get_analyses_by_patient(ecg_service, test_db):
     """Test retrieving ECG analyses by patient ID."""
-    patient_id = 1
+    patient_id = 999  # Use unique patient ID to avoid conflicts
     
     for i in range(3):
         analysis = ECGAnalysis(
-            analysis_id=f"test_analysis_patient_{i:03d}",
+            analysis_id=f"test_analysis_patient_999_{i:03d}",
             patient_id=patient_id,
             file_path=f"/tmp/test_{i}.txt",
             original_filename=f"test_{i}.txt",

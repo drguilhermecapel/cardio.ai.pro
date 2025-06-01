@@ -92,3 +92,30 @@ async def test_get_analyses_for_patient(ecg_service):
     )
     
     assert len(analyses) == 2
+
+
+@pytest.mark.asyncio
+async def test_delete_analysis(ecg_service):
+    """Test deleting ECG analysis."""
+    ecg_service.repository.delete_analysis = AsyncMock(return_value=True)
+    
+    success = await ecg_service.delete_analysis(1)
+    
+    assert success is True
+    ecg_service.repository.delete_analysis.assert_called_once_with(1)
+
+
+@pytest.mark.asyncio
+async def test_search_analyses_with_correct_params(ecg_service):
+    """Test searching analyses with correct parameters."""
+    mock_analyses = [ECGAnalysis(), ECGAnalysis()]
+    ecg_service.repository.search_analyses = AsyncMock(return_value=(mock_analyses, 2))
+    
+    analyses, total = await ecg_service.search_analyses(
+        filters={"patient_id": 1, "status": "completed"},
+        limit=10,
+        offset=0
+    )
+    
+    assert len(analyses) == 2
+    assert total == 2
