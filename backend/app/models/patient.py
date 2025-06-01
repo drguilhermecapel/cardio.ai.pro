@@ -54,7 +54,7 @@ class Patient(Base):
     consent_for_research: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     consent_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     data_retention_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    
+
     created_by: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
 
     analyses: Mapped[list["ECGAnalysis"]] = relationship(
