@@ -6,6 +6,7 @@ import logging
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 class SignalQualityAnalyzer:
     """Analyzer for ECG signal quality assessment."""
 
-    async def analyze_quality(self, ecg_data: np.ndarray) -> dict[str, Any]:
+    async def analyze_quality(self, ecg_data: NDArray[np.float64]) -> dict[str, Any]:
         """Analyze ECG signal quality."""
         try:
             quality_metrics = {
@@ -32,30 +33,51 @@ class SignalQualityAnalyzer:
                 lead_quality = await self._analyze_lead_quality(lead_data)
                 lead_scores.append(lead_quality["score"])
 
-                quality_metrics["artifacts_detected"].extend(lead_quality.get("artifacts", []))
-                quality_metrics["quality_issues"].extend(lead_quality.get("issues", []))
+                artifacts = lead_quality.get("artifacts", [])
+                if isinstance(artifacts, list):
+                    artifacts_detected = quality_metrics["artifacts_detected"]
+                    if isinstance(artifacts_detected, list):
+                        artifacts_detected.extend(artifacts)
+                
+                issues = lead_quality.get("issues", [])
+                if isinstance(issues, list):
+                    quality_issues = quality_metrics["quality_issues"]
+                    if isinstance(quality_issues, list):
+                        quality_issues.extend(issues)
 
             quality_metrics["overall_score"] = np.mean(lead_scores)
             quality_metrics["noise_level"] = await self._calculate_noise_level(ecg_data)
             quality_metrics["baseline_wander"] = await self._calculate_baseline_wander(ecg_data)
             quality_metrics["signal_to_noise_ratio"] = await self._calculate_snr(ecg_data)
 
-            if quality_metrics["overall_score"] < 0.5:
-                quality_metrics["quality_issues"].append("Poor overall signal quality")
+            overall_score = quality_metrics["overall_score"]
+            if isinstance(overall_score, (int, float)) and overall_score < 0.5:
+                quality_issues = quality_metrics["quality_issues"]
+                if isinstance(quality_issues, list):
+                    quality_issues.append("Poor overall signal quality")
 
-            if quality_metrics["noise_level"] > 0.3:
-                quality_metrics["quality_issues"].append("High noise level detected")
+            noise_level = quality_metrics["noise_level"]
+            if isinstance(noise_level, (int, float)) and noise_level > 0.3:
+                quality_issues = quality_metrics["quality_issues"]
+                if isinstance(quality_issues, list):
+                    quality_issues.append("High noise level detected")
 
-            if quality_metrics["baseline_wander"] > 0.2:
-                quality_metrics["quality_issues"].append("Significant baseline wander")
+            baseline_wander = quality_metrics["baseline_wander"]
+            if isinstance(baseline_wander, (int, float)) and baseline_wander > 0.2:
+                quality_issues = quality_metrics["quality_issues"]
+                if isinstance(quality_issues, list):
+                    quality_issues.append("Significant baseline wander")
 
-            if quality_metrics["signal_to_noise_ratio"] < 10:
-                quality_metrics["quality_issues"].append("Low signal-to-noise ratio")
+            snr = quality_metrics["signal_to_noise_ratio"]
+            if isinstance(snr, (int, float)) and snr < 10:
+                quality_issues = quality_metrics["quality_issues"]
+                if isinstance(quality_issues, list):
+                    quality_issues.append("Low signal-to-noise ratio")
 
             return quality_metrics
 
         except Exception as e:
-            logger.error(f"Signal quality analysis failed: {str(e)}")
+            logger.error("Signal quality analysis failed: %s", str(e))
             return {
                 "overall_score": 0.5,
                 "noise_level": 0.0,
@@ -65,7 +87,7 @@ class SignalQualityAnalyzer:
                 "quality_issues": ["Quality analysis failed"],
             }
 
-    async def _analyze_lead_quality(self, lead_data: np.ndarray) -> dict[str, Any]:
+    async def _analyze_lead_quality(self, lead_data: NDArray[np.float64]) -> dict[str, Any]:
         """Analyze quality of a single ECG lead."""
         try:
             quality = {
@@ -76,19 +98,31 @@ class SignalQualityAnalyzer:
 
             if np.std(lead_data) < 0.01:
                 quality["score"] = 0.0
-                quality["artifacts"].append("flat_line")
-                quality["issues"].append("Possible electrode disconnection")
+                artifacts_list = quality["artifacts"]
+                if isinstance(artifacts_list, list):
+                    artifacts_list.append("flat_line")
+                issues_list = quality["issues"]
+                if isinstance(issues_list, list):
+                    issues_list.append("Possible electrode disconnection")
                 return quality
 
             max_val = np.max(np.abs(lead_data))
             if max_val > 10:  # Assuming mV units
-                quality["artifacts"].append("saturation")
-                quality["issues"].append("Signal saturation detected")
+                artifacts_list = quality["artifacts"]
+                if isinstance(artifacts_list, list):
+                    artifacts_list.append("saturation")
+                issues_list = quality["issues"]
+                if isinstance(issues_list, list):
+                    issues_list.append("Signal saturation detected")
 
             signal_variance = np.var(lead_data)
             if signal_variance > 5:
-                quality["artifacts"].append("high_noise")
-                quality["issues"].append("High noise level")
+                artifacts_list = quality["artifacts"]
+                if isinstance(artifacts_list, list):
+                    artifacts_list.append("high_noise")
+                issues_list = quality["issues"]
+                if isinstance(issues_list, list):
+                    issues_list.append("High noise level")
 
             score = 1.0
 
@@ -106,10 +140,10 @@ class SignalQualityAnalyzer:
             return quality
 
         except Exception as e:
-            logger.error(f"Lead quality analysis failed: {str(e)}")
+            logger.error("Lead quality analysis failed: %s", str(e))
             return {"score": 0.5, "artifacts": [], "issues": []}
 
-    async def _calculate_noise_level(self, ecg_data: np.ndarray) -> float:
+    async def _calculate_noise_level(self, ecg_data: NDArray[np.float64]) -> float:
         """Calculate noise level in ECG signal."""
         try:
             noise_levels = []
@@ -130,10 +164,10 @@ class SignalQualityAnalyzer:
             return float(np.mean(noise_levels))
 
         except Exception as e:
-            logger.error(f"Noise level calculation failed: {str(e)}")
+            logger.error("Noise level calculation failed: %s", str(e))
             return 0.1
 
-    async def _calculate_baseline_wander(self, ecg_data: np.ndarray) -> float:
+    async def _calculate_baseline_wander(self, ecg_data: NDArray[np.float64]) -> float:
         """Calculate baseline wander in ECG signal."""
         try:
             wander_levels = []
@@ -154,10 +188,10 @@ class SignalQualityAnalyzer:
             return float(np.mean(wander_levels))
 
         except Exception as e:
-            logger.error(f"Baseline wander calculation failed: {str(e)}")
+            logger.error("Baseline wander calculation failed: %s", str(e))
             return 0.1
 
-    async def _calculate_snr(self, ecg_data: np.ndarray) -> float:
+    async def _calculate_snr(self, ecg_data: NDArray[np.float64]) -> float:
         """Calculate signal-to-noise ratio."""
         try:
             snr_values = []
@@ -179,5 +213,5 @@ class SignalQualityAnalyzer:
             return float(np.mean(snr_values))
 
         except Exception as e:
-            logger.error(f"SNR calculation failed: {str(e)}")
-            return 20.0  # Default reasonable SNR
+            logger.error("SNR calculation failed: %s", str(e))
+            return 20.0

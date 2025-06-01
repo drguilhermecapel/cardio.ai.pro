@@ -59,48 +59,41 @@ class ECGAnalysisService:
 
             ecg_metadata = await self.processor.extract_metadata(file_path)
 
-            analysis = ECGAnalysis(
-                analysis_id=analysis_id,
-                patient_id=patient_id,
-                created_by=created_by,
-                original_filename=original_filename,
-                file_path=file_path,
-                file_hash=file_hash,
-                file_size=file_size,
-                acquisition_date=ecg_metadata.get("acquisition_date", datetime.utcnow()),
-                sample_rate=ecg_metadata.get("sample_rate", settings.ECG_SAMPLE_RATE),
-                duration_seconds=ecg_metadata.get("duration_seconds", 10.0),
-                leads_count=ecg_metadata.get("leads_count", 12),
-                leads_names=ecg_metadata.get("leads_names", settings.ECG_LEADS),
-                device_manufacturer=ecg_metadata.get("device_manufacturer"),
-                device_model=ecg_metadata.get("device_model"),
-                device_serial=ecg_metadata.get("device_serial"),
-                status=AnalysisStatus.PENDING,
-                clinical_urgency=ClinicalUrgency.LOW,
-                requires_immediate_attention=False,
-                is_validated=False,
-                validation_required=True,
-            )
+            analysis = ECGAnalysis()
+            analysis.analysis_id = analysis_id
+            analysis.patient_id = patient_id
+            analysis.created_by = created_by
+            analysis.original_filename = original_filename
+            analysis.file_path = file_path
+            analysis.file_hash = file_hash
+            analysis.file_size = file_size
+            analysis.acquisition_date = ecg_metadata.get("acquisition_date", datetime.utcnow())
+            analysis.sample_rate = ecg_metadata.get("sample_rate", settings.ECG_SAMPLE_RATE)
+            analysis.duration_seconds = ecg_metadata.get("duration_seconds", 10.0)
+            analysis.leads_count = ecg_metadata.get("leads_count", 12)
+            analysis.leads_names = ecg_metadata.get("leads_names", settings.ECG_LEADS)
+            analysis.device_manufacturer = ecg_metadata.get("device_manufacturer")
+            analysis.device_model = ecg_metadata.get("device_model")
+            analysis.device_serial = ecg_metadata.get("device_serial")
+            analysis.status = AnalysisStatus.PENDING
+            analysis.clinical_urgency = ClinicalUrgency.LOW
+            analysis.requires_immediate_attention = False
+            analysis.is_validated = False
+            analysis.validation_required = True
 
             analysis = await self.repository.create_analysis(analysis)
 
             asyncio.create_task(self._process_analysis_async(analysis.id))
 
             logger.info(
-                "ECG analysis created",
-                analysis_id=analysis_id,
-                patient_id=patient_id,
-                filename=original_filename,
+                f"ECG analysis created: analysis_id={analysis_id}, patient_id={patient_id}, filename={original_filename}"
             )
 
             return analysis
 
         except Exception as e:
             logger.error(
-                "Failed to create ECG analysis",
-                error=str(e),
-                patient_id=patient_id,
-                filename=original_filename,
+                f"Failed to create ECG analysis: error={str(e)}, patient_id={patient_id}, filename={original_filename}"
             )
             raise ECGProcessingException(f"Failed to create analysis: {str(e)}") from e
 
@@ -125,7 +118,7 @@ class ECGAnalysisService:
             )
 
             ai_results = await self.ml_service.analyze_ecg(
-                preprocessed_data,
+                preprocessed_data.astype(np.float32),
                 analysis.sample_rate,
                 analysis.leads_names,
             )
@@ -172,35 +165,29 @@ class ECGAnalysisService:
             await self.repository.update_analysis(analysis_id, update_data)
 
             for measurement_data in measurements.get("detailed_measurements", []):
-                measurement = ECGMeasurement(
-                    analysis_id=analysis_id,
-                    **measurement_data
-                )
+                measurement = ECGMeasurement()
+                measurement.analysis_id = analysis_id
+                for key, value in measurement_data.items():
+                    setattr(measurement, key, value)
                 await self.repository.create_measurement(measurement)
 
             for annotation_data in annotations:
-                annotation = ECGAnnotation(
-                    analysis_id=analysis_id,
-                    **annotation_data
-                )
+                annotation = ECGAnnotation()
+                annotation.analysis_id = analysis_id
+                for key, value in annotation_data.items():
+                    setattr(annotation, key, value)
                 await self.repository.create_annotation(annotation)
 
             if clinical_assessment.get("critical", False):
                 await self.validation_service.create_urgent_validation(analysis_id)
 
             logger.info(
-                "ECG analysis completed successfully",
-                analysis_id=analysis.analysis_id,
-                processing_time_ms=processing_duration_ms,
-                confidence=ai_results.get("confidence"),
-                urgency=clinical_assessment.get("urgency"),
+                f"ECG analysis completed successfully: analysis_id={analysis.analysis_id}, processing_time_ms={processing_duration_ms}, confidence={ai_results.get('confidence')}, urgency={clinical_assessment.get('urgency')}"
             )
 
         except Exception as e:
             logger.error(
-                "ECG analysis processing failed",
-                analysis_id=analysis_id,
-                error=str(e),
+                f"ECG analysis processing failed: analysis_id={analysis_id}, error={str(e)}"
             )
 
             await self.repository.update_analysis(
@@ -234,12 +221,12 @@ class ECGAnalysisService:
         return file_hash, file_size
 
     async def _extract_measurements(
-        self, ecg_data: np.ndarray, sample_rate: int
+        self, ecg_data: np.ndarray[Any, np.dtype[np.float64]], sample_rate: int
     ) -> dict[str, Any]:
         """Extract clinical measurements from ECG data."""
         try:
-            measurements = {}
-            detailed_measurements = []
+            measurements: dict[str, Any] = {}
+            detailed_measurements: list[dict[str, Any]] = []
 
             signals, info = nk.ecg_process(ecg_data, sampling_rate=sample_rate)
 
@@ -286,7 +273,7 @@ class ECGAnalysisService:
 
     async def _generate_annotations(
         self,
-        ecg_data: np.ndarray,
+        ecg_data: np.ndarray[Any, np.dtype[np.float64]],
         ai_results: dict[str, Any],
         sample_rate: int,
     ) -> list[dict[str, Any]]:
@@ -360,7 +347,9 @@ class ECGAnalysisService:
                     assessment["critical"] = True
                     assessment["primary_diagnosis"] = condition.replace("_", " ").title()
                     assessment["category"] = DiagnosisCategory.ARRHYTHMIA
-                    assessment["recommendations"].append("Immediate medical attention required")
+                    recommendations = assessment["recommendations"]
+                    if isinstance(recommendations, list):
+                        recommendations.append("Immediate medical attention required")
                     break
 
             if not assessment["critical"]:
@@ -375,11 +364,15 @@ class ECGAnalysisService:
                         assessment["urgency"] = ClinicalUrgency.HIGH
                         assessment["primary_diagnosis"] = condition.replace("_", " ").title()
                         assessment["category"] = DiagnosisCategory.ARRHYTHMIA
-                        assessment["recommendations"].append("Cardiology consultation recommended")
+                        recommendations = assessment["recommendations"]
+                        if isinstance(recommendations, list):
+                            recommendations.append("Cardiology consultation recommended")
                         break
 
             if confidence < 0.7:
-                assessment["recommendations"].append("Manual review recommended due to low AI confidence")
+                recommendations = assessment["recommendations"]
+                if isinstance(recommendations, list):
+                    recommendations.append("Manual review recommended due to low AI confidence")
 
             return assessment
 

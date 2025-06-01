@@ -105,7 +105,8 @@ def verify_password_reset_token(token: str) -> str | None:
         if decoded_token.get("type") != "password_reset":
             return None
 
-        return decoded_token["sub"]
+        sub = decoded_token.get("sub")
+        return str(sub) if sub is not None else None
 
     except JWTError:
         return None

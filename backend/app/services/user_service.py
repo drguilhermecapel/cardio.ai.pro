@@ -33,19 +33,18 @@ class UserService:
         """Create a new user."""
         hashed_password = get_password_hash(user_data.password)
 
-        user = User(
-            username=user_data.username,
-            email=user_data.email,
-            hashed_password=hashed_password,
-            first_name=user_data.first_name,
-            last_name=user_data.last_name,
-            phone=user_data.phone,
-            role=user_data.role,
-            license_number=user_data.license_number,
-            specialty=user_data.specialty,
-            institution=user_data.institution,
-            experience_years=user_data.experience_years,
-        )
+        user = User()
+        user.username = user_data.username
+        user.email = user_data.email
+        user.hashed_password = hashed_password
+        user.first_name = user_data.first_name
+        user.last_name = user_data.last_name
+        user.phone = user_data.phone
+        user.role = user_data.role
+        user.license_number = user_data.license_number
+        user.specialty = user_data.specialty
+        user.institution = user_data.institution
+        user.experience_years = user_data.experience_years
 
         return await self.repository.create_user(user)
 
@@ -78,10 +77,12 @@ class UserService:
             payload = jwt.decode(
                 refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
             )
-            username: str = payload.get("sub")
-            token_type: str = payload.get("type")
+            username_raw = payload.get("sub")
+            token_type_raw = payload.get("type")
+            username: str = str(username_raw) if username_raw is not None else ""
+            token_type: str = str(token_type_raw) if token_type_raw is not None else ""
 
-            if username is None or token_type != "refresh":
+            if not username or token_type != "refresh":
                 return None
 
         except JWTError:
@@ -106,8 +107,9 @@ class UserService:
             payload = jwt.decode(
                 token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
             )
-            username: str = payload.get("sub")
-            if username is None:
+            username_raw = payload.get("sub")
+            username: str = str(username_raw) if username_raw is not None else ""
+            if not username:
                 raise credentials_exception
 
         except JWTError as e:

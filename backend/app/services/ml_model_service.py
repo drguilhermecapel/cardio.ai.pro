@@ -84,9 +84,7 @@ class MLModelService:
             }
 
             logger.info(
-                f"Loaded model {model_name}",
-                input_shape=input_meta.shape,
-                providers=session.get_providers(),
+                f"Loaded model {model_name} with input_shape={input_meta.shape} providers={session.get_providers()}"
             )
 
         except Exception as e:
@@ -95,7 +93,7 @@ class MLModelService:
 
     async def analyze_ecg(
         self,
-        ecg_data: np.ndarray,
+        ecg_data: "np.ndarray[Any, np.dtype[np.float32]]",
         sample_rate: int,
         leads_names: list[str],
     ) -> dict[str, Any]:
@@ -117,7 +115,11 @@ class MLModelService:
 
             if "ecg_classifier" in self.models:
                 classification_results = await self._run_classification(processed_data)
-                results["predictions"].update(classification_results["predictions"])
+                predictions = classification_results["predictions"]
+                if isinstance(predictions, dict):
+                    results_predictions = results["predictions"]
+                    if isinstance(results_predictions, dict):
+                        results_predictions.update(predictions)
                 results["confidence"] = classification_results["confidence"]
 
                 if classification_results["confidence"] > 0.5:
@@ -129,7 +131,11 @@ class MLModelService:
             if "rhythm_detector" in self.models:
                 rhythm_results = await self._run_rhythm_detection(processed_data)
                 results["rhythm"] = rhythm_results["rhythm"]
-                results["events"].extend(rhythm_results.get("events", []))
+                events = rhythm_results.get("events", [])
+                if isinstance(events, list):
+                    results_events = results["events"]
+                    if isinstance(results_events, list):
+                        results_events.extend(events)
 
             if "quality_assessor" in self.models:
                 quality_results = await self._run_quality_assessment(processed_data)
@@ -140,10 +146,7 @@ class MLModelService:
             results["processing_time_seconds"] = processing_time
 
             logger.info(
-                "ECG analysis completed",
-                confidence=results["confidence"],
-                rhythm=results["rhythm"],
-                processing_time=processing_time,
+                f"ECG analysis completed with confidence={results['confidence']} rhythm={results['rhythm']} processing_time={processing_time}"
             )
 
             return results
@@ -154,18 +157,18 @@ class MLModelService:
 
     async def _preprocess_for_inference(
         self,
-        ecg_data: np.ndarray,
+        ecg_data: "np.ndarray[Any, np.dtype[np.float32]]",
         sample_rate: int,
         leads_names: list[str],
-    ) -> np.ndarray:
+    ) -> "np.ndarray[Any, np.dtype[np.float32]]":
         """Preprocess ECG data for model inference."""
         try:
             if ecg_data.shape[1] < 12:
-                padded_data = np.zeros((ecg_data.shape[0], 12))
+                padded_data = np.zeros((ecg_data.shape[0], 12), dtype=np.float32)
                 padded_data[:, :ecg_data.shape[1]] = ecg_data
                 ecg_data = padded_data
             elif ecg_data.shape[1] > 12:
-                ecg_data = ecg_data[:, :12]
+                ecg_data = ecg_data[:, :12].astype(np.float32)
 
             target_sample_rate = 500
             if sample_rate != target_sample_rate:
@@ -179,7 +182,7 @@ class MLModelService:
             if ecg_data.shape[0] > target_length:
                 ecg_data = ecg_data[:target_length, :]
             elif ecg_data.shape[0] < target_length:
-                padded_data = np.zeros((target_length, 12))
+                padded_data = np.zeros((target_length, 12), dtype=np.float32)
                 padded_data[:ecg_data.shape[0], :] = ecg_data
                 ecg_data = padded_data
 
@@ -191,7 +194,7 @@ class MLModelService:
             logger.error(f"Preprocessing failed: {str(e)}")
             raise MLModelException(f"Preprocessing failed: {str(e)}") from e
 
-    async def _run_classification(self, data: np.ndarray) -> dict[str, Any]:
+    async def _run_classification(self, data: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
         """Run ECG classification model."""
         try:
             model = self.models["ecg_classifier"]
@@ -234,7 +237,7 @@ class MLModelService:
             logger.error(f"Classification failed: {str(e)}")
             return {"predictions": {}, "confidence": 0.0}
 
-    async def _run_rhythm_detection(self, data: np.ndarray) -> dict[str, Any]:
+    async def _run_rhythm_detection(self, data: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
         """Run rhythm detection model."""
         try:
             model = self.models["rhythm_detector"]
@@ -275,7 +278,7 @@ class MLModelService:
             logger.error(f"Rhythm detection failed: {str(e)}")
             return {"rhythm": "Unknown", "events": []}
 
-    async def _run_quality_assessment(self, data: np.ndarray) -> dict[str, Any]:
+    async def _run_quality_assessment(self, data: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
         """Run signal quality assessment model."""
         try:
             model = self.models["quality_assessor"]
@@ -300,7 +303,7 @@ class MLModelService:
             return {"score": 0.5, "issues": ["Quality assessment unavailable"]}
 
     async def _generate_interpretability(
-        self, data: np.ndarray, classification_results: dict[str, Any]
+        self, data: "np.ndarray[Any, np.dtype[np.float32]]", classification_results: dict[str, Any]
     ) -> dict[str, Any]:
         """Generate interpretability maps using gradient-based methods."""
         try:
@@ -310,9 +313,12 @@ class MLModelService:
                 "explanation": "AI detected patterns consistent with the predicted condition",
             }
 
-            for _i, lead in enumerate(["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]):
+            leads = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+            for _i, lead in enumerate(leads):
                 attention = np.random.random(data.shape[2]) * classification_results["confidence"]
-                interpretability["attention_maps"][lead] = attention.tolist()
+                attention_maps = interpretability["attention_maps"]
+                if isinstance(attention_maps, dict):
+                    attention_maps[lead] = attention.tolist()
 
             predictions = classification_results["predictions"]
             top_prediction = max(predictions.items(), key=lambda x: x[1])
