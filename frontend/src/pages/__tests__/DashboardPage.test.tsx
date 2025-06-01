@@ -26,7 +26,7 @@ vi.mock('../../hooks/redux', () => ({
   useAppDispatch: vi.fn(() => vi.fn())
 }));
 
-const renderWithProviders = (component: React.ReactElement) => {
+const renderWithProviders = (component: React.ReactElement): ReturnType<typeof render> => {
   return render(
     <Provider store={store}>
       <BrowserRouter>

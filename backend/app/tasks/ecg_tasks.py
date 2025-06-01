@@ -9,7 +9,7 @@ from app.db.session import AsyncSessionLocal
 
 # from app.repositories.ecg_repository import ECGRepository  # Reserved for future use
 from app.services.ecg_service import ECGAnalysisService
-from app.services.ml_service import MLService
+from app.services.ml_model_service import MLModelService
 from app.services.validation_service import ValidationService
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def process_ecg_analysis(self: Any, analysis_id: int) -> dict[str, Any]:
         async def _process() -> dict[str, Any]:
             async with AsyncSessionLocal() as db:
                 # ecg_repo = ECGRepository(db)  # Reserved for future use
-                ml_service = MLService()
+                ml_service = MLModelService()
                 from app.services.notification_service import NotificationService
                 notification_service = NotificationService(db)
                 validation_service = ValidationService(db, notification_service)

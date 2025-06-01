@@ -240,11 +240,13 @@ pids
 ehthumbs.db
 Thumbs.db
 
-# ML Models
-models/
+# ML Models - exclude large model files but allow source code
 *.onnx
 *.pkl
 *.joblib
+*.h5
+*.bin
+*.model
 
 # Data files
 data/
