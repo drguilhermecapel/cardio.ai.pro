@@ -5,8 +5,8 @@ from typing import Any
 from celery import current_task
 
 from app.core.celery import celery_app
-from app.db.session import async_sessionmaker
-from app.repositories.ecg_repository import ECGAnalysisRepository
+from app.db.session import AsyncSessionLocal
+from app.repositories.ecg_repository import ECGRepository
 from app.services.ecg_service import ECGAnalysisService
 from app.services.ml_service import MLService
 from app.services.validation_service import ValidationService
@@ -23,12 +23,15 @@ def process_ecg_analysis(self, analysis_id: int) -> dict[str, Any]:
         )
 
         async def _process() -> dict[str, Any]:
-            async with async_sessionmaker() as db:
-                ecg_repo = ECGAnalysisRepository(db)
+            async with AsyncSessionLocal() as db:
+                ecg_repo = ECGRepository(db)
                 ml_service = MLService()
-                validation_service = ValidationService(db)
+                from app.services.notification_service import NotificationService
+                notification_service = NotificationService(db)
+                validation_service = ValidationService(db, notification_service)
                 service = ECGAnalysisService(db, ml_service, validation_service)
-                return await service._process_analysis_async(analysis_id)
+                await service._process_analysis_async(analysis_id)
+                return {"status": "completed", "analysis_id": analysis_id}
 
         result = asyncio.run(_process())
 

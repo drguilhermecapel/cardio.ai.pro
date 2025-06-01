@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.constants import UserRoles
 from app.core.security import get_password_hash
-from app.db.session import async_sessionmaker
+from app.db.session import AsyncSessionLocal
 from app.models.user import User
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 async def init_db() -> None:
     """Initialize database with default data."""
-    async with async_sessionmaker() as session:
+    async with AsyncSessionLocal() as session:
         await create_admin_user(session)
 
 
@@ -34,16 +34,15 @@ async def create_admin_user(session: AsyncSession) -> User | None:
             logger.info("Admin user already exists")
             return existing_user
 
-        admin_user = User(
-            username=settings.FIRST_SUPERUSER,
-            email=settings.FIRST_SUPERUSER_EMAIL,
-            hashed_password=get_password_hash(settings.FIRST_SUPERUSER_PASSWORD),
-            first_name="Admin",
-            last_name="User",
-            role=UserRoles.ADMIN,
-            is_active=True,
-            is_superuser=True,
-        )
+        admin_user = User()
+        admin_user.username = settings.FIRST_SUPERUSER
+        admin_user.email = settings.FIRST_SUPERUSER_EMAIL
+        admin_user.hashed_password = get_password_hash(settings.FIRST_SUPERUSER_PASSWORD)
+        admin_user.first_name = "Admin"
+        admin_user.last_name = "User"
+        admin_user.role = UserRoles.ADMIN
+        admin_user.is_active = True
+        admin_user.is_superuser = True
 
         session.add(admin_user)
         await session.commit()

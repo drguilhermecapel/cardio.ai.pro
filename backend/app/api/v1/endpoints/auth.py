@@ -44,13 +44,14 @@ async def login(
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        subject=user.username, expires_delta=access_token_expires
     )
 
     refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     refresh_token = create_access_token(
-        data={"sub": user.username, "type": "refresh"},
-        expires_delta=refresh_token_expires
+        subject=user.username,
+        expires_delta=refresh_token_expires,
+        additional_claims={"type": "refresh"}
     )
 
     await user_service.update_last_login(user.id)
@@ -106,7 +107,7 @@ async def refresh_token(
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        subject=user.username, expires_delta=access_token_expires
     )
 
     return {
