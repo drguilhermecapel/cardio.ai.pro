@@ -115,7 +115,7 @@ class ValidationRepository:
         """Get available validators based on criteria."""
         stmt = (
             select(User)
-            .where(User.is_active is True)
+            .where(User.is_active == True)
             .where(User.role.in_([
                 UserRoles.TECHNICIAN,
                 UserRoles.PHYSICIAN,
@@ -167,7 +167,7 @@ class ValidationRepository:
         """Get active validation rules."""
         stmt = (
             select(ValidationRule)
-            .where(ValidationRule.is_active is True)
+            .where(ValidationRule.is_active == True)
             .order_by(ValidationRule.name)
         )
         result = await self.db.execute(stmt)
@@ -219,7 +219,7 @@ class ValidationRepository:
             status_stmt = status_stmt.where(Validation.created_at <= date_to)
 
         status_result = await self.db.execute(status_stmt)
-        status_counts = dict(status_result.all())
+        status_counts: dict[str, int] = {str(status): count for status, count in status_result.all()}
 
         avg_time_stmt = select(func.avg(Validation.validation_duration_minutes)).where(
             Validation.validation_duration_minutes.isnot(None)
@@ -237,7 +237,7 @@ class ValidationRepository:
             "status_distribution": status_counts,
             "average_validation_time_minutes": float(avg_validation_time) if avg_validation_time else None,
             "approval_rate": (
-                status_counts.get(ValidationStatus.APPROVED, 0) /
-                max(total_validations, 1) * 100
+                status_counts.get(str(ValidationStatus.APPROVED), 0) /
+                max(total_validations or 1, 1) * 100
             ),
         }

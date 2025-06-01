@@ -43,7 +43,10 @@ class MemoryMonitor:
         """Check if memory usage exceeds threshold."""
         try:
             memory_info = self.get_memory_usage()
-            return memory_info["system_memory_percent"] > threshold_percent
+            system_percent = memory_info["system_memory_percent"]
+            if isinstance(system_percent, (int, float)):
+                return system_percent > threshold_percent
+            return False
         except Exception:
             return False
 
@@ -52,9 +55,10 @@ class MemoryMonitor:
         try:
             memory_info = self.get_memory_usage()
             logger.info(
-                f"Memory usage {context}",
-                process_mb=memory_info["process_memory_mb"],
-                system_percent=memory_info["system_memory_percent"],
+                "Memory usage %s - Process: %.1f MB, System: %.1f%%",
+                context,
+                memory_info["process_memory_mb"],
+                memory_info["system_memory_percent"],
             )
         except Exception as e:
             logger.error(f"Failed to log memory usage: {str(e)}")

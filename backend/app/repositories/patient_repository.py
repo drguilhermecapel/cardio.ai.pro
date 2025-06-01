@@ -54,13 +54,13 @@ class PatientRepository:
 
     async def get_patients(self, limit: int = 50, offset: int = 0) -> tuple[list[Patient], int]:
         """Get patients with pagination."""
-        count_stmt = select(func.count(Patient.id)).where(Patient.is_active is True)
+        count_stmt = select(func.count(Patient.id)).where(Patient.is_active == True)
         count_result = await self.db.execute(count_stmt)
         total = count_result.scalar()
 
         stmt = (
             select(Patient)
-            .where(Patient.is_active is True)
+            .where(Patient.is_active == True)
             .order_by(Patient.last_name, Patient.first_name)
             .limit(limit)
             .offset(offset)
@@ -68,7 +68,7 @@ class PatientRepository:
         result = await self.db.execute(stmt)
         patients = list(result.scalars().all())
 
-        return patients, total
+        return patients, total or 0
 
     async def search_patients(
         self, query: str, search_fields: list[str], limit: int = 50, offset: int = 0
@@ -87,14 +87,14 @@ class PatientRepository:
 
         count_stmt = (
             select(func.count(Patient.id))
-            .where(and_(Patient.is_active is True, or_(*conditions)))
+            .where(and_(Patient.is_active == True, or_(*conditions)))
         )
         count_result = await self.db.execute(count_stmt)
         total = count_result.scalar()
 
         stmt = (
             select(Patient)
-            .where(and_(Patient.is_active is True, or_(*conditions)))
+            .where(and_(Patient.is_active == True, or_(*conditions)))
             .order_by(Patient.last_name, Patient.first_name)
             .limit(limit)
             .offset(offset)
@@ -102,4 +102,4 @@ class PatientRepository:
         result = await self.db.execute(stmt)
         patients = list(result.scalars().all())
 
-        return patients, total
+        return patients, total or 0
