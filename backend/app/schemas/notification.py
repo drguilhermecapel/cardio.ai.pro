@@ -18,6 +18,26 @@ class NotificationBase(BaseModel):
     priority: NotificationPriority
 
 
+class NotificationCreate(NotificationBase):
+    """Notification creation schema."""
+    user_id: int
+    channels: list[str] = []
+    related_resource_type: str | None = None
+    related_resource_id: int | None = None
+    metadata: dict[str, Any] | None = None
+    expires_at: datetime | None = None
+
+
+class NotificationUpdate(BaseModel):
+    """Notification update schema."""
+    title: str | None = None
+    message: str | None = None
+    notification_type: NotificationType | None = None
+    priority: NotificationPriority | None = None
+    is_read: bool | None = None
+    metadata: dict[str, Any] | None = None
+
+
 class NotificationInDB(NotificationBase):
     """Notification in database schema."""
     id: int

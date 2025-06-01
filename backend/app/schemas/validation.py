@@ -20,6 +20,23 @@ class ValidationCreate(ValidationBase):
     pass
 
 
+class ValidationUpdate(BaseModel):
+    """Validation update schema."""
+    status: ValidationStatus | None = None
+    agrees_with_ai: bool | None = None
+    clinical_notes: str | None = None
+    corrected_diagnosis: str | None = None
+    corrected_urgency: str | None = None
+    signal_quality_rating: int | None = Field(None, ge=1, le=5)
+    ai_confidence_rating: int | None = Field(None, ge=1, le=5)
+    overall_quality_score: float | None = Field(None, ge=0.0, le=1.0)
+    recommendations: list[str] | None = None
+    follow_up_required: bool | None = None
+    follow_up_notes: str | None = None
+    validation_duration_minutes: int | None = None
+    digital_signature: str | None = None
+
+
 class ValidationSubmit(BaseModel):
     """Validation submission schema."""
     approved: bool = True
