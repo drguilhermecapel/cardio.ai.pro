@@ -4,7 +4,7 @@ Application configuration settings.
 
 from typing import Any
 
-from pydantic import validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -31,7 +31,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str | None = None
     TEST_DATABASE_URL: str | None = None
 
-    @validator("DATABASE_URL", pre=True)
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
     def assemble_db_connection(cls, v: str | None, values: dict[str, Any]) -> Any:
         """Assemble database URL."""
         if isinstance(v, str):
@@ -43,7 +44,8 @@ class Settings(BaseSettings):
         db = values.get("POSTGRES_DB")
         return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"
 
-    @validator("TEST_DATABASE_URL", pre=True)
+    @field_validator("TEST_DATABASE_URL", mode="before")
+    @classmethod
     def assemble_test_db_connection(cls, v: str | None, values: dict[str, Any]) -> Any:
         """Assemble test database URL."""
         if isinstance(v, str):
@@ -61,7 +63,8 @@ class Settings(BaseSettings):
     REDIS_DB: int = 0
     REDIS_URL: str | None = None
 
-    @validator("REDIS_URL", pre=True)
+    @field_validator("REDIS_URL", mode="before")
+    @classmethod
     def assemble_redis_connection(cls, v: str | None, values: dict[str, Any]) -> str:
         """Assemble Redis URL."""
         if isinstance(v, str):
@@ -77,7 +80,8 @@ class Settings(BaseSettings):
 
     ALLOWED_HOSTS: list[str] = ["*"]
 
-    @validator("ALLOWED_HOSTS", pre=True)
+    @field_validator("ALLOWED_HOSTS", mode="before")
+    @classmethod
     def assemble_cors_origins(cls, v: str | list[str]) -> list[str] | str:
         """Assemble CORS origins."""
         if isinstance(v, str) and not v.startswith("["):
@@ -120,7 +124,8 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str | None = None
     CELERY_RESULT_BACKEND: str | None = None
 
-    @validator("CELERY_BROKER_URL", pre=True)
+    @field_validator("CELERY_BROKER_URL", mode="before")
+    @classmethod
     def assemble_celery_broker(cls, v: str | None, values: dict[str, Any]) -> str:
         """Assemble Celery broker URL."""
         if isinstance(v, str):
@@ -128,7 +133,8 @@ class Settings(BaseSettings):
         redis_url = values.get("REDIS_URL")
         return str(redis_url) if redis_url else "redis://localhost:6379/0"
 
-    @validator("CELERY_RESULT_BACKEND", pre=True)
+    @field_validator("CELERY_RESULT_BACKEND", mode="before")
+    @classmethod
     def assemble_celery_backend(cls, v: str | None, values: dict[str, Any]) -> str:
         """Assemble Celery result backend URL."""
         if isinstance(v, str):

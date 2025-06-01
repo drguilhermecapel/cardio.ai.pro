@@ -4,7 +4,7 @@ Patient schemas.
 
 from datetime import date, datetime
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class PatientBase(BaseModel):
@@ -22,7 +22,8 @@ class PatientBase(BaseModel):
     weight_kg: float | None = Field(None, ge=1.0, le=500.0)
     blood_type: str | None = Field(None, pattern="^(A|B|AB|O)[+-]?$")
 
-    @validator('date_of_birth')
+    @field_validator('date_of_birth')
+    @classmethod
     def validate_date_of_birth(cls, v: date) -> date:
         """Validate date of birth."""
         today = date.today()

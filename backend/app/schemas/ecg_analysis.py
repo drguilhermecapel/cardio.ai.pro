@@ -5,7 +5,7 @@ ECG Analysis schemas.
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from app.core.constants import (
     AnalysisStatus,
@@ -28,7 +28,8 @@ class ECGAnalysisBase(BaseModel):
     device_model: str | None = Field(None, max_length=100)
     device_serial: str | None = Field(None, max_length=50)
 
-    @validator('leads_names')
+    @field_validator('leads_names')
+    @classmethod
     def validate_leads(cls, v: list[str]) -> list[str]:
         """Validate ECG leads."""
         valid_leads = [lead.value for lead in ECGLeads]

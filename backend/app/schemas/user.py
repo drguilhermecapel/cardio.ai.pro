@@ -4,7 +4,7 @@ User schemas.
 
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.core.constants import UserRoles
 
@@ -27,7 +27,8 @@ class UserCreate(UserBase):
     """User creation schema."""
     password: str = Field(..., min_length=8, max_length=100)
 
-    @validator('password')
+    @field_validator('password')
+    @classmethod
     def validate_password(cls, v: str) -> str:
         """Validate password strength."""
         if len(v) < 8:
@@ -87,7 +88,8 @@ class PasswordChange(BaseModel):
     current_password: str
     new_password: str = Field(..., min_length=8, max_length=100)
 
-    @validator('new_password')
+    @field_validator('new_password')
+    @classmethod
     def validate_new_password(cls, v: str) -> str:
         """Validate new password strength."""
         if len(v) < 8:
