@@ -5,7 +5,7 @@ from typing import Any
 from celery import current_task
 
 from app.core.celery import celery_app
-from app.db.session import AsyncSessionLocal
+from app.db.session import get_session_factory
 
 # from app.repositories.ecg_repository import ECGRepository  # Reserved for future use
 from app.services.ecg_service import ECGAnalysisService
@@ -24,7 +24,8 @@ def process_ecg_analysis(self: Any, analysis_id: int) -> dict[str, Any]:
         )
 
         async def _process() -> dict[str, Any]:
-            async with AsyncSessionLocal() as db:
+            session_factory = get_session_factory()
+            async with session_factory() as db:
                 # ecg_repo = ECGRepository(db)  # Reserved for future use
                 ml_service = MLModelService()
                 from app.services.notification_service import NotificationService

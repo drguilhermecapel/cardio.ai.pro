@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.constants import UserRoles
 from app.core.security import get_password_hash
-from app.db.session import AsyncSessionLocal
+from app.db.session import get_session_factory
 from app.models.user import User
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 async def init_db() -> None:
     """Initialize database with default data."""
-    async with AsyncSessionLocal() as session:
+    session_factory = get_session_factory()
+    async with session_factory() as session:
         await create_admin_user(session)
 
 

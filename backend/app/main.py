@@ -22,7 +22,7 @@ from app.core.exceptions import (
     ValidationException,
 )
 from app.core.logging import configure_logging
-from app.db.session import engine
+from app.db.session import get_engine
 
 
 @asynccontextmanager
@@ -33,6 +33,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting CardioAI Pro Backend", version="1.0.0")
 
     try:
+        engine = get_engine()
         async with engine.begin() as conn:
             from sqlalchemy import text
             await conn.execute(text("SELECT 1"))
@@ -44,6 +45,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield
 
     logger.info("Shutting down CardioAI Pro Backend")
+    engine = get_engine()
     await engine.dispose()
 
 
