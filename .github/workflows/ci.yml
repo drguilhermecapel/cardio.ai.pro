@@ -230,30 +230,47 @@ jobs:
       with:
         sarif_file: 'trivy-results.sarif'
     
-    - name: Generate medical compliance report
+    - name: Medical software compliance check
+      run: |
+        echo "🏥 Checking medical-critical dependencies..."
+        CRITICAL_DEPS="numpy scipy pandas asyncpg redis fastapi"
+        for dep in $CRITICAL_DEPS; do
+          echo "Checking $dep..."
+          grep -i "$dep" trivy-results.sarif || echo "✅ $dep: No vulnerabilities found"
+        done
+    
+    - name: Save security report
       if: always()
       run: |
-        echo "🏥 CardioAI Pro Security Compliance Report" > compliance-report.txt
-        echo "Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> compliance-report.txt
-        echo "IEC 62304 Class C - Life Supporting Software" >> compliance-report.txt
-        echo "==========================================" >> compliance-report.txt
+        mkdir -p security-reports
+        cp trivy-results.sarif security-reports/
+        trivy fs . --format json > security-reports/trivy-report.json
+        trivy fs . --format table > security-reports/trivy-report.txt
         
-        if [ -f trivy-results.sarif ]; then
-          trivy fs . --format table >> compliance-report.txt
-          
-          echo -e "\n📊 Medical-Critical Dependencies Analysis:" >> compliance-report.txt
-          for lib in "numpy" "scipy" "fastapi" "asyncpg" "redis" "pydantic"; do
-            echo -n "- $lib: " >> compliance-report.txt
-            grep -q "\"$lib\"" trivy-results.sarif && echo "⚠️ REQUIRES REVIEW" >> compliance-report.txt || echo "✅ CLEAR" >> compliance-report.txt
-          done
-        fi
+        echo "CardioAI Pro Security Scan - $(date)" > security-reports/compliance.txt
+        echo "IEC 62304 Medical Device Software Compliance Check" >> security-reports/compliance.txt
+        echo "=================================================" >> security-reports/compliance.txt
     
-    - name: Upload security compliance artifacts
-      uses: actions/upload-artifact@v3
+    - name: Upload security artifacts
+      uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: security-compliance-$(date +%Y%m%d-%H%M%S)
-        path: |
-          trivy-results.sarif
-          compliance-report.txt
+        name: security-compliance-reports
+        path: security-reports/
         retention-days: 90
+    
+    - name: Generate summary report
+      if: always()
+      run: |
+        echo "## 🔐 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -f trivy-results.sarif ]; then
+          CRITICAL=$(grep -c "CRITICAL" security-reports/trivy-report.txt || true)
+          HIGH=$(grep -c "HIGH" security-reports/trivy-report.txt || true)
+          echo "- Critical vulnerabilities: $CRITICAL" >> $GITHUB_STEP_SUMMARY
+          echo "- High vulnerabilities: $HIGH" >> $GITHUB_STEP_SUMMARY
+          if [ $CRITICAL -gt 0 ]; then
+            echo "❌ Critical vulnerabilities found!" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+        fi
