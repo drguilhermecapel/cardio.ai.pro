@@ -7,7 +7,6 @@ from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.core.config import settings
 from app.db.session import get_db
 from app.main import app
 from app.models.base import Base
@@ -24,6 +23,8 @@ def event_loop():
 @pytest_asyncio.fixture(scope="session")
 async def test_engine():
     """Create test database engine."""
+    from app.core.config import settings
+    
     engine = create_async_engine(
         settings.TEST_DATABASE_URL or settings.DATABASE_URL.replace("/cardioai_pro", "/cardioai_pro_test"),
         echo=False,
