@@ -33,10 +33,11 @@ class Settings(BaseSettings):
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
-    def assemble_db_connection(cls, v: str | None, values: dict[str, Any]) -> Any:
+    def assemble_db_connection(cls, v: str | None, info) -> Any:
         """Assemble database URL."""
         if isinstance(v, str):
             return v
+        values = info.data
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
         host = values.get("POSTGRES_SERVER")
@@ -46,10 +47,11 @@ class Settings(BaseSettings):
 
     @field_validator("TEST_DATABASE_URL", mode="before")
     @classmethod
-    def assemble_test_db_connection(cls, v: str | None, values: dict[str, Any]) -> Any:
+    def assemble_test_db_connection(cls, v: str | None, info) -> Any:
         """Assemble test database URL."""
         if isinstance(v, str):
             return v
+        values = info.data
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
         host = values.get("POSTGRES_SERVER")
@@ -65,11 +67,12 @@ class Settings(BaseSettings):
 
     @field_validator("REDIS_URL", mode="before")
     @classmethod
-    def assemble_redis_connection(cls, v: str | None, values: dict[str, Any]) -> str:
+    def assemble_redis_connection(cls, v: str | None, info) -> str:
         """Assemble Redis URL."""
         if isinstance(v, str):
             return v
 
+        values = info.data
         password = values.get("REDIS_PASSWORD")
         auth = f":{password}@" if password else ""
 
@@ -126,19 +129,21 @@ class Settings(BaseSettings):
 
     @field_validator("CELERY_BROKER_URL", mode="before")
     @classmethod
-    def assemble_celery_broker(cls, v: str | None, values: dict[str, Any]) -> str:
+    def assemble_celery_broker(cls, v: str | None, info) -> str:
         """Assemble Celery broker URL."""
         if isinstance(v, str):
             return v
+        values = info.data
         redis_url = values.get("REDIS_URL")
         return str(redis_url) if redis_url else "redis://localhost:6379/0"
 
     @field_validator("CELERY_RESULT_BACKEND", mode="before")
     @classmethod
-    def assemble_celery_backend(cls, v: str | None, values: dict[str, Any]) -> str:
+    def assemble_celery_backend(cls, v: str | None, info) -> str:
         """Assemble Celery result backend URL."""
         if isinstance(v, str):
             return v
+        values = info.data
         redis_url = values.get("REDIS_URL")
         return str(redis_url) if redis_url else "redis://localhost:6379/0"
 
