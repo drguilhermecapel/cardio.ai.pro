@@ -133,7 +133,7 @@ class ValidationService:
             await self._calculate_quality_metrics(updated_validation.analysis_id, validation_data)
 
             await self._send_validation_notifications(updated_validation)
-            
+
             validation = updated_validation
 
             logger.info(

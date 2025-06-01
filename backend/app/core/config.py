@@ -139,11 +139,11 @@ class Settings(BaseSettings):
     AUDIT_LOG_RETENTION_DAYS: int = 2555  # 7 years
     ENABLE_DIGITAL_SIGNATURES: bool = True
     REQUIRE_AUDIT_TRAIL: bool = True
-    
+
     FIRST_SUPERUSER: str = "admin@cardioai.pro"
     FIRST_SUPERUSER_EMAIL: str = "admin@cardioai.pro"
     FIRST_SUPERUSER_PASSWORD: str = "changeme123"
-    
+
     MAX_ECG_FILE_SIZE: int = 50 * 1024 * 1024  # 50MB
     ECG_UPLOAD_DIR: str = "uploads/ecg"
 
