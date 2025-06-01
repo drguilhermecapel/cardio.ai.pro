@@ -9,7 +9,7 @@ import DashboardPage from '../DashboardPage'
 
 vi.mock('../../hooks/redux', () => ({
   useAppDispatch: vi.fn(() => vi.fn()),
-  useAppSelector: vi.fn((selector) => {
+  useAppSelector: vi.fn(selector => {
     const mockState = {
       ecg: {
         analyses: [],
@@ -26,14 +26,14 @@ vi.mock('../../hooks/redux', () => ({
       },
       auth: {
         isAuthenticated: true,
-        user: { 
+        user: {
           id: 1,
           username: 'testuser',
           email: 'test@example.com',
-          firstName: 'Test', 
-          lastName: 'User', 
+          firstName: 'Test',
+          lastName: 'User',
           role: 'physician',
-          isActive: true
+          isActive: true,
         },
         token: 'mock-token',
         refreshToken: 'mock-refresh-token',
