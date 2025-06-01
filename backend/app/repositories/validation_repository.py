@@ -115,7 +115,7 @@ class ValidationRepository:
         """Get available validators based on criteria."""
         stmt = (
             select(User)
-            .where(User.is_active is True)
+            .where(User.is_active == True)
             .where(User.role.in_([
                 UserRoles.TECHNICIAN,
                 UserRoles.PHYSICIAN,
@@ -167,7 +167,7 @@ class ValidationRepository:
         """Get active validation rules."""
         stmt = (
             select(ValidationRule)
-            .where(ValidationRule.is_active is True)
+            .where(ValidationRule.is_active == True)
             .order_by(ValidationRule.name)
         )
         result = await self.db.execute(stmt)
