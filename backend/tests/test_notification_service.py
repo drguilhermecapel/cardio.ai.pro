@@ -44,6 +44,36 @@ async def test_send_validation_assignment(notification_service):
 
 
 @pytest.mark.asyncio
+async def test_send_critical_rejection_alert(notification_service):
+    """Test sending critical rejection alert."""
+    notification_service.repository.get_critical_alert_recipients = AsyncMock(return_value=[
+        Mock(id=1), Mock(id=2)
+    ])
+    notification_service.repository.create_notification = AsyncMock()
+    notification_service._send_notification = AsyncMock()
+    
+    await notification_service.send_critical_rejection_alert(analysis_id=123)
+    
+    assert notification_service.repository.create_notification.call_count == 2
+    assert notification_service._send_notification.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_send_no_validator_alert(notification_service):
+    """Test sending no validator alert."""
+    notification_service.repository.get_administrators = AsyncMock(return_value=[
+        Mock(id=1), Mock(id=2)
+    ])
+    notification_service.repository.create_notification = AsyncMock()
+    notification_service._send_notification = AsyncMock()
+    
+    await notification_service.send_no_validator_alert(analysis_id=123)
+    
+    assert notification_service.repository.create_notification.call_count == 2
+    assert notification_service._send_notification.call_count == 2
+
+
+@pytest.mark.asyncio
 async def test_send_urgent_validation_alert(notification_service):
     """Test sending urgent validation alert."""
     notification_service.repository.create_notification = AsyncMock()
@@ -109,7 +139,9 @@ async def test_send_quality_alert(notification_service):
 @pytest.mark.asyncio
 async def test_send_system_alert(notification_service):
     """Test sending system alert notification."""
-    notification_service.repository.get_administrators = AsyncMock(return_value=[])
+    notification_service.repository.get_administrators = AsyncMock(return_value=[
+        Mock(id=1), Mock(id=2)
+    ])
     notification_service.repository.create_notification = AsyncMock()
     notification_service._send_notification = AsyncMock()
     
@@ -118,6 +150,9 @@ async def test_send_system_alert(notification_service):
         message="System maintenance scheduled",
         priority=NotificationPriority.HIGH
     )
+    
+    assert notification_service.repository.create_notification.call_count == 2
+    assert notification_service._send_notification.call_count == 2
 
 
 @pytest.mark.asyncio

@@ -20,6 +20,7 @@ def sample_patient_data():
     """Sample patient data."""
     return PatientCreate(
         patient_id="PAT123456",
+        mrn="MRN123456",
         first_name="John",
         last_name="Doe",
         date_of_birth=date(1990, 1, 15),
@@ -27,8 +28,19 @@ def sample_patient_data():
         phone="+1234567890",
         email="john.doe@example.com",
         address="123 Main St, City, State 12345",
+        height_cm=175,
+        weight_kg=70,
+        blood_type="O+",
         emergency_contact_name="Jane Doe",
-        emergency_contact_phone="+0987654321"
+        emergency_contact_phone="+0987654321",
+        emergency_contact_relationship="Spouse",
+        allergies=["Penicillin"],
+        medications=["Aspirin 81mg"],
+        medical_history=["Hypertension"],
+        family_history=["Heart disease"],
+        insurance_provider="Health Insurance Co",
+        insurance_number="INS123456",
+        consent_for_research=True
     )
 
 
