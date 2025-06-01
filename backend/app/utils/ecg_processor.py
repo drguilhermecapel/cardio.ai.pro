@@ -101,7 +101,7 @@ class ECGProcessor:
             data = await self.load_ecg_file(file_path)
             metadata["leads_count"] = data.shape[1]
             sample_rate = metadata.get("sample_rate", 500)
-            if isinstance(sample_rate, (int, float)):
+            if isinstance(sample_rate, int | float):
                 metadata["duration_seconds"] = float(data.shape[0]) / float(sample_rate)
             else:
                 metadata["duration_seconds"] = 10.0

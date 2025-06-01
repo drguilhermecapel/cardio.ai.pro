@@ -38,7 +38,7 @@ class SignalQualityAnalyzer:
                     artifacts_detected = quality_metrics["artifacts_detected"]
                     if isinstance(artifacts_detected, list):
                         artifacts_detected.extend(artifacts)
-                
+
                 issues = lead_quality.get("issues", [])
                 if isinstance(issues, list):
                     quality_issues = quality_metrics["quality_issues"]
@@ -51,25 +51,25 @@ class SignalQualityAnalyzer:
             quality_metrics["signal_to_noise_ratio"] = await self._calculate_snr(ecg_data)
 
             overall_score = quality_metrics["overall_score"]
-            if isinstance(overall_score, (int, float)) and overall_score < 0.5:
+            if isinstance(overall_score, int | float) and overall_score < 0.5:
                 quality_issues = quality_metrics["quality_issues"]
                 if isinstance(quality_issues, list):
                     quality_issues.append("Poor overall signal quality")
 
             noise_level = quality_metrics["noise_level"]
-            if isinstance(noise_level, (int, float)) and noise_level > 0.3:
+            if isinstance(noise_level, int | float) and noise_level > 0.3:
                 quality_issues = quality_metrics["quality_issues"]
                 if isinstance(quality_issues, list):
                     quality_issues.append("High noise level detected")
 
             baseline_wander = quality_metrics["baseline_wander"]
-            if isinstance(baseline_wander, (int, float)) and baseline_wander > 0.2:
+            if isinstance(baseline_wander, int | float) and baseline_wander > 0.2:
                 quality_issues = quality_metrics["quality_issues"]
                 if isinstance(quality_issues, list):
                     quality_issues.append("Significant baseline wander")
 
             snr = quality_metrics["signal_to_noise_ratio"]
-            if isinstance(snr, (int, float)) and snr < 10:
+            if isinstance(snr, int | float) and snr < 10:
                 quality_issues = quality_metrics["quality_issues"]
                 if isinstance(quality_issues, list):
                     quality_issues.append("Low signal-to-noise ratio")

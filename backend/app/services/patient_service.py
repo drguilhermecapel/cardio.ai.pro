@@ -30,26 +30,26 @@ class PatientService:
            (today.month == patient_data.date_of_birth.month and today.day < patient_data.date_of_birth.day):
             age -= 1
 
-        bmi = None
-        if patient_data.height_cm and patient_data.weight_kg:
-            height_m = patient_data.height_cm / 100
-            bmi = patient_data.weight_kg / (height_m ** 2)
+        # bmi = None
+        # if patient_data.height_cm and patient_data.weight_kg:
+        #     height_m = patient_data.height_cm / 100
+        #     bmi = patient_data.weight_kg / (height_m ** 2)
 
         allergies_json = None
         if patient_data.allergies:
             import json
             allergies_json = json.dumps(patient_data.allergies)
-            
+
         medications_json = None
         if patient_data.medications:
             import json
             medications_json = json.dumps(patient_data.medications)
-            
+
         medical_history_json = None
         if patient_data.medical_history:
             import json
             medical_history_json = json.dumps(patient_data.medical_history)
-            
+
         family_history_json = None
         if patient_data.family_history:
             import json
