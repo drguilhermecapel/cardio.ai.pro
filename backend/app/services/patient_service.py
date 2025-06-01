@@ -4,6 +4,7 @@ Patient Service - Patient management functionality.
 
 import logging
 from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,34 +35,51 @@ class PatientService:
             height_m = patient_data.height_cm / 100
             bmi = patient_data.weight_kg / (height_m ** 2)
 
-        patient = Patient(
-            patient_id=patient_data.patient_id,
-            mrn=patient_data.mrn,
-            first_name=patient_data.first_name,
-            last_name=patient_data.last_name,
-            date_of_birth=patient_data.date_of_birth,
-            age=age,
-            gender=patient_data.gender,
-            phone=patient_data.phone,
-            email=patient_data.email,
-            address=patient_data.address,
-            height_cm=patient_data.height_cm,
-            weight_kg=patient_data.weight_kg,
-            bmi=bmi,
-            blood_type=patient_data.blood_type,
-            emergency_contact_name=patient_data.emergency_contact_name,
-            emergency_contact_phone=patient_data.emergency_contact_phone,
-            emergency_contact_relationship=patient_data.emergency_contact_relationship,
-            allergies=patient_data.allergies,
-            medications=patient_data.medications,
-            medical_history=patient_data.medical_history,
-            family_history=patient_data.family_history,
-            insurance_provider=patient_data.insurance_provider,
-            insurance_number=patient_data.insurance_number,
-            consent_for_research=patient_data.consent_for_research,
-            consent_date=datetime.utcnow() if patient_data.consent_for_research else None,
-            created_by=created_by,
-        )
+        allergies_json = None
+        if patient_data.allergies:
+            import json
+            allergies_json = json.dumps(patient_data.allergies)
+            
+        medications_json = None
+        if patient_data.medications:
+            import json
+            medications_json = json.dumps(patient_data.medications)
+            
+        medical_history_json = None
+        if patient_data.medical_history:
+            import json
+            medical_history_json = json.dumps(patient_data.medical_history)
+            
+        family_history_json = None
+        if patient_data.family_history:
+            import json
+            family_history_json = json.dumps(patient_data.family_history)
+
+        patient = Patient()
+        patient.patient_id = patient_data.patient_id
+        patient.mrn = patient_data.mrn
+        patient.first_name = patient_data.first_name
+        patient.last_name = patient_data.last_name
+        patient.date_of_birth = patient_data.date_of_birth
+        patient.gender = patient_data.gender
+        patient.phone = patient_data.phone
+        patient.email = patient_data.email
+        patient.address = patient_data.address
+        patient.height_cm = patient_data.height_cm
+        patient.weight_kg = patient_data.weight_kg
+        patient.blood_type = patient_data.blood_type
+        patient.emergency_contact_name = patient_data.emergency_contact_name
+        patient.emergency_contact_phone = patient_data.emergency_contact_phone
+        patient.emergency_contact_relationship = patient_data.emergency_contact_relationship
+        patient.allergies = allergies_json
+        patient.medications = medications_json
+        patient.medical_history = medical_history_json
+        patient.family_history = family_history_json
+        patient.insurance_provider = patient_data.insurance_provider
+        patient.insurance_number = patient_data.insurance_number
+        patient.consent_for_research = patient_data.consent_for_research
+        patient.consent_date = datetime.utcnow() if patient_data.consent_for_research else None
+        patient.created_by = created_by
 
         return await self.repository.create_patient(patient)
 
@@ -69,7 +87,7 @@ class PatientService:
         """Get patient by patient ID."""
         return await self.repository.get_patient_by_patient_id(patient_id)
 
-    async def update_patient(self, patient_id: int, update_data: dict) -> Patient | None:
+    async def update_patient(self, patient_id: int, update_data: dict[str, Any]) -> Patient | None:
         """Update patient information."""
         if 'height_cm' in update_data or 'weight_kg' in update_data:
             patient = await self.repository.get_patient_by_id(patient_id)

@@ -105,7 +105,7 @@ class PatientSearch(BaseModel):
     query: str = Field(..., min_length=1, max_length=100)
     search_fields: list[str] = Field(
         default=["patient_id", "mrn", "first_name", "last_name", "email"],
-        min_items=1
+        min_length=1
     )
 
 

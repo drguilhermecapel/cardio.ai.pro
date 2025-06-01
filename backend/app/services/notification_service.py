@@ -33,16 +33,15 @@ class NotificationService:
         try:
             priority = self._map_urgency_to_priority(urgency)
 
-            notification = Notification(
-                user_id=validator_id,
-                title="New ECG Validation Assignment",
-                message=f"You have been assigned to validate ECG analysis #{analysis_id}",
-                notification_type=NotificationType.VALIDATION_REMINDER,
-                priority=priority,
-                channels=[NotificationChannel.IN_APP, NotificationChannel.EMAIL],
-                related_resource_type="ecg_analysis",
-                related_resource_id=analysis_id,
-            )
+            notification = Notification()
+            notification.user_id = validator_id
+            notification.title = "New ECG Validation Assignment"
+            notification.message = f"You have been assigned to validate ECG analysis #{analysis_id}"
+            notification.notification_type = NotificationType.VALIDATION_REMINDER
+            notification.priority = priority
+            notification.channels = [NotificationChannel.IN_APP, NotificationChannel.EMAIL]
+            notification.related_resource_type = "ecg_analysis"
+            notification.related_resource_id = analysis_id
 
             await self.repository.create_notification(notification)
             await self._send_notification(notification)
@@ -55,21 +54,20 @@ class NotificationService:
     ) -> None:
         """Send urgent validation alert."""
         try:
-            notification = Notification(
-                user_id=validator_id,
-                title="URGENT: Critical ECG Requires Immediate Validation",
-                message=f"Critical ECG analysis #{analysis_id} requires immediate validation",
-                notification_type=NotificationType.CRITICAL_FINDING,
-                priority=NotificationPriority.CRITICAL,
-                channels=[
-                    NotificationChannel.IN_APP,
-                    NotificationChannel.EMAIL,
-                    NotificationChannel.SMS,
-                    NotificationChannel.PUSH,
-                ],
-                related_resource_type="ecg_analysis",
-                related_resource_id=analysis_id,
-            )
+            notification = Notification()
+            notification.user_id = validator_id
+            notification.title = "URGENT: Critical ECG Requires Immediate Validation"
+            notification.message = f"Critical ECG analysis #{analysis_id} requires immediate validation"
+            notification.notification_type = NotificationType.CRITICAL_FINDING
+            notification.priority = NotificationPriority.CRITICAL
+            notification.channels = [
+                NotificationChannel.IN_APP,
+                NotificationChannel.EMAIL,
+                NotificationChannel.SMS,
+                NotificationChannel.PUSH,
+            ]
+            notification.related_resource_type = "ecg_analysis"
+            notification.related_resource_id = analysis_id
 
             await self.repository.create_notification(notification)
             await self._send_notification(notification)
@@ -82,16 +80,15 @@ class NotificationService:
     ) -> None:
         """Send validation completion notification."""
         try:
-            notification = Notification(
-                user_id=user_id,
-                title="ECG Validation Complete",
-                message=f"ECG analysis #{analysis_id} validation completed with status: {status}",
-                notification_type=NotificationType.ANALYSIS_COMPLETE,
-                priority=NotificationPriority.NORMAL,
-                channels=[NotificationChannel.IN_APP, NotificationChannel.EMAIL],
-                related_resource_type="ecg_analysis",
-                related_resource_id=analysis_id,
-            )
+            notification = Notification()
+            notification.user_id = user_id
+            notification.title = "ECG Validation Complete"
+            notification.message = f"ECG analysis #{analysis_id} validation completed with status: {status}"
+            notification.notification_type = NotificationType.ANALYSIS_COMPLETE
+            notification.priority = NotificationPriority.NORMAL
+            notification.channels = [NotificationChannel.IN_APP, NotificationChannel.EMAIL]
+            notification.related_resource_type = "ecg_analysis"
+            notification.related_resource_id = analysis_id
 
             await self.repository.create_notification(notification)
             await self._send_notification(notification)
@@ -105,20 +102,19 @@ class NotificationService:
             recipients = await self.repository.get_critical_alert_recipients()
 
             for recipient in recipients:
-                notification = Notification(
-                    user_id=recipient.id,
-                    title="ALERT: Critical ECG Analysis Rejected",
-                    message=f"Critical ECG analysis #{analysis_id} was rejected during validation",
-                    notification_type=NotificationType.CRITICAL_FINDING,
-                    priority=NotificationPriority.CRITICAL,
-                    channels=[
-                        NotificationChannel.IN_APP,
-                        NotificationChannel.EMAIL,
-                        NotificationChannel.SMS,
-                    ],
-                    related_resource_type="ecg_analysis",
-                    related_resource_id=analysis_id,
-                )
+                notification = Notification()
+                notification.user_id = recipient.id
+                notification.title = "ALERT: Critical ECG Analysis Rejected"
+                notification.message = f"Critical ECG analysis #{analysis_id} was rejected during validation"
+                notification.notification_type = NotificationType.CRITICAL_FINDING
+                notification.priority = NotificationPriority.CRITICAL
+                notification.channels = [
+                    NotificationChannel.IN_APP,
+                    NotificationChannel.EMAIL,
+                    NotificationChannel.SMS,
+                ]
+                notification.related_resource_type = "ecg_analysis"
+                notification.related_resource_id = analysis_id
 
                 await self.repository.create_notification(notification)
                 await self._send_notification(notification)
@@ -132,20 +128,19 @@ class NotificationService:
             admins = await self.repository.get_administrators()
 
             for admin in admins:
-                notification = Notification(
-                    user_id=admin.id,
-                    title="ALERT: No Validators Available",
-                    message=f"No validators available for critical ECG analysis #{analysis_id}",
-                    notification_type=NotificationType.SYSTEM_ALERT,
-                    priority=NotificationPriority.CRITICAL,
-                    channels=[
-                        NotificationChannel.IN_APP,
-                        NotificationChannel.EMAIL,
-                        NotificationChannel.PHONE_CALL,
-                    ],
-                    related_resource_type="ecg_analysis",
-                    related_resource_id=analysis_id,
-                )
+                notification = Notification()
+                notification.user_id = admin.id
+                notification.title = "ALERT: No Validators Available"
+                notification.message = f"No validators available for critical ECG analysis #{analysis_id}"
+                notification.notification_type = NotificationType.SYSTEM_ALERT
+                notification.priority = NotificationPriority.CRITICAL
+                notification.channels = [
+                    NotificationChannel.IN_APP,
+                    NotificationChannel.EMAIL,
+                    NotificationChannel.PHONE_CALL,
+                ]
+                notification.related_resource_type = "ecg_analysis"
+                notification.related_resource_id = analysis_id
 
                 await self.repository.create_notification(notification)
                 await self._send_notification(notification)
@@ -164,16 +159,15 @@ class NotificationService:
             if has_critical_findings:
                 channels.extend([NotificationChannel.SMS, NotificationChannel.PUSH])
 
-            notification = Notification(
-                user_id=user_id,
-                title="ECG Analysis Complete",
-                message=f"ECG analysis #{analysis_id} has been completed",
-                notification_type=NotificationType.ANALYSIS_COMPLETE,
-                priority=priority,
-                channels=channels,
-                related_resource_type="ecg_analysis",
-                related_resource_id=analysis_id,
-            )
+            notification = Notification()
+            notification.user_id = user_id
+            notification.title = "ECG Analysis Complete"
+            notification.message = f"ECG analysis #{analysis_id} has been completed"
+            notification.notification_type = NotificationType.ANALYSIS_COMPLETE
+            notification.priority = priority
+            notification.channels = channels
+            notification.related_resource_type = "ecg_analysis"
+            notification.related_resource_id = analysis_id
 
             await self.repository.create_notification(notification)
             await self._send_notification(notification)
@@ -188,17 +182,16 @@ class NotificationService:
         try:
             issues_text = ", ".join(quality_issues)
 
-            notification = Notification(
-                user_id=user_id,
-                title="ECG Quality Alert",
-                message=f"Quality issues detected in ECG analysis #{analysis_id}: {issues_text}",
-                notification_type=NotificationType.QUALITY_ALERT,
-                priority=NotificationPriority.MEDIUM,
-                channels=[NotificationChannel.IN_APP, NotificationChannel.EMAIL],
-                related_resource_type="ecg_analysis",
-                related_resource_id=analysis_id,
-                metadata={"quality_issues": quality_issues},
-            )
+            notification = Notification()
+            notification.user_id = user_id
+            notification.title = "ECG Quality Alert"
+            notification.message = f"Quality issues detected in ECG analysis #{analysis_id}: {issues_text}"
+            notification.notification_type = NotificationType.QUALITY_ALERT
+            notification.priority = NotificationPriority.MEDIUM
+            notification.channels = [NotificationChannel.IN_APP, NotificationChannel.EMAIL]
+            notification.related_resource_type = "ecg_analysis"
+            notification.related_resource_id = analysis_id
+            notification.notification_metadata = {"quality_issues": quality_issues}
 
             await self.repository.create_notification(notification)
             await self._send_notification(notification)
@@ -214,14 +207,13 @@ class NotificationService:
             admins = await self.repository.get_administrators()
 
             for admin in admins:
-                notification = Notification(
-                    user_id=admin.id,
-                    title=title,
-                    message=message,
-                    notification_type=NotificationType.SYSTEM_ALERT,
-                    priority=priority,
-                    channels=[NotificationChannel.IN_APP, NotificationChannel.EMAIL],
-                )
+                notification = Notification()
+                notification.user_id = admin.id
+                notification.title = title
+                notification.message = message
+                notification.notification_type = NotificationType.SYSTEM_ALERT
+                notification.priority = priority
+                notification.channels = [NotificationChannel.IN_APP, NotificationChannel.EMAIL]
 
                 await self.repository.create_notification(notification)
                 await self._send_notification(notification)
@@ -255,9 +247,7 @@ class NotificationService:
 
                 except Exception as e:
                     logger.error(
-                        f"Failed to send notification via {channel}",
-                        notification_id=notification.id,
-                        error=str(e),
+                        f"Failed to send notification via {channel}: notification_id={notification.id}, error={str(e)}"
                     )
 
             await self.repository.mark_notification_sent(notification.id)

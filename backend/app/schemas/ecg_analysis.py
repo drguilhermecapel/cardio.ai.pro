@@ -23,7 +23,7 @@ class ECGAnalysisBase(BaseModel):
     sample_rate: int = Field(..., ge=100, le=2000)
     duration_seconds: float = Field(..., ge=1.0, le=300.0)
     leads_count: int = Field(..., ge=1, le=15)
-    leads_names: list[str] = Field(..., min_items=1, max_items=15)
+    leads_names: list[str] = Field(..., min_length=1, max_length=15)
     device_manufacturer: str | None = Field(None, max_length=100)
     device_model: str | None = Field(None, max_length=100)
     device_serial: str | None = Field(None, max_length=50)
