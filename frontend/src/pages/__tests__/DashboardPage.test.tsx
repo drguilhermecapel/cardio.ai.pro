@@ -4,27 +4,48 @@ import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from '@mui/material/styles'
 import { describe, it, expect, vi } from 'vitest'
-import { store } from '../../store'
 import { theme } from '../../theme'
 import DashboardPage from '../DashboardPage'
 
 vi.mock('../../hooks/redux', () => ({
-  useAppSelector: vi.fn(() => ({
-    auth: {
-      isAuthenticated: true,
-      user: { firstName: 'Test', lastName: 'User', role: 'physician' },
-    },
-    dashboard: {
-      metrics: {
-        analysesToday: 15,
-        pendingValidations: 3,
-        criticalAlerts: 1,
-        systemHealth: 'healthy',
-      },
-    },
-  })),
   useAppDispatch: vi.fn(() => vi.fn()),
+  useAppSelector: vi.fn((selector) => {
+    const mockState = {
+      ecg: {
+        analyses: [],
+        isLoading: false,
+        error: null,
+        currentAnalysis: null,
+        uploadProgress: 0,
+      },
+      notification: {
+        unreadCount: 0,
+        notifications: [],
+        isLoading: false,
+        error: null,
+      },
+      auth: {
+        isAuthenticated: true,
+        user: { 
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com',
+          firstName: 'Test', 
+          lastName: 'User', 
+          role: 'physician',
+          isActive: true
+        },
+        token: 'mock-token',
+        refreshToken: 'mock-refresh-token',
+        isLoading: false,
+        error: null,
+      },
+    }
+    return selector(mockState)
+  }),
 }))
+
+import { store } from '../../store'
 
 const renderWithProviders = (component: React.ReactElement): ReturnType<typeof render> => {
   return render(
@@ -44,7 +65,7 @@ describe('DashboardPage', () => {
 
   it('displays dashboard metrics', () => {
     renderWithProviders(<DashboardPage />)
-    expect(screen.getByText('Análises Hoje')).toBeDefined()
-    expect(screen.getByText('Validações Pendentes')).toBeDefined()
+    expect(screen.getByText('Total Analyses')).toBeDefined()
+    expect(screen.getByText('Pending')).toBeDefined()
   })
 })
