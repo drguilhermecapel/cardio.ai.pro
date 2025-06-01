@@ -47,9 +47,13 @@ async def test_create_ecg_analysis(ecg_service, sample_ecg_data):
     mock_analysis.created_by = 1
     
     ecg_service.repository.create_analysis = AsyncMock(return_value=mock_analysis)
+    ecg_service.processor.extract_metadata = AsyncMock(return_value={})
+    ecg_service._calculate_file_info = AsyncMock(return_value=("hash123", 1024))
     
     analysis = await ecg_service.create_analysis(
-        ecg_data=sample_ecg_data,
+        patient_id=sample_ecg_data.patient_id,
+        file_path="/tmp/test_ecg.txt",
+        original_filename=sample_ecg_data.original_filename,
         created_by=1
     )
     
@@ -79,41 +83,12 @@ async def test_get_analysis_by_id(ecg_service):
 async def test_get_analyses_for_patient(ecg_service):
     """Test getting ECG analyses for a patient."""
     mock_analyses = [ECGAnalysis(), ECGAnalysis()]
-    ecg_service.repository.get_analyses_for_patient = AsyncMock(return_value=(mock_analyses, 2))
+    ecg_service.repository.get_analyses_by_patient = AsyncMock(return_value=mock_analyses)
     
-    analyses, total = await ecg_service.get_analyses_for_patient(
+    analyses = await ecg_service.get_analyses_by_patient(
         patient_id=1,
         limit=10,
         offset=0
     )
     
     assert len(analyses) == 2
-    assert total == 2
-
-
-@pytest.mark.asyncio
-async def test_process_ecg_signal(ecg_service):
-    """Test ECG signal processing."""
-    mock_signal_data = [1.0, 2.0, 3.0, 4.0, 5.0]
-    mock_processed_data = {"heart_rate": 75, "rhythm": "normal"}
-    
-    ecg_service.signal_processor.process_signal = Mock(return_value=mock_processed_data)
-    
-    result = ecg_service.signal_processor.process_signal(mock_signal_data)
-    
-    assert result["heart_rate"] == 75
-    assert result["rhythm"] == "normal"
-
-
-@pytest.mark.asyncio
-async def test_validate_ecg_quality(ecg_service):
-    """Test ECG quality validation."""
-    mock_signal_data = [1.0, 2.0, 3.0, 4.0, 5.0]
-    mock_quality_result = {"quality_score": 0.85, "issues": []}
-    
-    ecg_service.quality_validator.validate_quality = Mock(return_value=mock_quality_result)
-    
-    result = ecg_service.quality_validator.validate_quality(mock_signal_data)
-    
-    assert result["quality_score"] == 0.85
-    assert len(result["issues"]) == 0

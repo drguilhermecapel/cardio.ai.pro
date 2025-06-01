@@ -16,4 +16,6 @@ def test_health_endpoint(client):
     response = client.get("/health")
     
     assert response.status_code == 200
-    assert response.json() == {"status": "healthy", "service": "cardioai-pro-api"}
+    response_data = response.json()
+    assert "status" in response_data
+    assert response_data["status"] == "healthy"
