@@ -218,10 +218,42 @@ jobs:
         scan-ref: '.'
         format: 'sarif'
         output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH,MEDIUM'
+        ignore-unfixed: false
+        vuln-type: 'os,library'
+        skip-dirs: 'node_modules,__pycache__'
     
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3
       if: always()
+      continue-on-error: true
       with:
         sarif_file: 'trivy-results.sarif'
-        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Generate medical compliance report
+      if: always()
+      run: |
+        echo "🏥 CardioAI Pro Security Compliance Report" > compliance-report.txt
+        echo "Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> compliance-report.txt
+        echo "IEC 62304 Class C - Life Supporting Software" >> compliance-report.txt
+        echo "==========================================" >> compliance-report.txt
+        
+        if [ -f trivy-results.sarif ]; then
+          trivy fs . --format table >> compliance-report.txt
+          
+          echo -e "\n📊 Medical-Critical Dependencies Analysis:" >> compliance-report.txt
+          for lib in "numpy" "scipy" "fastapi" "asyncpg" "redis" "pydantic"; do
+            echo -n "- $lib: " >> compliance-report.txt
+            grep -q "\"$lib\"" trivy-results.sarif && echo "⚠️ REQUIRES REVIEW" >> compliance-report.txt || echo "✅ CLEAR" >> compliance-report.txt
+          done
+        fi
+    
+    - name: Upload security compliance artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-compliance-$(date +%Y%m%d-%H%M%S)
+        path: |
+          trivy-results.sarif
+          compliance-report.txt
+        retention-days: 90
