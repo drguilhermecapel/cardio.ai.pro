@@ -2,7 +2,10 @@
 Application configuration settings.
 """
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Type
 
 from pydantic import field_validator, ValidationInfo
 from pydantic_settings import BaseSettings
@@ -33,7 +36,7 @@ class Settings(BaseSettings):
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
-    def assemble_db_connection(cls, v: str | None, info: ValidationInfo) -> Any:
+    def assemble_db_connection(cls: "Type[Settings]", v: str | None, info: ValidationInfo) -> Any:
         """Assemble database URL."""
         if isinstance(v, str):
             return v
@@ -47,7 +50,7 @@ class Settings(BaseSettings):
 
     @field_validator("TEST_DATABASE_URL", mode="before")
     @classmethod
-    def assemble_test_db_connection(cls, v: str | None, info: ValidationInfo) -> Any:
+    def assemble_test_db_connection(cls: "Type[Settings]", v: str | None, info: ValidationInfo) -> Any:
         """Assemble test database URL."""
         if isinstance(v, str):
             return v
@@ -67,7 +70,7 @@ class Settings(BaseSettings):
 
     @field_validator("REDIS_URL", mode="before")
     @classmethod
-    def assemble_redis_connection(cls, v: str | None, info: ValidationInfo) -> str:
+    def assemble_redis_connection(cls: "Type[Settings]", v: str | None, info: ValidationInfo) -> str:
         """Assemble Redis URL."""
         if isinstance(v, str):
             return v
@@ -129,7 +132,7 @@ class Settings(BaseSettings):
 
     @field_validator("CELERY_BROKER_URL", mode="before")
     @classmethod
-    def assemble_celery_broker(cls, v: str | None, info: ValidationInfo) -> str:
+    def assemble_celery_broker(cls: "Type[Settings]", v: str | None, info: ValidationInfo) -> str:
         """Assemble Celery broker URL."""
         if isinstance(v, str):
             return v
@@ -139,7 +142,7 @@ class Settings(BaseSettings):
 
     @field_validator("CELERY_RESULT_BACKEND", mode="before")
     @classmethod
-    def assemble_celery_backend(cls, v: str | None, info: ValidationInfo) -> str:
+    def assemble_celery_backend(cls: "Type[Settings]", v: str | None, info: ValidationInfo) -> str:
         """Assemble Celery result backend URL."""
         if isinstance(v, str):
             return v
