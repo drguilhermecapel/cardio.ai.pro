@@ -14,6 +14,10 @@ vi.mock('../../hooks/redux', () => ({
       isAuthenticated: true,
       user: { firstName: 'Test', lastName: 'User', role: 'physician' },
     },
+    ecg: {
+      analyses: [],
+      isLoading: false,
+    },
     notification: {
       unreadCount: 0,
     },
@@ -47,6 +51,6 @@ describe('Layout', () => {
         <div>Test Content</div>
       </Layout>
     )
-    expect(screen.getByText('CardioAI Pro')).toBeDefined()
+    expect(screen.getAllByText('CardioAI Pro')[0]).toBeDefined()
   })
 })
