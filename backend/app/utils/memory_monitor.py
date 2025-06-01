@@ -44,7 +44,7 @@ class MemoryMonitor:
         try:
             memory_info = self.get_memory_usage()
             system_percent = memory_info["system_memory_percent"]
-            if isinstance(system_percent, (int, float)):
+            if isinstance(system_percent, int | float):
                 return system_percent > threshold_percent
             return False
         except Exception:
