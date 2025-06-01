@@ -38,7 +38,7 @@ class NotificationRepository:
         )
 
         if unread_only:
-            stmt = stmt.where(Notification.is_read is False)
+            stmt = stmt.where(Notification.is_read.is_(False))
 
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
@@ -72,7 +72,7 @@ class NotificationRepository:
             .where(
                 and_(
                     Notification.user_id == user_id,
-                    Notification.is_read is False,
+                    Notification.is_read.is_(False),
                 )
             )
         )
@@ -97,12 +97,13 @@ class NotificationRepository:
             .where(
                 and_(
                     Notification.user_id == user_id,
-                    Notification.is_read is False,
+                    Notification.is_read.is_(False),
                 )
             )
         )
         result = await self.db.execute(stmt)
-        return result.scalar()
+        count = result.scalar()
+        return count or 0
 
     async def mark_notification_sent(self, notification_id: int) -> bool:
         """Mark notification as sent."""
@@ -140,7 +141,7 @@ class NotificationRepository:
             select(User)
             .where(
                 and_(
-                    User.is_active is True,
+                    User.is_active.is_(True),
                     User.role == UserRoles.ADMIN,
                 )
             )
@@ -154,7 +155,7 @@ class NotificationRepository:
             select(User)
             .where(
                 and_(
-                    User.is_active is True,
+                    User.is_active.is_(True),
                     User.role.in_([UserRoles.ADMIN, UserRoles.CARDIOLOGIST]),
                 )
             )

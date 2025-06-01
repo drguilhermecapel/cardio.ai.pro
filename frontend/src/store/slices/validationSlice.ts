@@ -48,7 +48,7 @@ export const fetchMyValidations = createAsyncThunk(
 
 export const submitValidation = createAsyncThunk(
   'validation/submitValidation',
-  async (data: { validationId: number; validationData: any }) => {
+  async (data: { validationId: number; validationData: Record<string, unknown> }) => {
     const response = await fetch(`/api/v1/validations/${data.validationId}/submit`, {
       method: 'POST',
       headers: {

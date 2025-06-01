@@ -9,6 +9,7 @@ from typing import Any
 
 import neurokit2 as nk
 import numpy as np
+from numpy.typing import NDArray
 
 from app.core.exceptions import ECGProcessingException
 
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 class ECGProcessor:
     """ECG signal processing and file handling."""
 
-    async def load_ecg_file(self, file_path: str) -> np.ndarray:
+    async def load_ecg_file(self, file_path: str) -> NDArray[np.float64]:
         """Load ECG data from file."""
         try:
             path = Path(file_path)
@@ -35,10 +36,10 @@ class ECGProcessor:
                 raise ECGProcessingException(f"Unsupported file format: {path.suffix}")
 
         except Exception as e:
-            logger.error(f"Failed to load ECG file {file_path}: {str(e)}")
+            logger.error("Failed to load ECG file %s: %s", file_path, str(e))
             raise ECGProcessingException(f"Failed to load ECG file: {str(e)}") from e
 
-    async def _load_csv(self, file_path: str) -> np.ndarray:
+    async def _load_csv(self, file_path: str) -> NDArray[np.float64]:
         """Load ECG data from CSV file."""
         try:
             data = np.loadtxt(file_path, delimiter=',', skiprows=1)
@@ -48,7 +49,7 @@ class ECGProcessor:
         except Exception as e:
             raise ECGProcessingException(f"Failed to load CSV file: {str(e)}") from e
 
-    async def _load_text(self, file_path: str) -> np.ndarray:
+    async def _load_text(self, file_path: str) -> NDArray[np.float64]:
         """Load ECG data from text file."""
         try:
             data = np.loadtxt(file_path)
@@ -58,7 +59,7 @@ class ECGProcessor:
         except Exception as e:
             raise ECGProcessingException(f"Failed to load text file: {str(e)}") from e
 
-    async def _load_xml(self, file_path: str) -> np.ndarray:
+    async def _load_xml(self, file_path: str) -> NDArray[np.float64]:
         """Load ECG data from XML file (simplified implementation)."""
         try:
             import xml.etree.ElementTree as ET
@@ -99,12 +100,16 @@ class ECGProcessor:
 
             data = await self.load_ecg_file(file_path)
             metadata["leads_count"] = data.shape[1]
-            metadata["duration_seconds"] = data.shape[0] / metadata["sample_rate"]
+            sample_rate = metadata.get("sample_rate", 500)
+            if isinstance(sample_rate, (int, float)):
+                metadata["duration_seconds"] = float(data.shape[0]) / float(sample_rate)
+            else:
+                metadata["duration_seconds"] = 10.0
 
             return metadata
 
         except Exception as e:
-            logger.error(f"Failed to extract metadata from {file_path}: {str(e)}")
+            logger.error("Failed to extract metadata from %s: %s", file_path, str(e))
             return {
                 "acquisition_date": datetime.utcnow(),
                 "sample_rate": 500,
@@ -121,40 +126,41 @@ class ECGProcessor:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-            metadata = {}
+            metadata: dict[str, Any] = {}
 
             sample_rate_elem = root.find('.//sampleRate')
-            if sample_rate_elem is not None:
+            if sample_rate_elem is not None and sample_rate_elem.text is not None:
                 metadata["sample_rate"] = int(sample_rate_elem.text)
 
             date_elem = root.find('.//acquisitionDate')
             if date_elem is not None:
-                try:
-                    metadata["acquisition_date"] = datetime.fromisoformat(date_elem.text)
-                except Exception:
-                    pass
+                if date_elem.text is not None:
+                    try:
+                        metadata["acquisition_date"] = datetime.fromisoformat(date_elem.text)
+                    except Exception:
+                        pass
 
             device_elem = root.find('.//device')
             if device_elem is not None:
                 manufacturer = device_elem.find('manufacturer')
-                if manufacturer is not None:
+                if manufacturer is not None and manufacturer.text is not None:
                     metadata["device_manufacturer"] = manufacturer.text
 
                 model = device_elem.find('model')
-                if model is not None:
+                if model is not None and model.text is not None:
                     metadata["device_model"] = model.text
 
                 serial = device_elem.find('serialNumber')
-                if serial is not None:
+                if serial is not None and serial.text is not None:
                     metadata["device_serial"] = serial.text
 
             return metadata
 
         except Exception as e:
-            logger.error(f"Failed to extract XML metadata: {str(e)}")
+            logger.error("Failed to extract XML metadata: %s", str(e))
             return {}
 
-    async def preprocess_signal(self, ecg_data: np.ndarray) -> np.ndarray:
+    async def preprocess_signal(self, ecg_data: NDArray[np.float64]) -> NDArray[np.float64]:
         """Preprocess ECG signal for analysis."""
         try:
             processed_data = ecg_data.copy()
@@ -168,5 +174,5 @@ class ECGProcessor:
             return processed_data
 
         except Exception as e:
-            logger.error(f"Signal preprocessing failed: {str(e)}")
+            logger.error("Signal preprocessing failed: %s", str(e))
             return ecg_data

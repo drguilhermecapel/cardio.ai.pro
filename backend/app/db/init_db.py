@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.constants import UserRoles
 from app.core.security import get_password_hash
-from app.db.session import async_session
+from app.db.session import async_sessionmaker
 from app.models.user import User
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 async def init_db() -> None:
     """Initialize database with default data."""
-    async with async_session() as session:
+    async with async_sessionmaker() as session:
         await create_admin_user(session)
 
 
@@ -49,11 +49,11 @@ async def create_admin_user(session: AsyncSession) -> User | None:
         await session.commit()
         await session.refresh(admin_user)
 
-        logger.info(f"Created admin user: {admin_user.username}")
+        logger.info("Created admin user: %s", admin_user.username)
         return admin_user
 
     except Exception as e:
-        logger.error(f"Failed to create admin user: {str(e)}")
+        logger.error("Failed to create admin user: %s", str(e))
         await session.rollback()
         return None
 

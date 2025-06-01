@@ -134,7 +134,7 @@ class ECGRepository:
         result = await self.db.execute(stmt)
         analyses = list(result.scalars().all())
 
-        return analyses, total
+        return analyses, total or 0
 
     async def update_analysis(
         self, analysis_id: int, update_data: dict[str, Any]
@@ -223,12 +223,12 @@ class ECGRepository:
             )
             .where(
                 or_(
-                    ECGAnalysis.requires_immediate_attention is True,
+                    ECGAnalysis.requires_immediate_attention.is_(True),
                     ECGAnalysis.clinical_urgency == "critical",
                 )
             )
             .where(ECGAnalysis.status == AnalysisStatus.COMPLETED)
-            .where(ECGAnalysis.is_validated is False)
+            .where(ECGAnalysis.is_validated.is_(False))
             .order_by(desc(ECGAnalysis.created_at))
             .limit(limit)
         )
@@ -244,8 +244,8 @@ class ECGRepository:
                 selectinload(ECGAnalysis.created_by_user),
             )
             .where(ECGAnalysis.status == AnalysisStatus.COMPLETED)
-            .where(ECGAnalysis.validation_required is True)
-            .where(ECGAnalysis.is_validated is False)
+            .where(ECGAnalysis.validation_required.is_(True))
+            .where(ECGAnalysis.is_validated.is_(False))
             .order_by(desc(ECGAnalysis.clinical_urgency), desc(ECGAnalysis.created_at))
             .limit(limit)
         )
@@ -282,10 +282,10 @@ class ECGRepository:
             status_stmt = status_stmt.where(ECGAnalysis.created_at <= date_to)
 
         status_result = await self.db.execute(status_stmt)
-        status_counts = dict(status_result.all())
+        status_counts: dict[str, int] = {str(status): count for status, count in status_result.all()}
 
         critical_stmt = select(func.count(ECGAnalysis.id)).where(
-            ECGAnalysis.requires_immediate_attention is True
+            ECGAnalysis.requires_immediate_attention.is_(True)
         )
         if date_from:
             critical_stmt = critical_stmt.where(ECGAnalysis.created_at >= date_from)
@@ -301,6 +301,6 @@ class ECGRepository:
             "critical_analyses": critical_count,
             "validation_rate": (
                 status_counts.get("completed", 0) -
-                (total_analyses - sum(status_counts.values()))
-            ) / max(total_analyses, 1) * 100,
+                ((total_analyses or 0) - sum(status_counts.values()))
+            ) / max(total_analyses or 1, 1) * 100,
         }

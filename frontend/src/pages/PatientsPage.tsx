@@ -24,6 +24,7 @@ import {
   MenuItem,
   Alert,
   LinearProgress,
+  SelectChangeEvent,
 } from '@mui/material'
 import { Add, Edit } from '@mui/icons-material'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
@@ -67,10 +68,10 @@ const PatientsPage: React.FC = () => {
     }))
   }
 
-  const handleGenderChange = (event: any): void => {
+  const handleGenderChange = (event: SelectChangeEvent<string>): void => {
     setFormData(prev => ({
       ...prev,
-      gender: event.target.value,
+      gender: event.target.value as string,
     }))
   }
 

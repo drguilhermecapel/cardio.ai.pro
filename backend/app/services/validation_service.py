@@ -208,10 +208,7 @@ class ValidationService:
                         results.append(result)
                 except Exception as e:
                     logger.error(
-                        "Validation rule execution failed",
-                        rule_id=rule.id,
-                        rule_name=rule.name,
-                        error=str(e),
+                        f"Validation rule execution failed: rule_id={rule.id}, rule_name={rule.name}, error={str(e)}"
                     )
 
             logger.info(
@@ -261,11 +258,14 @@ class ValidationService:
         if not settings.REQUIRE_DOUBLE_VALIDATION_CRITICAL:
             return False
 
-        return (
-            analysis.clinical_urgency == ClinicalUrgency.CRITICAL or
-            analysis.requires_immediate_attention or
-            (analysis.ai_confidence and analysis.ai_confidence < 0.7)
-        )
+        if analysis.clinical_urgency == ClinicalUrgency.CRITICAL:
+            return True
+        if analysis.requires_immediate_attention:
+            return True
+        ai_confidence = getattr(analysis, 'ai_confidence', None)
+        if ai_confidence is not None and ai_confidence < 0.7:
+            return True
+        return False
 
     async def _update_analysis_validation_status(self, analysis_id: int) -> None:
         """Update analysis validation status."""
@@ -285,9 +285,7 @@ class ValidationService:
 
         except Exception as e:
             logger.error(
-                "Failed to update analysis validation status",
-                error=str(e),
-                analysis_id=analysis_id,
+                f"Failed to update analysis validation status: error={str(e)}, analysis_id={analysis_id}"
             )
 
     async def _calculate_quality_metrics(
@@ -298,49 +296,47 @@ class ValidationService:
             metrics = []
 
             if validation_data.get("signal_quality_rating"):
-                metrics.append(QualityMetric(
-                    analysis_id=analysis_id,
-                    metric_name="signal_quality_rating",
-                    metric_value=float(validation_data["signal_quality_rating"]),
-                    metric_unit="score",
-                    normal_min=3.0,
-                    normal_max=5.0,
-                    is_within_normal=validation_data["signal_quality_rating"] >= 3,
-                    calculation_method="manual_validation",
-                ))
+                metric = QualityMetric()
+                metric.analysis_id = analysis_id
+                metric.metric_name = "signal_quality_rating"
+                metric.metric_value = float(validation_data["signal_quality_rating"])
+                metric.metric_unit = "score"
+                metric.normal_min = 3.0
+                metric.normal_max = 5.0
+                metric.is_within_normal = validation_data["signal_quality_rating"] >= 3
+                metric.calculation_method = "manual_validation"
+                metrics.append(metric)
 
             if validation_data.get("ai_confidence_rating"):
-                metrics.append(QualityMetric(
-                    analysis_id=analysis_id,
-                    metric_name="ai_confidence_rating",
-                    metric_value=float(validation_data["ai_confidence_rating"]),
-                    metric_unit="score",
-                    normal_min=3.0,
-                    normal_max=5.0,
-                    is_within_normal=validation_data["ai_confidence_rating"] >= 3,
-                    calculation_method="manual_validation",
-                ))
+                metric = QualityMetric()
+                metric.analysis_id = analysis_id
+                metric.metric_name = "ai_confidence_rating"
+                metric.metric_value = float(validation_data["ai_confidence_rating"])
+                metric.metric_unit = "score"
+                metric.normal_min = 3.0
+                metric.normal_max = 5.0
+                metric.is_within_normal = validation_data["ai_confidence_rating"] >= 3
+                metric.calculation_method = "manual_validation"
+                metrics.append(metric)
 
             if validation_data.get("overall_quality_score"):
-                metrics.append(QualityMetric(
-                    analysis_id=analysis_id,
-                    metric_name="overall_quality_score",
-                    metric_value=float(validation_data["overall_quality_score"]),
-                    metric_unit="score",
-                    normal_min=0.7,
-                    normal_max=1.0,
-                    is_within_normal=validation_data["overall_quality_score"] >= 0.7,
-                    calculation_method="manual_validation",
-                ))
+                metric = QualityMetric()
+                metric.analysis_id = analysis_id
+                metric.metric_name = "overall_quality_score"
+                metric.metric_value = float(validation_data["overall_quality_score"])
+                metric.metric_unit = "score"
+                metric.normal_min = 0.7
+                metric.normal_max = 1.0
+                metric.is_within_normal = validation_data["overall_quality_score"] >= 0.7
+                metric.calculation_method = "manual_validation"
+                metrics.append(metric)
 
             for metric in metrics:
                 await self.repository.create_quality_metric(metric)
 
         except Exception as e:
             logger.error(
-                "Failed to calculate quality metrics",
-                error=str(e),
-                analysis_id=analysis_id,
+                f"Failed to calculate quality metrics: error={str(e)}, analysis_id={analysis_id}"
             )
 
     async def _execute_validation_rule(
@@ -363,23 +359,20 @@ class ValidationService:
             end_time = datetime.utcnow()
             execution_time_ms = int((end_time - start_time).total_seconds() * 1000)
 
-            validation_result = ValidationResult(
-                analysis_id=analysis.id,
-                rule_id=rule.id,
-                passed=result["passed"],
-                score=result.get("score"),
-                message=result["message"],
-                details=result.get("details", {}),
-                execution_time_ms=execution_time_ms,
-            )
+            validation_result = ValidationResult()
+            validation_result.analysis_id = analysis.id
+            validation_result.rule_id = rule.id
+            validation_result.passed = result["passed"]
+            validation_result.score = result.get("score")
+            validation_result.message = result["message"]
+            validation_result.details = result.get("details", {})
+            validation_result.execution_time_ms = execution_time_ms
 
             return await self.repository.create_validation_result(validation_result)
 
         except Exception as e:
             logger.error(
-                "Rule execution failed",
-                rule_id=rule.id,
-                error=str(e),
+                f"Rule execution failed: rule_id={rule.id}, error={str(e)}"
             )
             return None
 
@@ -469,7 +462,5 @@ class ValidationService:
 
         except Exception as e:
             logger.error(
-                "Failed to send validation notifications",
-                error=str(e),
-                validation_id=validation.id,
+                f"Failed to send validation notifications: error={str(e)}, validation_id={validation.id}"
             )

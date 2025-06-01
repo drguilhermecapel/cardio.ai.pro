@@ -30,7 +30,7 @@ class MemoryMonitor:
             }
 
         except Exception as e:
-            logger.error(f"Failed to get memory usage: {str(e)}")
+            logger.error("Failed to get memory usage: %s", str(e))
             return {
                 "process_memory_mb": 0,
                 "process_memory_percent": 0,
@@ -61,4 +61,4 @@ class MemoryMonitor:
                 memory_info["system_memory_percent"],
             )
         except Exception as e:
-            logger.error(f"Failed to log memory usage: {str(e)}")
+            logger.error("Failed to log memory usage: %s", str(e))
