@@ -60,12 +60,14 @@ def sample_ecg_data():
     """Sample ECG analysis data."""
     return ECGAnalysisCreate(
         patient_id=1,
-        file_path="/tmp/test_ecg.txt",
+        original_filename="test_ecg.txt",
         acquisition_date="2025-06-01T14:00:00Z",
-        device_info="Test Device v1.0",
-        sampling_rate=500,
-        duration=10.0,
-        leads=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+        sample_rate=500,
+        duration_seconds=10.0,
+        leads_count=12,
+        leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+        device_manufacturer="Test Device",
+        device_model="v1.0"
     )
 
 
@@ -91,13 +93,15 @@ async def test_create_ecg_analysis_success(ecg_service, sample_ecg_data, mock_ml
 async def test_create_ecg_analysis_with_patient_creation(ecg_service, sample_patient_data):
     """Test ECG analysis creation with new patient."""
     ecg_data = ECGAnalysisCreate(
-        patient_data=sample_patient_data,
-        file_path="/tmp/test_ecg.txt",
+        patient_id=1,
+        original_filename="test_ecg.txt",
         acquisition_date="2025-06-01T14:00:00Z",
-        device_info="Test Device v1.0",
-        sampling_rate=500,
-        duration=10.0,
-        leads=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+        sample_rate=500,
+        duration_seconds=10.0,
+        leads_count=12,
+        leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+        device_manufacturer="Test Device",
+        device_model="v1.0"
     )
     
     with patch('app.utils.ecg_processor.ECGProcessor.process_file') as mock_processor:
@@ -314,12 +318,14 @@ async def test_concurrent_analysis_processing(ecg_service, sample_ecg_data):
         for i in range(3):
             ecg_data = ECGAnalysisCreate(
                 patient_id=i + 1,
-                file_path=f"/tmp/test_{i}.txt",
+                original_filename=f"test_{i}.txt",
                 acquisition_date="2025-06-01T14:00:00Z",
-                device_info="Test Device v1.0",
-                sampling_rate=500,
-                duration=10.0,
-                leads=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+                sample_rate=500,
+                duration_seconds=10.0,
+                leads_count=12,
+                leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+                device_manufacturer="Test Device",
+                device_model="v1.0"
             )
             tasks.append(ecg_service.create_ecg_analysis(ecg_data))
         

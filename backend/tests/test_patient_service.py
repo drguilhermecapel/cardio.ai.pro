@@ -17,14 +17,16 @@ def patient_service(test_db):
 def sample_patient_data():
     """Sample patient data."""
     return PatientCreate(
-        name="John Doe",
-        birth_date=date(1990, 1, 15),
-        gender="M",
-        medical_record_number="MRN123456",
+        patient_id="PAT123456",
+        first_name="John",
+        last_name="Doe",
+        date_of_birth=date(1990, 1, 15),
+        gender="male",
         phone="+1234567890",
         email="john.doe@example.com",
         address="123 Main St, City, State 12345",
-        emergency_contact="Jane Doe - +0987654321"
+        emergency_contact_name="Jane Doe",
+        emergency_contact_phone="+0987654321"
     )
 
 
@@ -34,20 +36,22 @@ async def test_create_patient_success(patient_service, sample_patient_data):
     result = await patient_service.create_patient(sample_patient_data)
     
     assert result is not None
-    assert result.name == sample_patient_data.name
-    assert result.birth_date == sample_patient_data.birth_date
+    assert result.first_name == sample_patient_data.first_name
+    assert result.last_name == sample_patient_data.last_name
+    assert result.date_of_birth == sample_patient_data.date_of_birth
     assert result.gender == sample_patient_data.gender
-    assert result.medical_record_number == sample_patient_data.medical_record_number
+    assert result.patient_id == sample_patient_data.patient_id
 
 
 @pytest.mark.asyncio
 async def test_create_patient_duplicate_mrn(patient_service, sample_patient_data, test_db):
     """Test creating patient with duplicate medical record number."""
     existing_patient = Patient(
-        name="Existing Patient",
-        birth_date=date(1985, 5, 20),
-        gender="F",
-        medical_record_number=sample_patient_data.medical_record_number
+        first_name="Existing",
+        last_name="Patient",
+        date_of_birth=date(1985, 5, 20),
+        gender="female",
+        patient_id=sample_patient_data.patient_id
     )
     test_db.add(existing_patient)
     await test_db.commit()
@@ -60,10 +64,11 @@ async def test_create_patient_duplicate_mrn(patient_service, sample_patient_data
 async def test_get_patient_by_id(patient_service, test_db):
     """Test retrieving patient by ID."""
     patient = Patient(
-        name="Test Patient",
-        birth_date=date(1990, 1, 1),
-        gender="M",
-        medical_record_number="TEST123"
+        first_name="Test",
+        last_name="Patient",
+        date_of_birth=date(1990, 1, 1),
+        gender="male",
+        patient_id="TEST123"
     )
     test_db.add(patient)
     await test_db.commit()
@@ -73,7 +78,8 @@ async def test_get_patient_by_id(patient_service, test_db):
     
     assert result is not None
     assert result.id == patient.id
-    assert result.name == "Test Patient"
+    assert result.first_name == "Test"
+    assert result.last_name == "Patient"
 
 
 @pytest.mark.asyncio
@@ -88,10 +94,11 @@ async def test_get_patient_by_mrn(patient_service, test_db):
     """Test retrieving patient by medical record number."""
     mrn = "UNIQUE123"
     patient = Patient(
-        name="Test Patient",
-        birth_date=date(1990, 1, 1),
-        gender="M",
-        medical_record_number=mrn
+        first_name="Test",
+        last_name="Patient",
+        date_of_birth=date(1990, 1, 1),
+        gender="male",
+        patient_id=mrn
     )
     test_db.add(patient)
     await test_db.commit()
@@ -99,7 +106,7 @@ async def test_get_patient_by_mrn(patient_service, test_db):
     result = await patient_service.get_patient_by_mrn(mrn)
     
     assert result is not None
-    assert result.medical_record_number == mrn
+    assert result.patient_id == mrn
 
 
 @pytest.mark.asyncio
@@ -113,17 +120,19 @@ async def test_get_patient_by_mrn_not_found(patient_service):
 async def test_update_patient(patient_service, test_db):
     """Test updating patient information."""
     patient = Patient(
-        name="Original Name",
-        birth_date=date(1990, 1, 1),
-        gender="M",
-        medical_record_number="UPDATE123"
+        first_name="Original",
+        last_name="Name",
+        date_of_birth=date(1990, 1, 1),
+        gender="male",
+        patient_id="UPDATE123"
     )
     test_db.add(patient)
     await test_db.commit()
     await test_db.refresh(patient)
     
     update_data = PatientUpdate(
-        name="Updated Name",
+        first_name="Updated",
+        last_name="Name",
         phone="+1111111111",
         email="updated@example.com"
     )
@@ -131,16 +140,17 @@ async def test_update_patient(patient_service, test_db):
     result = await patient_service.update_patient(patient.id, update_data)
     
     assert result is not None
-    assert result.name == "Updated Name"
+    assert result.first_name == "Updated"
+    assert result.last_name == "Name"
     assert result.phone == "+1111111111"
     assert result.email == "updated@example.com"
-    assert result.birth_date == date(1990, 1, 1)
+    assert result.date_of_birth == date(1990, 1, 1)
 
 
 @pytest.mark.asyncio
 async def test_update_patient_not_found(patient_service):
     """Test updating non-existent patient."""
-    update_data = PatientUpdate(name="New Name")
+    update_data = PatientUpdate(first_name="New", last_name="Name")
     
     result = await patient_service.update_patient(99999, update_data)
     assert result is None
@@ -287,10 +297,11 @@ async def test_validate_patient_data(patient_service):
 async def test_validate_patient_data_invalid_email(patient_service):
     """Test patient data validation with invalid email."""
     invalid_data = PatientCreate(
-        name="Invalid Patient",
-        birth_date=date(1990, 1, 1),
-        gender="M",
-        medical_record_number="INVALID123",
+        patient_id="INVALID123",
+        first_name="Invalid",
+        last_name="Patient",
+        date_of_birth=date(1990, 1, 1),
+        gender="male",
         email="invalid-email"
     )
     

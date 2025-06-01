@@ -12,7 +12,9 @@ from app.schemas.validation import ValidationCreate, ValidationUpdate
 @pytest.fixture
 def validation_service(test_db):
     """Create validation service instance."""
-    return ValidationService(db=test_db)
+    from unittest.mock import Mock
+    mock_notification_service = Mock()
+    return ValidationService(db=test_db, notification_service=mock_notification_service)
 
 
 @pytest.fixture
