@@ -25,7 +25,7 @@ def event_loop():
 async def test_engine():
     """Create test database engine."""
     engine = create_async_engine(
-        settings.DATABASE_URL.replace("cardioai", "cardioai_test"),
+        settings.TEST_DATABASE_URL or settings.DATABASE_URL.replace("/cardioai_pro", "/cardioai_pro_test"),
         echo=False,
     )
     
