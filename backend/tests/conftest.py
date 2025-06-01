@@ -54,7 +54,11 @@ async def test_engine():
         await conn.run_sync(Base.metadata.create_all)
         
         from sqlalchemy import text
-        result = await conn.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
+        if os.getenv("CI"):
+            result = await conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname = 'public';"))
+        else:
+            result = await conn.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
+        
         tables = [row[0] for row in result.fetchall()]
         print(f"✅ Created tables: {tables}")
         
@@ -80,12 +84,19 @@ async def test_db(test_engine):
         test_engine, class_=AsyncSession, expire_on_commit=False
     )
     
-    async with async_session() as session:
+    session = async_session()
+    try:
+        yield session
+    finally:
         try:
-            yield session
-        finally:
-            await session.rollback()
+            if session.is_active:
+                await session.rollback()
+        except Exception:
+            pass
+        try:
             await session.close()
+        except Exception:
+            pass
 
 
 @pytest.fixture
