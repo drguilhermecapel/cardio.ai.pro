@@ -32,21 +32,25 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger = structlog.get_logger()
     logger.info("Starting CardioAI Pro Backend", version="1.0.0")
 
-    try:
-        engine = get_engine()
-        async with engine.begin() as conn:
-            from sqlalchemy import text
-            await conn.execute(text("SELECT 1"))
-        logger.info("Database connection established")
-    except Exception as e:
-        logger.error("Failed to connect to database", error=str(e))
-        raise
+    if settings.ENVIRONMENT != "test":
+        try:
+            engine = get_engine()
+            async with engine.begin() as conn:
+                from sqlalchemy import text
+                await conn.execute(text("SELECT 1"))
+            logger.info("Database connection established")
+        except Exception as e:
+            logger.error("Failed to connect to database", error=str(e))
+            raise
+    else:
+        logger.info("Skipping database connection in test environment")
 
     yield
 
     logger.info("Shutting down CardioAI Pro Backend")
-    engine = get_engine()
-    await engine.dispose()
+    if settings.ENVIRONMENT != "test":
+        engine = get_engine()
+        await engine.dispose()
 
 
 app = FastAPI(
