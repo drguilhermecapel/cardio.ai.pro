@@ -15,7 +15,7 @@ from app.services.validation_service import ValidationService
 logger = logging.getLogger(__name__)
 
 @celery_app.task(bind=True)
-def process_ecg_analysis(self, analysis_id: int) -> dict[str, Any]:
+def process_ecg_analysis(self: Any, analysis_id: int) -> dict[str, Any]:
     """Process ECG analysis in background"""
     try:
         current_task.update_state(

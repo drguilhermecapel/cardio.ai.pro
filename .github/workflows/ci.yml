@@ -198,6 +198,9 @@ jobs:
 
   security-scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     
     steps:
     - uses: actions/checkout@v4
@@ -215,3 +218,4 @@ jobs:
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'
+        token: ${{ secrets.GITHUB_TOKEN }}

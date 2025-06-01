@@ -121,7 +121,7 @@ async def list_analyses(
     validation_service = ValidationService(db, NotificationService(db))
     ecg_service = ECGAnalysisService(db, ml_service, validation_service)
 
-    filters = {}
+    filters: dict[str, Any] = {}
     if patient_id:
         filters["patient_id"] = patient_id
     if status:
@@ -154,19 +154,19 @@ async def search_analyses(
     validation_service = ValidationService(db, NotificationService(db))
     ecg_service = ECGAnalysisService(db, ml_service, validation_service)
 
-    filters = {}
+    filters: dict[str, Any] = {}
     if search_params.patient_id:
         filters["patient_id"] = search_params.patient_id
     if search_params.status:
-        filters["status"] = search_params.status
+        filters["status"] = search_params.status.value
     if search_params.clinical_urgency:
-        filters["clinical_urgency"] = search_params.clinical_urgency
+        filters["clinical_urgency"] = search_params.clinical_urgency.value
     if search_params.diagnosis_category:
-        filters["diagnosis_category"] = search_params.diagnosis_category
+        filters["diagnosis_category"] = search_params.diagnosis_category.value
     if search_params.date_from:
-        filters["date_from"] = search_params.date_from
+        filters["date_from"] = search_params.date_from.isoformat()
     if search_params.date_to:
-        filters["date_to"] = search_params.date_to
+        filters["date_to"] = search_params.date_to.isoformat()
     if search_params.is_validated is not None:
         filters["is_validated"] = search_params.is_validated
     if search_params.requires_validation is not None:
