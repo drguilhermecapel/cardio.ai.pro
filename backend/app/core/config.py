@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     API_V1_STR: str = "/api/v1"
 
-    SECRET_KEY: str
+    SECRET_KEY: str = "dev-secret-key-change-in-production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALGORITHM: str = "HS256"
@@ -161,10 +161,12 @@ class Settings(BaseSettings):
     MAX_ECG_FILE_SIZE: int = 50 * 1024 * 1024  # 50MB
     ECG_UPLOAD_DIR: str = "uploads/ecg"
 
-    class Config:
-        """Pydantic config."""
-        case_sensitive = True
-        env_file = ".env"
+    model_config = {
+        "case_sensitive": True,
+        "env_file": ".env",
+        "env_file_encoding": "utf-8",
+        "extra": "ignore"
+    }
 
 
-settings = Settings(SECRET_KEY="dev-secret-key-change-in-production")
+settings = Settings()
