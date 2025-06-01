@@ -125,18 +125,27 @@ class Settings(BaseSettings):
         """Assemble Celery broker URL."""
         if isinstance(v, str):
             return v
-        return values.get("REDIS_URL", "redis://localhost:6379/0")
+        redis_url = values.get("REDIS_URL")
+        return str(redis_url) if redis_url else "redis://localhost:6379/0"
 
     @validator("CELERY_RESULT_BACKEND", pre=True)
     def assemble_celery_backend(cls, v: str | None, values: dict[str, Any]) -> str:
         """Assemble Celery result backend URL."""
         if isinstance(v, str):
             return v
-        return values.get("REDIS_URL", "redis://localhost:6379/0")
+        redis_url = values.get("REDIS_URL")
+        return str(redis_url) if redis_url else "redis://localhost:6379/0"
 
     AUDIT_LOG_RETENTION_DAYS: int = 2555  # 7 years
     ENABLE_DIGITAL_SIGNATURES: bool = True
     REQUIRE_AUDIT_TRAIL: bool = True
+    
+    FIRST_SUPERUSER: str = "admin@cardioai.pro"
+    FIRST_SUPERUSER_EMAIL: str = "admin@cardioai.pro"
+    FIRST_SUPERUSER_PASSWORD: str = "changeme123"
+    
+    MAX_ECG_FILE_SIZE: int = 50 * 1024 * 1024  # 50MB
+    ECG_UPLOAD_DIR: str = "uploads/ecg"
 
     class Config:
         """Pydantic config."""
@@ -144,4 +153,4 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 
-settings = Settings()
+settings = Settings(SECRET_KEY="dev-secret-key-change-in-production")

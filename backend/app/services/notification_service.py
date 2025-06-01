@@ -165,7 +165,7 @@ class NotificationService:
             notification.message = f"ECG analysis #{analysis_id} has been completed"
             notification.notification_type = NotificationType.ANALYSIS_COMPLETE
             notification.priority = priority
-            notification.channels = channels
+            notification.channels = [str(ch) for ch in channels]
             notification.related_resource_type = "ecg_analysis"
             notification.related_resource_id = analysis_id
 

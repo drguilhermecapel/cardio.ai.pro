@@ -130,7 +130,7 @@ class TokenRefresh(BaseModel):
 class APIKeyCreate(BaseModel):
     """API key creation schema."""
     name: str = Field(..., min_length=1, max_length=100)
-    scopes: list[str] = Field(..., min_items=1)
+    scopes: list[str] = Field(..., min_length=1)
     expires_at: datetime | None = None
 
 

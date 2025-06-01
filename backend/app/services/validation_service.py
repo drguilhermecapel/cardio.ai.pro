@@ -62,12 +62,11 @@ class ValidationService:
                     "Insufficient permissions to validate this analysis"
                 )
 
-            validation = Validation(
-                analysis_id=analysis_id,
-                validator_id=validator_id,
-                status=ValidationStatus.PENDING,
-                requires_second_opinion=self._requires_second_opinion(analysis),
-            )
+            validation = Validation()
+            validation.analysis_id = analysis_id
+            validation.validator_id = validator_id
+            validation.status = ValidationStatus.PENDING
+            validation.requires_second_opinion = self._requires_second_opinion(analysis)
 
             validation = await self.repository.create_validation(validation)
 
@@ -76,20 +75,14 @@ class ValidationService:
             )
 
             logger.info(
-                "Validation created",
-                validation_id=validation.id,
-                analysis_id=analysis_id,
-                validator_id=validator_id,
+                f"Validation created: validation_id={validation.id}, analysis_id={analysis_id}, validator_id={validator_id}"
             )
 
             return validation
 
         except Exception as e:
             logger.error(
-                "Failed to create validation",
-                error=str(e),
-                analysis_id=analysis_id,
-                validator_id=validator_id,
+                f"Failed to create validation: error={str(e)}, analysis_id={analysis_id}, validator_id={validator_id}"
             )
             raise
 
@@ -131,29 +124,27 @@ class ValidationService:
                 update_data["digital_signature"] = validation_data["digital_signature"]
                 update_data["signature_timestamp"] = datetime.utcnow()
 
-            validation = await self.repository.update_validation(validation_id, update_data)
+            updated_validation = await self.repository.update_validation(validation_id, update_data)
+            if not updated_validation:
+                raise ValidationException("Failed to update validation")
 
-            await self._update_analysis_validation_status(validation.analysis_id)
+            await self._update_analysis_validation_status(updated_validation.analysis_id)
 
-            await self._calculate_quality_metrics(validation.analysis_id, validation_data)
+            await self._calculate_quality_metrics(updated_validation.analysis_id, validation_data)
 
-            await self._send_validation_notifications(validation)
+            await self._send_validation_notifications(updated_validation)
+            
+            validation = updated_validation
 
             logger.info(
-                "Validation submitted",
-                validation_id=validation_id,
-                status=validation.status,
-                validator_id=validator_id,
+                f"Validation submitted: validation_id={validation_id}, status={validation.status}, validator_id={validator_id}"
             )
 
             return validation
 
         except Exception as e:
             logger.error(
-                "Failed to submit validation",
-                error=str(e),
-                validation_id=validation_id,
-                validator_id=validator_id,
+                f"Failed to submit validation: error={str(e)}, validation_id={validation_id}, validator_id={validator_id}"
             )
             raise
 
@@ -191,15 +182,12 @@ class ValidationService:
                 await self.notification_service.send_no_validator_alert(analysis_id)
 
                 logger.warning(
-                    "No validators available for urgent validation",
-                    analysis_id=analysis_id,
+                    f"No validators available for urgent validation: analysis_id={analysis_id}"
                 )
 
         except Exception as e:
             logger.error(
-                "Failed to create urgent validation",
-                error=str(e),
-                analysis_id=analysis_id,
+                f"Failed to create urgent validation: error={str(e)}, analysis_id={analysis_id}"
             )
 
     async def run_automated_validation_rules(self, analysis_id: int) -> list[ValidationResult]:
@@ -227,19 +215,14 @@ class ValidationService:
                     )
 
             logger.info(
-                "Automated validation completed",
-                analysis_id=analysis_id,
-                rules_executed=len(rules),
-                results_count=len(results),
+                f"Automated validation completed: analysis_id={analysis_id}, rules_executed={len(rules)}, results_count={len(results)}"
             )
 
             return results
 
         except Exception as e:
             logger.error(
-                "Automated validation failed",
-                error=str(e),
-                analysis_id=analysis_id,
+                f"Automated validation failed: error={str(e)}, analysis_id={analysis_id}"
             )
             return []
 
