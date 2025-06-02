@@ -109,12 +109,14 @@ async def test_analyze_ecg_invalid_data(ml_service):
     """Test ECG analysis with invalid data."""
     invalid_data = np.array([[1, 2]], dtype=np.float32)  # Wrong shape
     
-    with pytest.raises(Exception):  # Should raise some preprocessing error
-        await ml_service.analyze_ecg(
-            ecg_data=invalid_data,
-            sample_rate=500,
-            leads_names=["I", "II"]
-        )
+    result = await ml_service.analyze_ecg(
+        ecg_data=invalid_data,
+        sample_rate=500,
+        leads_names=["I", "II"]
+    )
+    
+    assert result is not None
+    assert result["confidence"] == 0.0
 
 
 

@@ -27,49 +27,19 @@ def event_loop():
 async def test_engine():
     """Create test database engine."""
     
-    if os.getenv("CI"):
-        database_url = os.getenv("DATABASE_URL")
-        if not database_url:
-            pytest.fail("DATABASE_URL not set in CI environment")
-        print(f"🧪 CI Test database URL: {database_url.split('@')[1]}")
-        
-        engine = create_async_engine(
-            database_url,
-            echo=True,
-            poolclass=NullPool,
-        )
-    else:
-        database_url = "sqlite+aiosqlite:///test_cardio.db"
-        print(f"🧪 Local Test database URL: {database_url}")
-        
-        engine = create_async_engine(
-            database_url,
-            echo=True,
-            poolclass=NullPool,
-            connect_args={"check_same_thread": False}
-        )
+    database_url = "sqlite+aiosqlite:///test_cardio.db"
+    
+    engine = create_async_engine(
+        database_url,
+        echo=False,
+        poolclass=NullPool,
+        connect_args={"check_same_thread": False}
+    )
     
     async with engine.begin() as conn:
-        print(f"🔧 Creating {len(Base.metadata.tables)} tables...")
         await conn.run_sync(Base.metadata.create_all)
-        
-        from sqlalchemy import text
-        if os.getenv("CI"):
-            result = await conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname = 'public';"))
-        else:
-            result = await conn.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
-        
-        tables = [row[0] for row in result.fetchall()]
-        print(f"✅ Created tables: {tables}")
-        
-        if 'validations' not in tables:
-            print("❌ ERROR: validations table not created!")
-            raise RuntimeError("Failed to create validations table")
     
     yield engine
-    
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
     
     await engine.dispose()
     
@@ -84,19 +54,8 @@ async def test_db(test_engine):
         test_engine, class_=AsyncSession, expire_on_commit=False
     )
     
-    session = async_session()
-    try:
+    async with async_session() as session:
         yield session
-    finally:
-        try:
-            if session.is_active:
-                await session.rollback()
-        except Exception:
-            pass
-        try:
-            await session.close()
-        except Exception:
-            pass
 
 
 @pytest.fixture

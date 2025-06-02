@@ -49,8 +49,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     logger.info("Shutting down CardioAI Pro Backend")
     if settings.ENVIRONMENT != "test":
-        engine = get_engine()
-        await engine.dispose()
+        try:
+            engine = get_engine()
+            await engine.dispose()
+        except Exception:
+            pass  # Ignore disposal errors in shutdown
 
 
 app = FastAPI(
