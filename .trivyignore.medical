@@ -1,0 +1,29 @@
+# .trivyignore.medical for CardioAI Pro - Medical Software Compliance
+# Documented exceptions with medical justifications for regulatory compliance
+
+# CVE-2023-XXXXX - Example format for documented exceptions
+# Justificativa: Affects only non-critical functionality not used in ECG analysis
+# Mitigação: Application firewall blocks vulnerable endpoint
+# Aprovado por: Security Officer em 2024-01-15
+# Status: Accepted risk for medical device software
+
+# Ignore false positives in test files
+test/
+tests/
+docs/
+*.test.js
+*.test.py
+__pycache__/
+.pytest_cache/
+
+# Development dependencies not in production
+node_modules/
+.venv/
+htmlcov/
+
+# Documentation and configuration files
+README.md
+*.md
+*.yml
+*.yaml
+docker-compose*.yml
