@@ -99,6 +99,7 @@ class ECGAnalysisService:
 
     async def _process_analysis_async(self, analysis_id: int) -> None:
         """Process ECG analysis asynchronously."""
+        analysis = None  # Initialize analysis variable to avoid UnboundLocalError
         try:
             await self.repository.update_analysis_status(
                 analysis_id, AnalysisStatus.PROCESSING
