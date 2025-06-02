@@ -39,19 +39,27 @@ def get_engine() -> AsyncEngine:
                 "Patient data persistence at risk."
             )
 
-        _engine = create_async_engine(
-            str(settings.DATABASE_URL),
-            echo=settings.DEBUG,
-            poolclass=NullPool if settings.ENVIRONMENT == "test" else None,
-            pool_pre_ping=True,
-            pool_recycle=300,
-            connect_args={
+        connect_args = {}
+        if "postgresql" in str(settings.DATABASE_URL):
+            connect_args = {
                 "server_settings": {
                     "application_name": "CardioAI_Pro_v1",
                     "jit": "off"
                 },
                 "command_timeout": 60,
             }
+        elif "sqlite" in str(settings.DATABASE_URL):
+            connect_args = {
+                "check_same_thread": False,
+            }
+
+        _engine = create_async_engine(
+            str(settings.DATABASE_URL),
+            echo=settings.DEBUG,
+            poolclass=NullPool if settings.ENVIRONMENT == "test" else None,
+            pool_pre_ping=True,
+            pool_recycle=300,
+            connect_args=connect_args
         )
 
     return _engine
