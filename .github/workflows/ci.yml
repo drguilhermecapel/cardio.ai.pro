@@ -176,7 +176,7 @@ jobs:
     - name: Start services with Docker Compose
       run: |
         cp .env.test .env
-        docker-compose up -d --build
+        docker compose up -d --build
         sleep 30
     
     - name: Wait for services to be healthy
@@ -186,21 +186,21 @@ jobs:
     
     - name: Run API integration tests
       run: |
-        docker-compose exec -T api python -m pytest tests/integration/ -v
+        docker compose exec -T api python -m pytest tests/integration/ -v
     
     - name: Check service logs
       if: failure()
       run: |
         echo "=== API Logs ==="
-        docker-compose logs api
+        docker compose logs api
         echo "=== Frontend Logs ==="
-        docker-compose logs frontend
+        docker compose logs frontend
         echo "=== Database Logs ==="
-        docker-compose logs postgres
+        docker compose logs postgres
     
     - name: Cleanup
       if: always()
-      run: docker-compose down -v
+      run: docker compose down -v
 
   security-scan:
     runs-on: ubuntu-latest
