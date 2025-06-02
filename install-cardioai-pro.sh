@@ -12,7 +12,7 @@ CYAN='\033[0;36m'
 WHITE='\033[1;37m'
 NC='\033[0m' # No Color
 
-DEFAULT_DB_PASSWORD="cardioai_secure_2025"
+DEFAULT_DB_PASSWORD="cardioai_secure_$(date +%s)"
 DEFAULT_JWT_SECRET="cardioai_jwt_secret_$(date +%s)"
 DEFAULT_API_PORT="8000"
 DEFAULT_WEB_PORT="3000"
@@ -144,8 +144,8 @@ configure_environment() {
 ENVIRONMENT=production
 DEBUG=false
 
-DATABASE_URL=postgresql://postgres:${db_password}@postgres:5432/cardioai_pro
-POSTGRES_USER=postgres
+DATABASE_URL=postgresql+asyncpg://cardioai:${db_password}@postgres:5432/cardioai_pro
+POSTGRES_USER=cardioai
 POSTGRES_PASSWORD=${db_password}
 POSTGRES_DB=cardioai_pro
 
@@ -154,10 +154,10 @@ JWT_SECRET_KEY=${jwt_secret}
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-REDIS_URL=redis://redis:6379/0
+REDIS_URL=redis://:${db_password}@redis:6379/0
 
-CELERY_BROKER_URL=redis://redis:6379/0
-CELERY_RESULT_BACKEND=redis://redis:6379/0
+CELERY_BROKER_URL=redis://:${db_password}@redis:6379/0
+CELERY_RESULT_BACKEND=redis://:${db_password}@redis:6379/0
 
 API_PORT=${api_port}
 WEB_PORT=${web_port}
@@ -172,7 +172,10 @@ LOG_FORMAT=json
 
 MEDICAL_COMPLIANCE_MODE=true
 AUDIT_LOGGING=true
-DATA_RETENTION_DAYS=2555  # 7 anos ANVISA
+DATA_RETENTION_DAYS=2555
+
+REACT_APP_API_URL=http://localhost:${api_port}
+REACT_APP_WS_URL=ws://localhost:${api_port}
 
 EOF
 
