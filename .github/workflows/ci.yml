@@ -186,7 +186,7 @@ jobs:
     
     - name: Run API integration tests
       run: |
-        docker compose exec -T api python -m pytest tests/integration/ -v
+        docker compose exec -T api python -m pytest tests/integration/ -v --no-cov
     
     - name: Check service logs
       if: failure()
