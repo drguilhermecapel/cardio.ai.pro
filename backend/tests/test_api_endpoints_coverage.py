@@ -25,15 +25,32 @@ def mock_services():
          patch('app.api.v1.endpoints.validations.ValidationService') as mock_validation_service, \
          patch('app.api.v1.endpoints.notifications.NotificationService') as mock_notification_service:
         
-        mock_user_service.return_value.authenticate_user = AsyncMock(return_value={
-            "id": 1, "username": "test_user", "email": "test@test.com", "role": UserRoles.PHYSICIAN
-        })
-        mock_user_service.return_value.create_user = AsyncMock(return_value={
-            "id": 1, "username": "new_user", "email": "new@test.com"
-        })
-        mock_user_service.return_value.get_user_by_email = AsyncMock(return_value={
-            "id": 1, "username": "test_user", "email": "test@test.com"
-        })
+        mock_user = Mock()
+        mock_user.id = 1
+        mock_user.username = "test_user"
+        mock_user.email = "test@test.com"
+        mock_user.role = UserRoles.PHYSICIAN
+        mock_user.is_active = True
+        mock_user.first_name = "Test"
+        mock_user.last_name = "User"
+        
+        mock_user_service.return_value.authenticate_user = AsyncMock(return_value=mock_user)
+        mock_user_service.return_value.update_last_login = AsyncMock(return_value=None)
+        
+        mock_new_user = Mock()
+        mock_new_user.id = 1
+        mock_new_user.username = "new_user"
+        mock_new_user.email = "new@test.com"
+        mock_new_user.is_active = True
+        
+        mock_existing_user = Mock()
+        mock_existing_user.id = 1
+        mock_existing_user.username = "test_user"
+        mock_existing_user.email = "test@test.com"
+        mock_existing_user.is_active = True
+        
+        mock_user_service.return_value.create_user = AsyncMock(return_value=mock_new_user)
+        mock_user_service.return_value.get_user_by_email = AsyncMock(return_value=mock_existing_user)
         
         mock_patient_service.return_value.create_patient = AsyncMock(return_value={
             "id": 1, "patient_id": "P001", "first_name": "Test", "last_name": "Patient"
@@ -67,6 +84,17 @@ def mock_services():
 
 
 @pytest.fixture
+def client():
+    """Create test client with mocked database."""
+    with patch('app.db.session.get_db') as mock_get_db:
+        mock_db = AsyncMock()
+        mock_get_db.return_value = mock_db
+        
+        with TestClient(app) as test_client:
+            yield test_client
+
+
+@pytest.fixture
 def auth_headers():
     """Mock authentication headers."""
     return {"Authorization": "Bearer mock_token"}
@@ -89,16 +117,17 @@ async def test_auth_login_endpoint(client, mock_services):
 @pytest.mark.asyncio
 async def test_auth_register_endpoint(client, mock_services):
     """Test auth register endpoint coverage."""
-    response = client.post("/api/v1/auth/register", json={
-        "username": "new_user",
-        "email": "new@test.com",
-        "password": "test_password",
-        "first_name": "New",
-        "last_name": "User",
-        "role": "physician"
-    })
-    
-    assert response.status_code in [200, 201, 422]  # Accept various success/validation codes
+    with patch('app.core.security.get_password_hash', return_value="hashed_password"):
+        response = client.post("/api/v1/auth/register", json={
+            "username": "new_user",
+            "email": "new@test.com",
+            "password": "test_password",
+            "first_name": "New",
+            "last_name": "User",
+            "role": "physician"
+        })
+        
+        assert response.status_code in [200, 201, 422]  # Accept various success/validation codes
 
 
 @pytest.mark.asyncio
@@ -141,7 +170,7 @@ async def test_ecg_analysis_create_endpoint(client, mock_services, auth_headers)
         mock_file.filename = "test.txt"
         mock_file.read = AsyncMock(return_value=b"test data")
         
-        response = client.post("/api/v1/ecg-analysis/", 
+        response = client.post("/api/v1/ecg/upload", 
             headers=auth_headers,
             files={"file": ("test.txt", b"test data", "text/plain")},
             data={"patient_id": "1"}
@@ -153,7 +182,7 @@ async def test_ecg_analysis_create_endpoint(client, mock_services, auth_headers)
 @pytest.mark.asyncio
 async def test_ecg_analysis_list_endpoint(client, mock_services, auth_headers):
     """Test ECG analysis list endpoint coverage."""
-    response = client.get("/api/v1/ecg-analysis/patient/1", headers=auth_headers)
+    response = client.get("/api/v1/ecg/", headers=auth_headers)
     
     assert response.status_code in [200, 401, 404]  # Accept auth/not found errors
 
@@ -176,7 +205,7 @@ async def test_validations_create_endpoint(client, mock_services, auth_headers):
 @pytest.mark.asyncio
 async def test_validations_list_endpoint(client, mock_services, auth_headers):
     """Test validations list endpoint coverage."""
-    response = client.get("/api/v1/validations/", headers=auth_headers)
+    response = client.get("/api/v1/validations/my-validations", headers=auth_headers)
     
     assert response.status_code in [200, 401]  # Accept auth errors
 
@@ -192,7 +221,7 @@ async def test_notifications_list_endpoint(client, mock_services, auth_headers):
 @pytest.mark.asyncio
 async def test_notifications_mark_read_endpoint(client, mock_services, auth_headers):
     """Test notifications mark read endpoint coverage."""
-    response = client.put("/api/v1/notifications/1/read", headers=auth_headers)
+    response = client.post("/api/v1/notifications/1/read", headers=auth_headers)
     
     assert response.status_code in [200, 401, 404]  # Accept auth/not found errors
 
@@ -200,7 +229,7 @@ async def test_notifications_mark_read_endpoint(client, mock_services, auth_head
 @pytest.mark.asyncio
 async def test_users_profile_endpoint(client, mock_services, auth_headers):
     """Test users profile endpoint coverage."""
-    response = client.get("/api/v1/users/profile", headers=auth_headers)
+    response = client.get("/api/v1/users/me", headers=auth_headers)
     
     assert response.status_code in [200, 401]  # Accept auth errors
 
@@ -208,7 +237,7 @@ async def test_users_profile_endpoint(client, mock_services, auth_headers):
 @pytest.mark.asyncio
 async def test_users_update_endpoint(client, mock_services, auth_headers):
     """Test users update endpoint coverage."""
-    response = client.put("/api/v1/users/profile", 
+    response = client.put("/api/v1/users/me", 
         headers=auth_headers,
         json={
             "first_name": "Updated",
