@@ -3,8 +3,8 @@ ECG-specific metrics collection for Prometheus monitoring
 """
 
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
 
 from prometheus_client import (
     REGISTRY,
@@ -110,9 +110,9 @@ class ECGMetricsCollector:
         ).inc()
 
     def record_pathology_detection(
-        self, 
-        pathology_type: str, 
-        confidence: float, 
+        self,
+        pathology_type: str,
+        confidence: float,
         model_version: str
     ) -> None:
         """Registra detecção de patologia"""
@@ -150,9 +150,9 @@ class ECGMetricsCollector:
         ).set(memory_bytes)
 
     def record_regulatory_compliance(
-        self, 
-        standard: str, 
-        compliant: bool, 
+        self,
+        standard: str,
+        compliant: bool,
         validation_type: str
     ) -> None:
         """Registra resultado de conformidade regulatória"""
