@@ -6,13 +6,12 @@ Integrates comprehensive pathology detection with existing cardio.ai.pro infrast
 import logging
 import time
 import warnings
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 import neurokit2 as nk
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
-import pywt
-import wfdb
 from scipy import signal
 from scipy.stats import entropy, kurtosis, skew
 from sklearn.preprocessing import StandardScaler
@@ -22,6 +21,17 @@ from app.core.exceptions import ECGProcessingException
 from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
 
+if TYPE_CHECKING:
+    import pywt
+    import wfdb
+else:
+    try:
+        import pywt
+        import wfdb
+    except ImportError:
+        pywt = None  # type: ignore
+        wfdb = None  # type: ignore
+
 warnings.filterwarnings('ignore')
 
 logger = logging.getLogger(__name__)
@@ -30,7 +40,7 @@ logger = logging.getLogger(__name__)
 class UniversalECGReader:
     """Universal ECG reader supporting multiple formats"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.supported_formats = {
             '.dat': self._read_mitbih,
             '.edf': self._read_edf,
@@ -46,7 +56,7 @@ class UniversalECGReader:
         ext = os.path.splitext(filepath)[1].lower()
 
         if ext in self.supported_formats:
-            return self.supported_formats[ext](filepath, sampling_rate)
+            return self.supported_formats[ext](filepath, sampling_rate or 500)
         else:
             raise ValueError(f"Unsupported format: {ext}")
 
@@ -129,17 +139,17 @@ class UniversalECGReader:
 class AdvancedPreprocessor:
     """Advanced ECG signal preprocessing"""
 
-    def __init__(self, sampling_rate: int = 500):
+    def __init__(self, sampling_rate: int = 500) -> None:
         self.fs = sampling_rate
         self.scaler = StandardScaler()
 
-    def preprocess_signal(self, signal_data: np.ndarray, remove_baseline: bool = True,
-                         remove_powerline: bool = True, normalize: bool = True) -> np.ndarray:
+    def preprocess_signal(self, signal_data: npt.NDArray[np.float64], remove_baseline: bool = True,
+                         remove_powerline: bool = True, normalize: bool = True) -> npt.NDArray[np.float64]:
         """Complete preprocessing pipeline"""
         if signal_data.ndim == 1:
             signal_data = signal_data.reshape(-1, 1)
 
-        processed = []
+        processed: list[npt.NDArray[np.float64]] = []
         for lead in range(signal_data.shape[1]):
             lead_signal = signal_data[:, lead]
 
@@ -154,51 +164,51 @@ class AdvancedPreprocessor:
 
             processed.append(lead_signal)
 
-        processed = np.array(processed).T
+        processed_array = np.array(processed).T
 
         if normalize:
-            processed = self.scaler.fit_transform(processed)
+            processed_array = self.scaler.fit_transform(processed_array)
 
-        return processed
+        return processed_array
 
-    def _remove_baseline_wandering(self, signal_data: np.ndarray) -> np.ndarray:
+    def _remove_baseline_wandering(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Remove baseline wandering using median filter"""
         from scipy.ndimage import median_filter
         window_size = int(0.6 * self.fs)
         baseline = median_filter(signal_data, size=window_size)
         return signal_data - baseline
 
-    def _remove_powerline_interference(self, signal_data: np.ndarray) -> np.ndarray:
+    def _remove_powerline_interference(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Remove 50/60 Hz interference"""
         for freq in [50, 60]:
             b, a = signal.iirnotch(freq, Q=30, fs=self.fs)
-            signal_data = signal.filtfilt(b, a, signal_data)
+            signal_data = np.array(signal.filtfilt(b, a, signal_data), dtype=np.float64)
         return signal_data
 
-    def _bandpass_filter(self, signal_data: np.ndarray) -> np.ndarray:
+    def _bandpass_filter(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Bandpass filter 0.5-40 Hz"""
         nyquist = self.fs / 2
         low = 0.5 / nyquist
         high = 40 / nyquist
         b, a = signal.butter(4, [low, high], btype='band')
-        return signal.filtfilt(b, a, signal_data)
+        return np.array(signal.filtfilt(b, a, signal_data), dtype=np.float64)
 
-    def _wavelet_denoise(self, signal_data: np.ndarray) -> np.ndarray:
+    def _wavelet_denoise(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Denoising using wavelets"""
         coeffs = pywt.wavedec(signal_data, 'db4', level=9)
         threshold = 0.04
         coeffs_thresh = [pywt.threshold(c, threshold*np.max(c), mode='soft')
                         for c in coeffs]
-        return pywt.waverec(coeffs_thresh, 'db4')[:len(signal_data)]
+        return np.array(pywt.waverec(coeffs_thresh, 'db4')[:len(signal_data)], dtype=np.float64)
 
 
 class FeatureExtractor:
     """Comprehensive ECG feature extraction"""
 
-    def __init__(self, sampling_rate: int = 500):
+    def __init__(self, sampling_rate: int = 500) -> None:
         self.fs = sampling_rate
 
-    def extract_all_features(self, signal_data: np.ndarray, r_peaks: np.ndarray | None = None) -> dict[str, Any]:
+    def extract_all_features(self, signal_data: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] | None = None) -> dict[str, Any]:
         """Complete feature extraction"""
         features = {}
 
@@ -214,17 +224,17 @@ class FeatureExtractor:
 
         return features
 
-    def _detect_r_peaks(self, signal_data: np.ndarray) -> np.ndarray:
+    def _detect_r_peaks(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.int64]:
         """R peak detection using Pan-Tompkins algorithm"""
         try:
             signals, info = nk.ecg_process(signal_data[:, 0] if signal_data.ndim > 1 else signal_data,
                                          sampling_rate=self.fs)
-            return info.get("ECG_R_Peaks", np.array([]))
+            return np.array(info.get("ECG_R_Peaks", np.array([])), dtype=np.int64)
         except Exception as e:
             logger.warning(f"R peak detection failed: {e}")
-            return np.array([])
+            return np.array([], dtype=np.int64)
 
-    def _extract_morphological_features(self, signal_data: np.ndarray, r_peaks: np.ndarray) -> dict[str, Any]:
+    def _extract_morphological_features(self, signal_data: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64]) -> dict[str, Any]:
         """Extract morphological wave features"""
         features = {}
 
@@ -241,7 +251,7 @@ class FeatureExtractor:
 
         return features
 
-    def _extract_interval_features(self, signal_data: np.ndarray, r_peaks: np.ndarray) -> dict[str, Any]:
+    def _extract_interval_features(self, signal_data: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64]) -> dict[str, Any]:
         """Extract interval features"""
         features = {}
 
@@ -263,7 +273,7 @@ class FeatureExtractor:
 
         return features
 
-    def _extract_hrv_features(self, r_peaks: np.ndarray) -> dict[str, Any]:
+    def _extract_hrv_features(self, r_peaks: npt.NDArray[np.int64]) -> dict[str, Any]:
         """Extract HRV features"""
         features = {}
 
@@ -278,7 +288,7 @@ class FeatureExtractor:
 
         return features
 
-    def _extract_spectral_features(self, signal_data: np.ndarray) -> dict[str, Any]:
+    def _extract_spectral_features(self, signal_data: npt.NDArray[np.float64]) -> dict[str, Any]:
         """Extract spectral features"""
         features = {}
 
@@ -291,7 +301,7 @@ class FeatureExtractor:
 
         return features
 
-    def _extract_wavelet_features(self, signal_data: np.ndarray) -> dict[str, Any]:
+    def _extract_wavelet_features(self, signal_data: npt.NDArray[np.float64]) -> dict[str, Any]:
         """Extract wavelet features"""
         features = {}
 
@@ -308,7 +318,7 @@ class FeatureExtractor:
 
         return features
 
-    def _extract_nonlinear_features(self, signal_data: np.ndarray, r_peaks: np.ndarray) -> dict[str, Any]:
+    def _extract_nonlinear_features(self, signal_data: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64]) -> dict[str, Any]:
         """Extract non-linear features"""
         features = {}
 
@@ -317,13 +327,13 @@ class FeatureExtractor:
 
         return features
 
-    def _sample_entropy(self, signal_data: np.ndarray, m: int = 2, r: float = 0.2) -> float:
+    def _sample_entropy(self, signal_data: npt.NDArray[np.float64], m: int = 2, r: float = 0.2) -> float:
         """Calculate sample entropy"""
         try:
             N = len(signal_data)
 
-            def _maxdist(xi, xj, m):
-                return max([abs(ua - va) for ua, va in zip(xi, xj, strict=False)])
+            def _maxdist(xi: npt.NDArray[np.float64], xj: npt.NDArray[np.float64], m: int) -> float:
+                return float(max([abs(ua - va) for ua, va in zip(xi, xj, strict=False)]))
 
             phi = np.zeros(2)
             for m_i in [m, m+1]:
@@ -342,15 +352,15 @@ class FeatureExtractor:
         except Exception:
             return 0.0
 
-    def _approximate_entropy(self, signal_data: np.ndarray, m: int = 2, r: float = 0.2) -> float:
+    def _approximate_entropy(self, signal_data: npt.NDArray[np.float64], m: int = 2, r: float = 0.2) -> float:
         """Calculate approximate entropy"""
         try:
             N = len(signal_data)
 
-            def _maxdist(xi, xj, m):
-                return max([abs(ua - va) for ua, va in zip(xi, xj, strict=False)])
+            def _maxdist(xi: npt.NDArray[np.float64], xj: npt.NDArray[np.float64], m: int) -> float:
+                return float(max([abs(ua - va) for ua, va in zip(xi, xj, strict=False)]))
 
-            def _phi(m):
+            def _phi(m: int) -> float:
                 patterns = np.array([signal_data[i:i+m] for i in range(N-m+1)])
                 C = np.zeros(N-m+1)
 
@@ -361,9 +371,9 @@ class FeatureExtractor:
                             C[i] += 1
 
                 phi = np.mean(np.log(C / (N-m+1)))
-                return phi
+                return float(phi)
 
-            return _phi(m) - _phi(m+1)
+            return float(_phi(m) - _phi(m+1))
         except Exception:
             return 0.0
 
@@ -373,7 +383,7 @@ class HybridECGAnalysisService:
     Hybrid ECG Analysis Service integrating advanced AI with existing infrastructure
     """
 
-    def __init__(self, db, validation_service: ValidationService):
+    def __init__(self, db: Any, validation_service: ValidationService) -> None:
         self.db = db
         self.repository = ECGRepository(db)
         self.validation_service = validation_service
@@ -454,7 +464,7 @@ class HybridECGAnalysisService:
             logger.error(f"Comprehensive ECG analysis failed: {e}")
             raise ECGProcessingException(f"Analysis failed: {str(e)}") from e
 
-    async def _run_simplified_analysis(self, signal: np.ndarray, features: dict[str, Any]) -> dict[str, Any]:
+    async def _run_simplified_analysis(self, signal: npt.NDArray[np.float64], features: dict[str, Any]) -> dict[str, Any]:
         """Simplified AI analysis for integration"""
 
         predictions = {}
@@ -490,7 +500,7 @@ class HybridECGAnalysisService:
             'model_version': 'simplified_v1.0'
         }
 
-    async def _detect_pathologies(self, signal: np.ndarray, features: dict[str, Any]) -> dict[str, Any]:
+    async def _detect_pathologies(self, signal: npt.NDArray[np.float64], features: dict[str, Any]) -> dict[str, Any]:
         """Detect specific pathologies"""
         pathologies = {}
 
@@ -523,13 +533,13 @@ class HybridECGAnalysisService:
         if features.get('spectral_entropy', 0) > 0.8:
             score += 0.3
 
-        return min(score, 1.0)
+        return float(min(score, 1.0))
 
     def _detect_long_qt(self, features: dict[str, Any]) -> float:
         """Detect long QT syndrome"""
         qtc = features.get('qtc_bazett', 0)
         if qtc > 460:  # ms
-            return min((qtc - 460) / 100, 1.0)
+            return float(min((qtc - 460) / 100, 1.0))
         return 0.0
 
     async def _generate_clinical_assessment(
@@ -563,7 +573,7 @@ class HybridECGAnalysisService:
 
         return assessment
 
-    async def _assess_signal_quality(self, signal: np.ndarray) -> dict[str, float]:
+    async def _assess_signal_quality(self, signal: npt.NDArray[np.float64]) -> dict[str, float]:
         """Assess ECG signal quality"""
         quality_metrics = {}
 

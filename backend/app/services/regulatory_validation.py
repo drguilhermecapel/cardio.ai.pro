@@ -39,7 +39,7 @@ class RegulatoryValidationService:
     Implements standards from FDA, ANVISA, NMSA, and EU MDR
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.validation_thresholds = {
             RegulatoryStandard.FDA: {
                 'min_confidence': 0.85,
@@ -110,7 +110,7 @@ class RegulatoryValidationService:
 
         thresholds = self.validation_thresholds[standard]
         errors = []
-        warnings = []
+        warnings: list[str] = []
         test_results = {}
 
         confidence = analysis_results.get('ai_predictions', {}).get('confidence', 0.0)
@@ -206,9 +206,9 @@ class RegulatoryValidationService:
                 metrics[f'{condition}_precision'] = precision
 
         if metrics:
-            metrics['sensitivity'] = np.mean([v for k, v in metrics.items() if 'sensitivity' in k])
-            metrics['specificity'] = np.mean([v for k, v in metrics.items() if 'specificity' in k])
-            metrics['precision'] = np.mean([v for k, v in metrics.items() if 'precision' in k])
+            metrics['sensitivity'] = float(np.mean([v for k, v in metrics.items() if 'sensitivity' in k]))
+            metrics['specificity'] = float(np.mean([v for k, v in metrics.items() if 'specificity' in k]))
+            metrics['precision'] = float(np.mean([v for k, v in metrics.items() if 'precision' in k]))
             metrics['false_positive_rate'] = 1 - metrics['specificity']
 
         return metrics
@@ -323,7 +323,7 @@ class RegulatoryValidationService:
         }
 
         for standard, result in validation_results.items():
-            report['standards_summary'][standard.value] = {
+            report['standards_summary'][standard.value] = {  # type: ignore[index]
                 'compliant': result.compliant,
                 'confidence_score': result.confidence_score,
                 'error_count': len(result.validation_errors),
@@ -331,7 +331,7 @@ class RegulatoryValidationService:
             }
 
             if not result.compliant:
-                report['recommendations'].extend([
+                report['recommendations'].extend([  # type: ignore[attr-defined]
                     f"{standard.value}: {error}" for error in result.validation_errors
                 ])
 

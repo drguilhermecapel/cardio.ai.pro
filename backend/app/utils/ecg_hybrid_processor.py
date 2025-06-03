@@ -17,7 +17,7 @@ class ECGHybridProcessor:
     Processor for integrating hybrid ECG analysis with existing infrastructure
     """
 
-    def __init__(self, db, validation_service):
+    def __init__(self, db: Any, validation_service: Any) -> None:
         self.hybrid_service = HybridECGAnalysisService(db, validation_service)
         self.regulatory_service = RegulatoryValidationService()
 
