@@ -398,7 +398,7 @@ class RobustnessValidationFramework:
         for case_name, test_signal in edge_cases:
             try:
                 start_time = time.time()
-                _ = analysis_function(test_signal)
+                pred = analysis_function(test_signal)
                 processing_time = (time.time() - start_time) * 1000
                 
                 if isinstance(pred, dict):
