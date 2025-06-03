@@ -12,6 +12,9 @@ from passlib.context import CryptContext
 
 from app.core.config import settings
 from app.core.exceptions import AuthenticationException
+from app.schemas.user import User
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -150,3 +153,36 @@ def generate_file_hash(file_content: bytes) -> str:
 def constant_time_compare(val1: str, val2: str) -> bool:
     """Constant time string comparison to prevent timing attacks."""
     return secrets.compare_digest(val1, val2)
+
+
+security = HTTPBearer()
+
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+) -> User:
+    """Get current user from JWT token."""
+    try:
+        payload = verify_token(credentials.credentials)
+        user_id = payload.get("sub")
+        
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        return User(
+            id=int(user_id),
+            email=f"user{user_id}@example.com",
+            is_active=True,
+            is_superuser=False
+        )
+        
+    except AuthenticationException:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

@@ -152,16 +152,26 @@ Update `configmap.yaml` with your environment-specific values:
 - `REACT_APP_WS_URL`: WebSocket endpoint
 
 ### Secrets
-Update `secrets.yaml` with base64-encoded values:
+Copy `secrets.example.yaml` to `secrets.yaml` and update with base64-encoded values:
 - `postgres-password`: PostgreSQL password
 - `redis-password`: Redis password
 - `secret-key`: Application secret key
 
+Generate base64-encoded secrets using:
+```bash
+echo -n "your_postgres_password" | base64
+echo -n "your_redis_password" | base64
+echo -n "your_application_secret_key" | base64
+echo -n "your_cast_ai_api_key" | base64
+```
+
 ### CAST AI Configuration
-Update `cast-ai-integration.yaml`:
-- Replace `api-key` in `cast-ai-secrets` with your CAST AI API key
-- Adjust `cluster-id` in `cast-ai-config`
-- Modify optimization parameters as needed
+1. Get your CAST AI API key from the [CAST AI Console](https://console.cast.ai/)
+2. Update `secrets.yaml` with your base64-encoded CAST AI API key
+3. Adjust `cluster-id` in `cast-ai-config` in `cast-ai-integration.yaml`
+4. Modify optimization parameters as needed
+
+**Security Note**: Never commit actual API keys or secrets to version control. Use the provided template files and replace placeholders with actual values during deployment.
 
 ## Scaling Behavior
 

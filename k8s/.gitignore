@@ -1,0 +1,18 @@
+# Ignore actual secrets files to prevent accidental commits
+secrets.yaml
+
+# Ignore any files containing actual credentials
+*-credentials.yaml
+*-secrets.yaml
+*.key
+*.pem
+*.crt
+
+# Ignore environment-specific configurations
+local-config.yaml
+dev-secrets.yaml
+prod-secrets.yaml
+
+# Ignore temporary files
+*.tmp
+*.bak

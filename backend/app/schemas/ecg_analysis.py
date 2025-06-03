@@ -202,3 +202,5 @@ class ECGUploadResponse(BaseModel):
     message: str
     status: AnalysisStatus
     estimated_processing_time_seconds: int
+    file_type: str | None = None
+    document_scanning_metadata: dict[str, Any] | None = None
