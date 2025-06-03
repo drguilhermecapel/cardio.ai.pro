@@ -61,7 +61,7 @@ const ContextualResponseDisplay: React.FC<ContextualResponseDisplayProps> = ({
   onLearnMore,
   onGetHelp,
 }) => {
-  const getCategoryIcon = (category: string) => {
+  const getCategoryIcon = (category: string): JSX.Element => {
     switch (category.toLowerCase()) {
       case 'medical_document':
         return <Info color="info" />

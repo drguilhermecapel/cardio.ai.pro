@@ -94,9 +94,7 @@ const ECGAnalysisPage: React.FC = () => {
   const { analyses, isLoading, error, uploadProgress } = useAppSelector(state => state.ecg)
   const { patients } = useAppSelector(state => state.patient)
   
-  const isNonECGError = (error: any): error is NonECGError => {
-    return error && typeof error === 'object' && error.error_code === 'NON_ECG_IMAGE_DETECTED'
-  }
+
 
   useEffect(() => {
     dispatch(fetchAnalyses({}))
@@ -110,7 +108,7 @@ const ECGAnalysisPage: React.FC = () => {
       
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
-        reader.onload = (e) => {
+        reader.onload = (e): void => {
           setImagePreview(e.target?.result as string)
         }
         reader.readAsDataURL(file)
