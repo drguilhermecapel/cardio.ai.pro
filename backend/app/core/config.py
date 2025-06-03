@@ -161,6 +161,52 @@ class Settings(BaseSettings):
     MAX_ECG_FILE_SIZE: int = 50 * 1024 * 1024  # 50MB
     ECG_UPLOAD_DIR: str = "uploads/ecg"
 
+    ECG_SCANNER_MIN_CONFIDENCE: float = 0.5
+    ECG_SCANNER_EDGE_THRESHOLD: int = 50
+    ECG_SCANNER_MIN_CONTOUR_AREA: int = 10000
+    ECG_SCANNER_PERSPECTIVE_CORRECTION: bool = True
+    ECG_SCANNER_ENHANCE_QUALITY: bool = True
+    ECG_SCANNER_VALIDATE_ECG: bool = True
+    ECG_SCANNER_BATCH_SIZE: int = 10
+    ECG_SCANNER_MAX_WORKERS: int = 4
+    ECG_SCANNER_TIMEOUT_SECONDS: int = 30
+
+    NON_ECG_CLASSIFIER_ENABLED: bool = True
+    NON_ECG_CLASSIFIER_CONFIDENCE_THRESHOLD: float = 0.7
+    NON_ECG_CLASSIFIER_CATEGORIES: list[str] = [
+        "medical_document", "x_ray", "mri", "ct_scan", "prescription",
+        "lab_results", "food", "animal", "person", "landscape", 
+        "screenshot", "text_document", "drawing", "other", "unknown"
+    ]
+    NON_ECG_CLASSIFIER_USE_GPU: bool = True
+    NON_ECG_CLASSIFIER_BATCH_SIZE: int = 8
+    NON_ECG_CLASSIFIER_TIMEOUT_SECONDS: int = 15
+
+    NON_ECG_RESPONSE_EDUCATIONAL_MODE: bool = True
+    NON_ECG_RESPONSE_INCLUDE_HUMOR: bool = True
+    NON_ECG_RESPONSE_PERSONALIZATION_ENABLED: bool = True
+    NON_ECG_RESPONSE_TRACK_USER_HISTORY: bool = True
+    NON_ECG_RESPONSE_MAX_TIPS: int = 5
+    NON_ECG_RESPONSE_INCLUDE_VISUAL_GUIDES: bool = True
+
+    ADAPTIVE_FEEDBACK_ENABLED: bool = True
+    ADAPTIVE_FEEDBACK_LEARNING_STAGES: list[str] = ["beginner", "intermediate", "advanced"]
+    ADAPTIVE_FEEDBACK_MIN_ATTEMPTS_FOR_STAGE: int = 3
+    ADAPTIVE_FEEDBACK_SUCCESS_THRESHOLD_INTERMEDIATE: float = 0.3
+    ADAPTIVE_FEEDBACK_SUCCESS_THRESHOLD_ADVANCED: float = 0.7
+    ADAPTIVE_FEEDBACK_MAX_HISTORY_SIZE: int = 100
+
+    NON_ECG_METRICS_ENABLED: bool = True
+    NON_ECG_METRICS_CACHE_DURATION_MINUTES: int = 15
+    NON_ECG_METRICS_PROMETHEUS_ENABLED: bool = True
+    NON_ECG_METRICS_INSIGHTS_GENERATION_ENABLED: bool = True
+    NON_ECG_METRICS_MAX_USER_CACHE_SIZE: int = 10000
+
+    NON_ECG_IMAGE_AUTO_DELETE: bool = True
+    NON_ECG_IMAGE_DELETE_DELAY_SECONDS: int = 0
+    NON_ECG_PRIVACY_LOGGING_ENABLED: bool = True
+    NON_ECG_AUDIT_TRAIL_ENABLED: bool = True
+
     model_config = {
         "case_sensitive": True,
         "env_file": ".env",

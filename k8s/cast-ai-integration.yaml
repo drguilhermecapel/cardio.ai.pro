@@ -1,0 +1,159 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cast-ai-config
+  namespace: cardioai-pro
+data:
+  cluster-id: "cardioai-pro-cluster"
+  optimization-level: "aggressive"
+  cost-reduction-target: "65"
+  scaling-policy: "predictive"
+  gpu-optimization: "enabled"
+  spot-instance-ratio: "70"
+  
+  prediction-window: "15m"
+  scale-up-threshold: "0.7"
+  scale-down-threshold: "0.3"
+  min-node-count: "3"
+  max-node-count: "50"
+  
+  right-sizing: "enabled"
+  workload-rebalancing: "enabled"
+  cluster-hibernation: "enabled"
+  unused-resource-cleanup: "enabled"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cast-ai-agent
+  namespace: cardioai-pro
+  labels:
+    app: cast-ai-agent
+    component: cost-optimization
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cast-ai-agent
+  template:
+    metadata:
+      labels:
+        app: cast-ai-agent
+        component: cost-optimization
+    spec:
+      serviceAccountName: cast-ai-service-account
+      containers:
+      - name: cast-ai-agent
+        image: castai/cluster-controller:latest
+        env:
+        - name: CLUSTER_ID
+          valueFrom:
+            configMapKeyRef:
+              name: cast-ai-config
+              key: cluster-id
+        - name: CAST_AI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cast-ai-secrets
+              key: api-key
+        - name: OPTIMIZATION_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: cast-ai-config
+              key: optimization-level
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: cast-ai-config-volume
+          mountPath: /etc/cast-ai
+      volumes:
+      - name: cast-ai-config-volume
+        configMap:
+          name: cast-ai-config
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cast-ai-service-account
+  namespace: cardioai-pro
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cast-ai-cluster-role
+rules:
+- apiGroups: [""]
+  resources: ["nodes", "pods", "services", "endpoints", "persistentvolumes", "persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["autoscaling"]
+  resources: ["horizontalpodautoscalers"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["nodes", "pods"]
+  verbs: ["get", "list"]
+- apiGroups: ["custom.metrics.k8s.io"]
+  resources: ["*"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cast-ai-cluster-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cast-ai-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: cast-ai-service-account
+  namespace: cardioai-pro
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cast-ai-secrets
+  namespace: cardioai-pro
+type: Opaque
+data:
+  api-key: Y2FzdC1haS1hcGkta2V5LXJlcGxhY2UtaW4tcHJvZHVjdGlvbg==
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-pdb
+  namespace: cardioai-pro
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: celery-worker-pdb
+  namespace: cardioai-pro
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: celery-worker
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  namespace: cardioai-pro
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: frontend

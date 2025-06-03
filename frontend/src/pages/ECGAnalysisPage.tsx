@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Box,
   Card,
@@ -24,20 +24,79 @@ import {
   TableHead,
   TableRow,
   Paper,
+  IconButton,
+  Tooltip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
 } from '@mui/material'
-import { CloudUpload, Visibility } from '@mui/icons-material'
+import { 
+  CloudUpload, 
+  Visibility, 
+  CameraAlt, 
+  Image as ImageIcon,
+  CheckCircle,
+  Warning,
+  Error as ErrorIcon,
+  ExpandMore,
+  GridOn,
+  Timeline,
+  Assessment
+} from '@mui/icons-material'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { uploadECG, fetchAnalyses, clearError } from '../store/slices/ecgSlice'
 import { fetchPatients } from '../store/slices/patientSlice'
+
+interface DocumentScanningMetadata {
+  scanner_confidence: number
+  document_detected: boolean
+  processing_method: string
+  grid_detected: boolean
+  leads_detected: number
+  original_size: [number, number]
+  processed_size: [number, number]
+  error?: string
+}
+
+interface NonECGError {
+  error_code: string
+  message: string
+  category: string
+  confidence: number
+  contextual_response: {
+    message: string
+    explanation?: string
+    tips?: string[]
+    visual_guide?: string
+    educational_content?: any
+    helpful_actions?: string[]
+  }
+}
 
 const ECGAnalysisPage: React.FC = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [selectedPatientId, setSelectedPatientId] = useState<number | ''>('')
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [cameraMode, setCameraMode] = useState(false)
+  const [scanningProgress, setScanningProgress] = useState(0)
+  const [scanningMetadata, setScanningMetadata] = useState<DocumentScanningMetadata | null>(null)
+  const [isScanning, setIsScanning] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const dispatch = useAppDispatch()
   const { analyses, isLoading, error, uploadProgress } = useAppSelector(state => state.ecg)
   const { patients } = useAppSelector(state => state.patient)
+  
+  const isNonECGError = (error: any): error is NonECGError => {
+    return error && typeof error === 'object' && error.error_code === 'NON_ECG_IMAGE_DETECTED'
+  }
 
   useEffect(() => {
     dispatch(fetchAnalyses({}))
@@ -48,23 +107,131 @@ const ECGAnalysisPage: React.FC = () => {
     const file = event.target.files?.[0]
     if (file) {
       setSelectedFile(file)
+      
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          setImagePreview(e.target?.result as string)
+        }
+        reader.readAsDataURL(file)
+      } else {
+        setImagePreview(null)
+      }
+      
+      setScanningMetadata(null)
+    }
+  }
+
+  const startCamera = async (): Promise<void> => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment', // Use back camera on mobile
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        } 
+      })
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        setCameraMode(true)
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error)
+      alert('Unable to access camera. Please check permissions.')
+    }
+  }
+
+  const stopCamera = (): void => {
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream
+      stream.getTracks().forEach(track => track.stop())
+      videoRef.current.srcObject = null
+    }
+    setCameraMode(false)
+  }
+
+  const capturePhoto = (): void => {
+    if (videoRef.current && canvasRef.current) {
+      const canvas = canvasRef.current
+      const video = videoRef.current
+      
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(video, 0, 0)
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], `ecg-capture-${Date.now()}.jpg`, { type: 'image/jpeg' })
+            setSelectedFile(file)
+            setImagePreview(canvas.toDataURL())
+            stopCamera()
+          }
+        }, 'image/jpeg', 0.9)
+      }
     }
   }
 
   const handleUpload = async (): Promise<void> => {
     if (selectedFile && selectedPatientId) {
       dispatch(clearError())
-      await dispatch(
+      
+      if (selectedFile.type.startsWith('image/')) {
+        setIsScanning(true)
+        setScanningProgress(0)
+        
+        const progressInterval = setInterval(() => {
+          setScanningProgress(prev => {
+            if (prev >= 90) {
+              clearInterval(progressInterval)
+              return 90
+            }
+            return prev + 10
+          })
+        }, 200)
+      }
+      
+      const result = await dispatch(
         uploadECG({
           patientId: selectedPatientId as number,
           file: selectedFile,
         })
       )
+      
+      if (result.payload?.document_scanning_metadata) {
+        setScanningMetadata(result.payload.document_scanning_metadata)
+        setScanningProgress(100)
+        
+        setTimeout(() => {
+          setIsScanning(false)
+          setScanningProgress(0)
+        }, 2000)
+      } else {
+        setIsScanning(false)
+        setScanningProgress(0)
+      }
+      
       setUploadDialogOpen(false)
       setSelectedFile(null)
       setSelectedPatientId('')
+      setImagePreview(null)
+      setScanningMetadata(null)
       dispatch(fetchAnalyses({}))
     }
+  }
+
+  const resetUploadDialog = (): void => {
+    setUploadDialogOpen(false)
+    setSelectedFile(null)
+    setSelectedPatientId('')
+    setImagePreview(null)
+    setScanningMetadata(null)
+    setIsScanning(false)
+    setScanningProgress(0)
+    stopCamera()
   }
 
   const getStatusColor = (
@@ -115,8 +282,71 @@ const ECGAnalysisPage: React.FC = () => {
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
+        <Alert 
+          severity={error?.error_code === 'NON_ECG_IMAGE_DETECTED' ? 'info' : 'error'} 
+          sx={{ mb: 2 }}
+        >
+          {error?.error_code === 'NON_ECG_IMAGE_DETECTED' ? (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                {error.contextual_response?.message || 'Non-ECG image detected'}
+              </Typography>
+              {error.contextual_response?.explanation && (
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  {error.contextual_response.explanation}
+                </Typography>
+              )}
+              {error.contextual_response?.tips && error.contextual_response.tips.length > 0 && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    💡 Tips:
+                  </Typography>
+                  <List dense>
+                    {error.contextual_response.tips.map((tip: string, index: number) => (
+                      <ListItem key={index} sx={{ py: 0 }}>
+                        <ListItemText primary={`• ${tip}`} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
+              {error.contextual_response?.visual_guide && (
+                <Box sx={{ mb: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    📋 What an ECG looks like:
+                  </Typography>
+                  <Typography variant="body2">
+                    {error.contextual_response.visual_guide}
+                  </Typography>
+                </Box>
+              )}
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 2 }}>
+                <Button 
+                  variant="contained" 
+                  size="small"
+                  onClick={() => {
+                    dispatch(clearError())
+                    setUploadDialogOpen(true)
+                  }}
+                >
+                  📷 Try Again
+                </Button>
+                {error.contextual_response?.educational_content && (
+                  <Button 
+                    variant="outlined" 
+                    size="small"
+                    onClick={() => {
+                      console.log('Educational content:', error.contextual_response.educational_content)
+                    }}
+                  >
+                    📚 Learn More
+                  </Button>
+                )}
+              </Box>
+            </Box>
+          ) : (
+            typeof error === 'string' ? error : error?.message || 'An error occurred'
+          )}
         </Alert>
       )}
 
@@ -204,16 +434,198 @@ const ECGAnalysisPage: React.FC = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <Button variant="outlined" component="label" fullWidth sx={{ height: 56 }}>
-                {selectedFile ? selectedFile.name : 'Choose ECG File'}
-                <input
-                  type="file"
-                  hidden
-                  accept=".csv,.txt,.xml,.dat"
-                  onChange={handleFileSelect}
-                />
-              </Button>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button 
+                  variant="outlined" 
+                  component="label" 
+                  fullWidth 
+                  sx={{ height: 56 }}
+                  startIcon={<ImageIcon />}
+                >
+                  {selectedFile ? selectedFile.name : 'Choose ECG File'}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    hidden
+                    accept=".csv,.txt,.xml,.dat,.jpg,.jpeg,.png"
+                    onChange={handleFileSelect}
+                  />
+                </Button>
+                <Tooltip title="Capture with Camera">
+                  <IconButton 
+                    onClick={startCamera}
+                    sx={{ 
+                      border: 1, 
+                      borderColor: 'divider',
+                      width: 56,
+                      height: 56
+                    }}
+                  >
+                    <CameraAlt />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </Grid>
+
+            {/* Camera Mode */}
+            {cameraMode && (
+              <Grid item xs={12}>
+                <Card sx={{ p: 2 }}>
+                  <Box sx={{ position: 'relative', textAlign: 'center' }}>
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      style={{ 
+                        width: '100%', 
+                        maxHeight: '300px',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'center' }}>
+                      <Button variant="contained" onClick={capturePhoto}>
+                        Capture ECG
+                      </Button>
+                      <Button variant="outlined" onClick={stopCamera}>
+                        Cancel
+                      </Button>
+                    </Box>
+                  </Box>
+                </Card>
+                <canvas ref={canvasRef} style={{ display: 'none' }} />
+              </Grid>
+            )}
+
+            {/* Image Preview */}
+            {imagePreview && !cameraMode && (
+              <Grid item xs={12}>
+                <Card sx={{ p: 2 }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Image Preview
+                  </Typography>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <img
+                      src={imagePreview}
+                      alt="ECG Preview"
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '300px',
+                        borderRadius: '8px',
+                        border: '2px dashed #ccc'
+                      }}
+                    />
+                  </Box>
+                </Card>
+              </Grid>
+            )}
+
+            {/* Document Scanning Progress */}
+            {isScanning && (
+              <Grid item xs={12}>
+                <Card sx={{ p: 2 }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Scanning ECG Document...
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={scanningProgress} 
+                    sx={{ mb: 1 }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {scanningProgress < 30 && 'Detecting document edges...'}
+                    {scanningProgress >= 30 && scanningProgress < 60 && 'Applying perspective correction...'}
+                    {scanningProgress >= 60 && scanningProgress < 90 && 'Enhancing image quality...'}
+                    {scanningProgress >= 90 && 'Validating ECG document...'}
+                  </Typography>
+                </Card>
+              </Grid>
+            )}
+
+            {/* Scanning Results */}
+            {scanningMetadata && (
+              <Grid item xs={12}>
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {scanningMetadata.document_detected ? (
+                        <CheckCircle color="success" />
+                      ) : scanningMetadata.scanner_confidence > 0.3 ? (
+                        <Warning color="warning" />
+                      ) : (
+                        <ErrorIcon color="error" />
+                      )}
+                      <Typography variant="subtitle2">
+                        Document Scanning Results 
+                        ({(scanningMetadata.scanner_confidence * 100).toFixed(1)}% confidence)
+                      </Typography>
+                    </Box>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <List dense>
+                      <ListItem>
+                        <ListItemIcon>
+                          {scanningMetadata.document_detected ? (
+                            <CheckCircle color="success" />
+                          ) : (
+                            <ErrorIcon color="error" />
+                          )}
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="ECG Document Detected"
+                          secondary={scanningMetadata.document_detected ? 'Yes' : 'No'}
+                        />
+                      </ListItem>
+                      
+                      <ListItem>
+                        <ListItemIcon>
+                          {scanningMetadata.grid_detected ? (
+                            <GridOn color="success" />
+                          ) : (
+                            <GridOn color="disabled" />
+                          )}
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="Grid Pattern"
+                          secondary={scanningMetadata.grid_detected ? 'Detected' : 'Not detected'}
+                        />
+                      </ListItem>
+                      
+                      <ListItem>
+                        <ListItemIcon>
+                          <Timeline color={scanningMetadata.leads_detected > 0 ? 'success' : 'disabled'} />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="ECG Leads"
+                          secondary={`${scanningMetadata.leads_detected} leads detected`}
+                        />
+                      </ListItem>
+                      
+                      <ListItem>
+                        <ListItemIcon>
+                          <Assessment />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary="Processing Method"
+                          secondary={scanningMetadata.processing_method}
+                        />
+                      </ListItem>
+                      
+                      {scanningMetadata.error && (
+                        <ListItem>
+                          <ListItemIcon>
+                            <ErrorIcon color="error" />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary="Error"
+                            secondary={scanningMetadata.error}
+                          />
+                        </ListItem>
+                      )}
+                    </List>
+                  </AccordionDetails>
+                </Accordion>
+              </Grid>
+            )}
             {uploadProgress > 0 && uploadProgress < 100 && (
               <Grid item xs={12}>
                 <LinearProgress variant="determinate" value={uploadProgress} />
@@ -225,13 +637,13 @@ const ECGAnalysisPage: React.FC = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setUploadDialogOpen(false)}>Cancel</Button>
+          <Button onClick={resetUploadDialog}>Cancel</Button>
           <Button
             onClick={handleUpload}
             variant="contained"
-            disabled={!selectedFile || !selectedPatientId || isLoading}
+            disabled={!selectedFile || !selectedPatientId || isLoading || isScanning}
           >
-            Upload
+            {isScanning ? 'Processing...' : 'Upload'}
           </Button>
         </DialogActions>
       </Dialog>

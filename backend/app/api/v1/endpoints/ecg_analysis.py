@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.exceptions import NonECGImageException
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.ecg_analysis import (
@@ -25,6 +26,7 @@ from app.services.ml_model_service import MLModelService
 from app.services.notification_service import NotificationService
 from app.services.user_service import UserService
 from app.services.validation_service import ValidationService
+from app.services.adaptive_feedback_service import adaptive_feedback_service
 
 router = APIRouter()
 
@@ -37,7 +39,7 @@ async def upload_ecg(
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """Upload ECG file for analysis."""
-    allowed_extensions = {'.csv', '.txt', '.xml', '.dat'}
+    allowed_extensions = {'.csv', '.txt', '.xml', '.dat', '.jpg', '.jpeg', '.png'}
     file_extension = os.path.splitext(file.filename or "")[1].lower()
 
     if file_extension not in allowed_extensions:
@@ -65,6 +67,79 @@ async def upload_ecg(
     validation_service = ValidationService(db, NotificationService(db))
     ecg_service = ECGAnalysisService(db, ml_service, validation_service)
 
+    document_scanning_metadata = None
+    estimated_time = 30
+    
+    if file_extension in {'.jpg', '.jpeg', '.png'}:
+        try:
+            from app.services.ecg_document_scanner import ECGDocumentScanner
+            scanner = ECGDocumentScanner()
+            
+            user_session = None
+            try:
+                from app.models.user import UserSession
+                from sqlalchemy import select
+                stmt = select(UserSession).where(UserSession.user_id == current_user.id).order_by(UserSession.created_at.desc())
+                result = await db.execute(stmt)
+                user_session = result.scalar_one_or_none()
+            except Exception:
+                pass  # Continue without user session if not available
+            
+            scan_result = await scanner.process_ecg_image(
+                file_path, 
+                user_session=user_session,
+                raise_non_ecg_exception=True  # This will raise NonECGImageException for non-ECG images
+            )
+            
+            document_scanning_metadata = {
+                "scanner_confidence": scan_result.get("confidence", 0.0),
+                "document_detected": scan_result.get("validation", {}).get("is_valid_ecg", False),
+                "processing_method": scan_result.get("metadata", {}).get("processing_method", "unknown"),
+                "grid_detected": scan_result.get("validation", {}).get("grid_detected", False),
+                "leads_detected": scan_result.get("validation", {}).get("leads_detected", 0),
+                "original_size": scan_result.get("metadata", {}).get("original_size", [0, 0]),
+                "processed_size": scan_result.get("metadata", {}).get("processed_size", [0, 0])
+            }
+            
+            estimated_time = 60 if scan_result.get("confidence", 0.0) > 0.5 else 45
+            
+        except NonECGImageException as e:
+            if user_session:
+                await adaptive_feedback_service.track_user_attempt(
+                    user_session=user_session,
+                    category=e.details["category"],
+                    success=False,
+                    confidence=e.details["confidence"]
+                )
+            
+            try:
+                os.unlink(file_path)
+            except Exception:
+                pass  # File might already be deleted
+            
+            raise HTTPException(
+                status_code=e.status_code,
+                detail={
+                    "error_code": e.error_code,
+                    "message": e.message,
+                    "category": e.details["category"],
+                    "confidence": e.details["confidence"],
+                    "contextual_response": e.details["contextual_response"]
+                }
+            )
+            
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Image preprocessing failed for {file_path}: {str(e)}")
+            
+            document_scanning_metadata = {
+                "scanner_confidence": 0.0,
+                "document_detected": False,
+                "processing_method": "fallback",
+                "error": str(e)
+            }
+
     analysis = await ecg_service.create_analysis(
         patient_id=patient_id,
         file_path=file_path,
@@ -72,11 +147,29 @@ async def upload_ecg(
         created_by=current_user.id,
     )
 
+    if file_extension in {'.jpg', '.jpeg', '.png'} and user_session:
+        await adaptive_feedback_service.track_user_attempt(
+            user_session=user_session,
+            category="ecg_success",
+            success=True,
+            confidence=document_scanning_metadata.get("scanner_confidence", 0.0) if document_scanning_metadata else 0.0
+        )
+
+    if file_extension in {'.jpg', '.jpeg', '.png'}:
+        if document_scanning_metadata and document_scanning_metadata.get("document_detected", False):
+            message = "ECG image uploaded and document detected successfully. Analysis started."
+        else:
+            message = "Image uploaded. Document detection had low confidence. Analysis started with fallback processing."
+    else:
+        message = "ECG uploaded successfully. Analysis started."
+
     return ECGUploadResponse(
         analysis_id=analysis.analysis_id,
-        message="ECG uploaded successfully. Analysis started.",
+        message=message,
         status=analysis.status,
-        estimated_processing_time_seconds=30,
+        estimated_processing_time_seconds=estimated_time,
+        file_type=file_extension,
+        document_scanning_metadata=document_scanning_metadata,
     )
 
 

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cardioai-config
+  namespace: cardioai-pro
+data:
+  DATABASE_URL: "postgresql+asyncpg://cardioai:cardioai_dev_password@postgres:5432/cardioai_pro"
+  REDIS_URL: "redis://:cardioai_redis_password@redis:6379/0"
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  REACT_APP_API_URL: "http://api.cardioai.pro"
+  REACT_APP_WS_URL: "ws://api.cardioai.pro"

@@ -1,0 +1,92 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: cardioai-pro
+  namespace: cardioai-pro
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - postgres.yaml
+  - redis.yaml
+  - api.yaml
+  - celery.yaml
+  - frontend.yaml
+  - ingress.yaml
+  - cast-ai-integration.yaml
+  - monitoring.yaml
+
+commonLabels:
+  app.kubernetes.io/name: cardioai-pro
+  app.kubernetes.io/version: "1.0.0"
+  app.kubernetes.io/component: ecg-analysis
+  app.kubernetes.io/part-of: cardioai-platform
+
+images:
+  - name: cardioai/backend
+    newTag: latest
+  - name: cardioai/frontend
+    newTag: latest
+
+replicas:
+  - name: api
+    count: 3
+  - name: celery-worker
+    count: 2
+  - name: frontend
+    count: 2
+
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: api
+      namespace: cardioai-pro
+    spec:
+      template:
+        metadata:
+          annotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "8000"
+            prometheus.io/path: "/metrics"
+
+configMapGenerator:
+  - name: cast-ai-optimization-config
+    literals:
+      - optimization_level=aggressive
+      - cost_target=65
+      - prediction_window=15m
+      - spot_ratio=70
+
+secretGenerator:
+  - name: cardioai-tls
+    type: kubernetes.io/tls
+    files:
+      - tls.crt=certs/cardioai.crt
+      - tls.key=certs/cardioai.key
+
+namespace: cardioai-pro
+
+namePrefix: cardioai-
+
+nameSuffix: -v1
+
+vars:
+  - name: NAMESPACE
+    objref:
+      kind: Namespace
+      name: cardioai-pro
+      apiVersion: v1
+  - name: DATABASE_SERVICE
+    objref:
+      kind: Service
+      name: postgres
+      apiVersion: v1
+  - name: REDIS_SERVICE
+    objref:
+      kind: Service
+      name: redis
+      apiVersion: v1
