@@ -270,7 +270,7 @@ class FeatureExtractor:
 
             features['pr_interval_mean'] = np.mean(rr_intervals) * 0.16
             features['qt_interval_mean'] = np.mean(rr_intervals) * 0.4
-            
+
             rr_mean_seconds = np.mean(rr_intervals) / 1000
             if rr_mean_seconds > 0:
                 features['qtc_bazett'] = features['qt_interval_mean'] / np.sqrt(rr_mean_seconds)
@@ -290,16 +290,16 @@ class FeatureExtractor:
 
         if len(r_peaks) > 1:
             rr_intervals = np.diff(r_peaks) / self.fs * 1000
-            
+
             if len(rr_intervals) > 1:
                 rr_diff = np.diff(rr_intervals)
                 if len(rr_diff) > 0:
                     features['hrv_rmssd'] = np.sqrt(np.mean(rr_diff**2))
                 else:
                     features['hrv_rmssd'] = 0.0
-                    
+
                 features['hrv_sdnn'] = np.std(rr_intervals)
-                
+
                 if len(rr_intervals) > 0:
                     features['hrv_pnn50'] = len(np.where(np.abs(rr_diff) > 50)[0]) / len(rr_intervals) * 100
                 else:
@@ -316,17 +316,17 @@ class FeatureExtractor:
         features = {}
 
         lead_signal = signal_data[:, 0] if signal_data.ndim > 1 else signal_data
-        
+
         # Use larger nperseg for better frequency resolution
         nperseg = min(len(lead_signal), 2048)  # Use full signal or 2048, whichever is smaller
         freqs, psd = signal.welch(lead_signal, fs=self.fs, nperseg=nperseg, noverlap=nperseg//2)
-        
+
         dominant_freq_idx = np.argmax(psd)
         features['dominant_frequency'] = float(freqs[dominant_freq_idx])
-        
+
         psd_norm = psd / (np.sum(psd) + 1e-10)  # Avoid division by zero
         features['spectral_entropy'] = float(entropy(psd_norm + 1e-10))  # Avoid log(0)
-        
+
         features['power_total'] = float(np.sum(psd))
 
         return features
@@ -353,10 +353,10 @@ class FeatureExtractor:
         features = {}
 
         lead_signal = signal_data[:, 0] if signal_data.ndim > 1 else signal_data
-        
+
         features['signal_complexity'] = float(np.std(np.diff(lead_signal)))
         features['signal_variability'] = float(np.var(lead_signal))
-        
+
         if len(lead_signal) > 0:
             features['sample_entropy'] = float(min(np.log(np.var(lead_signal) + 1e-10), 10.0))
             features['approximate_entropy'] = float(min(np.log(np.std(lead_signal) + 1e-10), 10.0))
@@ -370,11 +370,11 @@ class FeatureExtractor:
         """Calculate sample entropy with performance optimization"""
         try:
             N = len(signal_data)
-            
+
             if N > 5000:
                 signal_data = signal_data[:5000]
                 N = 5000
-            
+
             if N < 10:  # Need minimum data points
                 return 0.0
 
@@ -383,14 +383,14 @@ class FeatureExtractor:
 
             phi = np.zeros(2)
             signal_std = np.std(signal_data)
-            
+
             if signal_std == 0:
                 return 0.0
-                
+
             for m_i in [m, m+1]:
                 if N-m_i+1 <= 0:
                     continue
-                    
+
                 patterns_m = np.array([signal_data[i:i+m_i] for i in range(N-m_i+1)])
                 C = np.zeros(N-m_i+1)
 
@@ -411,11 +411,11 @@ class FeatureExtractor:
         """Calculate approximate entropy with performance optimization"""
         try:
             N = len(signal_data)
-            
+
             if N > 5000:
                 signal_data = signal_data[:5000]
                 N = 5000
-            
+
             if N < 10:  # Need minimum data points
                 return 0.0
 
@@ -429,7 +429,7 @@ class FeatureExtractor:
             def _phi(m: int) -> float:
                 if N-m+1 <= 0:
                     return 0.0
-                    
+
                 patterns = np.array([signal_data[i:i+m] for i in range(N-m+1)])
                 C = np.zeros(N-m+1)
 
@@ -597,7 +597,7 @@ class HybridECGAnalysisService:
 
         rr_mean = features.get('rr_mean', 1000)  # Default to 1000ms for normal RR interval
         rr_std = features.get('rr_std', 0)
-        
+
         # Avoid division by zero
         if rr_mean > 0 and rr_std / rr_mean > 0.3:
             score += 0.4
@@ -658,10 +658,10 @@ class HybridECGAnalysisService:
 
         signal_power = np.mean(np.abs(signal)**2)
         noise_estimate = np.std(np.diff(signal, axis=0))
-        
+
         if noise_estimate == 0:
             noise_estimate = 1e-10
-            
+
         snr = 10 * np.log10(signal_power / (noise_estimate**2 + 1e-10))
         quality_metrics['snr_db'] = float(snr)
 
@@ -671,10 +671,10 @@ class HybridECGAnalysisService:
 
         snr_normalized = min(max((snr + 10) / 30, 0), 1)  # Adjusted range
         quality_score = snr_normalized * quality_metrics['baseline_stability']
-        
+
         if signal_power > 1e-6:  # If signal has reasonable power
             quality_score = max(quality_score, 0.6)  # Minimum quality for valid signals
-            
+
         quality_metrics['overall_score'] = float(quality_score)
 
         return quality_metrics
