@@ -20,6 +20,8 @@ from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
 from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
+from app.monitoring.ecg_metrics import ecg_metrics
+from app.monitoring.structured_logging import get_ecg_logger
 
 if TYPE_CHECKING:
     import pywt  # type: ignore[import-untyped]
@@ -461,6 +463,7 @@ class HybridECGAnalysisService:
         self.ecg_reader = UniversalECGReader()
         self.preprocessor = AdvancedPreprocessor()
         self.feature_extractor = FeatureExtractor()
+        self.ecg_logger = get_ecg_logger(__name__)
 
         logger.info("Hybrid ECG Analysis Service initialized")
 

@@ -15,6 +15,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.v1.api import api_router
 from app.core.config import settings
+from app.monitoring.health_checks import router as health_router
 from app.core.exceptions import (
     AuthenticationException,
     CardioAIException,
@@ -141,6 +142,7 @@ async def health_check() -> dict[str, str]:
 
 
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(health_router, prefix="/monitoring", tags=["monitoring"])
 
 
 @app.get("/")
