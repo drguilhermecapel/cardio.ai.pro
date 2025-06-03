@@ -6,7 +6,7 @@ Integrates comprehensive pathology detection with existing cardio.ai.pro infrast
 import logging
 import time
 import warnings
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import neurokit2 as nk
 import numpy as np
