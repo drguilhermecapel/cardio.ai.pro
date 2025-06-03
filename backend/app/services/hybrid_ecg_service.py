@@ -18,6 +18,7 @@ from sklearn.preprocessing import StandardScaler  # type: ignore[import-untyped]
 
 from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
+
 # from app.monitoring.structured_logging import get_ecg_logger  # Temporarily disabled for core component
 from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
@@ -129,17 +130,17 @@ class UniversalECGReader:
         try:
             # from app.services.ecg_document_scanner import ECGDocumentScanner  # Disabled for core component
             raise NotImplementedError("Image processing not available in core component")
-            
+
             confidence = 0.0
             if confidence > 0.5:
                 time_points = int(10 * sampling_rate)  # 10 seconds of data
                 t = np.linspace(0, 10, time_points)
-                
+
                 leads_data = []
                 for lead_idx in range(12):
                     heart_rate = 75  # BPM
                     rr_interval = 60 / heart_rate
-                    
+
                     ecg_signal = np.zeros_like(t)
                     for beat_time in np.arange(0, 10, rr_interval):
                         if beat_time + 0.5 < 10:  # Ensure we don't go beyond signal length
@@ -147,29 +148,29 @@ class UniversalECGReader:
                             p_end = int((beat_time + 0.2) * sampling_rate)
                             if p_end < len(ecg_signal):
                                 ecg_signal[p_start:p_end] += 0.1 * np.sin(np.linspace(0, np.pi, p_end - p_start))
-                            
+
                             qrs_start = int((beat_time + 0.3) * sampling_rate)
                             qrs_end = int((beat_time + 0.4) * sampling_rate)
                             if qrs_end < len(ecg_signal):
                                 ecg_signal[qrs_start:qrs_end] += 0.8 * np.sin(np.linspace(0, 2*np.pi, qrs_end - qrs_start))
-                            
+
                             t_start = int((beat_time + 0.5) * sampling_rate)
                             t_end = int((beat_time + 0.7) * sampling_rate)
                             if t_end < len(ecg_signal):
                                 ecg_signal[t_start:t_end] += 0.3 * np.sin(np.linspace(0, np.pi, t_end - t_start))
-                    
+
                     lead_multiplier = 1.0 + (lead_idx % 3) * 0.2
                     ecg_signal *= lead_multiplier
-                    
+
                     noise = np.random.normal(0, 0.02, len(ecg_signal))
                     ecg_signal += noise
-                    
+
                     leads_data.append(ecg_signal)
-                
+
                 signal_matrix = np.column_stack(leads_data)
             else:
                 signal_matrix = np.random.randn(5000, 12) * 0.1
-            
+
             return {
                 'signal': signal_matrix,
                 'sampling_rate': sampling_rate,
@@ -184,7 +185,7 @@ class UniversalECGReader:
                     'leads_detected': 0  # Placeholder for PR-008
                 }
             }
-            
+
         except Exception as e:
             logger.error(f"ECG image digitization failed for {filepath}: {str(e)}")
             mock_signal = np.random.randn(5000, 12) * 0.1

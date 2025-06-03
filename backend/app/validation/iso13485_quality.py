@@ -7,8 +7,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
-import json
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ class RiskAssessment:
     severity: int  # 1-5 scale
     probability: int  # 1-5 scale
     risk_level: RiskLevel
-    risk_control_measures: List[str]
+    risk_control_measures: list[str]
     residual_risk: RiskLevel
     acceptability: bool
 
@@ -52,13 +51,13 @@ class RiskAssessment:
 class DesignControl:
     """Design control record per ISO 13485"""
     phase: DesignPhase
-    requirements: List[str]
-    outputs: List[str]
-    verification_methods: List[str]
-    validation_methods: List[str]
-    review_participants: List[str]
+    requirements: list[str]
+    outputs: list[str]
+    verification_methods: list[str]
+    validation_methods: list[str]
+    review_participants: list[str]
     approval_status: bool
-    approval_date: Optional[datetime]
+    approval_date: datetime | None
 
 
 class ISO13485QualitySystem:
@@ -66,19 +65,19 @@ class ISO13485QualitySystem:
     ISO 13485 Quality Management System implementation
     Ensures medical device compliance for ECG analysis system
     """
-    
+
     def __init__(self):
-        self.design_controls: Dict[DesignPhase, DesignControl] = {}
-        self.risk_assessments: List[RiskAssessment] = []
-        self.quality_records: Dict[str, Any] = {}
-        self.document_control: Dict[str, Any] = {}
-        
+        self.design_controls: dict[DesignPhase, DesignControl] = {}
+        self.risk_assessments: list[RiskAssessment] = []
+        self.quality_records: dict[str, Any] = {}
+        self.document_control: dict[str, Any] = {}
+
         self._initialize_design_controls()
         self._initialize_risk_assessments()
-    
+
     def _initialize_design_controls(self) -> None:
         """Initialize design controls for ECG analysis system"""
-        
+
         self.design_controls[DesignPhase.PLANNING] = DesignControl(
             phase=DesignPhase.PLANNING,
             requirements=[
@@ -113,7 +112,7 @@ class ISO13485QualitySystem:
             approval_status=True,
             approval_date=datetime.now()
         )
-        
+
         self.design_controls[DesignPhase.INPUTS] = DesignControl(
             phase=DesignPhase.INPUTS,
             requirements=[
@@ -147,7 +146,7 @@ class ISO13485QualitySystem:
             approval_status=True,
             approval_date=datetime.now()
         )
-        
+
         self.design_controls[DesignPhase.OUTPUTS] = DesignControl(
             phase=DesignPhase.OUTPUTS,
             requirements=[
@@ -183,10 +182,10 @@ class ISO13485QualitySystem:
             approval_status=False,  # In progress
             approval_date=None
         )
-    
+
     def _initialize_risk_assessments(self) -> None:
         """Initialize risk assessments per ISO 14971"""
-        
+
         self.risk_assessments.append(RiskAssessment(
             hazard_id="RISK-001",
             hazard_description="False negative detection of STEMI",
@@ -204,7 +203,7 @@ class ISO13485QualitySystem:
             residual_risk=RiskLevel.LOW,
             acceptability=True
         ))
-        
+
         self.risk_assessments.append(RiskAssessment(
             hazard_id="RISK-002",
             hazard_description="System downtime during emergency",
@@ -222,7 +221,7 @@ class ISO13485QualitySystem:
             residual_risk=RiskLevel.LOW,
             acceptability=True
         ))
-        
+
         self.risk_assessments.append(RiskAssessment(
             hazard_id="RISK-003",
             hazard_description="Unauthorized access to patient ECG data",
@@ -240,7 +239,7 @@ class ISO13485QualitySystem:
             residual_risk=RiskLevel.LOW,
             acceptability=True
         ))
-        
+
         self.risk_assessments.append(RiskAssessment(
             hazard_id="RISK-004",
             hazard_description="Algorithmic bias affecting certain patient populations",
@@ -258,47 +257,47 @@ class ISO13485QualitySystem:
             residual_risk=RiskLevel.LOW,
             acceptability=True
         ))
-    
-    def design_controls_verification(self) -> Dict[str, Any]:
+
+    def design_controls_verification(self) -> dict[str, Any]:
         """Verify design controls compliance"""
-        
+
         verification_results = {
             "overall_compliance": True,
             "phase_results": {},
             "non_conformances": [],
             "recommendations": []
         }
-        
+
         for phase, control in self.design_controls.items():
             phase_compliant = True
             phase_issues = []
-            
+
             if len(control.requirements) < 3:
                 phase_compliant = False
                 phase_issues.append("Insufficient requirements defined")
-            
+
             if len(control.outputs) < len(control.requirements):
                 phase_compliant = False
                 phase_issues.append("Outputs don't match requirements")
-            
+
             if len(control.verification_methods) < 2:
                 phase_compliant = False
                 phase_issues.append("Insufficient verification methods")
-            
+
             if len(control.review_participants) < 2:
                 phase_compliant = False
                 phase_issues.append("Insufficient review participation")
-            
+
             verification_results["phase_results"][phase.value] = {
                 "compliant": phase_compliant,
                 "issues": phase_issues,
                 "approval_status": control.approval_status
             }
-            
+
             if not phase_compliant:
                 verification_results["overall_compliance"] = False
                 verification_results["non_conformances"].extend(phase_issues)
-        
+
         verification_results["recommendations"] = [
             "Complete design validation for all phases",
             "Obtain formal approval from all review participants",
@@ -306,12 +305,12 @@ class ISO13485QualitySystem:
             "Schedule regular design review meetings",
             "Document all design changes with impact assessment"
         ]
-        
+
         return verification_results
-    
-    def risk_management_iso14971(self) -> Dict[str, Any]:
+
+    def risk_management_iso14971(self) -> dict[str, Any]:
         """Comprehensive risk management per ISO 14971"""
-        
+
         risk_analysis = {
             "total_risks_identified": len(self.risk_assessments),
             "risk_distribution": {},
@@ -320,41 +319,41 @@ class ISO13485QualitySystem:
             "residual_risk_acceptability": True,
             "risk_management_file_complete": True
         }
-        
+
         for level in RiskLevel:
             count = sum(1 for risk in self.risk_assessments if risk.risk_level == level)
             risk_analysis["risk_distribution"][level.value] = count
-        
+
         unacceptable = [risk for risk in self.risk_assessments if not risk.acceptability]
         risk_analysis["unacceptable_risks"] = [risk.hazard_id for risk in unacceptable]
-        
+
         for risk in self.risk_assessments:
             initial_risk_score = risk.severity * risk.probability
-            
+
             risk_reduction_factor = len(risk.risk_control_measures) * 0.2
             residual_risk_score = max(1, initial_risk_score * (1 - risk_reduction_factor))
-            
+
             risk_analysis["risk_control_effectiveness"][risk.hazard_id] = {
                 "initial_score": initial_risk_score,
                 "residual_score": residual_risk_score,
                 "reduction_percentage": (1 - residual_risk_score / initial_risk_score) * 100,
                 "control_measures_count": len(risk.risk_control_measures)
             }
-        
+
         high_residual_risks = [
-            risk for risk in self.risk_assessments 
+            risk for risk in self.risk_assessments
             if risk.residual_risk in [RiskLevel.HIGH, RiskLevel.UNACCEPTABLE]
         ]
-        
+
         if high_residual_risks:
             risk_analysis["residual_risk_acceptability"] = False
             risk_analysis["high_residual_risks"] = [risk.hazard_id for risk in high_residual_risks]
-        
+
         return risk_analysis
-    
-    def quality_metrics_monitoring(self) -> Dict[str, Any]:
+
+    def quality_metrics_monitoring(self) -> dict[str, Any]:
         """Monitor quality metrics for continuous improvement"""
-        
+
         quality_metrics = {
             "clinical_performance": {
                 "sensitivity_target": ">99.5%",
@@ -381,12 +380,12 @@ class ISO13485QualitySystem:
                 "iso13485_certification": "Implementation in progress"
             }
         }
-        
+
         return quality_metrics
-    
-    def document_control_system(self) -> Dict[str, Any]:
+
+    def document_control_system(self) -> dict[str, Any]:
         """Document control per ISO 13485 requirements"""
-        
+
         document_control = {
             "controlled_documents": {
                 "quality_manual": {
@@ -426,12 +425,12 @@ class ISO13485QualitySystem:
                 "impact_assessments_required": 0
             }
         }
-        
+
         return document_control
-    
-    def management_review_preparation(self) -> Dict[str, Any]:
+
+    def management_review_preparation(self) -> dict[str, Any]:
         """Prepare management review per ISO 13485"""
-        
+
         management_review = {
             "review_date": "2025-06-03",
             "participants": [
@@ -463,12 +462,12 @@ class ISO13485QualitySystem:
                 "Prepare regulatory submissions"
             ]
         }
-        
+
         return management_review
-    
-    def generate_quality_report(self) -> Dict[str, Any]:
+
+    def generate_quality_report(self) -> dict[str, Any]:
         """Generate comprehensive quality system report"""
-        
+
         report = {
             "report_date": datetime.now().isoformat(),
             "quality_system_status": "Implementation Phase",
@@ -492,18 +491,18 @@ class ISO13485QualitySystem:
                 "are implemented to ensure patient safety and regulatory compliance."
             )
         }
-        
+
         return report
 
 
 class ContinuousImprovementSystem:
     """Continuous improvement system for quality enhancement"""
-    
+
     def __init__(self):
-        self.improvement_opportunities: List[Dict[str, Any]] = []
-        self.corrective_actions: List[Dict[str, Any]] = []
-        self.preventive_actions: List[Dict[str, Any]] = []
-    
+        self.improvement_opportunities: list[dict[str, Any]] = []
+        self.corrective_actions: list[dict[str, Any]] = []
+        self.preventive_actions: list[dict[str, Any]] = []
+
     def identify_improvement_opportunity(
         self,
         source: str,
@@ -512,7 +511,7 @@ class ContinuousImprovementSystem:
         priority: str
     ) -> None:
         """Identify improvement opportunity"""
-        
+
         opportunity = {
             "id": f"IMP-{len(self.improvement_opportunities) + 1:03d}",
             "source": source,
@@ -524,10 +523,10 @@ class ContinuousImprovementSystem:
             "assigned_to": None,
             "target_completion": None
         }
-        
+
         self.improvement_opportunities.append(opportunity)
         logger.info(f"Improvement opportunity identified: {opportunity['id']}")
-    
+
     def implement_corrective_action(
         self,
         nonconformance: str,
@@ -536,7 +535,7 @@ class ContinuousImprovementSystem:
         responsible_person: str
     ) -> None:
         """Implement corrective action"""
-        
+
         action = {
             "id": f"CA-{len(self.corrective_actions) + 1:03d}",
             "nonconformance": nonconformance,
@@ -547,10 +546,10 @@ class ContinuousImprovementSystem:
             "status": "in_progress",
             "effectiveness_verified": False
         }
-        
+
         self.corrective_actions.append(action)
         logger.info(f"Corrective action initiated: {action['id']}")
-    
+
     def implement_preventive_action(
         self,
         potential_issue: str,
@@ -558,7 +557,7 @@ class ContinuousImprovementSystem:
         responsible_person: str
     ) -> None:
         """Implement preventive action"""
-        
+
         action = {
             "id": f"PA-{len(self.preventive_actions) + 1:03d}",
             "potential_issue": potential_issue,
@@ -568,6 +567,6 @@ class ContinuousImprovementSystem:
             "status": "in_progress",
             "effectiveness_verified": False
         }
-        
+
         self.preventive_actions.append(action)
         logger.info(f"Preventive action initiated: {action['id']}")

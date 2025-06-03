@@ -188,8 +188,8 @@ class NonECGImageException(CardioAIException):
     """Non-ECG image detected exception with contextual response."""
 
     def __init__(
-        self, 
-        message: str, 
+        self,
+        message: str,
         category: str,
         contextual_response: dict[str, Any],
         confidence: float = 0.0
