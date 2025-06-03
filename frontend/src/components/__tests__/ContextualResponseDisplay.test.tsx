@@ -486,7 +486,7 @@ describe('ContextualResponseDisplay', () => {
     it('handles empty response object gracefully', () => {
       const propsWithEmptyResponse = {
         ...defaultProps,
-        response: {},
+        response: { message: '' },
       }
 
       render(

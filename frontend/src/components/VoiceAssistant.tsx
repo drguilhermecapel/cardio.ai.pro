@@ -151,7 +151,7 @@ class VoiceSynthesis {
 }
 
 class VoiceRecognition {
-  private recognition: any;
+  private recognition: SpeechRecognition | null = null;
   private isListening: boolean = false;
   private settings: VoiceSettings;
   private onResult: (command: VoiceCommand) => void;
@@ -174,14 +174,19 @@ class VoiceRecognition {
       return;
     }
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as Window & typeof globalThis & { 
+      SpeechRecognition?: typeof window.SpeechRecognition;
+      webkitSpeechRecognition?: typeof window.SpeechRecognition;
+    }).SpeechRecognition || (window as Window & typeof globalThis & { 
+      webkitSpeechRecognition?: typeof window.SpeechRecognition;
+    }).webkitSpeechRecognition;
     this.recognition = new SpeechRecognition();
 
     this.recognition.continuous = this.settings.continuousListening;
     this.recognition.interimResults = true;
     this.recognition.lang = this.settings.language;
 
-    this.recognition.onresult = (event: any): void => {
+    this.recognition.onresult = (event: SpeechRecognitionEvent): void => {
       const last = event.results.length - 1;
       const transcript = event.results[last][0].transcript.toLowerCase().trim();
       const confidence = event.results[last][0].confidence;
@@ -191,7 +196,7 @@ class VoiceRecognition {
       }
     };
 
-    this.recognition.onerror = (event: any): void => {
+    this.recognition.onerror = (event: SpeechRecognitionErrorEvent): void => {
       this.onError(`Speech recognition error: ${event.error}`);
     };
 
@@ -265,7 +270,7 @@ class VoiceRecognition {
     const voiceCommand: VoiceCommand = {
       command: transcript,
       action: 'unknown_command',
-      parameters,
+      parameters: parameters as { [key: string]: string | number | boolean },
       confidence,
       timestamp: Date.now()
     };

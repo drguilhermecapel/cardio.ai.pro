@@ -241,7 +241,7 @@ export const useECGVisualization = ({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [analyzeECG]);
 
   const analyzeECG = useCallback(async (data?: ECGData): Promise<void> => {
     const dataToAnalyze = data || ecgData;

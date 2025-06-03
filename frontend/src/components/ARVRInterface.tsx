@@ -131,7 +131,7 @@ export const ARVRInterface: React.FC<ARVRInterfaceProps> = ({
       }
 
       try {
-        const xr = (navigator as Navigator & { xr?: any }).xr;
+        const xr = (navigator as Navigator & { xr?: XRSystem }).xr;
         if (xr) {
           const vrSupported = await xr.isSessionSupported('immersive-vr');
           const arSupported = await xr.isSessionSupported('immersive-ar');

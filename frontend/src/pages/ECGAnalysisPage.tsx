@@ -62,6 +62,28 @@ interface DocumentScanningMetadata {
   error?: string
 }
 
+interface ContextualResponse {
+  message: string
+  explanation?: string
+  tips?: string[]
+  visual_guide?: string
+  educational_content?: {
+    title?: string;
+    description?: string;
+    key_features?: string[];
+    examples?: string[];
+  }
+  helpful_actions?: string[]
+}
+
+interface StructuredError {
+  error_code: string
+  message: string
+  contextual_response?: ContextualResponse
+}
+
+type ErrorType = string | StructuredError | null
+
 const ECGAnalysisPage: React.FC = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -77,6 +99,7 @@ const ECGAnalysisPage: React.FC = () => {
 
   const dispatch = useAppDispatch()
   const { analyses, isLoading, error, uploadProgress } = useAppSelector(state => state.ecg)
+  const typedError = error as ErrorType
   const { patients } = useAppSelector(state => state.patient)
   
 
@@ -264,28 +287,28 @@ const ECGAnalysisPage: React.FC = () => {
         </Button>
       </Box>
 
-      {error && (
+      {typedError && (
         <Alert 
-          severity={error?.error_code === 'NON_ECG_IMAGE_DETECTED' ? 'info' : 'error'} 
+          severity={typeof typedError === 'object' && typedError !== null && 'error_code' in typedError && typedError.error_code === 'NON_ECG_IMAGE_DETECTED' ? 'info' : 'error'} 
           sx={{ mb: 2 }}
         >
-          {error?.error_code === 'NON_ECG_IMAGE_DETECTED' ? (
+          {typeof typedError === 'object' && typedError !== null && 'error_code' in typedError && typedError.error_code === 'NON_ECG_IMAGE_DETECTED' ? (
             <Box>
               <Typography variant="h6" gutterBottom>
-                {error.contextual_response?.message || 'Non-ECG image detected'}
+                {typeof typedError === 'object' && typedError !== null && 'contextual_response' in typedError && typedError.contextual_response?.message || 'Non-ECG image detected'}
               </Typography>
-              {error.contextual_response?.explanation && (
+              {typeof typedError === 'object' && typedError !== null && 'contextual_response' in typedError && typedError.contextual_response?.explanation && (
                 <Typography variant="body2" sx={{ mb: 2 }}>
-                  {error.contextual_response.explanation}
+                  {typeof typedError === 'object' && typedError !== null && 'contextual_response' in typedError && typedError.contextual_response.explanation}
                 </Typography>
               )}
-              {error.contextual_response?.tips && error.contextual_response.tips.length > 0 && (
+              {typeof typedError === 'object' && typedError !== null && 'contextual_response' in typedError && typedError.contextual_response?.tips && typedError.contextual_response.tips.length > 0 && (
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="subtitle2" gutterBottom>
                     💡 Tips:
                   </Typography>
                   <List dense>
-                    {error.contextual_response.tips.map((tip: string, index: number) => (
+                    {typeof typedError === 'object' && typedError !== null && 'contextual_response' in typedError && typedError.contextual_response.tips.map((tip: string, index: number) => (
                       <ListItem key={index} sx={{ py: 0 }}>
                         <ListItemText primary={`• ${tip}`} />
                       </ListItem>
@@ -293,13 +316,13 @@ const ECGAnalysisPage: React.FC = () => {
                   </List>
                 </Box>
               )}
-              {error.contextual_response?.visual_guide && (
+              {typeof typedError === 'object' && typedError !== null && 'contextual_response' in typedError && typedError.contextual_response?.visual_guide && (
                 <Box sx={{ mb: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
                   <Typography variant="subtitle2" gutterBottom>
                     📋 What an ECG looks like:
                   </Typography>
                   <Typography variant="body2">
-                    {error.contextual_response.visual_guide}
+                    {typeof typedError === 'object' && typedError !== null && 'contextual_response' in typedError && typedError.contextual_response.visual_guide}
                   </Typography>
                 </Box>
               )}
@@ -314,12 +337,12 @@ const ECGAnalysisPage: React.FC = () => {
                 >
                   📷 Try Again
                 </Button>
-                {error.contextual_response?.educational_content && (
+                {typeof typedError === 'object' && typedError !== null && 'contextual_response' in typedError && typedError.contextual_response?.educational_content && (
                   <Button 
                     variant="outlined" 
                     size="small"
                     onClick={() => {
-                      console.log('Educational content:', error.contextual_response.educational_content)
+                      console.log('Educational content:', typeof typedError === 'object' && typedError !== null && 'contextual_response' in typedError && typedError.contextual_response?.educational_content)
                     }}
                   >
                     📚 Learn More
@@ -328,7 +351,7 @@ const ECGAnalysisPage: React.FC = () => {
               </Box>
             </Box>
           ) : (
-            typeof error === 'string' ? error : error?.message || 'An error occurred'
+            typeof typedError === 'string' ? typedError : (typeof typedError === 'object' && typedError !== null && 'message' in typedError && typedError.message) || 'An error occurred'
           )}
         </Alert>
       )}
