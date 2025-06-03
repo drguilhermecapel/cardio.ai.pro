@@ -6,11 +6,11 @@ Implements the "Zero Compromise" validation strategy for Core ECG Signal Process
 import logging
 import statistics
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from enum import Enum
 import numpy as np
 import numpy.typing as npt
-from scipy import stats
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class ValidationMetrics:
     npv: float  # Negative Predictive Value
     ppv: float  # Positive Predictive Value
     detection_time_ms: float
-    confidence_interval: Tuple[float, float]
+    confidence_interval: tuple[float, float]
     sample_size: int
     kappa_cohen: float
     inter_observer_agreement: float
@@ -85,8 +85,8 @@ class ClinicalValidationFramework:
     
     def __init__(self):
         self.criteria = UltraRigorousCriteria()
-        self.validation_results: Dict[PathologyType, ValidationMetrics] = {}
-        self.ensemble_validators: List[Any] = []
+        self.validation_results: dict[PathologyType, ValidationMetrics] = {}
+        self.ensemble_validators: list[Any] = []
         
     def validate_pathology_detection(
         self,
@@ -196,7 +196,7 @@ class ClinicalValidationFramework:
         ground_truth: npt.NDArray[np.int64],
         metric: str = 'sensitivity',
         n_bootstrap: int = 1000
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """Calculate bootstrap confidence intervals"""
         
         bootstrap_metrics = []
@@ -305,7 +305,7 @@ class ClinicalValidationFramework:
         
         logger.info(f"✅ {pathology.value} validation PASSED all ultra-rigorous criteria")
     
-    def generate_validation_report(self) -> Dict[str, Any]:
+    def generate_validation_report(self) -> dict[str, Any]:
         """Generate comprehensive validation report"""
         
         report = {
@@ -350,7 +350,7 @@ class FailSafeValidator:
     
     def __init__(self):
         self.primary_validator = ClinicalValidationFramework()
-        self.secondary_validators: List[ClinicalValidationFramework] = []
+        self.secondary_validators: list[ClinicalValidationFramework] = []
         self.consensus_threshold = 0.8
         
     def add_secondary_validator(self, validator: ClinicalValidationFramework) -> None:
@@ -360,7 +360,7 @@ class FailSafeValidator:
     def ensemble_validate(
         self,
         pathology: PathologyType,
-        predictions_list: List[npt.NDArray[np.float64]],
+        predictions_list: list[npt.NDArray[np.float64]],
         ground_truth: npt.NDArray[np.int64],
         detection_times_ms: npt.NDArray[np.float64]
     ) -> ValidationMetrics:
@@ -393,7 +393,7 @@ class FailSafeValidator:
     
     def _calculate_ensemble_metrics(
         self,
-        results: List[ValidationMetrics]
+        results: list[ValidationMetrics]
     ) -> ValidationMetrics:
         """Calculate ensemble metrics from multiple validation results"""
         
@@ -425,7 +425,7 @@ class FailSafeValidator:
     def _verify_consensus(
         self,
         pathology: PathologyType,
-        results: List[ValidationMetrics]
+        results: list[ValidationMetrics]
     ) -> None:
         """Verify consensus across validators"""
         

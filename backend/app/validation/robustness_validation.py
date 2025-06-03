@@ -7,7 +7,7 @@ import logging
 import random
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional, Tuple
 import numpy as np
 import numpy.typing as npt
 from scipy import signal
@@ -74,8 +74,8 @@ class RobustnessValidationFramework:
     """
     
     def __init__(self):
-        self.stress_test_results: Dict[StressTestType, List[StressTestResult]] = {}
-        self.robustness_metrics: Dict[StressTestType, RobustnessMetrics] = {}
+        self.stress_test_results: dict[StressTestType, list[StressTestResult]] = {}
+        self.robustness_metrics: dict[StressTestType, RobustnessMetrics] = {}
         
         self.robustness_criteria = {
             StressTestType.NOISE_INJECTION: {
@@ -120,7 +120,7 @@ class RobustnessValidationFramework:
         ecg_signals: npt.NDArray[np.float64],
         ground_truth: npt.NDArray[np.int64],
         analysis_function: Any,
-        noise_levels: List[float] = [0.1, 0.2, 0.3, 0.4, 0.5]
+        noise_levels: list[float] = [0.1, 0.2, 0.3, 0.4, 0.5]
     ) -> RobustnessMetrics:
         """
         Test robustness against various noise types and levels
@@ -236,7 +236,7 @@ class RobustnessValidationFramework:
         ecg_signals: npt.NDArray[np.float64],
         ground_truth: npt.NDArray[np.int64],
         analysis_function: Any,
-        attack_strengths: List[float] = [0.01, 0.02, 0.05, 0.1]
+        attack_strengths: list[float] = [0.01, 0.02, 0.05, 0.1]
     ) -> RobustnessMetrics:
         """
         Test robustness against adversarial attacks
@@ -312,7 +312,7 @@ class RobustnessValidationFramework:
     def extreme_conditions_testing(
         self,
         analysis_function: Any,
-        concurrent_requests: List[int] = [10, 50, 100, 500, 1000]
+        concurrent_requests: list[int] = [10, 50, 100, 500, 1000]
     ) -> RobustnessMetrics:
         """
         Test system behavior under extreme load conditions
@@ -325,7 +325,7 @@ class RobustnessValidationFramework:
             test_signal = np.random.randn(5000)  # 10 seconds at 500 Hz
             
             start_time = time.time()
-            baseline_pred = analysis_function(test_signal)
+            _ = analysis_function(test_signal)
             baseline_time = (time.time() - start_time) * 1000
             
             start_time = time.time()
@@ -335,14 +335,14 @@ class RobustnessValidationFramework:
             for _ in range(num_requests):
                 try:
                     request_start = time.time()
-                    pred = analysis_function(test_signal)
+                    _ = analysis_function(test_signal)
                     request_time = (time.time() - request_start) * 1000
                     total_processing_time += request_time
                     successful_requests += 1
                 except Exception as e:
                     logger.warning(f"Request failed under load: {e}")
             
-            total_time = (time.time() - start_time) * 1000
+            _ = (time.time() - start_time) * 1000
             avg_processing_time = total_processing_time / max(successful_requests, 1)
             success_rate = (successful_requests / num_requests) * 100
             
@@ -398,7 +398,7 @@ class RobustnessValidationFramework:
         for case_name, test_signal in edge_cases:
             try:
                 start_time = time.time()
-                pred = analysis_function(test_signal)
+                _ = analysis_function(test_signal)
                 processing_time = (time.time() - start_time) * 1000
                 
                 if isinstance(pred, dict):
@@ -447,7 +447,7 @@ class RobustnessValidationFramework:
     def _calculate_robustness_metrics(
         self,
         test_type: StressTestType,
-        test_results: List[StressTestResult]
+        test_results: list[StressTestResult]
     ) -> RobustnessMetrics:
         """Calculate comprehensive robustness metrics"""
         
@@ -497,7 +497,7 @@ class RobustnessValidationFramework:
             processing_time_increase=time_increase
         )
     
-    def validate_robustness_criteria(self) -> Dict[str, Any]:
+    def validate_robustness_criteria(self) -> dict[str, Any]:
         """Validate all robustness metrics against ultra-rigorous criteria"""
         
         validation_results = {
@@ -560,7 +560,7 @@ class RobustnessValidationFramework:
         
         return validation_results
     
-    def generate_robustness_report(self) -> Dict[str, Any]:
+    def generate_robustness_report(self) -> dict[str, Any]:
         """Generate comprehensive robustness validation report"""
         
         report = {
@@ -616,7 +616,7 @@ class FailSafeRobustnessValidator:
     
     def __init__(self):
         self.primary_validator = RobustnessValidationFramework()
-        self.secondary_validators: List[RobustnessValidationFramework] = []
+        self.secondary_validators: list[RobustnessValidationFramework] = []
         self.consensus_threshold = 0.8
     
     def comprehensive_robustness_validation(
@@ -624,7 +624,7 @@ class FailSafeRobustnessValidator:
         ecg_signals: npt.NDArray[np.float64],
         ground_truth: npt.NDArray[np.int64],
         analysis_function: Any
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Perform comprehensive robustness validation with multiple validators
         """
