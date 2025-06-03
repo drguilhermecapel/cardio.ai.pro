@@ -2,26 +2,33 @@
 ECG-specific metrics collection for Prometheus monitoring
 """
 
-from prometheus_client import Counter, Histogram, Gauge, Summary, CollectorRegistry, REGISTRY
-from typing import Dict, Any, Optional
 import time
 from contextlib import contextmanager
+
+from prometheus_client import (
+    REGISTRY,
+    CollectorRegistry,
+    Counter,
+    Gauge,
+    Histogram,
+    Summary,
+)
 
 
 class ECGMetricsCollector:
     """Collector for ECG analysis specific metrics"""
-    
-    def __init__(self, registry: Optional[CollectorRegistry] = None):
+
+    def __init__(self, registry: CollectorRegistry | None = None):
         if registry is None:
             registry = REGISTRY
-        
+
         self.ecg_analysis_total = Counter(
             'ecg_analysis_total',
             'Total de análises ECG realizadas',
             ['format', 'status', 'regulatory_standard'],
             registry=registry
         )
-        
+
         self.ecg_processing_duration = Histogram(
             'ecg_processing_duration_seconds',
             'Tempo de processamento ECG por etapa',
@@ -29,42 +36,42 @@ class ECGMetricsCollector:
             buckets=(0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0),
             registry=registry
         )
-        
+
         self.ecg_quality_score = Gauge(
             'ecg_quality_score',
             'Score de qualidade do sinal ECG',
             ['lead', 'patient_id'],
             registry=registry
         )
-        
+
         self.pathology_detections = Counter(
             'ecg_pathology_detections_total',
             'Detecções por tipo de patologia',
             ['pathology_type', 'confidence_level', 'model_version'],
             registry=registry
         )
-        
+
         self.model_inference_time = Summary(
             'ecg_model_inference_seconds',
             'Tempo de inferência por modelo ML',
             ['model_name', 'model_version'],
             registry=registry
         )
-        
+
         self.model_memory_usage = Gauge(
             'ecg_model_memory_usage_bytes',
             'Uso de memória por modelo ML',
             ['model_name', 'model_type'],
             registry=registry
         )
-        
+
         self.regulatory_compliance = Counter(
             'ecg_regulatory_compliance_total',
             'Resultados de conformidade regulatória',
             ['standard', 'compliant', 'validation_type'],
             registry=registry
         )
-        
+
         self.prediction_confidence = Histogram(
             'ecg_prediction_confidence',
             'Distribuição de confiança das predições',
@@ -72,7 +79,7 @@ class ECGMetricsCollector:
             buckets=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0),
             registry=registry
         )
-        
+
         self.processing_errors = Counter(
             'ecg_processing_errors_total',
             'Erros durante processamento ECG',
@@ -102,9 +109,9 @@ class ECGMetricsCollector:
         ).inc()
 
     def record_pathology_detection(
-        self, 
-        pathology_type: str, 
-        confidence: float, 
+        self,
+        pathology_type: str,
+        confidence: float,
         model_version: str
     ):
         """Registra detecção de patologia"""
@@ -114,7 +121,7 @@ class ECGMetricsCollector:
             confidence_level=confidence_level,
             model_version=model_version
         ).inc()
-        
+
         self.prediction_confidence.labels(
             pathology_type=pathology_type,
             model_name=model_version
@@ -142,9 +149,9 @@ class ECGMetricsCollector:
         ).set(memory_bytes)
 
     def record_regulatory_compliance(
-        self, 
-        standard: str, 
-        compliant: bool, 
+        self,
+        standard: str,
+        compliant: bool,
         validation_type: str
     ):
         """Registra resultado de conformidade regulatória"""

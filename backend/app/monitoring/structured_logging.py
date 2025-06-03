@@ -2,22 +2,23 @@
 Structured logging configuration for ECG analysis system
 """
 
-import structlog
 import logging
 import sys
-from typing import Any, Dict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Any
+
+import structlog
 
 
 def setup_structured_logging(log_level: str = "INFO") -> None:
     """Configure structured logging for the ECG system"""
-    
+
     logging.basicConfig(
         format="%(message)s",
         stream=sys.stdout,
         level=getattr(logging, log_level.upper())
     )
-    
+
     structlog.configure(
         processors=[
             structlog.stdlib.filter_by_level,
@@ -39,15 +40,15 @@ def setup_structured_logging(log_level: str = "INFO") -> None:
 
 class ECGLogger:
     """Structured logger for ECG analysis operations"""
-    
+
     def __init__(self, name: str):
         self.logger = structlog.get_logger(name)
-    
+
     def log_analysis_start(
-        self, 
-        patient_id: str, 
-        format: str, 
-        lead_count: int, 
+        self,
+        patient_id: str,
+        format: str,
+        lead_count: int,
         sampling_rate: int,
         analysis_id: str
     ) -> None:
@@ -60,9 +61,9 @@ class ECGLogger:
             ecg_format=format,
             lead_count=lead_count,
             sampling_rate=sampling_rate,
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(UTC).isoformat()
         )
-    
+
     def log_analysis_complete(
         self,
         patient_id: str,
@@ -82,9 +83,9 @@ class ECGLogger:
             confidence_mean=confidence_mean,
             processing_time_seconds=processing_time,
             regulatory_compliant=regulatory_compliant,
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(UTC).isoformat()
         )
-    
+
     def log_analysis_error(
         self,
         patient_id: str,
@@ -103,10 +104,10 @@ class ECGLogger:
             error_type=error_type,
             error_message=error_message,
             failed_step=step,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             exc_info=exc_info
         )
-    
+
     def log_pathology_detection(
         self,
         patient_id: str,
@@ -126,15 +127,15 @@ class ECGLogger:
             confidence=confidence,
             model_name=model_name,
             clinical_significance=clinical_significance,
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(UTC).isoformat()
         )
-    
+
     def log_regulatory_validation(
         self,
         analysis_id: str,
         standard: str,
         compliant: bool,
-        validation_details: Dict[str, Any]
+        validation_details: dict[str, Any]
     ) -> None:
         """Log regulatory validation result"""
         self.logger.info(
@@ -144,9 +145,9 @@ class ECGLogger:
             regulatory_standard=standard,
             compliant=compliant,
             validation_details=validation_details,
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(UTC).isoformat()
         )
-    
+
     def log_model_performance(
         self,
         model_name: str,
@@ -164,14 +165,14 @@ class ECGLogger:
             inference_time_seconds=inference_time,
             memory_usage_mb=memory_usage_mb,
             batch_size=batch_size,
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(UTC).isoformat()
         )
-    
+
     def log_signal_quality(
         self,
         patient_id: str,
         analysis_id: str,
-        lead_qualities: Dict[str, float],
+        lead_qualities: dict[str, float],
         overall_quality: float,
         quality_issues: list
     ) -> None:
@@ -184,16 +185,16 @@ class ECGLogger:
             lead_qualities=lead_qualities,
             overall_quality=overall_quality,
             quality_issues=quality_issues,
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(UTC).isoformat()
         )
-    
+
     def log_preprocessing_step(
         self,
         analysis_id: str,
         step_name: str,
         input_shape: tuple,
         output_shape: tuple,
-        parameters: Dict[str, Any],
+        parameters: dict[str, Any],
         duration: float
     ) -> None:
         """Log preprocessing step details"""
@@ -206,9 +207,9 @@ class ECGLogger:
             output_shape=output_shape,
             parameters=parameters,
             duration_seconds=duration,
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(UTC).isoformat()
         )
-    
+
     def log_feature_extraction(
         self,
         analysis_id: str,
@@ -224,7 +225,7 @@ class ECGLogger:
             feature_types=feature_types,
             feature_count=feature_count,
             extraction_time_seconds=extraction_time,
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(UTC).isoformat()
         )
 
 

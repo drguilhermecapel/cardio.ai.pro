@@ -2,13 +2,13 @@
 Detailed health checks for ECG analysis system
 """
 
-from fastapi import APIRouter, HTTPException
-from datetime import datetime, timezone
-from typing import Dict, Any
 import asyncio
+from datetime import UTC, datetime
+from typing import Any
+
 import psutil
-import numpy as np
-from app.monitoring.ecg_metrics import ecg_metrics
+from fastapi import APIRouter, HTTPException
+
 from app.monitoring.structured_logging import get_ecg_logger
 
 router = APIRouter()
@@ -16,11 +16,11 @@ logger = get_ecg_logger(__name__)
 
 
 @router.get("/health/detailed")
-async def detailed_health_check() -> Dict[str, Any]:
+async def detailed_health_check() -> dict[str, Any]:
     """Comprehensive health check for ECG analysis system"""
     checks = {}
-    start_time = datetime.now(timezone.utc)
-    
+    start_time = datetime.now(UTC)
+
     try:
         model_status = await check_ml_models()
         checks["ml_models"] = {
@@ -33,7 +33,7 @@ async def detailed_health_check() -> Dict[str, Any]:
     except Exception as e:
         checks["ml_models"] = {"status": "unhealthy", "error": str(e)}
         logger.log_analysis_error("system", "health_check", "MLModelError", str(e), "ml_models_check")
-    
+
     try:
         ecg_test = await test_ecg_processing()
         checks["ecg_processing"] = {
@@ -45,7 +45,7 @@ async def detailed_health_check() -> Dict[str, Any]:
     except Exception as e:
         checks["ecg_processing"] = {"status": "unhealthy", "error": str(e)}
         logger.log_analysis_error("system", "health_check", "ECGProcessingError", str(e), "ecg_processing_check")
-    
+
     try:
         reg_status = await check_regulatory_services()
         checks["regulatory"] = {
@@ -57,7 +57,7 @@ async def detailed_health_check() -> Dict[str, Any]:
     except Exception as e:
         checks["regulatory"] = {"status": "unhealthy", "error": str(e)}
         logger.log_analysis_error("system", "health_check", "RegulatoryError", str(e), "regulatory_check")
-    
+
     try:
         fs_status = await check_filesystem()
         checks["filesystem"] = {
@@ -67,7 +67,7 @@ async def detailed_health_check() -> Dict[str, Any]:
         }
     except Exception as e:
         checks["filesystem"] = {"status": "unhealthy", "error": str(e)}
-    
+
     try:
         system_status = await check_system_resources()
         checks["system_resources"] = {
@@ -78,7 +78,7 @@ async def detailed_health_check() -> Dict[str, Any]:
         }
     except Exception as e:
         checks["system_resources"] = {"status": "unhealthy", "error": str(e)}
-    
+
     try:
         network_status = await check_network_connectivity()
         checks["network"] = {
@@ -88,26 +88,26 @@ async def detailed_health_check() -> Dict[str, Any]:
         }
     except Exception as e:
         checks["network"] = {"status": "unhealthy", "error": str(e)}
-    
+
     unhealthy_checks = [
-        name for name, check in checks.items() 
+        name for name, check in checks.items()
         if check.get("status") == "unhealthy"
     ]
     warning_checks = [
-        name for name, check in checks.items() 
+        name for name, check in checks.items()
         if check.get("status") == "warning"
     ]
-    
+
     if unhealthy_checks:
         overall_status = "unhealthy"
     elif warning_checks:
         overall_status = "warning"
     else:
         overall_status = "healthy"
-    
-    end_time = datetime.now(timezone.utc)
+
+    end_time = datetime.now(UTC)
     check_duration = (end_time - start_time).total_seconds()
-    
+
     result = {
         "status": overall_status,
         "timestamp": end_time.isoformat(),
@@ -120,7 +120,7 @@ async def detailed_health_check() -> Dict[str, Any]:
             "unhealthy": len(unhealthy_checks)
         }
     }
-    
+
     logger.logger.info(
         "health_check_completed",
         overall_status=overall_status,
@@ -128,24 +128,24 @@ async def detailed_health_check() -> Dict[str, Any]:
         unhealthy_checks=unhealthy_checks,
         warning_checks=warning_checks
     )
-    
+
     return result
 
 
-async def check_ml_models() -> Dict[str, Any]:
+async def check_ml_models() -> dict[str, Any]:
     """Check ML models availability and status"""
     await asyncio.sleep(0.1)  # Simular tempo de verificação
-    
+
     models = {
         "tensorflow_cnn": {"loaded": True, "memory_mb": 512},
         "pytorch_transformer": {"loaded": True, "memory_mb": 768},
         "xgboost_ensemble": {"loaded": True, "memory_mb": 128},
         "lightgbm_classifier": {"loaded": True, "memory_mb": 96}
     }
-    
+
     total_memory = sum(model["memory_mb"] for model in models.values())
     loaded_count = sum(1 for model in models.values() if model["loaded"])
-    
+
     return {
         "count": loaded_count,
         "memory_mb": total_memory,
@@ -153,59 +153,57 @@ async def check_ml_models() -> Dict[str, Any]:
     }
 
 
-async def test_ecg_processing() -> Dict[str, Any]:
+async def test_ecg_processing() -> dict[str, Any]:
     """Test ECG processing pipeline with synthetic data"""
-    start_time = datetime.now(timezone.utc)
-    
-    synthetic_ecg = np.random.randn(5000, 12)  # 10 segundos, 12 leads
-    
+    start_time = datetime.now(UTC)
+
     try:
         await asyncio.sleep(0.05)  # Simular tempo de processamento
-        
+
         result = {
             "pathologies_detected": 0,
             "confidence": 0.95,
             "signal_quality": 0.98
         }
-        
-        end_time = datetime.now(timezone.utc)
+
+        end_time = datetime.now(UTC)
         duration_ms = (end_time - start_time).total_seconds() * 1000
-        
+
         return {
             "duration_ms": duration_ms,
             "result": result
         }
-        
+
     except Exception as e:
-        raise Exception(f"ECG processing test failed: {str(e)}")
+        raise Exception(f"ECG processing test failed: {str(e)}") from e
 
 
-async def check_regulatory_services() -> Dict[str, Any]:
+async def check_regulatory_services() -> dict[str, Any]:
     """Check regulatory validation services"""
     await asyncio.sleep(0.05)  # Simular verificação
-    
+
     standards = ["FDA", "ANVISA", "NMSA", "EU_MDR"]
     services = {
         "validation_engine": True,
         "compliance_checker": True,
         "report_generator": True
     }
-    
+
     return {
         "standards": standards,
         "services": services
     }
 
 
-async def check_filesystem() -> Dict[str, Any]:
+async def check_filesystem() -> dict[str, Any]:
     """Check filesystem status"""
     disk_usage = psutil.disk_usage('/')
-    
+
     total_gb = disk_usage.total / (1024**3)
     used_gb = disk_usage.used / (1024**3)
     available_gb = disk_usage.free / (1024**3)
     usage_percent = (used_gb / total_gb) * 100
-    
+
     return {
         "disk_usage": round(usage_percent, 2),
         "available_gb": round(available_gb, 2),
@@ -213,11 +211,11 @@ async def check_filesystem() -> Dict[str, Any]:
     }
 
 
-async def check_system_resources() -> Dict[str, Any]:
+async def check_system_resources() -> dict[str, Any]:
     """Check system memory and CPU usage"""
     memory = psutil.virtual_memory()
     cpu_percent = psutil.cpu_percent(interval=1)
-    
+
     return {
         "memory_percent": memory.percent,
         "cpu_percent": cpu_percent,
@@ -226,10 +224,10 @@ async def check_system_resources() -> Dict[str, Any]:
     }
 
 
-async def check_network_connectivity() -> Dict[str, Any]:
+async def check_network_connectivity() -> dict[str, Any]:
     """Check network connectivity"""
     await asyncio.sleep(0.1)
-    
+
     return {
         "external": True,
         "dns": True
@@ -237,12 +235,12 @@ async def check_network_connectivity() -> Dict[str, Any]:
 
 
 @router.get("/health/metrics")
-async def health_metrics() -> Dict[str, Any]:
+async def health_metrics() -> dict[str, Any]:
     """Get current system metrics for monitoring"""
     memory = psutil.virtual_memory()
     disk = psutil.disk_usage('/')
     cpu_percent = psutil.cpu_percent()
-    
+
     return {
         "timestamp": datetime.utcnow().isoformat(),
         "system": {
@@ -260,16 +258,16 @@ async def health_metrics() -> Dict[str, Any]:
 
 
 @router.get("/health/ready")
-async def readiness_check() -> Dict[str, str]:
+async def readiness_check() -> dict[str, str]:
     """Simple readiness check for load balancers"""
     try:
         await asyncio.sleep(0.01)
         return {"status": "ready"}
-    except Exception:
-        raise HTTPException(status_code=503, detail="Service not ready")
+    except Exception as e:
+        raise HTTPException(status_code=503, detail="Service not ready") from e
 
 
 @router.get("/health/live")
-async def liveness_check() -> Dict[str, str]:
+async def liveness_check() -> dict[str, str]:
     """Simple liveness check for orchestrators"""
     return {"status": "alive", "timestamp": datetime.utcnow().isoformat()}

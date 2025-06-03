@@ -18,10 +18,9 @@ from sklearn.preprocessing import StandardScaler  # type: ignore[import-untyped]
 
 from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
+from app.monitoring.structured_logging import get_ecg_logger
 from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
-from app.monitoring.ecg_metrics import ecg_metrics
-from app.monitoring.structured_logging import get_ecg_logger
 
 if TYPE_CHECKING:
     import pywt  # type: ignore[import-untyped]
