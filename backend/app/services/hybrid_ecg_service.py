@@ -14,7 +14,7 @@ import numpy.typing as npt
 import pandas as pd
 from scipy import signal
 from scipy.stats import entropy, kurtosis, skew
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler  # type: ignore[import-untyped]
 
 from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
@@ -22,12 +22,12 @@ from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
 
 if TYPE_CHECKING:
-    import pywt
-    import wfdb
+    import pywt  # type: ignore[import-untyped]
+    import wfdb  # type: ignore[import-untyped]
 else:
     try:
-        import pywt
-        import wfdb
+        import pywt  # type: ignore[import-untyped]
+        import wfdb  # type: ignore[import-untyped]
     except ImportError:
         pywt = None  # type: ignore
         wfdb = None  # type: ignore
