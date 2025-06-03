@@ -15,7 +15,6 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.v1.api import api_router
 from app.core.config import settings
-from app.monitoring.health_checks import router as health_router
 from app.core.exceptions import (
     AuthenticationException,
     CardioAIException,
@@ -24,6 +23,7 @@ from app.core.exceptions import (
 )
 from app.core.logging import configure_logging
 from app.db.session import get_engine
+from app.monitoring.health_checks import router as health_router
 
 
 @asynccontextmanager
