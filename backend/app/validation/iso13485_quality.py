@@ -66,7 +66,7 @@ class ISO13485QualitySystem:
     Ensures medical device compliance for ECG analysis system
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.design_controls: dict[DesignPhase, DesignControl] = {}
         self.risk_assessments: list[RiskAssessment] = []
         self.quality_records: dict[str, Any] = {}
@@ -498,7 +498,7 @@ class ISO13485QualitySystem:
 class ContinuousImprovementSystem:
     """Continuous improvement system for quality enhancement"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.improvement_opportunities: list[dict[str, Any]] = []
         self.corrective_actions: list[dict[str, Any]] = []
         self.preventive_actions: list[dict[str, Any]] = []

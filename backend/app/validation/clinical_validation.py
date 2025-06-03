@@ -83,7 +83,7 @@ class ClinicalValidationFramework:
     Implements medical-grade validation with statistical rigor
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.criteria = UltraRigorousCriteria()
         self.validation_results: dict[PathologyType, ValidationMetrics] = {}
         self.ensemble_validators: list[Any] = []
@@ -348,7 +348,7 @@ class FailSafeValidator:
     Implements multiple validation layers with ensemble methods
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.primary_validator = ClinicalValidationFramework()
         self.secondary_validators: list[ClinicalValidationFramework] = []
         self.consensus_threshold = 0.8

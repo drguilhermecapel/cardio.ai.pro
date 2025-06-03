@@ -73,7 +73,7 @@ class RobustnessValidationFramework:
     Tests system resilience under adverse conditions
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.stress_test_results: dict[StressTestType, list[StressTestResult]] = {}
         self.robustness_metrics: dict[StressTestType, RobustnessMetrics] = {}
 
@@ -495,12 +495,12 @@ class RobustnessValidationFramework:
             passed_tests=passed_tests,
             failed_tests=failed_tests,
             success_rate=success_rate,
-            avg_performance_degradation=avg_degradation,
+            avg_performance_degradation=float(avg_degradation),
             max_performance_degradation=max_degradation,
             detection_accuracy_under_stress=detection_accuracy,
             false_positive_rate=fp_rate,
             false_negative_rate=fn_rate,
-            processing_time_increase=time_increase
+            processing_time_increase=float(time_increase)
         )
 
     def validate_robustness_criteria(self) -> dict[str, Any]:
@@ -620,7 +620,7 @@ class FailSafeRobustnessValidator:
     Ensures maximum system resilience
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.primary_validator = RobustnessValidationFramework()
         self.secondary_validators: list[RobustnessValidationFramework] = []
         self.consensus_threshold = 0.8
