@@ -62,21 +62,6 @@ interface DocumentScanningMetadata {
   error?: string
 }
 
-interface NonECGError {
-  error_code: string
-  message: string
-  category: string
-  confidence: number
-  contextual_response: {
-    message: string
-    explanation?: string
-    tips?: string[]
-    visual_guide?: string
-    educational_content?: any
-    helpful_actions?: string[]
-  }
-}
-
 const ECGAnalysisPage: React.FC = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)

@@ -9,7 +9,7 @@ import { Mic, MicOff, Volume2, VolumeX, Settings } from 'lucide-react';
 interface VoiceCommand {
   command: string;
   action: string;
-  parameters?: { [key: string]: any };
+  parameters?: { [key: string]: string | number | boolean };
   confidence: number;
   timestamp: number;
 }
@@ -58,7 +58,7 @@ interface VoiceAssistantProps {
 interface CommandPattern {
   action: string;
   category: string;
-  parameters?: { [key: string]: any };
+  parameters?: { [key: string]: string | number | boolean };
 }
 
 const COMMAND_PATTERNS: { [key: string]: CommandPattern } = {
@@ -342,7 +342,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
       voiceSynthesis.current?.stop();
       voiceRecognition.current?.stop();
     };
-  }, [isEnabled, settings]);
+  }, [isEnabled, settings, handleVoiceCommand, handleVoiceError]);
 
   const handleVoiceCommand = useCallback((command: VoiceCommand): void => {
     setLastCommand(command);
@@ -373,7 +373,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
     }
 
     setIsProcessing(false);
-  }, [isMuted, onCommand, onVisualizationControl]);
+  }, [isMuted, onCommand, onVisualizationControl, processCommand]);
 
   const processCommand = useCallback((command: VoiceCommand): VoiceResponse => {
     const { action, parameters } = command;
