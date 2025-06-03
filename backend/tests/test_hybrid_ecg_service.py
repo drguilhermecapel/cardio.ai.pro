@@ -329,6 +329,9 @@ class TestRegulatoryValidationService:
     async def test_fda_validation_compliant(self):
         """Test FDA validation for compliant analysis"""
         analysis_results = {
+            'analysis_id': 'FDA_TEST_001',
+            'patient_id': 123,
+            'processing_time_seconds': 2.5,
             'ai_predictions': {
                 'confidence': 0.90,
                 'predictions': {'normal': 0.9},
@@ -340,6 +343,7 @@ class TestRegulatoryValidationService:
                 'recommendations': ['Regular follow-up recommended']
             },
             'metadata': {
+                'sampling_rate': 500,
                 'gdpr_compliant': True,
                 'ce_marking': True
             }
@@ -357,6 +361,9 @@ class TestRegulatoryValidationService:
     async def test_fda_validation_non_compliant(self):
         """Test FDA validation for non-compliant analysis"""
         analysis_results = {
+            'analysis_id': 'FDA_TEST_002',
+            'patient_id': 124,
+            'processing_time_seconds': 3.0,
             'ai_predictions': {
                 'confidence': 0.70,  # Below FDA threshold
                 'predictions': {'normal': 0.7}
@@ -365,6 +372,9 @@ class TestRegulatoryValidationService:
             'clinical_assessment': {
                 'requires_immediate_attention': True,
                 'recommendations': []
+            },
+            'metadata': {
+                'sampling_rate': 500
             }
         }
         
@@ -380,10 +390,14 @@ class TestRegulatoryValidationService:
     async def test_eu_mdr_validation(self):
         """Test EU MDR specific validation"""
         analysis_results = {
-            'ai_predictions': {'confidence': 0.90, 'predictions': {'normal': 0.9}},
+            'analysis_id': 'EU_TEST_001',
+            'patient_id': 125,
+            'processing_time_seconds': 2.2,
+            'ai_predictions': {'confidence': 0.90, 'predictions': {'normal': 0.9}, 'model_version': 'hybrid_v1.0'},
             'signal_quality': {'overall_score': 0.8},
             'clinical_assessment': {'requires_immediate_attention': False},
             'metadata': {
+                'sampling_rate': 500,
                 'gdpr_compliant': True,
                 'ce_marking': True,
                 'surveillance_plan': True
@@ -401,10 +415,14 @@ class TestRegulatoryValidationService:
     async def test_anvisa_validation(self):
         """Test ANVISA specific validation"""
         analysis_results = {
-            'ai_predictions': {'confidence': 0.85, 'predictions': {'normal': 0.85}},
+            'analysis_id': 'ANVISA_TEST_001',
+            'patient_id': 126,
+            'processing_time_seconds': 2.8,
+            'ai_predictions': {'confidence': 0.85, 'predictions': {'normal': 0.85}, 'model_version': 'hybrid_v1.0'},
             'signal_quality': {'overall_score': 0.7},
             'clinical_assessment': {'requires_immediate_attention': False},
             'metadata': {
+                'sampling_rate': 500,
                 'language_support': True,
                 'population_validation': True
             }
@@ -421,10 +439,14 @@ class TestRegulatoryValidationService:
     async def test_nmsa_validation(self):
         """Test NMSA (China) specific validation"""
         analysis_results = {
-            'ai_predictions': {'confidence': 0.85, 'predictions': {'normal': 0.85}},
+            'analysis_id': 'NMSA_TEST_001',
+            'patient_id': 127,
+            'processing_time_seconds': 2.1,
+            'ai_predictions': {'confidence': 0.85, 'predictions': {'normal': 0.85}, 'model_version': 'hybrid_v1.0'},
             'signal_quality': {'overall_score': 0.7},
             'clinical_assessment': {'requires_immediate_attention': False},
             'metadata': {
+                'sampling_rate': 500,
                 'nmsa_certification': True,
                 'data_residency': True
             }
