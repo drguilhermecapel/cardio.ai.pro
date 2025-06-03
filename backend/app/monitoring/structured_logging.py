@@ -174,7 +174,7 @@ class ECGLogger:
         analysis_id: str,
         lead_qualities: dict[str, float],
         overall_quality: float,
-        quality_issues: list
+        quality_issues: list[str]
     ) -> None:
         """Log signal quality assessment"""
         self.logger.info(
@@ -192,8 +192,8 @@ class ECGLogger:
         self,
         analysis_id: str,
         step_name: str,
-        input_shape: tuple,
-        output_shape: tuple,
+        input_shape: tuple[int, ...],
+        output_shape: tuple[int, ...],
         parameters: dict[str, Any],
         duration: float
     ) -> None:
@@ -213,7 +213,7 @@ class ECGLogger:
     def log_feature_extraction(
         self,
         analysis_id: str,
-        feature_types: list,
+        feature_types: list[str],
         feature_count: int,
         extraction_time: float
     ) -> None:

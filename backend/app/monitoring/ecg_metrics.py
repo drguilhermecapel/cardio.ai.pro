@@ -4,6 +4,7 @@ ECG-specific metrics collection for Prometheus monitoring
 
 import time
 from contextlib import contextmanager
+from typing import Generator
 
 from prometheus_client import (
     REGISTRY,
@@ -88,7 +89,7 @@ class ECGMetricsCollector:
         )
 
     @contextmanager
-    def time_operation(self, step: str, model_type: str = "hybrid"):
+    def time_operation(self, step: str, model_type: str = "hybrid") -> Generator[None, None, None]:
         """Context manager para medir tempo de operações"""
         start_time = time.time()
         try:
@@ -100,7 +101,7 @@ class ECGMetricsCollector:
                 model_type=model_type
             ).observe(duration)
 
-    def record_analysis(self, format: str, status: str, regulatory_standard: str):
+    def record_analysis(self, format: str, status: str, regulatory_standard: str) -> None:
         """Registra uma análise ECG completa"""
         self.ecg_analysis_total.labels(
             format=format,
@@ -109,11 +110,11 @@ class ECGMetricsCollector:
         ).inc()
 
     def record_pathology_detection(
-        self,
-        pathology_type: str,
-        confidence: float,
+        self, 
+        pathology_type: str, 
+        confidence: float, 
         model_version: str
-    ):
+    ) -> None:
         """Registra detecção de patologia"""
         confidence_level = self._get_confidence_level(confidence)
         self.pathology_detections.labels(
@@ -127,21 +128,21 @@ class ECGMetricsCollector:
             model_name=model_version
         ).observe(confidence)
 
-    def record_quality_score(self, lead: str, patient_id: str, score: float):
+    def record_quality_score(self, lead: str, patient_id: str, score: float) -> None:
         """Registra score de qualidade do sinal"""
         self.ecg_quality_score.labels(
             lead=lead,
             patient_id=patient_id
         ).set(score)
 
-    def record_model_inference(self, model_name: str, model_version: str, duration: float):
+    def record_model_inference(self, model_name: str, model_version: str, duration: float) -> None:
         """Registra tempo de inferência do modelo"""
         self.model_inference_time.labels(
             model_name=model_name,
             model_version=model_version
         ).observe(duration)
 
-    def record_model_memory(self, model_name: str, model_type: str, memory_bytes: int):
+    def record_model_memory(self, model_name: str, model_type: str, memory_bytes: int) -> None:
         """Registra uso de memória do modelo"""
         self.model_memory_usage.labels(
             model_name=model_name,
@@ -149,11 +150,11 @@ class ECGMetricsCollector:
         ).set(memory_bytes)
 
     def record_regulatory_compliance(
-        self,
-        standard: str,
-        compliant: bool,
+        self, 
+        standard: str, 
+        compliant: bool, 
         validation_type: str
-    ):
+    ) -> None:
         """Registra resultado de conformidade regulatória"""
         self.regulatory_compliance.labels(
             standard=standard,
@@ -161,7 +162,7 @@ class ECGMetricsCollector:
             validation_type=validation_type
         ).inc()
 
-    def record_processing_error(self, error_type: str, step: str, format: str):
+    def record_processing_error(self, error_type: str, step: str, format: str) -> None:
         """Registra erro de processamento"""
         self.processing_errors.labels(
             error_type=error_type,

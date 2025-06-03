@@ -3,6 +3,7 @@ Custom middleware for ECG analysis monitoring
 """
 
 import time
+from typing import Awaitable, Callable
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -16,7 +17,7 @@ logger = get_ecg_logger(__name__)
 class ECGMetricsMiddleware(BaseHTTPMiddleware):
     """Middleware to collect ECG-specific metrics"""
 
-    async def dispatch(self, request: Request, call_next) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         start_time = time.time()
         path = request.url.path
         method = request.method
