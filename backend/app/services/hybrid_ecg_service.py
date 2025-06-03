@@ -136,7 +136,7 @@ class UniversalECGReader:
         try:
             # from app.services.ecg_document_scanner import ECGDocumentScanner  # Disabled for core component
             raise NotImplementedError("Image processing not available in core component")
-        except Exception:
+        except NotImplementedError:
             signal_matrix = np.random.randn(5000, 12) * 0.1
 
             return {
@@ -153,7 +153,6 @@ class UniversalECGReader:
                     'leads_detected': 0  # Placeholder for PR-008
                 }
             }
-
         except Exception as e:
             logger.error(f"ECG image digitization failed for {filepath}: {str(e)}")
             mock_signal = np.random.randn(5000, 12) * 0.1
