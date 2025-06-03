@@ -25,11 +25,11 @@ from app.services.validation_service import ValidationService
 
 if TYPE_CHECKING:
     import pywt  # type: ignore[import-untyped]
-    import wfdb  # type: ignore[import-untyped]
+    import wfdb
 else:
     try:
         import pywt  # type: ignore[import-untyped]
-        import wfdb  # type: ignore[import-untyped]
+        import wfdb
     except ImportError:
         pywt = None  # type: ignore
         wfdb = None  # type: ignore
