@@ -308,7 +308,7 @@ class ClinicalValidationFramework:
     def generate_validation_report(self) -> dict[str, Any]:
         """Generate comprehensive validation report"""
 
-        report = {
+        report: dict[str, Any] = {
             "validation_framework": "Ultra-Rigorous Clinical Validation",
             "compliance_level": "Medical Grade - Zero Compromise",
             "validation_date": "2025-06-03",

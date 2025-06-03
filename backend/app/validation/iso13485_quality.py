@@ -261,7 +261,7 @@ class ISO13485QualitySystem:
     def design_controls_verification(self) -> dict[str, Any]:
         """Verify design controls compliance"""
 
-        verification_results = {
+        verification_results: dict[str, Any] = {
             "overall_compliance": True,
             "phase_results": {},
             "non_conformances": [],
@@ -311,7 +311,7 @@ class ISO13485QualitySystem:
     def risk_management_iso14971(self) -> dict[str, Any]:
         """Comprehensive risk management per ISO 14971"""
 
-        risk_analysis = {
+        risk_analysis: dict[str, Any] = {
             "total_risks_identified": len(self.risk_assessments),
             "risk_distribution": {},
             "unacceptable_risks": [],

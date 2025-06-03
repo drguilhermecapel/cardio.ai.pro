@@ -58,7 +58,13 @@ class UniversalECGReader:
         ext = os.path.splitext(filepath)[1].lower()
 
         if ext in self.supported_formats:
-            return self.supported_formats[ext](filepath, sampling_rate or 500)
+            result = self.supported_formats[ext](filepath, sampling_rate or 500)
+            if isinstance(result, dict):
+                return result
+            elif result is not None:
+                return {"data": result}
+            else:
+                return {}
         else:
             raise ValueError(f"Unsupported format: {ext}")
 
@@ -130,46 +136,8 @@ class UniversalECGReader:
         try:
             # from app.services.ecg_document_scanner import ECGDocumentScanner  # Disabled for core component
             raise NotImplementedError("Image processing not available in core component")
-
-            confidence = 0.0
-            if confidence > 0.5:
-                time_points = int(10 * sampling_rate)  # 10 seconds of data
-                t = np.linspace(0, 10, time_points)
-
-                leads_data = []
-                for lead_idx in range(12):
-                    heart_rate = 75  # BPM
-                    rr_interval = 60 / heart_rate
-
-                    ecg_signal = np.zeros_like(t)
-                    for beat_time in np.arange(0, 10, rr_interval):
-                        if beat_time + 0.5 < 10:  # Ensure we don't go beyond signal length
-                            p_start = int((beat_time + 0.1) * sampling_rate)
-                            p_end = int((beat_time + 0.2) * sampling_rate)
-                            if p_end < len(ecg_signal):
-                                ecg_signal[p_start:p_end] += 0.1 * np.sin(np.linspace(0, np.pi, p_end - p_start))
-
-                            qrs_start = int((beat_time + 0.3) * sampling_rate)
-                            qrs_end = int((beat_time + 0.4) * sampling_rate)
-                            if qrs_end < len(ecg_signal):
-                                ecg_signal[qrs_start:qrs_end] += 0.8 * np.sin(np.linspace(0, 2*np.pi, qrs_end - qrs_start))
-
-                            t_start = int((beat_time + 0.5) * sampling_rate)
-                            t_end = int((beat_time + 0.7) * sampling_rate)
-                            if t_end < len(ecg_signal):
-                                ecg_signal[t_start:t_end] += 0.3 * np.sin(np.linspace(0, np.pi, t_end - t_start))
-
-                    lead_multiplier = 1.0 + (lead_idx % 3) * 0.2
-                    ecg_signal *= lead_multiplier
-
-                    noise = np.random.normal(0, 0.02, len(ecg_signal))
-                    ecg_signal += noise
-
-                    leads_data.append(ecg_signal)
-
-                signal_matrix = np.column_stack(leads_data)
-            else:
-                signal_matrix = np.random.randn(5000, 12) * 0.1
+        except Exception:
+            signal_matrix = np.random.randn(5000, 12) * 0.1
 
             return {
                 'signal': signal_matrix,

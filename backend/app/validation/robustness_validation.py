@@ -228,8 +228,6 @@ class RobustnessValidationFramework:
             )
             noise[dropout_indices] = -signal_data[dropout_indices] * 0.8
 
-        else:
-            noise = np.zeros_like(signal_data)
 
         return signal_data + noise
 
@@ -335,15 +333,15 @@ class RobustnessValidationFramework:
             baseline_time = (time.time() - start_time) * 1000
 
             start_time = time.time()
-            successful_requests = 0
-            total_processing_time = 0
+            successful_requests = 0.0
+            total_processing_time = 0.0
 
             for _ in range(num_requests):
                 try:
                     request_start = time.time()
                     _ = analysis_function(test_signal)
                     request_time = (time.time() - request_start) * 1000
-                    total_processing_time += request_time
+                    total_processing_time += float(request_time)
                     successful_requests += 1
                 except Exception as e:
                     logger.warning(f"Request failed under load: {e}")
@@ -506,7 +504,7 @@ class RobustnessValidationFramework:
     def validate_robustness_criteria(self) -> dict[str, Any]:
         """Validate all robustness metrics against ultra-rigorous criteria"""
 
-        validation_results = {
+        validation_results: dict[str, Any] = {
             "overall_robustness": True,
             "test_results": {},
             "failed_criteria": [],
@@ -569,7 +567,7 @@ class RobustnessValidationFramework:
     def generate_robustness_report(self) -> dict[str, Any]:
         """Generate comprehensive robustness validation report"""
 
-        report = {
+        report: dict[str, Any] = {
             "report_date": "2025-06-03",
             "validation_framework": "Ultra-Rigorous Robustness Testing",
             "compliance_level": "Medical Grade - Zero Compromise",
@@ -635,7 +633,7 @@ class FailSafeRobustnessValidator:
         Perform comprehensive robustness validation with multiple validators
         """
 
-        validation_results = {
+        validation_results: dict[str, Any] = {
             "primary_validation": {},
             "consensus_validation": {},
             "overall_robustness": True,
