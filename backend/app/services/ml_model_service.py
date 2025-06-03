@@ -21,6 +21,7 @@ from app.services.wearable_integration_service import WearableIntegrationService
 from app.services.federated_learning import FederatedLearningService, ParticipantRole
 from app.services.explainable_ai import ExplainableAIService, ExplanationMethod
 from app.services.homomorphic_encryption import HomomorphicEncryptionService, homomorphic_service
+from app.services.blockchain_service import BlockchainService, blockchain_service
 from app.utils.memory_monitor import MemoryMonitor
 
 logger = logging.getLogger(__name__)
@@ -61,6 +62,7 @@ class MLModelService:
         self.explainable_ai_service = ExplainableAIService()
         
         self.homomorphic_encryption_service = homomorphic_service
+        self.blockchain_service = blockchain_service
         
         self._load_models()
         self._initialize_tensorrt()
@@ -627,6 +629,30 @@ class MLModelService:
             
         if self.risk_service_loaded:
             info["risk_service_info"] = self.risk_prediction_service.get_service_info()
+        
+        if self.blockchain_service:
+            try:
+                import asyncio
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    info["blockchain_service"] = {
+                        "service_status": "active",
+                        "network": self.blockchain_service.network.value,
+                        "provider_connected": self.blockchain_service.provider is not None
+                    }
+                else:
+                    blockchain_stats = loop.run_until_complete(self.blockchain_service.get_service_stats())
+                    info["blockchain_service"] = {
+                        "service_status": "active",
+                        **blockchain_stats
+                    }
+            except Exception as e:
+                info["blockchain_service"] = {
+                    "service_status": "error",
+                    "error": str(e)
+                }
+        else:
+            info["blockchain_service"] = {"service_status": "inactive"}
             
         return info
 

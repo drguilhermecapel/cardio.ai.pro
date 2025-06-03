@@ -12,7 +12,7 @@ from app.api.v1.endpoints import (
     users,
     validations,
 )
-from app.api.v1 import encryption
+from app.api.v1 import encryption, blockchain
 
 api_router = APIRouter()
 
@@ -23,3 +23,4 @@ api_router.include_router(patients.router, prefix="/patients", tags=["patients"]
 api_router.include_router(validations.router, prefix="/validations", tags=["validations"])
 api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
 api_router.include_router(encryption.router, prefix="/encryption", tags=["homomorphic-encryption"])
+api_router.include_router(blockchain.router, prefix="/blockchain", tags=["blockchain"])
