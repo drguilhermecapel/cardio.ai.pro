@@ -7,7 +7,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
@@ -24,6 +24,7 @@ from app.core.exceptions import (
 from app.core.logging import configure_logging
 from app.db.session import get_engine
 from app.monitoring.health_checks import router as health_router
+from app.websockets.ecg_streaming import handle_ecg_websocket, streaming_manager
 
 
 @asynccontextmanager
@@ -143,6 +144,25 @@ async def health_check() -> dict[str, str]:
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(health_router, prefix="/monitoring", tags=["monitoring"])
+
+
+@app.websocket("/ws/ecg/{session_id}")
+async def websocket_ecg_endpoint(websocket: WebSocket, session_id: str):
+    """WebSocket endpoint for real-time ECG streaming"""
+    await handle_ecg_websocket(websocket, session_id)
+
+
+@app.get("/streaming/stats")
+async def get_streaming_stats():
+    """Get real-time streaming statistics"""
+    return await streaming_manager.get_all_sessions_stats()
+
+
+@app.post("/streaming/cleanup")
+async def cleanup_inactive_sessions(timeout_seconds: int = 300):
+    """Clean up inactive streaming sessions"""
+    cleaned_count = await streaming_manager.cleanup_inactive_sessions(timeout_seconds)
+    return {"cleaned_sessions": cleaned_count}
 
 
 @app.get("/")
