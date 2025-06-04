@@ -56,7 +56,7 @@ class I18nService:
         if not self._translations_loaded:
             self.load_translations()
             self._translations_loaded = True
-            
+
         try:
             translation = self._get_nested_value(self.translations.get(lang, {}), key)
 
