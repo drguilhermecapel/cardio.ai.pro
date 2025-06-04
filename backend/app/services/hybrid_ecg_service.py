@@ -283,7 +283,7 @@ class FeatureExtractor:
             r_peaks = self._detect_r_peaks(signal_data)
 
         features.update(self._extract_morphological_features(signal_data, r_peaks))
-        features.update(self._extract_interval_features(signal_data, r_peaks))
+        features.update(self._extract_interval_features(r_peaks))
         features.update(self._extract_hrv_features(r_peaks))
         features.update(self._extract_spectral_features(signal_data))
         features.update(self._extract_wavelet_features(signal_data))
