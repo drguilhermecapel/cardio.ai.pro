@@ -126,7 +126,9 @@ const DashboardPage: React.FC = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant="body1">{t('dashboard.analysisNumber', { id: analysis.analysisId })}</Typography>
+                    <Typography variant="body1">
+                      {t('dashboard.analysisNumber', { id: analysis.analysisId })}
+                    </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {t('dashboard.patientId')}: {analysis.patientId}
                     </Typography>
@@ -169,7 +171,10 @@ const DashboardPage: React.FC = () => {
                   sx={{ mb: 1 }}
                 />
                 <Typography variant="body2" color="text.secondary">
-                  {t('dashboard.completedOf', { completed: completedAnalyses, total: totalAnalyses })}
+                  {t('dashboard.completedOf', {
+                    completed: completedAnalyses,
+                    total: totalAnalyses,
+                  })}
                 </Typography>
               </Box>
 

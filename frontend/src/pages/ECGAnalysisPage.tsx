@@ -166,7 +166,9 @@ const ECGAnalysisPage: React.FC = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      {analysis.confidence ? `${(analysis.confidence * 100).toFixed(1)}%` : t('common.notAvailable')}
+                      {analysis.confidence
+                        ? `${(analysis.confidence * 100).toFixed(1)}%`
+                        : t('common.notAvailable')}
                     </TableCell>
                     <TableCell>{formatters.formatDate(new Date(analysis.createdAt))}</TableCell>
                     <TableCell>

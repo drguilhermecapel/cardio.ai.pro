@@ -11,10 +11,13 @@ const EncryptionMatrix = styled(Box)(({ theme: _theme }) => ({
   position: 'relative',
   overflow: 'hidden',
   border: `1px solid ${futuristicTheme.colors.ui.border}`,
-  fontFamily: futuristicTheme.typography.fontFamily.mono
+  fontFamily: futuristicTheme.typography.fontFamily.mono,
 }))
 
-const QuantumBit = styled(Box)<{ state: 'superposition' | 'entangled' | 'measured' }>(({ theme: _theme, state }) => {
+const QuantumBit = styled(Box)<{ state: 'superposition' | 'entangled' | 'measured' }>(({
+  theme: _theme,
+  state,
+}) => {
   const getStateColor = (): string => {
     switch (state) {
       case 'superposition':
@@ -35,9 +38,13 @@ const QuantumBit = styled(Box)<{ state: 'superposition' | 'entangled' | 'measure
     borderRadius: '50%',
     backgroundColor: getStateColor(),
     boxShadow: `0 0 8px ${getStateColor()}`,
-    animation: state === 'superposition' ? 'quantumFlicker 0.5s ease-in-out infinite' : 
-               state === 'entangled' ? 'quantumPulse 1s ease-in-out infinite' : 'none',
-    transition: 'all 0.3s ease'
+    animation:
+      state === 'superposition'
+        ? 'quantumFlicker 0.5s ease-in-out infinite'
+        : state === 'entangled'
+          ? 'quantumPulse 1s ease-in-out infinite'
+          : 'none',
+    transition: 'all 0.3s ease',
   }
 })
 
@@ -49,15 +56,19 @@ const SecurityMetric = styled(Box)(({ theme: _theme }) => ({
   background: `rgba(0, 0, 0, 0.4)`,
   borderRadius: futuristicTheme.borderRadius.sm,
   border: `1px solid ${futuristicTheme.colors.ui.border}`,
-  marginBottom: futuristicTheme.spacing.sm
+  marginBottom: futuristicTheme.spacing.sm,
 }))
 
 const BlockchainBlock = styled(Box)<{ verified?: boolean }>(({ theme: _theme, verified }) => ({
   width: '20px',
   height: '20px',
-  background: verified ? 
-    `linear-gradient(45deg, ${futuristicTheme.colors.data.secondary}, ${futuristicTheme.colors.neural.connections})` :
-    `rgba(${futuristicTheme.colors.ui.border.replace('#', '').match(/.{2}/g)?.map(hex => parseInt(hex, 16)).join(', ')}, 0.3)`,
+  background: verified
+    ? `linear-gradient(45deg, ${futuristicTheme.colors.data.secondary}, ${futuristicTheme.colors.neural.connections})`
+    : `rgba(${futuristicTheme.colors.ui.border
+        .replace('#', '')
+        .match(/.{2}/g)
+        ?.map(hex => parseInt(hex, 16))
+        .join(', ')}, 0.3)`,
   border: `1px solid ${verified ? futuristicTheme.colors.data.secondary : futuristicTheme.colors.ui.border}`,
   borderRadius: futuristicTheme.borderRadius.sm,
   display: 'flex',
@@ -68,7 +79,7 @@ const BlockchainBlock = styled(Box)<{ verified?: boolean }>(({ theme: _theme, ve
   fontFamily: futuristicTheme.typography.fontFamily.mono,
   fontWeight: 'bold',
   boxShadow: verified ? `0 0 5px ${futuristicTheme.colors.data.secondary}` : 'none',
-  animation: verified ? 'pulse 2s ease-in-out infinite' : 'none'
+  animation: verified ? 'pulse 2s ease-in-out infinite' : 'none',
 }))
 
 const DataStreamIndicator = styled(Box)(({ theme: _theme }) => ({
@@ -77,7 +88,7 @@ const DataStreamIndicator = styled(Box)(({ theme: _theme }) => ({
   animation: 'dataStream 2s ease-in-out infinite',
   marginBottom: futuristicTheme.spacing.sm,
   borderRadius: '1px',
-  boxShadow: `0 0 5px ${futuristicTheme.colors.data.holographic}`
+  boxShadow: `0 0 5px ${futuristicTheme.colors.data.holographic}`,
 }))
 
 interface QuantumState {
@@ -104,7 +115,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
     decoherenceTime: 15.3,
     encryptionRate: 1.2,
     blockchainBlocks: [true, true, true, true, false, false],
-    quantumBits: []
+    quantumBits: [],
   })
 
   const [isEncrypting, setIsEncrypting] = useState(false)
@@ -116,8 +127,8 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
       state: 'superposition' as const,
       position: {
         x: 10 + (i % 6) * 15,
-        y: 15 + Math.floor(i / 6) * 25
-      }
+        y: 15 + Math.floor(i / 6) * 25,
+      },
     }))
     setQuantumState(prev => ({ ...prev, quantumBits: bits }))
   }, [])
@@ -133,8 +144,10 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
         blockchainBlocks: prev.blockchainBlocks.map(() => Math.random() > 0.2),
         quantumBits: prev.quantumBits.map(bit => ({
           ...bit,
-          state: (['superposition', 'entangled', 'measured'] as const)[Math.floor(Math.random() * 3)]
-        }))
+          state: (['superposition', 'entangled', 'measured'] as const)[
+            Math.floor(Math.random() * 3)
+          ],
+        })),
       }))
 
       setIsEncrypting(Math.random() > 0.6)
@@ -172,7 +185,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
             sx={{
               left: `${bit.position.x}%`,
               top: `${bit.position.y}%`,
-              transform: 'translate(-50%, -50%)'
+              transform: 'translate(-50%, -50%)',
             }}
           />
         ))}
@@ -185,7 +198,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
             left: 0,
             width: '100%',
             height: '100%',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
         >
           {quantumState.quantumBits
@@ -205,7 +218,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
                   strokeWidth="1"
                   opacity="0.6"
                   style={{
-                    filter: `drop-shadow(0 0 3px ${futuristicTheme.colors.neural.connections})`
+                    filter: `drop-shadow(0 0 3px ${futuristicTheme.colors.neural.connections})`,
                   }}
                 />
               )
@@ -227,7 +240,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
             alignItems: 'center',
             justifyContent: 'center',
             background: `radial-gradient(circle, rgba(0, 255, 255, 0.2), transparent)`,
-            animation: 'quantumPulse 1.5s ease-in-out infinite'
+            animation: 'quantumPulse 1.5s ease-in-out infinite',
           }}
         >
           <Typography
@@ -235,7 +248,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
               color: futuristicTheme.colors.data.holographic,
               fontSize: futuristicTheme.typography.sizes.xs,
               fontFamily: futuristicTheme.typography.fontFamily.mono,
-              fontWeight: 'bold'
+              fontWeight: 'bold',
             }}
           >
             Q
@@ -251,7 +264,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
             sx={{
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             Key Strength
@@ -262,7 +275,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
               color: futuristicTheme.colors.data.primary,
               fontSize: futuristicTheme.typography.sizes.sm,
               fontFamily: futuristicTheme.typography.fontFamily.primary,
-              fontWeight: 'bold'
+              fontWeight: 'bold',
             }}
           >
             {quantumState.keyStrength}-bit
@@ -275,7 +288,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
             sx={{
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             Entanglement Level
@@ -286,7 +299,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
               color: futuristicTheme.colors.neural.connections,
               fontSize: futuristicTheme.typography.sizes.sm,
               fontFamily: futuristicTheme.typography.fontFamily.primary,
-              fontWeight: 'bold'
+              fontWeight: 'bold',
             }}
           >
             {quantumState.entanglementLevel.toFixed(1)}%
@@ -299,7 +312,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
             sx={{
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             Threat Level
@@ -312,7 +325,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
               color: futuristicTheme.colors.background.primary,
               fontSize: futuristicTheme.typography.sizes.xs,
               fontWeight: 'bold',
-              boxShadow: `0 0 5px ${getThreatColor(threatLevel)}`
+              boxShadow: `0 0 5px ${getThreatColor(threatLevel)}`,
             }}
           />
         </SecurityMetric>
@@ -326,12 +339,12 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             fontFamily: futuristicTheme.typography.fontFamily.mono,
-            mb: 1
+            mb: 1,
           }}
         >
           Blockchain Verification:
         </Typography>
-        
+
         <Box sx={{ display: 'flex', gap: 0.5, mb: 2 }}>
           {quantumState.blockchainBlocks.map((verified, index) => (
             <BlockchainBlock key={index} verified={verified}>
@@ -349,7 +362,7 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
           borderTop: `1px solid ${futuristicTheme.colors.ui.border}`,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -358,30 +371,36 @@ export const QuantumEncryptionPanel: React.FC<QuantumEncryptionPanelProps> = ({ 
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: isEncrypting ? futuristicTheme.colors.data.holographic : futuristicTheme.colors.ui.border,
+              backgroundColor: isEncrypting
+                ? futuristicTheme.colors.data.holographic
+                : futuristicTheme.colors.ui.border,
               animation: isEncrypting ? 'pulse 1s ease-in-out infinite' : 'none',
-              boxShadow: isEncrypting ? `0 0 10px ${futuristicTheme.colors.data.holographic}` : 'none'
+              boxShadow: isEncrypting
+                ? `0 0 10px ${futuristicTheme.colors.data.holographic}`
+                : 'none',
             }}
           />
           <Typography
             variant="body2"
             sx={{
-              color: isEncrypting ? futuristicTheme.colors.data.holographic : futuristicTheme.colors.data.text,
+              color: isEncrypting
+                ? futuristicTheme.colors.data.holographic
+                : futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             {isEncrypting ? 'ENCRYPTING' : 'SECURE'}
           </Typography>
         </Box>
-        
+
         <Typography
           variant="body2"
           sx={{
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             fontFamily: futuristicTheme.typography.fontFamily.mono,
-            opacity: 0.7
+            opacity: 0.7,
           }}
         >
           {quantumState.encryptionRate.toFixed(1)} GB/s

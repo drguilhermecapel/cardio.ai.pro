@@ -15,7 +15,7 @@ class ValidationSeverity(Enum):
 class MedicalTerminologyValidator:
     """Validates medical terminology translations for accuracy and consistency."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.critical_terms: dict[str, dict[str, str]] = {}
         self.validated_terms: dict[str, dict[str, dict[str, Any]]] = {}
         self.severity_mapping: dict[str, ValidationSeverity] = {}
@@ -184,9 +184,17 @@ class MedicalTerminologyValidator:
         }
 
         for term_key, term_data in critical_cardiac_terms.items():
-            severity = term_data.pop("severity")
+            severity_obj = term_data.pop("severity")
+            if isinstance(severity_obj, ValidationSeverity):
+                severity = severity_obj
+            else:
+                severity = ValidationSeverity.INFORMATIONAL
             self.severity_mapping[term_key] = severity
-            self.critical_terms[term_key] = term_data
+            term_translations: dict[str, str] = {}
+            for k, v in term_data.items():
+                if k != "severity" and isinstance(v, str):
+                    term_translations[k] = v
+            self.critical_terms[term_key] = term_translations
 
     def validate_term(self, term: str, translation: str, language: str) -> tuple[bool, str, ValidationSeverity]:
         """
@@ -341,21 +349,29 @@ class MedicalTerminologyValidator:
             status = self.get_validation_status(term, language)
 
             if status["has_validated_translation"]:
-                report["summary"]["validated_terms"] += 1
-                report["validated_terms"].append(status)
+                if isinstance(report["summary"], dict):
+                    report["summary"]["validated_terms"] += 1
+                if isinstance(report["validated_terms"], list):
+                    report["validated_terms"].append(status)
             else:
-                report["summary"]["pending_validations"] += 1
+                if isinstance(report["summary"], dict):
+                    report["summary"]["pending_validations"] += 1
                 severity = self.severity_mapping.get(term, ValidationSeverity.INFORMATIONAL)
 
                 if severity == ValidationSeverity.CRITICAL:
-                    report["summary"]["critical_pending"] += 1
+                    if isinstance(report["summary"], dict):
+                        report["summary"]["critical_pending"] += 1
                 elif severity == ValidationSeverity.IMPORTANT:
-                    report["summary"]["important_pending"] += 1
+                    if isinstance(report["summary"], dict):
+                        report["summary"]["important_pending"] += 1
 
-                report["pending_validations"].append(status)
+                if isinstance(report["pending_validations"], list):
+                    report["pending_validations"].append(status)
 
-        if len(self.critical_terms) > 0:
-            report["validation_coverage"] = (report["summary"]["validated_terms"] / len(self.critical_terms)) * 100
+        if len(self.critical_terms) > 0 and isinstance(report["summary"], dict):
+            validated_count = report["summary"]["validated_terms"]
+            if isinstance(validated_count, int):
+                report["validation_coverage"] = (validated_count / len(self.critical_terms)) * 100
 
         return report
 

@@ -12,26 +12,26 @@ i18n
     debug: true,
     ns: ['common'],
     defaultNS: 'common',
-    
+
     interpolation: {
       escapeValue: false,
     },
-    
+
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
-    
+
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
       convertDetectedLanguage: (lng: string) => {
-        const supportedLanguages = ['en', 'pt', 'es', 'fr', 'de', 'zh', 'ar'];
-        const langCode = lng.split('-')[0]; // Convert 'en-US' to 'en'
-        return supportedLanguages.includes(langCode) ? langCode : 'en';
+        const supportedLanguages = ['en', 'pt', 'es', 'fr', 'de', 'zh', 'ar']
+        const langCode = lng.split('-')[0] // Convert 'en-US' to 'en'
+        return supportedLanguages.includes(langCode) ? langCode : 'en'
       },
     },
-    
+
     react: {
       useSuspense: false,
     },

@@ -15,7 +15,7 @@ const WaveformContainer = styled(Box)(({ theme: _theme }) => ({
   border: `1px solid ${futuristicTheme.colors.ui.border}`,
   borderRadius: futuristicTheme.borderRadius.lg,
   padding: futuristicTheme.spacing.md,
-  zIndex: futuristicTheme.zIndex.overlay
+  zIndex: futuristicTheme.zIndex.overlay,
 }))
 
 const LeadContainer = styled(Box)(({ theme: _theme }) => ({
@@ -23,7 +23,7 @@ const LeadContainer = styled(Box)(({ theme: _theme }) => ({
   gridTemplateColumns: 'repeat(4, 1fr)',
   gridTemplateRows: 'repeat(3, 1fr)',
   gap: futuristicTheme.spacing.sm,
-  height: '100%'
+  height: '100%',
 }))
 
 const LeadPanel = styled(Box)(({ theme: _theme }) => ({
@@ -32,7 +32,7 @@ const LeadPanel = styled(Box)(({ theme: _theme }) => ({
   borderRadius: futuristicTheme.borderRadius.sm,
   padding: futuristicTheme.spacing.xs,
   position: 'relative',
-  overflow: 'hidden'
+  overflow: 'hidden',
 }))
 
 const LeadLabel = styled(Typography)(({ theme: _theme }) => ({
@@ -43,7 +43,7 @@ const LeadLabel = styled(Typography)(({ theme: _theme }) => ({
   fontSize: futuristicTheme.typography.sizes.xs,
   fontFamily: futuristicTheme.typography.fontFamily.mono,
   fontWeight: 'bold',
-  zIndex: 2
+  zIndex: 2,
 }))
 
 interface ECGData {
@@ -73,8 +73,11 @@ interface ECGWaveformDisplayProps {
 
 export const ECGWaveformDisplay: React.FC<ECGWaveformDisplayProps> = ({ ecgData }) => {
   const svgRefs = useRef<{ [key: string]: SVGSVGElement | null }>({})
-  
-  const leads = React.useMemo(() => ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'], [])
+
+  const leads = React.useMemo(
+    () => ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'],
+    []
+  )
 
   useEffect(() => {
     if (!ecgData) return
@@ -92,32 +95,39 @@ export const ECGWaveformDisplay: React.FC<ECGWaveformDisplayProps> = ({ ecgData 
       const width = svg.clientWidth - margin.left - margin.right
       const height = svg.clientHeight - margin.top - margin.bottom
 
-      const svgSelection = d3.select(svg)
+      const svgSelection = d3
+        .select(svg)
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
 
-      const g = svgSelection.append('g')
+      const g = svgSelection
+        .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`)
 
-      const xScale = d3.scaleLinear()
+      const xScale = d3
+        .scaleLinear()
         .domain([0, data.length - 1])
         .range([0, width])
 
-      const yScale = d3.scaleLinear()
+      const yScale = d3
+        .scaleLinear()
         .domain(d3.extent(data) as [number, number])
         .range([height, 0])
 
-      const line = d3.line<number>()
+      const line = d3
+        .line<number>()
         .x((_d, i) => xScale(i))
         .y(d => yScale(d))
         .curve(d3.curveCardinal)
 
-      const xAxis = d3.axisBottom(xScale)
+      const xAxis = d3
+        .axisBottom(xScale)
         .tickSize(-height)
         .tickFormat(() => '')
         .ticks(10)
 
-      const yAxis = d3.axisLeft(yScale)
+      const yAxis = d3
+        .axisLeft(yScale)
         .tickSize(-width)
         .tickFormat(() => '')
         .ticks(5)
@@ -139,7 +149,8 @@ export const ECGWaveformDisplay: React.FC<ECGWaveformDisplayProps> = ({ ecgData 
         .style('stroke-width', 0.5)
         .style('opacity', 0.3)
 
-      const path = g.append('path')
+      const path = g
+        .append('path')
         .datum(data)
         .attr('fill', 'none')
         .attr('stroke', futuristicTheme.colors.data.primary)
@@ -184,28 +195,30 @@ export const ECGWaveformDisplay: React.FC<ECGWaveformDisplayProps> = ({ ecgData 
   const detectPeaks = (data: number[]): number[] => {
     const peaks: number[] = []
     const threshold = Math.max(...data) * 0.6
-    
+
     for (let i = 1; i < data.length - 1; i++) {
       if (data[i] > data[i - 1] && data[i] > data[i + 1] && data[i] > threshold) {
         peaks.push(i)
       }
     }
-    
+
     return peaks
   }
 
   const detectAnomalies = (data: number[]): number[] => {
     const anomalies: number[] = []
     const mean = data.reduce((sum, val) => sum + val, 0) / data.length
-    const stdDev = Math.sqrt(data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / data.length)
+    const stdDev = Math.sqrt(
+      data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / data.length
+    )
     const threshold = 2.5 * stdDev
-    
+
     for (let i = 0; i < data.length; i++) {
       if (Math.abs(data[i] - mean) > threshold) {
         anomalies.push(i)
       }
     }
-    
+
     return anomalies
   }
 
@@ -217,28 +230,30 @@ export const ECGWaveformDisplay: React.FC<ECGWaveformDisplayProps> = ({ ecgData 
           color: futuristicTheme.colors.data.text,
           fontFamily: futuristicTheme.typography.fontFamily.primary,
           mb: 1,
-          textAlign: 'center'
+          textAlign: 'center',
         }}
       >
         Real-Time ECG Analysis - {ecgData?.rhythm || 'Analyzing...'}
       </Typography>
-      
+
       <LeadContainer>
         {leads.map(lead => (
           <LeadPanel key={lead}>
             <LeadLabel>{lead}</LeadLabel>
             <svg
-              ref={el => { svgRefs.current[lead] = el }}
+              ref={el => {
+                svgRefs.current[lead] = el
+              }}
               style={{
                 width: '100%',
                 height: '100%',
-                background: 'transparent'
+                background: 'transparent',
               }}
             />
           </LeadPanel>
         ))}
       </LeadContainer>
-      
+
       {/* Real-time metrics overlay */}
       <Box
         sx={{
@@ -249,16 +264,18 @@ export const ECGWaveformDisplay: React.FC<ECGWaveformDisplayProps> = ({ ecgData 
           gap: futuristicTheme.spacing.md,
           color: futuristicTheme.colors.data.text,
           fontSize: futuristicTheme.typography.sizes.sm,
-          fontFamily: futuristicTheme.typography.fontFamily.mono
+          fontFamily: futuristicTheme.typography.fontFamily.mono,
         }}
       >
         <Box>
-          HR: <span style={{ color: futuristicTheme.colors.data.secondary }}>
+          HR:{' '}
+          <span style={{ color: futuristicTheme.colors.data.secondary }}>
             {ecgData?.heartRate?.toFixed(0) || '--'} BPM
           </span>
         </Box>
         <Box>
-          Confidence: <span style={{ color: futuristicTheme.colors.data.primary }}>
+          Confidence:{' '}
+          <span style={{ color: futuristicTheme.colors.data.primary }}>
             {ecgData?.confidence ? (ecgData.confidence * 100).toFixed(1) : '--'}%
           </span>
         </Box>

@@ -40,7 +40,7 @@ async def get_validation_status(
     term: str,
     language: str,
     current_user: User = Depends(UserService.get_current_user)
-):
+) -> ValidationStatusResponse:
     """Get validation status for a specific medical term and language."""
     try:
         status_info = i18n_service.get_medical_validation_status(term, language)
@@ -73,7 +73,7 @@ async def get_pending_validations(
 async def register_medical_validation(
     request: MedicalValidationRequest,
     current_user: User = Depends(UserService.get_current_user)
-):
+) -> dict[str, str]:
     """Register professional validation for a medical term."""
     try:
         if not hasattr(current_user, 'is_medical_validator') or not current_user.is_medical_validator:

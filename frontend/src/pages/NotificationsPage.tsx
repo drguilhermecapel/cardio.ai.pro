@@ -114,7 +114,9 @@ const NotificationsPage: React.FC = () => {
                         color={getPriorityColor(notification.priority)}
                         size="small"
                       />
-                      {!notification.isRead && <Chip label={t('notifications.new')} color="primary" size="small" />}
+                      {!notification.isRead && (
+                        <Chip label={t('notifications.new')} color="primary" size="small" />
+                      )}
                     </Box>
                   }
                   secondary={
@@ -132,7 +134,10 @@ const NotificationsPage: React.FC = () => {
             ))}
             {notifications.length === 0 && !isLoading && (
               <ListItem>
-                <ListItemText primary={t('notifications.noNotifications')} secondary={t('notifications.allCaughtUp')} />
+                <ListItemText
+                  primary={t('notifications.noNotifications')}
+                  secondary={t('notifications.allCaughtUp')}
+                />
               </ListItem>
             )}
           </List>

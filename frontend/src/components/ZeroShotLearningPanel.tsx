@@ -20,11 +20,14 @@ const ConditionCard = styled(Box)(({ theme: _theme }) => ({
     width: '3px',
     height: '100%',
     background: `linear-gradient(180deg, ${futuristicTheme.colors.neural.pathways}, transparent)`,
-    animation: 'conditionGlow 3s ease-in-out infinite'
-  }
+    animation: 'conditionGlow 3s ease-in-out infinite',
+  },
 }))
 
-const RarityIndicator = styled(Box)<{ rarity: 'ultra-rare' | 'rare' | 'uncommon' }>(({ theme: _theme, rarity }) => {
+const RarityIndicator = styled(Box)<{ rarity: 'ultra-rare' | 'rare' | 'uncommon' }>(({
+  theme: _theme,
+  rarity,
+}) => {
   const getRarityColor = (): string => {
     switch (rarity) {
       case 'ultra-rare':
@@ -41,7 +44,11 @@ const RarityIndicator = styled(Box)<{ rarity: 'ultra-rare' | 'rare' | 'uncommon'
     alignItems: 'center',
     gap: futuristicTheme.spacing.xs,
     padding: `${futuristicTheme.spacing.xs} ${futuristicTheme.spacing.sm}`,
-    background: `rgba(${getRarityColor().replace('#', '').match(/.{2}/g)?.map(hex => parseInt(hex, 16)).join(', ')}, 0.2)`,
+    background: `rgba(${getRarityColor()
+      .replace('#', '')
+      .match(/.{2}/g)
+      ?.map(hex => parseInt(hex, 16))
+      .join(', ')}, 0.2)`,
     border: `1px solid ${getRarityColor()}`,
     borderRadius: futuristicTheme.borderRadius.sm,
     fontSize: futuristicTheme.typography.sizes.xs,
@@ -49,7 +56,7 @@ const RarityIndicator = styled(Box)<{ rarity: 'ultra-rare' | 'rare' | 'uncommon'
     fontFamily: futuristicTheme.typography.fontFamily.mono,
     fontWeight: 'bold',
     textTransform: 'uppercase',
-    boxShadow: `0 0 5px ${getRarityColor()}`
+    boxShadow: `0 0 5px ${getRarityColor()}`,
   }
 })
 
@@ -61,7 +68,7 @@ const LearningProgress = styled(Box)(({ theme: _theme }) => ({
   padding: futuristicTheme.spacing.sm,
   background: `linear-gradient(45deg, rgba(0, 191, 255, 0.1), rgba(0, 255, 127, 0.1))`,
   borderRadius: futuristicTheme.borderRadius.sm,
-  border: `1px solid ${futuristicTheme.colors.ui.border}`
+  border: `1px solid ${futuristicTheme.colors.ui.border}`,
 }))
 
 const NeuralNetworkVisualization = styled(Box)(({ theme: _theme }) => ({
@@ -71,19 +78,23 @@ const NeuralNetworkVisualization = styled(Box)(({ theme: _theme }) => ({
   position: 'relative',
   overflow: 'hidden',
   marginTop: futuristicTheme.spacing.md,
-  border: `1px solid ${futuristicTheme.colors.ui.border}`
+  border: `1px solid ${futuristicTheme.colors.ui.border}`,
 }))
 
-const NeuralNode = styled(Box)<{ active?: boolean; size?: number }>(({ theme: _theme, active, size = 4 }) => ({
-  position: 'absolute',
-  width: `${size}px`,
-  height: `${size}px`,
-  borderRadius: '50%',
-  backgroundColor: active ? futuristicTheme.colors.neural.nodes : futuristicTheme.colors.ui.border,
-  boxShadow: active ? `0 0 8px ${futuristicTheme.colors.neural.nodes}` : 'none',
-  animation: active ? 'pulse 2s ease-in-out infinite' : 'none',
-  transition: 'all 0.3s ease'
-}))
+const NeuralNode = styled(Box)<{ active?: boolean; size?: number }>(
+  ({ theme: _theme, active, size = 4 }) => ({
+    position: 'absolute',
+    width: `${size}px`,
+    height: `${size}px`,
+    borderRadius: '50%',
+    backgroundColor: active
+      ? futuristicTheme.colors.neural.nodes
+      : futuristicTheme.colors.ui.border,
+    boxShadow: active ? `0 0 8px ${futuristicTheme.colors.neural.nodes}` : 'none',
+    animation: active ? 'pulse 2s ease-in-out infinite' : 'none',
+    transition: 'all 0.3s ease',
+  })
+)
 
 interface RareCondition {
   name: string
@@ -112,7 +123,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
         rarity: 'ultra-rare',
         prevalence: '1:10,000',
         description: 'Rare genetic arrhythmia disorder',
-        learningSource: 'Literature synthesis'
+        learningSource: 'Literature synthesis',
       },
       {
         name: 'Catecholaminergic Polymorphic VT',
@@ -120,7 +131,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
         rarity: 'ultra-rare',
         prevalence: '1:10,000',
         description: 'Exercise-induced ventricular arrhythmia',
-        learningSource: 'Case study analysis'
+        learningSource: 'Case study analysis',
       },
       {
         name: 'Long QT Syndrome Type 8',
@@ -128,7 +139,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
         rarity: 'rare',
         prevalence: '1:5,000',
         description: 'Rare variant of LQTS',
-        learningSource: 'Genetic database'
+        learningSource: 'Genetic database',
       },
       {
         name: 'Arrhythmogenic Cardiomyopathy',
@@ -136,7 +147,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
         rarity: 'rare',
         prevalence: '1:2,500',
         description: 'Progressive heart muscle disease',
-        learningSource: 'Multi-modal learning'
+        learningSource: 'Multi-modal learning',
       },
       {
         name: 'Epsilon Wave Pattern',
@@ -144,8 +155,8 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
         rarity: 'uncommon',
         prevalence: '1:1,000',
         description: 'Characteristic ARVC finding',
-        learningSource: 'Pattern recognition'
-      }
+        learningSource: 'Pattern recognition',
+      },
     ]
 
     const interval = setInterval(() => {
@@ -167,7 +178,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
       }
 
       const nodeCount = 12
-      const newActiveNodes = Array.from({ length: nodeCount }, (_, i) => 
+      const newActiveNodes = Array.from({ length: nodeCount }, (_, i) =>
         Math.random() > 0.4 ? i : -1
       ).filter(i => i !== -1)
       setActiveNodes(newActiveNodes)
@@ -188,7 +199,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
     { top: '50%', left: '80%' },
     { top: '85%', left: '25%' },
     { top: '85%', left: '50%' },
-    { top: '85%', left: '75%' }
+    { top: '85%', left: '75%' },
   ]
 
   return (
@@ -206,7 +217,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
               fontFamily: futuristicTheme.typography.fontFamily.mono,
-              mb: 0.5
+              mb: 0.5,
             }}
           >
             Knowledge Acquisition Progress
@@ -220,8 +231,8 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
               backgroundColor: `rgba(0, 191, 255, 0.2)`,
               '& .MuiLinearProgress-bar': {
                 backgroundColor: futuristicTheme.colors.neural.connections,
-                boxShadow: `0 0 8px ${futuristicTheme.colors.neural.connections}`
-              }
+                boxShadow: `0 0 8px ${futuristicTheme.colors.neural.connections}`,
+              },
             }}
           />
         </Box>
@@ -230,7 +241,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
             color: futuristicTheme.colors.neural.connections,
             fontSize: futuristicTheme.typography.sizes.sm,
             fontFamily: futuristicTheme.typography.fontFamily.primary,
-            fontWeight: 'bold'
+            fontWeight: 'bold',
           }}
         >
           {learningProgress.toFixed(1)}%
@@ -246,11 +257,11 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
             sx={{
               top: pos.top,
               left: pos.left,
-              transform: 'translate(-50%, -50%)'
+              transform: 'translate(-50%, -50%)',
             }}
           />
         ))}
-        
+
         {/* Learning indicator */}
         {isLearning && (
           <Box
@@ -263,7 +274,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
               fontSize: futuristicTheme.typography.sizes.xs,
               fontFamily: futuristicTheme.typography.fontFamily.mono,
               fontWeight: 'bold',
-              animation: 'pulse 1s ease-in-out infinite'
+              animation: 'pulse 1s ease-in-out infinite',
             }}
           >
             LEARNING...
@@ -278,7 +289,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             fontFamily: futuristicTheme.typography.fontFamily.mono,
-            mb: 1
+            mb: 1,
           }}
         >
           Rare Condition Detections:
@@ -291,7 +302,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
               py: 2,
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              opacity: 0.7
+              opacity: 0.7,
             }}
           >
             No rare conditions detected
@@ -299,7 +310,14 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
         ) : (
           detectedConditions.map((condition, index) => (
             <ConditionCard key={`${condition.name}-${index}`}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  mb: 1,
+                }}
+              >
                 <Typography
                   variant="body2"
                   sx={{
@@ -307,7 +325,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
                     fontSize: futuristicTheme.typography.sizes.sm,
                     fontFamily: futuristicTheme.typography.fontFamily.primary,
                     fontWeight: 'bold',
-                    flex: 1
+                    flex: 1,
                   }}
                 >
                   {condition.name}
@@ -318,7 +336,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
                     color: futuristicTheme.colors.data.secondary,
                     fontSize: futuristicTheme.typography.sizes.sm,
                     fontFamily: futuristicTheme.typography.fontFamily.primary,
-                    fontWeight: 'bold'
+                    fontWeight: 'bold',
                   }}
                 >
                   {(condition.confidence * 100).toFixed(1)}%
@@ -331,7 +349,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
                   color: futuristicTheme.colors.data.text,
                   fontSize: futuristicTheme.typography.sizes.xs,
                   opacity: 0.8,
-                  mb: 1
+                  mb: 1,
                 }}
               >
                 {condition.description}
@@ -341,14 +359,14 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
                 <RarityIndicator rarity={condition.rarity}>
                   {condition.rarity} • {condition.prevalence}
                 </RarityIndicator>
-                
+
                 <Typography
                   variant="body2"
                   sx={{
                     color: futuristicTheme.colors.neural.pathways,
                     fontSize: futuristicTheme.typography.sizes.xs,
                     fontFamily: futuristicTheme.typography.fontFamily.mono,
-                    fontStyle: 'italic'
+                    fontStyle: 'italic',
                   }}
                 >
                   {condition.learningSource}
@@ -367,7 +385,7 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
           borderTop: `1px solid ${futuristicTheme.colors.ui.border}`,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -376,30 +394,36 @@ export const ZeroShotLearningPanel: React.FC<ZeroShotLearningPanelProps> = ({ cl
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: isLearning ? futuristicTheme.colors.neural.connections : futuristicTheme.colors.ui.border,
+              backgroundColor: isLearning
+                ? futuristicTheme.colors.neural.connections
+                : futuristicTheme.colors.ui.border,
               animation: isLearning ? 'pulse 1s ease-in-out infinite' : 'none',
-              boxShadow: isLearning ? `0 0 10px ${futuristicTheme.colors.neural.connections}` : 'none'
+              boxShadow: isLearning
+                ? `0 0 10px ${futuristicTheme.colors.neural.connections}`
+                : 'none',
             }}
           />
           <Typography
             variant="body2"
             sx={{
-              color: isLearning ? futuristicTheme.colors.neural.connections : futuristicTheme.colors.data.text,
+              color: isLearning
+                ? futuristicTheme.colors.neural.connections
+                : futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             {isLearning ? 'ACTIVE LEARNING' : 'STANDBY'}
           </Typography>
         </Box>
-        
+
         <Typography
           variant="body2"
           sx={{
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             fontFamily: futuristicTheme.typography.fontFamily.mono,
-            opacity: 0.7
+            opacity: 0.7,
           }}
         >
           {detectedConditions.length} conditions identified

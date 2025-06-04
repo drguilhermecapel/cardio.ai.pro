@@ -24,7 +24,7 @@ const PanelContainer = styled(motion.div)<{ width?: string }>(({ width }) => ({
     background: `linear-gradient(45deg, transparent 30%, ${futuristicTheme.colors.ui.glow} 50%, transparent 70%)`,
     opacity: 0.1,
     animation: 'holographic-sweep 3s ease-in-out infinite',
-    pointerEvents: 'none'
+    pointerEvents: 'none',
   },
   '&::after': {
     content: '""',
@@ -37,15 +37,15 @@ const PanelContainer = styled(motion.div)<{ width?: string }>(({ width }) => ({
     borderRadius: futuristicTheme.borderRadius.lg,
     opacity: 0.3,
     animation: 'border-glow 4s linear infinite',
-    zIndex: -1
-  }
+    zIndex: -1,
+  },
 }))
 
 const PanelHeader = styled(Box)(() => ({
   borderBottom: `1px solid ${futuristicTheme.colors.ui.border}`,
   paddingBottom: futuristicTheme.spacing.sm,
   marginBottom: futuristicTheme.spacing.md,
-  position: 'relative'
+  position: 'relative',
 }))
 
 const PanelTitle = styled(Typography)(() => ({
@@ -68,8 +68,8 @@ const PanelTitle = styled(Typography)(() => ({
     width: '100%',
     height: '1px',
     background: `linear-gradient(90deg, ${futuristicTheme.colors.data.primary}, transparent)`,
-    animation: 'title-glow 2s ease-in-out infinite alternate'
-  }
+    animation: 'title-glow 2s ease-in-out infinite alternate',
+  },
 }))
 
 const PanelContent = styled(Box)(() => ({
@@ -77,10 +77,12 @@ const PanelContent = styled(Box)(() => ({
   fontSize: futuristicTheme.typography.sizes.sm,
   lineHeight: 1.4,
   position: 'relative',
-  zIndex: 1
+  zIndex: 1,
 }))
 
-const StatusIndicator = styled(Box)<{ status?: 'active' | 'warning' | 'critical' | 'normal' }>(({ status }) => {
+const StatusIndicator = styled(Box)<{ status?: 'active' | 'warning' | 'critical' | 'normal' }>(({
+  status,
+}) => {
   const getStatusColor = (): string => {
     switch (status) {
       case 'active':
@@ -103,7 +105,7 @@ const StatusIndicator = styled(Box)<{ status?: 'active' | 'warning' | 'critical'
     borderRadius: '50%',
     backgroundColor: getStatusColor(),
     boxShadow: `0 0 10px ${getStatusColor()}`,
-    animation: 'pulse 2s ease-in-out infinite'
+    animation: 'pulse 2s ease-in-out infinite',
   }
 })
 
@@ -120,7 +122,7 @@ export const HolographicPanel: React.FC<HolographicPanelProps> = ({
   children,
   width,
   status = 'normal',
-  className
+  className,
 }) => {
   return (
     <PanelContainer
@@ -132,21 +134,17 @@ export const HolographicPanel: React.FC<HolographicPanelProps> = ({
       whileHover={{
         scale: 1.02,
         boxShadow: futuristicTheme.effects.glow.secondary,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
     >
       <StatusIndicator status={status} />
-      
+
       <PanelHeader>
-        <PanelTitle variant="h6">
-          {title}
-        </PanelTitle>
+        <PanelTitle variant="h6">{title}</PanelTitle>
       </PanelHeader>
-      
-      <PanelContent>
-        {children}
-      </PanelContent>
-      
+
+      <PanelContent>{children}</PanelContent>
+
       {/* Holographic scan lines effect */}
       <Box
         sx={{
@@ -163,10 +161,10 @@ export const HolographicPanel: React.FC<HolographicPanelProps> = ({
             rgba(0, 191, 255, 0.03) 4px
           )`,
           pointerEvents: 'none',
-          animation: 'scan-lines 3s linear infinite'
+          animation: 'scan-lines 3s linear infinite',
         }}
       />
-      
+
       {/* Global styles for animations */}
       <style>{`
         @keyframes holographic-sweep {

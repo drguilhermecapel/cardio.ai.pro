@@ -31,27 +31,25 @@ const testTranslations = {
       'nav.ecgAnalysis': 'ECG Analysis',
       'nav.notifications': 'Notifications',
       'nav.validations': 'Validations',
-      'nav.logout': 'Logout'
-    }
-  }
+      'nav.logout': 'Logout',
+    },
+  },
 }
 
 export const initI18nForTesting = (): typeof i18n => {
   if (!i18n.isInitialized) {
-    i18n
-      .use(initReactI18next)
-      .init({
-        lng: 'en',
-        fallbackLng: 'en',
-        debug: false,
-        interpolation: {
-          escapeValue: false,
-        },
-        resources: testTranslations,
-        react: {
-          useSuspense: false,
-        },
-      })
+    i18n.use(initReactI18next).init({
+      lng: 'en',
+      fallbackLng: 'en',
+      debug: false,
+      interpolation: {
+        escapeValue: false,
+      },
+      resources: testTranslations,
+      react: {
+        useSuspense: false,
+      },
+    })
   }
   return i18n
 }

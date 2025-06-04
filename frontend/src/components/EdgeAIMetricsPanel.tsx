@@ -8,7 +8,7 @@ const MetricsGrid = styled(Box)(({ theme: _theme }) => ({
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   gap: futuristicTheme.spacing.sm,
-  marginBottom: futuristicTheme.spacing.md
+  marginBottom: futuristicTheme.spacing.md,
 }))
 
 const MetricCard = styled(Box)(({ theme: _theme }) => ({
@@ -17,10 +17,13 @@ const MetricCard = styled(Box)(({ theme: _theme }) => ({
   borderRadius: futuristicTheme.borderRadius.sm,
   padding: futuristicTheme.spacing.sm,
   position: 'relative',
-  overflow: 'hidden'
+  overflow: 'hidden',
 }))
 
-const MetricValue = styled(Typography)<{ status?: 'optimal' | 'warning' | 'critical' }>(({ theme: _theme, status }) => {
+const MetricValue = styled(Typography)<{ status?: 'optimal' | 'warning' | 'critical' }>(({
+  theme: _theme,
+  status,
+}) => {
   const getColor = (): string => {
     switch (status) {
       case 'critical':
@@ -37,7 +40,7 @@ const MetricValue = styled(Typography)<{ status?: 'optimal' | 'warning' | 'criti
     fontSize: futuristicTheme.typography.sizes.lg,
     fontFamily: futuristicTheme.typography.fontFamily.primary,
     fontWeight: 'bold',
-    textShadow: `0 0 5px ${getColor()}`
+    textShadow: `0 0 5px ${getColor()}`,
   }
 })
 
@@ -48,31 +51,33 @@ const PerformanceGraph = styled(Box)(({ theme: _theme }) => ({
   borderRadius: futuristicTheme.borderRadius.md,
   position: 'relative',
   overflow: 'hidden',
-  marginTop: futuristicTheme.spacing.md
+  marginTop: futuristicTheme.spacing.md,
 }))
 
-const GraphBar = styled(Box)<{ height: number; delay: number }>(({ theme: _theme, height, delay }) => ({
-  position: 'absolute',
-  bottom: 0,
-  width: '8px',
-  height: `${height}%`,
-  background: `linear-gradient(180deg, ${futuristicTheme.colors.data.primary}, ${futuristicTheme.colors.neural.connections})`,
-  borderRadius: '2px 2px 0 0',
-  animation: `barGrow 0.5s ease-out ${delay}s both`,
-  boxShadow: `0 0 5px ${futuristicTheme.colors.data.primary}`
-}))
+const GraphBar = styled(Box)<{ height: number; delay: number }>(
+  ({ theme: _theme, height, delay }) => ({
+    position: 'absolute',
+    bottom: 0,
+    width: '8px',
+    height: `${height}%`,
+    background: `linear-gradient(180deg, ${futuristicTheme.colors.data.primary}, ${futuristicTheme.colors.neural.connections})`,
+    borderRadius: '2px 2px 0 0',
+    animation: `barGrow 0.5s ease-out ${delay}s both`,
+    boxShadow: `0 0 5px ${futuristicTheme.colors.data.primary}`,
+  })
+)
 
 const ProcessorIndicator = styled(Box)<{ active?: boolean }>(({ theme: _theme, active }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: futuristicTheme.spacing.xs,
   padding: futuristicTheme.spacing.xs,
-  background: active ? 
-    `linear-gradient(45deg, rgba(0, 255, 127, 0.2), rgba(0, 191, 255, 0.2))` :
-    `rgba(0, 0, 0, 0.3)`,
+  background: active
+    ? `linear-gradient(45deg, rgba(0, 255, 127, 0.2), rgba(0, 191, 255, 0.2))`
+    : `rgba(0, 0, 0, 0.3)`,
   border: `1px solid ${active ? futuristicTheme.colors.data.secondary : futuristicTheme.colors.ui.border}`,
   borderRadius: futuristicTheme.borderRadius.sm,
-  marginBottom: futuristicTheme.spacing.xs
+  marginBottom: futuristicTheme.spacing.xs,
 }))
 
 interface EdgeMetrics {
@@ -112,9 +117,9 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
       { id: 2, usage: 91, active: true },
       { id: 3, usage: 68, active: true },
       { id: 4, usage: 45, active: false },
-      { id: 5, usage: 38, active: false }
+      { id: 5, usage: 38, active: false },
     ],
-    performanceHistory: [65, 72, 68, 85, 91, 78, 82, 89, 76, 94, 88, 92]
+    performanceHistory: [65, 72, 68, 85, 91, 78, 82, 89, 76, 94, 88, 92],
   })
 
   useEffect(() => {
@@ -132,12 +137,9 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
         jetsonCores: prev.jetsonCores.map(core => ({
           ...core,
           usage: Math.max(20, core.usage + (Math.random() - 0.5) * 10),
-          active: Math.random() > 0.1
+          active: Math.random() > 0.1,
         })),
-        performanceHistory: [
-          ...prev.performanceHistory.slice(1),
-          70 + Math.random() * 30
-        ]
+        performanceHistory: [...prev.performanceHistory.slice(1), 70 + Math.random() * 30],
       }))
     }, 1500)
 
@@ -172,7 +174,7 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
               fontFamily: futuristicTheme.typography.fontFamily.mono,
-              mb: 0.5
+              mb: 0.5,
             }}
           >
             Latency
@@ -189,14 +191,12 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
               fontFamily: futuristicTheme.typography.fontFamily.mono,
-              mb: 0.5
+              mb: 0.5,
             }}
           >
             Throughput
           </Typography>
-          <MetricValue status="optimal">
-            {metrics.throughput.toFixed(0)}/s
-          </MetricValue>
+          <MetricValue status="optimal">{metrics.throughput.toFixed(0)}/s</MetricValue>
         </MetricCard>
 
         <MetricCard>
@@ -206,7 +206,7 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
               fontFamily: futuristicTheme.typography.fontFamily.mono,
-              mb: 0.5
+              mb: 0.5,
             }}
           >
             GPU Usage
@@ -223,7 +223,7 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
               fontFamily: futuristicTheme.typography.fontFamily.mono,
-              mb: 0.5
+              mb: 0.5,
             }}
           >
             Temperature
@@ -242,7 +242,7 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             fontFamily: futuristicTheme.typography.fontFamily.mono,
-            mb: 1
+            mb: 1,
           }}
         >
           NVIDIA Jetson Cores:
@@ -255,12 +255,12 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
                 color: futuristicTheme.colors.data.text,
                 fontSize: futuristicTheme.typography.sizes.xs,
                 fontFamily: futuristicTheme.typography.fontFamily.mono,
-                width: '40px'
+                width: '40px',
               }}
             >
               Core {core.id}
             </Typography>
-            
+
             <Box sx={{ flex: 1, mx: 1 }}>
               <LinearProgress
                 variant="determinate"
@@ -270,24 +270,26 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
                   borderRadius: '2px',
                   backgroundColor: `rgba(0, 191, 255, 0.2)`,
                   '& .MuiLinearProgress-bar': {
-                    backgroundColor: core.active ? 
-                      futuristicTheme.colors.data.secondary : 
-                      futuristicTheme.colors.ui.border,
-                    boxShadow: core.active ? 
-                      `0 0 5px ${futuristicTheme.colors.data.secondary}` : 
-                      'none'
-                  }
+                    backgroundColor: core.active
+                      ? futuristicTheme.colors.data.secondary
+                      : futuristicTheme.colors.ui.border,
+                    boxShadow: core.active
+                      ? `0 0 5px ${futuristicTheme.colors.data.secondary}`
+                      : 'none',
+                  },
                 }}
               />
             </Box>
-            
+
             <Typography
               sx={{
-                color: core.active ? futuristicTheme.colors.data.secondary : futuristicTheme.colors.data.text,
+                color: core.active
+                  ? futuristicTheme.colors.data.secondary
+                  : futuristicTheme.colors.data.text,
                 fontSize: futuristicTheme.typography.sizes.xs,
                 fontFamily: futuristicTheme.typography.fontFamily.mono,
                 width: '35px',
-                textAlign: 'right'
+                textAlign: 'right',
               }}
             >
               {core.usage.toFixed(0)}%
@@ -306,7 +308,7 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             fontFamily: futuristicTheme.typography.fontFamily.mono,
-            zIndex: 2
+            zIndex: 2,
           }}
         >
           Performance History
@@ -318,7 +320,7 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
             height={value}
             delay={index * 0.05}
             sx={{
-              left: `${8 + index * 7}%`
+              left: `${8 + index * 7}%`,
             }}
           />
         ))}
@@ -337,7 +339,7 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
               transparent 19px,
               rgba(0, 191, 255, 0.1) 20px
             )`,
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
         />
       </PerformanceGraph>
@@ -350,7 +352,7 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
           borderTop: `1px solid ${futuristicTheme.colors.ui.border}`,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -359,9 +361,12 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: metrics.latency < 3 ? futuristicTheme.colors.data.secondary : futuristicTheme.colors.data.warning,
+              backgroundColor:
+                metrics.latency < 3
+                  ? futuristicTheme.colors.data.secondary
+                  : futuristicTheme.colors.data.warning,
               animation: 'pulse 2s ease-in-out infinite',
-              boxShadow: `0 0 10px ${metrics.latency < 3 ? futuristicTheme.colors.data.secondary : futuristicTheme.colors.data.warning}`
+              boxShadow: `0 0 10px ${metrics.latency < 3 ? futuristicTheme.colors.data.secondary : futuristicTheme.colors.data.warning}`,
             }}
           />
           <Typography
@@ -369,20 +374,20 @@ export const EdgeAIMetricsPanel: React.FC<EdgeAIMetricsPanelProps> = ({ classNam
             sx={{
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             {metrics.latency < 3 ? 'OPTIMAL' : metrics.latency < 4 ? 'DEGRADED' : 'CRITICAL'}
           </Typography>
         </Box>
-        
+
         <Typography
           variant="body2"
           sx={{
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             fontFamily: futuristicTheme.typography.fontFamily.mono,
-            opacity: 0.7
+            opacity: 0.7,
           }}
         >
           {metrics.powerConsumption.toFixed(1)}W • {metrics.inferenceRate.toFixed(0)} inf/s

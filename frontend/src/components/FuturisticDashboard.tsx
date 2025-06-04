@@ -22,11 +22,9 @@ const DashboardContainer = styled(Box)(() => ({
     bottom: 0,
     background: 'radial-gradient(circle at 50% 50%, rgba(0, 191, 255, 0.1) 0%, transparent 70%)',
     pointerEvents: 'none',
-    zIndex: futuristicTheme.zIndex.background
-  }
+    zIndex: futuristicTheme.zIndex.background,
+  },
 }))
-
-
 
 const CentralCanvas = styled(Box)(() => ({
   position: 'absolute',
@@ -49,8 +47,8 @@ const CentralCanvas = styled(Box)(() => ({
     background: `conic-gradient(from 0deg, ${futuristicTheme.colors.neural.connections}, ${futuristicTheme.colors.neural.nodes}, ${futuristicTheme.colors.neural.pathways}, ${futuristicTheme.colors.neural.connections})`,
     opacity: 0.3,
     animation: 'rotate 20s linear infinite',
-    zIndex: -1
-  }
+    zIndex: -1,
+  },
 }))
 
 const LeftPanel = styled(Box)(() => ({
@@ -60,7 +58,7 @@ const LeftPanel = styled(Box)(() => ({
   transform: 'translateY(-50%)',
   width: '300px',
   height: '80vh',
-  zIndex: futuristicTheme.zIndex.overlay
+  zIndex: futuristicTheme.zIndex.overlay,
 }))
 
 const RightPanel = styled(Box)(() => ({
@@ -70,7 +68,7 @@ const RightPanel = styled(Box)(() => ({
   transform: 'translateY(-50%)',
   width: '300px',
   height: '80vh',
-  zIndex: futuristicTheme.zIndex.overlay
+  zIndex: futuristicTheme.zIndex.overlay,
 }))
 
 const BottomTimeline = styled(Box)(() => ({
@@ -80,7 +78,7 @@ const BottomTimeline = styled(Box)(() => ({
   transform: 'translateX(-50%)',
   width: '80vw',
   height: '120px',
-  zIndex: futuristicTheme.zIndex.overlay
+  zIndex: futuristicTheme.zIndex.overlay,
 }))
 
 const FloatingPanels = styled(Box)(() => ({
@@ -93,15 +91,10 @@ const FloatingPanels = styled(Box)(() => ({
   zIndex: futuristicTheme.zIndex.floating,
   display: 'flex',
   justifyContent: 'space-around',
-  alignItems: 'flex-start'
+  alignItems: 'flex-start',
 }))
 
-
-
-
-
 export const FuturisticDashboard: React.FC = () => {
-
   const [isLoading, setIsLoading] = useState(true)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -119,7 +112,7 @@ export const FuturisticDashboard: React.FC = () => {
             left: '50%',
             transform: 'translate(-50%, -50%)',
             textAlign: 'center',
-            color: futuristicTheme.colors.data.text
+            color: futuristicTheme.colors.data.text,
           }}
         >
           <motion.div
@@ -127,7 +120,10 @@ export const FuturisticDashboard: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1 }}
           >
-            <Typography variant="h3" sx={{ mb: 2, fontFamily: futuristicTheme.typography.fontFamily.primary }}>
+            <Typography
+              variant="h3"
+              sx={{ mb: 2, fontFamily: futuristicTheme.typography.fontFamily.primary }}
+            >
               Initializing Hybrid ECG AI System
             </Typography>
             <LinearProgress
@@ -138,8 +134,8 @@ export const FuturisticDashboard: React.FC = () => {
                 backgroundColor: futuristicTheme.colors.ui.glass,
                 '& .MuiLinearProgress-bar': {
                   backgroundColor: futuristicTheme.colors.data.primary,
-                  boxShadow: futuristicTheme.effects.glow.primary
-                }
+                  boxShadow: futuristicTheme.effects.glow.primary,
+                },
               }}
             />
             <Typography variant="body1" sx={{ mt: 2, opacity: 0.8 }}>
@@ -159,7 +155,7 @@ export const FuturisticDashboard: React.FC = () => {
           <PerspectiveCamera makeDefault position={[0, 0, 5]} />
           <OrbitControls enableZoom={false} enablePan={false} />
           <Environment preset="night" />
-          
+
           {/* 3D Heart Model Placeholder */}
           <mesh>
             <sphereGeometry args={[1.5, 32, 32]} />
@@ -180,7 +176,7 @@ export const FuturisticDashboard: React.FC = () => {
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.lg,
             fontFamily: futuristicTheme.typography.fontFamily.primary,
-            textAlign: 'center'
+            textAlign: 'center',
           }}
         >
           Futuristic Medical AI Dashboard
@@ -194,7 +190,7 @@ export const FuturisticDashboard: React.FC = () => {
             color: futuristicTheme.colors.data.secondary,
             fontSize: futuristicTheme.typography.sizes.base,
             fontFamily: futuristicTheme.typography.fontFamily.primary,
-            textAlign: 'center'
+            textAlign: 'center',
           }}
         >
           Edge AI Metrics
@@ -208,7 +204,7 @@ export const FuturisticDashboard: React.FC = () => {
             color: futuristicTheme.colors.neural.pathways,
             fontSize: futuristicTheme.typography.sizes.base,
             fontFamily: futuristicTheme.typography.fontFamily.primary,
-            textAlign: 'center'
+            textAlign: 'center',
           }}
         >
           Explainable AI
@@ -222,7 +218,7 @@ export const FuturisticDashboard: React.FC = () => {
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.base,
             fontFamily: futuristicTheme.typography.fontFamily.primary,
-            textAlign: 'center'
+            textAlign: 'center',
           }}
         >
           Continuous Learning Timeline

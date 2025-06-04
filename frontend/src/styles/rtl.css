@@ -1,124 +1,124 @@
 /* RTL-specific styles for Arabic and Hebrew languages */
 
 /* Base RTL styles */
-[dir="rtl"] {
+[dir='rtl'] {
   text-align: right;
 }
 
-[dir="rtl"] .MuiTextField-root .MuiInputBase-input {
+[dir='rtl'] .MuiTextField-root .MuiInputBase-input {
   text-align: right;
 }
 
-[dir="rtl"] .MuiButton-root {
+[dir='rtl'] .MuiButton-root {
   text-align: right;
 }
 
-[dir="rtl"] .MuiTypography-root {
+[dir='rtl'] .MuiTypography-root {
   text-align: right;
 }
 
 /* Navigation and layout adjustments */
-[dir="rtl"] .MuiDrawer-paper {
+[dir='rtl'] .MuiDrawer-paper {
   right: 0;
   left: auto;
 }
 
-[dir="rtl"] .MuiAppBar-root .MuiToolbar-root {
+[dir='rtl'] .MuiAppBar-root .MuiToolbar-root {
   flex-direction: row-reverse;
 }
 
 /* Form elements */
-[dir="rtl"] .MuiFormControl-root {
+[dir='rtl'] .MuiFormControl-root {
   text-align: right;
 }
 
-[dir="rtl"] .MuiInputLabel-root {
+[dir='rtl'] .MuiInputLabel-root {
   transform-origin: top right;
   right: 0;
   left: auto;
 }
 
-[dir="rtl"] .MuiSelect-select {
+[dir='rtl'] .MuiSelect-select {
   text-align: right;
 }
 
 /* Tables */
-[dir="rtl"] .MuiTableCell-root {
+[dir='rtl'] .MuiTableCell-root {
   text-align: right;
 }
 
-[dir="rtl"] .MuiTableCell-head {
+[dir='rtl'] .MuiTableCell-head {
   text-align: right;
 }
 
 /* Cards and panels */
-[dir="rtl"] .MuiCard-root {
+[dir='rtl'] .MuiCard-root {
   text-align: right;
 }
 
-[dir="rtl"] .MuiCardContent-root {
+[dir='rtl'] .MuiCardContent-root {
   text-align: right;
 }
 
 /* ECG-specific components */
-[dir="rtl"] .ecg-waveform-container {
+[dir='rtl'] .ecg-waveform-container {
   direction: rtl;
 }
 
-[dir="rtl"] .ecg-analysis-panel {
+[dir='rtl'] .ecg-analysis-panel {
   text-align: right;
 }
 
-[dir="rtl"] .medical-data-display {
+[dir='rtl'] .medical-data-display {
   text-align: right;
 }
 
 /* Floating action buttons and icons */
-[dir="rtl"] .MuiFab-root {
+[dir='rtl'] .MuiFab-root {
   left: 16px;
   right: auto;
 }
 
-[dir="rtl"] .MuiSpeedDial-root {
+[dir='rtl'] .MuiSpeedDial-root {
   left: 16px;
   right: auto;
 }
 
 /* Breadcrumbs */
-[dir="rtl"] .MuiBreadcrumbs-separator {
+[dir='rtl'] .MuiBreadcrumbs-separator {
   transform: scaleX(-1);
 }
 
 /* Stepper */
-[dir="rtl"] .MuiStepConnector-line {
+[dir='rtl'] .MuiStepConnector-line {
   border-left-style: solid;
   border-right-style: none;
 }
 
 /* Tooltips */
-[dir="rtl"] .MuiTooltip-tooltip {
+[dir='rtl'] .MuiTooltip-tooltip {
   text-align: right;
 }
 
 /* Snackbars */
-[dir="rtl"] .MuiSnackbar-root {
+[dir='rtl'] .MuiSnackbar-root {
   left: 8px;
   right: auto;
 }
 
 /* Medical terminology and numbers - keep LTR for consistency */
-[dir="rtl"] .medical-value,
-[dir="rtl"] .ecg-measurement,
-[dir="rtl"] .heart-rate-value,
-[dir="rtl"] .medical-unit {
+[dir='rtl'] .medical-value,
+[dir='rtl'] .ecg-measurement,
+[dir='rtl'] .heart-rate-value,
+[dir='rtl'] .medical-unit {
   direction: ltr;
   text-align: left;
   display: inline-block;
 }
 
 /* Charts and graphs - maintain LTR orientation */
-[dir="rtl"] .chart-container,
-[dir="rtl"] .ecg-chart,
-[dir="rtl"] .medical-graph {
+[dir='rtl'] .chart-container,
+[dir='rtl'] .ecg-chart,
+[dir='rtl'] .medical-graph {
   direction: ltr;
 }

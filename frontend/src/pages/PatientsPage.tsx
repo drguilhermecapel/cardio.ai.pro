@@ -182,7 +182,11 @@ const PatientsPage: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth required>
                 <InputLabel>{t('patients.gender')}</InputLabel>
-                <Select value={formData.gender} onChange={handleGenderChange} label={t('patients.gender')}>
+                <Select
+                  value={formData.gender}
+                  onChange={handleGenderChange}
+                  label={t('patients.gender')}
+                >
                   <MenuItem value="male">{t('patients.male')}</MenuItem>
                   <MenuItem value="female">{t('patients.female')}</MenuItem>
                   <MenuItem value="other">{t('patients.other')}</MenuItem>

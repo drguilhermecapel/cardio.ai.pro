@@ -12,16 +12,19 @@ const MetricRow = styled(Box)(({ theme: _theme }) => ({
   padding: futuristicTheme.spacing.xs,
   background: `rgba(0, 0, 0, 0.3)`,
   borderRadius: futuristicTheme.borderRadius.sm,
-  border: `1px solid ${futuristicTheme.colors.ui.border}`
+  border: `1px solid ${futuristicTheme.colors.ui.border}`,
 }))
 
 const MetricLabel = styled(Typography)(({ theme: _theme }) => ({
   color: futuristicTheme.colors.data.text,
   fontSize: futuristicTheme.typography.sizes.xs,
-  fontFamily: futuristicTheme.typography.fontFamily.mono
+  fontFamily: futuristicTheme.typography.fontFamily.mono,
 }))
 
-const MetricValue = styled(Typography)<{ severity?: 'normal' | 'warning' | 'critical' }>(({ theme: _theme, severity }) => {
+const MetricValue = styled(Typography)<{ severity?: 'normal' | 'warning' | 'critical' }>(({
+  theme: _theme,
+  severity,
+}) => {
   const getColor = (): string => {
     switch (severity) {
       case 'warning':
@@ -38,7 +41,7 @@ const MetricValue = styled(Typography)<{ severity?: 'normal' | 'warning' | 'crit
     fontSize: futuristicTheme.typography.sizes.sm,
     fontFamily: futuristicTheme.typography.fontFamily.primary,
     fontWeight: 'bold',
-    textShadow: `0 0 5px ${getColor()}`
+    textShadow: `0 0 5px ${getColor()}`,
   }
 })
 
@@ -50,16 +53,18 @@ const AccuracyIndicator = styled(Box)(({ theme: _theme }) => ({
   padding: futuristicTheme.spacing.sm,
   background: `linear-gradient(45deg, rgba(0, 255, 127, 0.1), rgba(0, 191, 255, 0.1))`,
   borderRadius: futuristicTheme.borderRadius.md,
-  border: `1px solid ${futuristicTheme.colors.data.secondary}`
+  border: `1px solid ${futuristicTheme.colors.data.secondary}`,
 }))
 
 const PulsingDot = styled(Box)<{ active?: boolean }>(({ theme: _theme, active }) => ({
   width: '8px',
   height: '8px',
   borderRadius: '50%',
-  backgroundColor: active ? futuristicTheme.colors.data.secondary : futuristicTheme.colors.ui.border,
+  backgroundColor: active
+    ? futuristicTheme.colors.data.secondary
+    : futuristicTheme.colors.ui.border,
   animation: active ? 'pulse 1s ease-in-out infinite' : 'none',
-  boxShadow: active ? `0 0 10px ${futuristicTheme.colors.data.secondary}` : 'none'
+  boxShadow: active ? `0 0 10px ${futuristicTheme.colors.data.secondary}` : 'none',
 }))
 
 interface ArrhythmiaData {
@@ -73,7 +78,9 @@ interface ArrhythmiaDetectionPanelProps {
   className?: string
 }
 
-export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> = ({ className }) => {
+export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> = ({
+  className,
+}) => {
   const [detections, setDetections] = useState<ArrhythmiaData[]>([])
   const [accuracy, setAccuracy] = useState(99.5)
   const [isProcessing, setIsProcessing] = useState(true)
@@ -86,7 +93,7 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
         { type: 'Ventricular Tachycardia', severity: 'critical' as const },
         { type: 'Premature Ventricular Contractions', severity: 'warning' as const },
         { type: 'Bradycardia', severity: 'warning' as const },
-        { type: 'Supraventricular Tachycardia', severity: 'critical' as const }
+        { type: 'Supraventricular Tachycardia', severity: 'critical' as const },
       ]
 
       const randomType = arrhythmiaTypes[Math.floor(Math.random() * arrhythmiaTypes.length)]
@@ -94,7 +101,7 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
         type: randomType.type,
         confidence: 0.85 + Math.random() * 0.14, // 85-99% confidence
         severity: randomType.severity,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }
 
       setDetections(prev => [newDetection, ...prev.slice(0, 4)]) // Keep last 5 detections
@@ -119,7 +126,9 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
   return (
     <HolographicPanel
       title="Real-Time Arrhythmia Detection"
-      status={detections.length > 0 && detections[0].severity === 'critical' ? 'critical' : 'active'}
+      status={
+        detections.length > 0 && detections[0].severity === 'critical' ? 'critical' : 'active'
+      }
       className={className}
       width="300px"
     >
@@ -131,7 +140,7 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
             sx={{
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             AI Accuracy
@@ -143,7 +152,7 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
               fontSize: futuristicTheme.typography.sizes.lg,
               fontFamily: futuristicTheme.typography.fontFamily.primary,
               fontWeight: 'bold',
-              textShadow: `0 0 5px ${futuristicTheme.colors.data.secondary}`
+              textShadow: `0 0 5px ${futuristicTheme.colors.data.secondary}`,
             }}
           >
             {accuracy.toFixed(1)}%
@@ -158,7 +167,7 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
             sx={{
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              mb: 1
+              mb: 1,
             }}
           >
             Processing ECG Signal...
@@ -168,8 +177,8 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
               backgroundColor: `rgba(0, 191, 255, 0.2)`,
               '& .MuiLinearProgress-bar': {
                 backgroundColor: futuristicTheme.colors.data.primary,
-                boxShadow: `0 0 10px ${futuristicTheme.colors.data.primary}`
-              }
+                boxShadow: `0 0 10px ${futuristicTheme.colors.data.primary}`,
+              },
             }}
           />
         </Box>
@@ -182,7 +191,7 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             mb: 1,
-            fontFamily: futuristicTheme.typography.fontFamily.mono
+            fontFamily: futuristicTheme.typography.fontFamily.mono,
           }}
         >
           Recent Detections:
@@ -201,7 +210,7 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
                     color: futuristicTheme.colors.background.primary,
                     fontSize: futuristicTheme.typography.sizes.xs,
                     fontWeight: 'bold',
-                    boxShadow: `0 0 5px ${getSeverityChipColor(detection.severity)}`
+                    boxShadow: `0 0 5px ${getSeverityChipColor(detection.severity)}`,
                   }}
                 />
                 <MetricValue severity={detection.severity}>
@@ -221,7 +230,7 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
           borderTop: `1px solid ${futuristicTheme.colors.ui.border}`,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -231,23 +240,25 @@ export const ArrhythmiaDetectionPanel: React.FC<ArrhythmiaDetectionPanelProps> =
             sx={{
               color: futuristicTheme.colors.data.secondary,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             LIVE
           </Typography>
         </Box>
-        
+
         <Typography
           variant="body2"
           sx={{
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             fontFamily: futuristicTheme.typography.fontFamily.mono,
-            opacity: 0.7
+            opacity: 0.7,
           }}
         >
-          {detections.length > 0 ? `${Math.floor((Date.now() - detections[0].timestamp) / 1000)}s ago` : 'Initializing...'}
+          {detections.length > 0
+            ? `${Math.floor((Date.now() - detections[0].timestamp) / 1000)}s ago`
+            : 'Initializing...'}
         </Typography>
       </Box>
     </HolographicPanel>

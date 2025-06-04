@@ -32,10 +32,10 @@ export const AppWrapper: React.FC = () => {
   React.useEffect(() => {
     const handleLanguageChange = (lng: string): void => {
       setIsRtl(lng === 'ar' || lng === 'he')
-      
+
       document.dir = lng === 'ar' || lng === 'he' ? 'rtl' : 'ltr'
       document.documentElement.lang = lng
-      
+
       if (lng === 'ar' || lng === 'he') {
         document.body.classList.add('rtl')
         document.body.classList.remove('ltr')
@@ -45,20 +45,26 @@ export const AppWrapper: React.FC = () => {
       }
     }
 
-    import('./i18n').then(() => {
-      if (typeof window !== 'undefined' && (window as unknown as Record<string, unknown>).i18n) {
-        const i18n = (window as unknown as Record<string, unknown>).i18n as { language: string; on: (event: string, callback: (lng: string) => void) => void; off: (event: string, callback: (lng: string) => void) => void }
-        handleLanguageChange(i18n.language)
-        i18n.on('languageChanged', handleLanguageChange)
-        
-        return () => {
-          i18n.off('languageChanged', handleLanguageChange)
+    import('./i18n')
+      .then(() => {
+        if (typeof window !== 'undefined' && (window as unknown as Record<string, unknown>).i18n) {
+          const i18n = (window as unknown as Record<string, unknown>).i18n as {
+            language: string
+            on: (event: string, callback: (lng: string) => void) => void
+            off: (event: string, callback: (lng: string) => void) => void
+          }
+          handleLanguageChange(i18n.language)
+          i18n.on('languageChanged', handleLanguageChange)
+
+          return () => {
+            i18n.off('languageChanged', handleLanguageChange)
+          }
         }
-      }
-    }).catch(() => {
-      const savedLang = localStorage.getItem('i18nextLng') || navigator.language.split('-')[0]
-      handleLanguageChange(savedLang)
-    })
+      })
+      .catch(() => {
+        const savedLang = localStorage.getItem('i18nextLng') || navigator.language.split('-')[0]
+        handleLanguageChange(savedLang)
+      })
   }, [])
 
   const rtlAwareTheme = React.useMemo(() => {

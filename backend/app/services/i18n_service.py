@@ -105,7 +105,7 @@ class I18nService:
         """
         try:
             keys = key.split('.')
-            current = data
+            current: Any = data
 
             for k in keys:
                 if isinstance(current, dict) and k in current:
@@ -113,7 +113,7 @@ class I18nService:
                 else:
                     return None
 
-            return current if isinstance(current, str) else None
+            return str(current) if isinstance(current, str) else None
 
         except Exception:
             return None

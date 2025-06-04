@@ -9,24 +9,33 @@ const ArchitectureContainer = styled(Box)(({ theme: _theme }) => ({
   height: '200px',
   overflow: 'hidden',
   background: `radial-gradient(circle at center, rgba(0, 191, 255, 0.1) 0%, transparent 70%)`,
-  borderRadius: futuristicTheme.borderRadius.md
+  borderRadius: futuristicTheme.borderRadius.md,
 }))
 
-const DataFlowPath = styled(Box)<{ direction: 'forward' | 'backward' }>(({ theme: _theme, direction }) => ({
-  position: 'absolute',
-  width: '100%',
-  height: '2px',
-  background: `linear-gradient(90deg, transparent, ${futuristicTheme.colors.neural.connections}, transparent)`,
-  animation: `dataFlow${direction === 'forward' ? 'Forward' : 'Backward'} 2s ease-in-out infinite`,
-  boxShadow: `0 0 5px ${futuristicTheme.colors.neural.connections}`
-}))
+const DataFlowPath = styled(Box)<{ direction: 'forward' | 'backward' }>(
+  ({ theme: _theme, direction }) => ({
+    position: 'absolute',
+    width: '100%',
+    height: '2px',
+    background: `linear-gradient(90deg, transparent, ${futuristicTheme.colors.neural.connections}, transparent)`,
+    animation: `dataFlow${direction === 'forward' ? 'Forward' : 'Backward'} 2s ease-in-out infinite`,
+    boxShadow: `0 0 5px ${futuristicTheme.colors.neural.connections}`,
+  })
+)
 
-const ProcessingNode = styled(Box)<{ active?: boolean; size?: 'small' | 'medium' | 'large' }>(({ theme: _theme, active, size = 'medium' }) => {
+const ProcessingNode = styled(Box)<{ active?: boolean; size?: 'small' | 'medium' | 'large' }>(({
+  theme: _theme,
+  active,
+  size = 'medium',
+}) => {
   const getSize = (): string => {
     switch (size) {
-      case 'small': return '8px'
-      case 'large': return '16px'
-      default: return '12px'
+      case 'small':
+        return '8px'
+      case 'large':
+        return '16px'
+      default:
+        return '12px'
     }
   }
 
@@ -35,10 +44,12 @@ const ProcessingNode = styled(Box)<{ active?: boolean; size?: 'small' | 'medium'
     width: getSize(),
     height: getSize(),
     borderRadius: '50%',
-    backgroundColor: active ? futuristicTheme.colors.neural.nodes : futuristicTheme.colors.ui.border,
+    backgroundColor: active
+      ? futuristicTheme.colors.neural.nodes
+      : futuristicTheme.colors.ui.border,
     boxShadow: active ? `0 0 10px ${futuristicTheme.colors.neural.nodes}` : 'none',
     animation: active ? 'pulse 1.5s ease-in-out infinite' : 'none',
-    transition: 'all 0.3s ease'
+    transition: 'all 0.3s ease',
   }
 })
 
@@ -50,14 +61,14 @@ const MetricDisplay = styled(Box)(({ theme: _theme }) => ({
   background: `rgba(0, 0, 0, 0.4)`,
   borderRadius: futuristicTheme.borderRadius.sm,
   border: `1px solid ${futuristicTheme.colors.ui.border}`,
-  marginBottom: futuristicTheme.spacing.sm
+  marginBottom: futuristicTheme.spacing.sm,
 }))
 
 const LayerVisualization = styled(Box)(({ theme: _theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: futuristicTheme.spacing.xs,
-  marginTop: futuristicTheme.spacing.md
+  marginTop: futuristicTheme.spacing.md,
 }))
 
 const LayerBar = styled(Box)<{ activity: number }>(({ theme: _theme, activity }) => ({
@@ -78,8 +89,8 @@ const LayerBar = styled(Box)<{ activity: number }>(({ theme: _theme, activity })
     right: 0,
     bottom: 0,
     background: `linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)`,
-    animation: 'shimmer 2s ease-in-out infinite'
-  }
+    animation: 'shimmer 2s ease-in-out infinite',
+  },
 }))
 
 interface MambaMetrics {
@@ -102,7 +113,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
     attentionHeads: 12,
     processingLatency: 2.3,
     memoryEfficiency: 94.7,
-    bidirectionalFlow: true
+    bidirectionalFlow: true,
   })
 
   const [layerActivities, setLayerActivities] = useState<number[]>([])
@@ -115,14 +126,14 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
         processingLatency: 2.1 + Math.random() * 0.4,
         memoryEfficiency: 93.5 + Math.random() * 2.0,
         sequenceLength: 1024 + Math.floor(Math.random() * 512),
-        bidirectionalFlow: Math.random() > 0.1 // Mostly true, occasionally false
+        bidirectionalFlow: Math.random() > 0.1, // Mostly true, occasionally false
       }))
 
       const newActivities = Array.from({ length: 12 }, () => 60 + Math.random() * 40)
       setLayerActivities(newActivities)
 
       const nodeCount = 8
-      const newActiveNodes = Array.from({ length: nodeCount }, (_, i) => 
+      const newActiveNodes = Array.from({ length: nodeCount }, (_, i) =>
         Math.random() > 0.3 ? i : -1
       ).filter(i => i !== -1)
       setActiveNodes(newActiveNodes)
@@ -139,7 +150,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
     { top: '65%', left: '55%' },
     { top: '50%', left: '65%' },
     { top: '35%', left: '75%' },
-    { top: '20%', left: '85%' }
+    { top: '20%', left: '85%' },
   ]
 
   return (
@@ -151,14 +162,8 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
     >
       <ArchitectureContainer>
         {/* Bidirectional data flow paths */}
-        <DataFlowPath 
-          direction="forward" 
-          sx={{ top: '30%' }}
-        />
-        <DataFlowPath 
-          direction="backward" 
-          sx={{ top: '70%' }}
-        />
+        <DataFlowPath direction="forward" sx={{ top: '30%' }} />
+        <DataFlowPath direction="backward" sx={{ top: '70%' }} />
 
         {/* Processing nodes */}
         {nodePositions.map((pos, index) => (
@@ -169,7 +174,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
             sx={{
               top: pos.top,
               left: pos.left,
-              transform: 'translate(-50%, -50%)'
+              transform: 'translate(-50%, -50%)',
             }}
           />
         ))}
@@ -189,7 +194,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
             alignItems: 'center',
             justifyContent: 'center',
             background: `radial-gradient(circle, rgba(0, 191, 255, 0.2), transparent)`,
-            animation: 'pulse 2s ease-in-out infinite'
+            animation: 'pulse 2s ease-in-out infinite',
           }}
         >
           <Typography
@@ -197,7 +202,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
               color: futuristicTheme.colors.neural.connections,
               fontSize: futuristicTheme.typography.sizes.xs,
               fontFamily: futuristicTheme.typography.fontFamily.mono,
-              fontWeight: 'bold'
+              fontWeight: 'bold',
             }}
           >
             MAMBA
@@ -213,7 +218,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
             sx={{
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             Sequence Length
@@ -224,7 +229,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
               color: futuristicTheme.colors.data.primary,
               fontSize: futuristicTheme.typography.sizes.sm,
               fontFamily: futuristicTheme.typography.fontFamily.primary,
-              fontWeight: 'bold'
+              fontWeight: 'bold',
             }}
           >
             {metrics.sequenceLength}
@@ -237,7 +242,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
             sx={{
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             Processing Latency
@@ -248,7 +253,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
               color: futuristicTheme.colors.data.secondary,
               fontSize: futuristicTheme.typography.sizes.sm,
               fontFamily: futuristicTheme.typography.fontFamily.primary,
-              fontWeight: 'bold'
+              fontWeight: 'bold',
             }}
           >
             {metrics.processingLatency.toFixed(1)}ms
@@ -261,7 +266,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
             sx={{
               color: futuristicTheme.colors.data.text,
               fontSize: futuristicTheme.typography.sizes.xs,
-              fontFamily: futuristicTheme.typography.fontFamily.mono
+              fontFamily: futuristicTheme.typography.fontFamily.mono,
             }}
           >
             Memory Efficiency
@@ -272,7 +277,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
               color: futuristicTheme.colors.data.secondary,
               fontSize: futuristicTheme.typography.sizes.sm,
               fontFamily: futuristicTheme.typography.fontFamily.primary,
-              fontWeight: 'bold'
+              fontWeight: 'bold',
             }}
           >
             {metrics.memoryEfficiency.toFixed(1)}%
@@ -288,12 +293,12 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
             color: futuristicTheme.colors.data.text,
             fontSize: futuristicTheme.typography.sizes.xs,
             fontFamily: futuristicTheme.typography.fontFamily.mono,
-            mb: 1
+            mb: 1,
           }}
         >
           Layer Activities:
         </Typography>
-        
+
         <LayerVisualization>
           {layerActivities.map((activity, index) => (
             <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -302,7 +307,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
                   color: futuristicTheme.colors.data.text,
                   fontSize: futuristicTheme.typography.sizes.xs,
                   fontFamily: futuristicTheme.typography.fontFamily.mono,
-                  width: '20px'
+                  width: '20px',
                 }}
               >
                 L{index + 1}
@@ -314,7 +319,7 @@ export const MambaArchitecturePanel: React.FC<MambaArchitecturePanelProps> = ({ 
                   fontSize: futuristicTheme.typography.sizes.xs,
                   fontFamily: futuristicTheme.typography.fontFamily.mono,
                   width: '35px',
-                  textAlign: 'right'
+                  textAlign: 'right',
                 }}
               >
                 {activity.toFixed(0)}%
