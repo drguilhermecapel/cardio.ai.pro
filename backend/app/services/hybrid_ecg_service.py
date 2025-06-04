@@ -3,7 +3,7 @@ Hybrid ECG Analysis Service
 Integrates multiple AI architectures for comprehensive ECG analysis
 """
 
-from typing import Any
+from typing import Any, Dict, List, Tuple, Optional, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -11,6 +11,7 @@ import pandas as pd
 import structlog
 
 from ..core.exceptions import ECGProcessingException
+from ..types.ecg_types import ECGDataFrame, ECGSchema, ECGAnalysisResult
 
 logger = structlog.get_logger(__name__)
 
