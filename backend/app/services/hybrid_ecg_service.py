@@ -720,6 +720,7 @@ class HybridECGAnalysisService:
 
     async def analyze_ecg_comprehensive(self, file_path: str, patient_id: int | None = None, analysis_id: str | None = None, **kwargs: Any) -> dict[str, Any]:
         """Comprehensive ECG analysis for medical use - optimized for performance"""
+        from app.core.exceptions import ECGProcessingException
         try:
             ecg_data = self.ecg_reader.read_ecg(file_path)
             if not ecg_data or ecg_data is None:
@@ -826,7 +827,6 @@ class HybridECGAnalysisService:
             raise e
         except Exception as e:
             logger.error(f"Comprehensive ECG analysis failed: {e}")
-            from app.core.exceptions import ECGProcessingException
             raise ECGProcessingException(f"ECG analysis failed: {str(e)}") from e
 
     async def _run_simplified_analysis(self, signal_data: dict[str, Any], features: dict[str, float]) -> dict[str, Any]:
