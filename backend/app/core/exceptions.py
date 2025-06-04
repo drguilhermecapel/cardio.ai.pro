@@ -3,6 +3,7 @@ Custom exceptions for CardioAI Pro.
 """
 
 from typing import Any
+
 from app.services.i18n_service import i18n_service
 
 
@@ -52,7 +53,7 @@ class AuthenticationException(CardioAIException):
     """Authentication error exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.authentication_error",
         lang: str = "en",
         **kwargs: Any,
@@ -70,7 +71,7 @@ class PermissionDeniedException(CardioAIException):
     """Permission denied exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.permission_denied",
         lang: str = "en",
         **kwargs: Any,
@@ -88,7 +89,7 @@ class NotFoundException(CardioAIException):
     """Resource not found exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.not_found",
         lang: str = "en",
         **kwargs: Any,
@@ -106,7 +107,7 @@ class ConflictException(CardioAIException):
     """Resource conflict exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.conflict",
         lang: str = "en",
         **kwargs: Any,
@@ -124,7 +125,7 @@ class ECGProcessingException(CardioAIException):
     """ECG processing error exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.ecg_processing_error",
         lang: str = "en",
         details: dict[str, Any] | None = None,
@@ -144,7 +145,7 @@ class MLModelException(CardioAIException):
     """ML model error exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.ml_model_error",
         lang: str = "en",
         model_name: str | None = None,
@@ -209,7 +210,7 @@ class RateLimitExceededException(CardioAIException):
     """Rate limit exceeded exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.rate_limit_exceeded",
         lang: str = "en",
         **kwargs: Any,
@@ -227,7 +228,7 @@ class FileProcessingException(CardioAIException):
     """File processing error exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.file_processing_error",
         lang: str = "en",
         filename: str | None = None,
@@ -248,7 +249,7 @@ class DatabaseException(CardioAIException):
     """Database error exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.database_error",
         lang: str = "en",
         **kwargs: Any,
@@ -266,7 +267,7 @@ class ExternalServiceException(CardioAIException):
     """External service error exception."""
 
     def __init__(
-        self, 
+        self,
         message_key: str = "errors.external_service_error",
         lang: str = "en",
         service_name: str | None = None,

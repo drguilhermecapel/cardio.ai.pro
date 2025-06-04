@@ -26,11 +26,11 @@ const ltrCache = createCache({
   stylisPlugins: [prefixer],
 })
 
-const AppWrapper: React.FC = () => {
+export const AppWrapper: React.FC = () => {
   const [isRtl, setIsRtl] = React.useState(false)
 
   React.useEffect(() => {
-    const handleLanguageChange = (lng: string) => {
+    const handleLanguageChange = (lng: string): void => {
       setIsRtl(lng === 'ar' || lng === 'he')
       
       document.dir = lng === 'ar' || lng === 'he' ? 'rtl' : 'ltr'
@@ -46,8 +46,8 @@ const AppWrapper: React.FC = () => {
     }
 
     import('./i18n').then(() => {
-      if (typeof window !== 'undefined' && (window as any).i18n) {
-        const i18n = (window as any).i18n
+      if (typeof window !== 'undefined' && (window as unknown as Record<string, unknown>).i18n) {
+        const i18n = (window as unknown as Record<string, unknown>).i18n as { language: string; on: (event: string, callback: (lng: string) => void) => void; off: (event: string, callback: (lng: string) => void) => void }
         handleLanguageChange(i18n.language)
         i18n.on('languageChanged', handleLanguageChange)
         

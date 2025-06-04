@@ -1,9 +1,9 @@
-from typing import Dict, List, Optional, Tuple, Any
 import json
-from pathlib import Path
-from datetime import datetime
 import logging
+from datetime import datetime
 from enum import Enum
+from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -14,37 +14,37 @@ class ValidationSeverity(Enum):
 
 class MedicalTerminologyValidator:
     """Validates medical terminology translations for accuracy and consistency."""
-    
+
     def __init__(self):
-        self.critical_terms: Dict[str, Dict[str, str]] = {}
-        self.validated_terms: Dict[str, Dict[str, Dict[str, Any]]] = {}
-        self.severity_mapping: Dict[str, ValidationSeverity] = {}
+        self.critical_terms: dict[str, dict[str, str]] = {}
+        self.validated_terms: dict[str, dict[str, dict[str, Any]]] = {}
+        self.severity_mapping: dict[str, ValidationSeverity] = {}
         self.load_critical_terms()
         self.load_validated_terms()
         self._initialize_critical_medical_terms()
-    
+
     def load_critical_terms(self) -> None:
         """Load critical medical terms that require professional validation."""
         terms_path = Path(__file__).parent.parent / "translations" / "medical_terms.json"
         if terms_path.exists():
             try:
-                with open(terms_path, 'r', encoding='utf-8') as f:
+                with open(terms_path, encoding='utf-8') as f:
                     self.critical_terms = json.load(f)
-            except (json.JSONDecodeError, IOError) as e:
+            except (OSError, json.JSONDecodeError) as e:
                 logger.error(f"Failed to load critical terms: {e}")
                 self.critical_terms = {}
-    
+
     def load_validated_terms(self) -> None:
         """Load previously validated terms."""
         validated_path = Path(__file__).parent.parent / "translations" / "validated_terms.json"
         if validated_path.exists():
             try:
-                with open(validated_path, 'r', encoding='utf-8') as f:
+                with open(validated_path, encoding='utf-8') as f:
                     self.validated_terms = json.load(f)
-            except (json.JSONDecodeError, IOError) as e:
+            except (OSError, json.JSONDecodeError) as e:
                 logger.error(f"Failed to load validated terms: {e}")
                 self.validated_terms = {}
-    
+
     def _initialize_critical_medical_terms(self) -> None:
         """Initialize critical cardiac/ECG terminology that requires validation."""
         critical_cardiac_terms = {
@@ -88,7 +88,7 @@ class MedicalTerminologyValidator:
                 "zh": "心脏停搏",
                 "ar": "انقطاع النظم"
             },
-            
+
             "p_wave": {
                 "severity": ValidationSeverity.IMPORTANT,
                 "en": "P Wave",
@@ -129,7 +129,7 @@ class MedicalTerminologyValidator:
                 "zh": "ST段",
                 "ar": "قطعة ST"
             },
-            
+
             "myocardial_infarction": {
                 "severity": ValidationSeverity.CRITICAL,
                 "en": "Myocardial Infarction",
@@ -150,7 +150,7 @@ class MedicalTerminologyValidator:
                 "zh": "心脏骤停",
                 "ar": "السكتة القلبية"
             },
-            
+
             "heart_rate": {
                 "severity": ValidationSeverity.IMPORTANT,
                 "en": "Heart Rate",
@@ -182,58 +182,58 @@ class MedicalTerminologyValidator:
                 "ar": "فترة QT"
             }
         }
-        
+
         for term_key, term_data in critical_cardiac_terms.items():
             severity = term_data.pop("severity")
             self.severity_mapping[term_key] = severity
             self.critical_terms[term_key] = term_data
-    
-    def validate_term(self, term: str, translation: str, language: str) -> Tuple[bool, str, ValidationSeverity]:
+
+    def validate_term(self, term: str, translation: str, language: str) -> tuple[bool, str, ValidationSeverity]:
         """
         Validate a medical term translation.
-        
+
         Args:
             term: The original medical term key
             translation: The translated term
             language: The target language code
-            
+
         Returns:
             Tuple of (is_valid, message, severity)
         """
         severity = self.severity_mapping.get(term, ValidationSeverity.INFORMATIONAL)
-        
+
         if term in self.critical_terms:
             if language in self.critical_terms[term]:
                 expected = self.critical_terms[term][language]
                 if translation != expected:
                     return False, f"Critical medical term '{term}' has incorrect translation. Expected: '{expected}'", severity
                 return True, "Validated critical term", severity
-            
+
             return False, f"Critical medical term '{term}' requires professional validation for {language}", severity
-        
+
         if len(translation) < 2:
             return False, "Translation too short", severity
-            
+
         if translation.isdigit():
             return False, "Translation cannot be only numbers", severity
-            
+
         dangerous_patterns = ["error", "null", "undefined", "test"]
         if any(pattern in translation.lower() for pattern in dangerous_patterns):
-            return False, f"Translation contains potentially dangerous pattern", severity
-        
+            return False, "Translation contains potentially dangerous pattern", severity
+
         return True, "Non-critical term, requires review", severity
-    
-    def register_professional_validation(self, term: str, translation: str, language: str, 
+
+    def register_professional_validation(self, term: str, translation: str, language: str,
                                         validator_id: str, validator_credentials: str) -> None:
         """Register that a medical professional has validated this translation."""
         if term not in self.critical_terms:
             self.critical_terms[term] = {}
-        
+
         self.critical_terms[term][language] = translation
-        
+
         if term not in self.validated_terms:
             self.validated_terms[term] = {}
-        
+
         self.validated_terms[term][language] = {
             "validated": True,
             "validator_id": validator_id,
@@ -241,13 +241,13 @@ class MedicalTerminologyValidator:
             "timestamp": datetime.now().isoformat(),
             "translation": translation
         }
-        
+
         self._save_critical_terms()
         self._save_validated_terms()
-        
+
         logger.info(f"Professional validation registered for term '{term}' in {language} by {validator_id}")
-    
-    def get_validation_status(self, term: str, language: str) -> Dict[str, Any]:
+
+    def get_validation_status(self, term: str, language: str) -> dict[str, Any]:
         """Get the validation status for a specific term and language."""
         status = {
             "term": term,
@@ -258,20 +258,20 @@ class MedicalTerminologyValidator:
             "validated_translation": None,
             "validation_info": None
         }
-        
+
         if term in self.critical_terms and language in self.critical_terms[term]:
             status["has_validated_translation"] = True
             status["validated_translation"] = self.critical_terms[term][language]
-            
+
             if term in self.validated_terms and language in self.validated_terms[term]:
                 status["validation_info"] = self.validated_terms[term][language]
-        
+
         return status
-    
-    def get_pending_validations(self, language: str) -> List[Dict[str, Any]]:
+
+    def get_pending_validations(self, language: str) -> list[dict[str, Any]]:
         """Get list of critical terms that need professional validation for a language."""
         pending = []
-        
+
         for term in self.critical_terms:
             if language not in self.critical_terms[term]:
                 pending.append({
@@ -280,13 +280,13 @@ class MedicalTerminologyValidator:
                     "severity": self.severity_mapping.get(term, ValidationSeverity.INFORMATIONAL).value,
                     "english_term": self.critical_terms[term].get("en", term)
                 })
-        
+
         return pending
-    
-    def validate_translation_batch(self, translations: Dict[str, str], language: str) -> Dict[str, Dict[str, Any]]:
+
+    def validate_translation_batch(self, translations: dict[str, str], language: str) -> dict[str, dict[str, Any]]:
         """Validate a batch of translations."""
         results = {}
-        
+
         for term, translation in translations.items():
             is_valid, message, severity = self.validate_term(term, translation, language)
             results[term] = {
@@ -295,32 +295,32 @@ class MedicalTerminologyValidator:
                 "severity": severity.value,
                 "translation": translation
             }
-        
+
         return results
-    
+
     def _save_critical_terms(self) -> None:
         """Save the updated critical terms to disk."""
         terms_path = Path(__file__).parent.parent / "translations" / "medical_terms.json"
         terms_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         try:
             with open(terms_path, 'w', encoding='utf-8') as f:
                 json.dump(self.critical_terms, f, ensure_ascii=False, indent=2)
-        except IOError as e:
+        except OSError as e:
             logger.error(f"Failed to save critical terms: {e}")
-    
+
     def _save_validated_terms(self) -> None:
         """Save the validated terms to disk."""
         validated_path = Path(__file__).parent.parent / "translations" / "validated_terms.json"
         validated_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         try:
             with open(validated_path, 'w', encoding='utf-8') as f:
                 json.dump(self.validated_terms, f, ensure_ascii=False, indent=2)
-        except IOError as e:
+        except OSError as e:
             logger.error(f"Failed to save validated terms: {e}")
-    
-    def export_validation_report(self, language: str) -> Dict[str, Any]:
+
+    def export_validation_report(self, language: str) -> dict[str, Any]:
         """Export a comprehensive validation report for a language."""
         report = {
             "language": language,
@@ -336,27 +336,27 @@ class MedicalTerminologyValidator:
             "pending_validations": [],
             "validation_coverage": 0.0
         }
-        
+
         for term in self.critical_terms:
             status = self.get_validation_status(term, language)
-            
+
             if status["has_validated_translation"]:
                 report["summary"]["validated_terms"] += 1
                 report["validated_terms"].append(status)
             else:
                 report["summary"]["pending_validations"] += 1
                 severity = self.severity_mapping.get(term, ValidationSeverity.INFORMATIONAL)
-                
+
                 if severity == ValidationSeverity.CRITICAL:
                     report["summary"]["critical_pending"] += 1
                 elif severity == ValidationSeverity.IMPORTANT:
                     report["summary"]["important_pending"] += 1
-                
+
                 report["pending_validations"].append(status)
-        
+
         if len(self.critical_terms) > 0:
             report["validation_coverage"] = (report["summary"]["validated_terms"] / len(self.critical_terms)) * 100
-        
+
         return report
 
 

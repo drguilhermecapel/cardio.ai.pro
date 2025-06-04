@@ -36,7 +36,7 @@ const testTranslations = {
   }
 }
 
-export const initI18nForTesting = () => {
+export const initI18nForTesting = (): typeof i18n => {
   if (!i18n.isInitialized) {
     i18n
       .use(initReactI18next)

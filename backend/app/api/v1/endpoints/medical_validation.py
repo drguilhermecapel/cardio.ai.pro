@@ -1,11 +1,12 @@
-from typing import Dict, Any, List
+from typing import Any
+
+import structlog
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-import structlog
 
 from ....models.user import User
-from ....services.user_service import UserService
 from ....services.i18n_service import i18n_service
+from ....services.user_service import UserService
 
 logger = structlog.get_logger(__name__)
 
@@ -20,7 +21,7 @@ class MedicalValidationRequest(BaseModel):
 
 
 class BatchValidationRequest(BaseModel):
-    translations: Dict[str, str]
+    translations: dict[str, str]
     language: str
 
 
@@ -31,7 +32,7 @@ class ValidationStatusResponse(BaseModel):
     has_validated_translation: bool
     severity: str
     validated_translation: str | None
-    validation_info: Dict[str, Any] | None
+    validation_info: dict[str, Any] | None
 
 
 @router.get("/status/{term}/{language}", response_model=ValidationStatusResponse)
@@ -49,14 +50,14 @@ async def get_validation_status(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get validation status"
-        )
+        ) from e
 
 
 @router.get("/pending/{language}")
 async def get_pending_validations(
     language: str,
     current_user: User = Depends(UserService.get_current_user)
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Get list of medical terms pending validation for a language."""
     try:
         return i18n_service.get_pending_medical_validations(language)
@@ -65,7 +66,7 @@ async def get_pending_validations(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get pending validations"
-        )
+        ) from e
 
 
 @router.post("/validate")
@@ -80,7 +81,7 @@ async def register_medical_validation(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="User does not have medical validation privileges"
             )
-        
+
         i18n_service.register_medical_validation(
             request.term,
             request.translation,
@@ -88,11 +89,11 @@ async def register_medical_validation(
             str(current_user.id),
             request.validator_credentials
         )
-        
+
         logger.info(f"Medical validation registered for term '{request.term}' by user {current_user.id}")
-        
+
         return {"message": "Medical validation registered successfully"}
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -100,18 +101,18 @@ async def register_medical_validation(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to register medical validation"
-        )
+        ) from e
 
 
 @router.post("/validate-batch")
 async def validate_translation_batch(
     request: BatchValidationRequest,
     current_user: User = Depends(UserService.get_current_user)
-) -> Dict[str, Dict[str, Any]]:
+) -> dict[str, dict[str, Any]]:
     """Validate a batch of medical translations."""
     try:
         results = {}
-        
+
         for term, translation in request.translations.items():
             is_valid, message, severity = i18n_service.validate_medical_translation(
                 term, translation, request.language
@@ -122,22 +123,22 @@ async def validate_translation_batch(
                 "severity": severity,
                 "translation": translation
             }
-        
+
         return results
-        
+
     except Exception as e:
         logger.error(f"Error validating translation batch: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to validate translation batch"
-        )
+        ) from e
 
 
 @router.get("/report/{language}")
 async def get_validation_report(
     language: str,
     current_user: User = Depends(UserService.get_current_user)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get comprehensive medical validation report for a language."""
     try:
         return i18n_service.export_medical_validation_report(language)
@@ -146,13 +147,13 @@ async def get_validation_report(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate validation report"
-        )
+        ) from e
 
 
 @router.get("/languages")
 async def get_supported_languages(
     current_user: User = Depends(UserService.get_current_user)
-) -> List[str]:
+) -> list[str]:
     """Get list of supported languages for medical validation."""
     try:
         return i18n_service.get_available_languages()
@@ -161,4 +162,4 @@ async def get_supported_languages(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get supported languages"
-        )
+        ) from e

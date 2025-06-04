@@ -15,12 +15,10 @@ const LanguageSelector: React.FC = () => {
     { code: 'ar', name: 'العربية', flag: '🇸🇦' }
   ]
 
-  const handleLanguageChange = (languageCode: string) => {
+  const handleLanguageChange = (languageCode: string): void => {
     i18n.changeLanguage(languageCode)
     localStorage.setItem('i18nextLng', languageCode)
   }
-
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0]
 
   return (
     <FormControl size="small" sx={{ minWidth: 120 }}>
