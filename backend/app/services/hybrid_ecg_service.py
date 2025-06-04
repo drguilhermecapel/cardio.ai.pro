@@ -10,6 +10,11 @@ import numpy.typing as npt
 import pandas as pd
 import structlog
 
+try:
+    import wfdb
+except ImportError:
+    wfdb = None
+
 from ..core.exceptions import ECGProcessingException
 
 logger = structlog.get_logger(__name__)

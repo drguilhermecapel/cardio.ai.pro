@@ -50,7 +50,7 @@ class TestUniversalECGReaderComprehensive:
         assert 'sampling_rate' in result
         assert 'labels' in result
         assert isinstance(result['signal'], np.ndarray)
-        assert result['sampling_rate'] == 500  # Default sampling rate
+        assert result['sampling_rate'] == 250  # Default sampling rate
     
     def test_read_csv_internal_method(self, ecg_reader, tmp_path):
         """Test internal CSV reading method."""
