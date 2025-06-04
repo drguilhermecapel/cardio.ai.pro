@@ -342,7 +342,7 @@ class FeatureExtractor:
                     features['qtc_bazett'] = features['qt_interval_mean'] / np.sqrt(rr_mean_seconds)
                 else:
                     features['qtc_bazett'] = 0.0
-                
+
                 features['heart_rate'] = 60000 / np.mean(rr_intervals) if np.mean(rr_intervals) > 0 else 0.0
             else:
                 features.update({
