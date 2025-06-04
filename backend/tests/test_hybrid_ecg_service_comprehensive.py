@@ -89,10 +89,13 @@ class TestUniversalECGReaderComprehensive:
     @patch('app.services.hybrid_ecg_service.wfdb')
     def test_read_mitbih_format(self, mock_wfdb, ecg_reader, tmp_path):
         """Test reading MIT-BIH format files."""
-        mock_wfdb.rdsamp.return_value = (
-            np.array([[0.1, 0.2], [0.3, 0.4]]),
-            {'fs': 360, 'sig_name': ['MLII', 'V1']}
-        )
+        mock_record = MagicMock()
+        mock_record.p_signal = np.array([[0.1, 0.2], [0.3, 0.4]])
+        mock_record.fs = 360
+        mock_record.sig_name = ['MLII', 'V1']
+        mock_record.units = ['mV', 'mV']
+        mock_record.comments = ['Test record']
+        mock_wfdb.rdrecord.return_value = mock_record
         
         dat_file = tmp_path / "test.dat"
         dat_file.touch()  # Create empty file
