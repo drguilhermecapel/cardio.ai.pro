@@ -19,7 +19,7 @@ class I18nService:
         self.translations: dict[str, dict[str, Any]] = {}
         self.default_language = "en"
         self.medical_validator = get_medical_validator()
-        self.load_translations()
+        self._translations_loaded = False
 
     def load_translations(self) -> None:
         """Load translation files from the translations directory."""
@@ -53,6 +53,10 @@ class I18nService:
         Returns:
             Translated string with parameters substituted, or the key if translation not found
         """
+        if not self._translations_loaded:
+            self.load_translations()
+            self._translations_loaded = True
+            
         try:
             translation = self._get_nested_value(self.translations.get(lang, {}), key)
 
