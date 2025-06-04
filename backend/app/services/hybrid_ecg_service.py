@@ -529,6 +529,8 @@ class HybridECGAnalysisService:
         self.ecg_reader = self.reader  # Alias for test compatibility
         self.preprocessor = AdvancedPreprocessor(sampling_rate)
         self.feature_extractor = FeatureExtractor(sampling_rate)
+        self.repository = db  # Repository alias for test compatibility
+        self.ecg_logger = logger  # Logger for test compatibility
 
         self.pathology_classes = [
             'Normal', 'Atrial Fibrillation', 'Atrial Flutter', 'Ventricular Tachycardia',
