@@ -317,8 +317,9 @@ class TestFeatureExtractorComprehensive:
     
     def test_interval_features(self, feature_extractor):
         """Test interval feature extraction."""
+        signal = np.random.randn(1000)  # Mock ECG signal
         r_peaks = np.array([100, 300, 500, 700, 900])  # Mock R-peaks with 200ms intervals
-        features = feature_extractor._extract_interval_features(r_peaks)
+        features = feature_extractor._extract_interval_features(signal, r_peaks)
         
         assert isinstance(features, dict)
         assert 'rr_mean' in features
