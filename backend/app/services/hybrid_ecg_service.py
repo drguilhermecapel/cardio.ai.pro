@@ -159,21 +159,22 @@ class UniversalECGReader:
     def _read_ecg(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
         """
         Read custom ECG format files
-        
+
         Args:
             filepath: Path to ECG file
             sampling_rate: Sampling rate in Hz (default: 250)
-            
+
         Returns:
             Dictionary containing signal data and metadata
         """
         try:
             import os
+
             from app.core.exceptions import ECGProcessingException
-            
+
             if not os.path.exists(filepath):
                 raise ECGProcessingException(f"ECG file not found: {filepath}")
-            
+
             if os.path.getsize(filepath) == 0:
                 if "stemi" in filepath.lower():
                     signal_data = np.array([0.1, 0.3, 0.8, 1.2, 0.9, 0.4, 0.1] * 357)  # ~2500 samples
@@ -185,14 +186,14 @@ class UniversalECGReader:
                     signal_data = np.array([0.0, 0.1, 0.3, 0.8, 0.3, 0.1, 0.0, -0.1] * 312)  # ~2500 samples
                 else:
                     signal_data = np.array([0.0, 0.1, 0.2, 0.1, 0.0, -0.1, 0.0, 0.1] * 312)  # ~2500 samples
-                
+
                 target_samples = 2500
                 if len(signal_data) > target_samples:
                     signal_data = signal_data[:target_samples]
                 elif len(signal_data) < target_samples:
                     repeats = target_samples // len(signal_data) + 1
                     signal_data = np.tile(signal_data, repeats)[:target_samples]
-                
+
                 return {
                     'signal': signal_data.reshape(-1, 1),  # Single lead
                     'sampling_rate': sampling_rate or 250,
@@ -202,12 +203,12 @@ class UniversalECGReader:
                 }
             else:
                 return self._read_csv(filepath, sampling_rate)
-                
+
         except ECGProcessingException:
             raise
         except Exception as e:
             from app.core.exceptions import ECGProcessingException
-            raise ECGProcessingException(f"Failed to read ECG file {filepath}: {str(e)}")
+            raise ECGProcessingException(f"Failed to read ECG file {filepath}: {str(e)}") from e
 
 
 class AdvancedPreprocessor:
@@ -731,7 +732,7 @@ class HybridECGAnalysisService:
                 signal = signal[:, 0]
 
             ai_result = self._analyze_with_ai(signal)
-            
+
             basic_features = {
                 'heart_rate': 75.0,
                 'rr_mean': 800.0,
@@ -746,7 +747,7 @@ class HybridECGAnalysisService:
                 "vtach": {"detected": False, "confidence": 0.02},
                 "afib": {"detected": False, "confidence": 0.05}
             }
-            
+
             if "probabilities" in ai_result:
                 probs = ai_result["probabilities"]
                 abnormalities["stemi"]["confidence"] = probs.get("stemi", 0.02)
@@ -764,7 +765,7 @@ class HybridECGAnalysisService:
 
             clinical_urgency = "low"
             findings = ["Normal sinus rhythm", "No acute abnormalities"]
-            
+
             if abnormalities["stemi"]["detected"] or abnormalities["vfib"]["detected"]:
                 clinical_urgency = "critical"
                 findings = []
@@ -935,17 +936,17 @@ class HybridECGAnalysisService:
         try:
             if signal.ndim > 1:
                 signal = signal[:, 0]
-            
+
             signal_std = float(np.std(signal))
             signal_max = float(np.max(signal))
             signal_min = float(np.min(signal))
-            
+
             st_elevation = signal_max > 2.0  # Simplified threshold
-            
+
             vfib_detected = signal_std > 5.0  # High variability
-            
+
             is_normal = 0.1 < signal_std < 1.0 and -2.0 < signal_min < 2.0 and -2.0 < signal_max < 2.0
-            
+
             return {
                 "stemi_detected": st_elevation,
                 "vfib_detected": vfib_detected,
@@ -968,7 +969,7 @@ class HybridECGAnalysisService:
         """Generate audit trail for regulatory compliance"""
         import time
         from datetime import datetime
-        
+
         return {
             "timestamp": datetime.utcnow().isoformat(),
             "analysis_id": f"ecg_{int(time.time())}",
@@ -976,7 +977,7 @@ class HybridECGAnalysisService:
             "input_validation": "passed",
             "processing_steps": [
                 "signal_validation",
-                "preprocessing", 
+                "preprocessing",
                 "feature_extraction",
                 "pattern_analysis"
             ],
@@ -995,7 +996,7 @@ class HybridECGAnalysisService:
         try:
             if signal.ndim > 1:
                 signal = signal[:, 0]
-            
+
             return self.preprocessor.preprocess_signal(signal)
         except Exception:
             return signal
@@ -1004,16 +1005,16 @@ class HybridECGAnalysisService:
         try:
             if signal.ndim > 1:
                 signal = signal[:, 0]
-            
+
             signal_std = float(np.std(signal))
             signal_max = float(np.max(signal))
             signal_min = float(np.min(signal))
             signal_mean = float(np.mean(signal))
-            
+
             stemi_probability = 0.95 if signal_max > 2.0 else 0.05
             vfib_probability = 0.90 if signal_std > 5.0 else 0.10
             normal_probability = 0.85 if (0.1 < signal_std < 1.0 and -2.0 < signal_min < 2.0 and -2.0 < signal_max < 2.0) else 0.15
-            
+
             if stemi_probability > 0.5:
                 primary_class = "STEMI"
                 confidence = stemi_probability
@@ -1026,7 +1027,7 @@ class HybridECGAnalysisService:
             else:
                 primary_class = "Unknown"
                 confidence = 0.3
-            
+
             return {
                 "classification": primary_class,
                 "confidence": confidence,
@@ -1079,28 +1080,28 @@ class HybridECGAnalysisService:
         try:
             if signal_data is None:
                 raise ValueError("Signal data cannot be None")
-            
+
             if isinstance(signal_data, dict) and not signal_data:
                 raise ValueError("Signal data cannot be empty")
-            
+
             if isinstance(signal_data, dict):
                 if "leads" not in signal_data:
                     raise ValueError("Signal data must contain 'leads' key")
-                
+
                 leads = signal_data["leads"]
                 if not isinstance(leads, dict) or not leads:
                     raise ValueError("Leads data cannot be empty")
-                
+
                 for lead_name, lead_data in leads.items():
-                    if not isinstance(lead_data, (list, np.ndarray)):
+                    if not isinstance(lead_data, list | np.ndarray):
                         raise TypeError(f"Lead {lead_name} must be list or array")
-                    
+
                     if len(lead_data) == 0:
                         raise ValueError(f"Lead {lead_name} cannot be empty")
-                    
+
                     if isinstance(lead_data, list):
                         for value in lead_data:
-                            if not isinstance(value, (int, float)):
+                            if not isinstance(value, int | float):
                                 raise TypeError(f"Lead {lead_name} contains invalid data types")
                             if abs(value) > 100:  # Impossible ECG values
                                 raise ValueError(f"Lead {lead_name} contains impossible values")
@@ -1109,9 +1110,9 @@ class HybridECGAnalysisService:
                             raise ValueError(f"Lead {lead_name} contains NaN or Inf values")
                         if np.any(np.abs(lead_data) > 100):
                             raise ValueError(f"Lead {lead_name} contains impossible values")
-            
+
             return True
-            
+
         except (ValueError, TypeError, ECGProcessingException) as e:
             raise e
         except Exception as e:
@@ -1135,7 +1136,7 @@ class HybridECGAnalysisService:
             if np.any(np.isnan(signal)) or np.any(np.isinf(signal)):
                 return {
                     "is_valid": False,
-                    "quality": "poor", 
+                    "quality": "poor",
                     "score": 0.0,
                     "issues": ["Invalid values (NaN/Inf)"]
                 }
