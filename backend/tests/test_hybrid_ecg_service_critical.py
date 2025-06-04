@@ -106,7 +106,12 @@ class TestECGCriticalSafety:
         """CRITICAL: STEMI detection must complete within emergency timeframe."""
         start_time = time.time()
         
-        with patch.object(ecg_service, '_analyze_with_ai', return_value={
+        with patch.object(ecg_service.ecg_reader, 'read_ecg', return_value={
+            'signal': np.array([[0.1, 0.3, 0.8, 1.2, 0.9, 0.4, 0.1] * 1000]),
+            'sample_rate': 250,
+            'leads': ['V1'],
+            'duration': 10.0
+        }), patch.object(ecg_service, '_analyze_with_ai', return_value={
             "abnormalities": {
                 "stemi": {"detected": True, "confidence": 0.99, "location": "anterior"},
                 "vfib": {"detected": False, "confidence": 0.01},
@@ -131,7 +136,12 @@ class TestECGCriticalSafety:
     @pytest.mark.asyncio
     async def test_normal_ecg_no_false_alarms(self, ecg_service, normal_signal):
         """CRITICAL: Normal ECG must not generate false critical alarms."""
-        with patch.object(ecg_service, '_analyze_with_ai', return_value={
+        with patch.object(ecg_service.ecg_reader, 'read_ecg', return_value={
+            'signal': np.array([[0.1, 0.2, 0.3, 0.2, 0.1, 0.0, -0.1] * 1000]),
+            'sample_rate': 250,
+            'leads': ['II'],
+            'duration': 10.0
+        }), patch.object(ecg_service, '_analyze_with_ai', return_value={
             "abnormalities": {
                 "stemi": {"detected": False, "confidence": 0.01},
                 "vfib": {"detected": False, "confidence": 0.01},
@@ -171,7 +181,12 @@ class TestECGCriticalSafety:
         """CRITICAL: Ventricular fibrillation must be detected immediately."""
         start_time = time.time()
         
-        with patch.object(ecg_service, '_analyze_with_ai', return_value={
+        with patch.object(ecg_service.ecg_reader, 'read_ecg', return_value={
+            'signal': np.array([np.random.normal(0, 0.3, 7000)]),
+            'sample_rate': 250,
+            'leads': ['V1'],
+            'duration': 10.0
+        }), patch.object(ecg_service, '_analyze_with_ai', return_value={
             "abnormalities": {
                 "vfib": {"detected": True, "confidence": 0.98},
                 "stemi": {"detected": False, "confidence": 0.05},
