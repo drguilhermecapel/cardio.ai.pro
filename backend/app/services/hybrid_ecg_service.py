@@ -122,7 +122,7 @@ class UniversalECGReader:
             df = pd.read_csv(filepath)
             return {
                 'signal': df.values,
-                'sampling_rate': sampling_rate or 500,
+                'sampling_rate': sampling_rate or 250,
                 'labels': list(df.columns),
                 'metadata': {}
             }
@@ -150,7 +150,7 @@ class AdvancedPreprocessor:
     Advanced ECG signal preprocessing
     """
 
-    def __init__(self, sampling_rate: int = 500) -> None:
+    def __init__(self, sampling_rate: int = 250) -> None:
         self.fs = sampling_rate
 
     def preprocess_signal(self, signal: npt.NDArray[np.float64], remove_baseline: bool = True,
@@ -265,7 +265,7 @@ class FeatureExtractor:
     Comprehensive ECG feature extraction
     """
 
-    def __init__(self, sampling_rate: int = 500) -> None:
+    def __init__(self, sampling_rate: int = 250) -> None:
         self.fs = sampling_rate
 
     def extract_all_features(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] | None = None) -> dict[str, float]:
@@ -510,7 +510,7 @@ class HybridECGAnalysisService:
     Main hybrid ECG analysis service
     """
 
-    def __init__(self, db: Any = None, validation_service: Any = None, sampling_rate: int = 500) -> None:
+    def __init__(self, db: Any = None, validation_service: Any = None, sampling_rate: int = 250) -> None:
         self.db = db
         self.validation_service = validation_service
         self.fs = sampling_rate
