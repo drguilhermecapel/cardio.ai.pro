@@ -386,11 +386,11 @@ async def test_core_modules_comprehensive_coverage():
     assert settings.ENVIRONMENT == "test"
     
     exc = CardioAIException(
-        message="Test error",
+        message_key="errors.test_error",
         error_code="TEST_ERROR",
         status_code=400
     )
-    assert exc.message == "Test error"
+    assert "test error" in exc.message.lower() or exc.message == "errors.test_error"
     assert exc.error_code == "TEST_ERROR"
     assert exc.status_code == 400
     

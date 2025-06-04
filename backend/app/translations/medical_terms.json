@@ -1,0 +1,119 @@
+{
+  "atrial_fibrillation": {
+    "en": "Atrial Fibrillation",
+    "pt": "Fibrilação Atrial",
+    "es": "Fibrilación Auricular",
+    "fr": "Fibrillation Auriculaire",
+    "de": "Vorhofflimmern",
+    "zh": "心房颤动",
+    "ar": "الرجفان الأذيني"
+  },
+  "ventricular_tachycardia": {
+    "en": "Ventricular Tachycardia",
+    "pt": "Taquicardia Ventricular",
+    "es": "Taquicardia Ventricular",
+    "fr": "Tachycardie Ventriculaire",
+    "de": "Ventrikuläre Tachykardie",
+    "zh": "室性心动过速",
+    "ar": "تسرع القلب البطيني"
+  },
+  "ventricular_fibrillation": {
+    "en": "Ventricular Fibrillation",
+    "pt": "Fibrilação Ventricular",
+    "es": "Fibrilación Ventricular",
+    "fr": "Fibrillation Ventriculaire",
+    "de": "Kammerflimmern",
+    "zh": "心室颤动",
+    "ar": "الرجفان البطيني"
+  },
+  "asystole": {
+    "en": "Asystole",
+    "pt": "Assistolia",
+    "es": "Asistolia",
+    "fr": "Asystolie",
+    "de": "Asystolie",
+    "zh": "心脏停搏",
+    "ar": "انقطاع النظم"
+  },
+  "p_wave": {
+    "en": "P Wave",
+    "pt": "Onda P",
+    "es": "Onda P",
+    "fr": "Onde P",
+    "de": "P-Welle",
+    "zh": "P波",
+    "ar": "موجة P"
+  },
+  "qrs_complex": {
+    "en": "QRS Complex",
+    "pt": "Complexo QRS",
+    "es": "Complejo QRS",
+    "fr": "Complexe QRS",
+    "de": "QRS-Komplex",
+    "zh": "QRS波群",
+    "ar": "مركب QRS"
+  },
+  "t_wave": {
+    "en": "T Wave",
+    "pt": "Onda T",
+    "es": "Onda T",
+    "fr": "Onde T",
+    "de": "T-Welle",
+    "zh": "T波",
+    "ar": "موجة T"
+  },
+  "st_segment": {
+    "en": "ST Segment",
+    "pt": "Segmento ST",
+    "es": "Segmento ST",
+    "fr": "Segment ST",
+    "de": "ST-Strecke",
+    "zh": "ST段",
+    "ar": "قطعة ST"
+  },
+  "myocardial_infarction": {
+    "en": "Myocardial Infarction",
+    "pt": "Infarto do Miocárdio",
+    "es": "Infarto de Miocardio",
+    "fr": "Infarctus du Myocarde",
+    "de": "Myokardinfarkt",
+    "zh": "心肌梗死",
+    "ar": "احتشاء عضلة القلب"
+  },
+  "cardiac_arrest": {
+    "en": "Cardiac Arrest",
+    "pt": "Parada Cardíaca",
+    "es": "Paro Cardíaco",
+    "fr": "Arrêt Cardiaque",
+    "de": "Herzstillstand",
+    "zh": "心脏骤停",
+    "ar": "السكتة القلبية"
+  },
+  "heart_rate": {
+    "en": "Heart Rate",
+    "pt": "Frequência Cardíaca",
+    "es": "Frecuencia Cardíaca",
+    "fr": "Fréquence Cardiaque",
+    "de": "Herzfrequenz",
+    "zh": "心率",
+    "ar": "معدل ضربات القلب"
+  },
+  "pr_interval": {
+    "en": "PR Interval",
+    "pt": "Intervalo PR",
+    "es": "Intervalo PR",
+    "fr": "Intervalle PR",
+    "de": "PR-Intervall",
+    "zh": "PR间期",
+    "ar": "فترة PR"
+  },
+  "qt_interval": {
+    "en": "QT Interval",
+    "pt": "Intervalo QT",
+    "es": "Intervalo QT",
+    "fr": "Intervalle QT",
+    "de": "QT-Intervall",
+    "zh": "QT间期",
+    "ar": "فترة QT"
+  }
+}

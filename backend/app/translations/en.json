@@ -1,0 +1,171 @@
+{
+  "errors": {
+    "validation_error": "Validation failed",
+    "authentication_error": "Authentication failed",
+    "permission_denied": "Permission denied",
+    "not_found": "Resource not found",
+    "conflict": "Resource conflict",
+    "ecg_processing_error": "ECG processing error",
+    "ml_model_error": "Machine learning model error",
+    "validation_not_found": "Validation {validation_id} not found",
+    "analysis_not_found": "Analysis {analysis_id} not found",
+    "validation_already_exists": "Validation for analysis {analysis_id} already exists",
+    "insufficient_permissions": "Insufficient permissions. Required: {required_permission}",
+    "rate_limit_exceeded": "Rate limit exceeded",
+    "file_processing_error": "File processing error",
+    "database_error": "Database error",
+    "external_service_error": "External service error",
+    "test_error": "Test error"
+  },
+  "schemas": {
+    "user": {
+      "username": {
+        "description": "Username for login (3-50 characters)"
+      },
+      "email": {
+        "description": "Email address for notifications and account recovery"
+      },
+      "first_name": {
+        "description": "User's first name"
+      },
+      "last_name": {
+        "description": "User's last name"
+      },
+      "phone": {
+        "description": "Phone number for contact and notifications"
+      },
+      "role": {
+        "description": "User role determining system permissions"
+      },
+      "license_number": {
+        "description": "Medical license number for healthcare professionals"
+      },
+      "specialty": {
+        "description": "Medical specialty or area of expertise"
+      },
+      "institution": {
+        "description": "Healthcare institution or organization"
+      },
+      "experience_years": {
+        "description": "Years of professional medical experience"
+      },
+      "password": {
+        "description": "Secure password (minimum 8 characters with uppercase, lowercase, digit, and special character)",
+        "error": {
+          "too_short": "Password must be at least 8 characters long",
+          "no_uppercase": "Password must contain at least one uppercase letter",
+          "no_lowercase": "Password must contain at least one lowercase letter",
+          "no_digit": "Password must contain at least one digit",
+          "no_special": "Password must contain at least one special character"
+        }
+      },
+      "current_password": {
+        "description": "Current password for verification"
+      },
+      "new_password": {
+        "description": "New password to replace the current one"
+      },
+      "reset_token": {
+        "description": "Password reset token received via email"
+      },
+      "api_key_name": {
+        "description": "Descriptive name for the API key"
+      },
+      "api_key_scopes": {
+        "description": "List of permissions granted to this API key"
+      },
+      "api_key_expires": {
+        "description": "Optional expiration date for the API key"
+      }
+    },
+    "notification": {
+      "title": {
+        "description": "Notification title or subject"
+      },
+      "message": {
+        "description": "Notification content or body text"
+      },
+      "type": {
+        "description": "Type of notification (info, warning, error, success)"
+      },
+      "priority": {
+        "description": "Priority level (low, medium, high, critical)"
+      },
+      "channels": {
+        "description": "Delivery channels (email, sms, push, in-app)"
+      },
+      "metadata": {
+        "description": "Additional notification metadata"
+      },
+      "expires_at": {
+        "description": "Optional expiration date for the notification"
+      }
+    },
+    "patient": {
+      "first_name": {
+        "description": "Patient's first name"
+      },
+      "last_name": {
+        "description": "Patient's last name"
+      },
+      "date_of_birth": {
+        "description": "Patient's date of birth"
+      },
+      "gender": {
+        "description": "Patient's gender"
+      },
+      "phone": {
+        "description": "Patient's contact phone number"
+      },
+      "email": {
+        "description": "Patient's email address"
+      },
+      "medical_record_number": {
+        "description": "Unique medical record identifier"
+      },
+      "emergency_contact": {
+        "description": "Emergency contact information"
+      }
+    },
+    "ecg_analysis": {
+      "patient_id": {
+        "description": "ID of the patient for this ECG analysis"
+      },
+      "file_path": {
+        "description": "Path to the ECG file being analyzed"
+      },
+      "analysis_type": {
+        "description": "Type of ECG analysis to perform"
+      },
+      "priority": {
+        "description": "Analysis priority level"
+      },
+      "metadata": {
+        "description": "Additional analysis metadata"
+      },
+      "results": {
+        "description": "ECG analysis results and findings"
+      },
+      "confidence": {
+        "description": "Confidence level of the analysis results"
+      },
+      "recommendations": {
+        "description": "Clinical recommendations based on analysis"
+      }
+    }
+  },
+  "api": {
+    "responses": {
+      "success": "Operation completed successfully",
+      "created": "Resource created successfully",
+      "updated": "Resource updated successfully",
+      "deleted": "Resource deleted successfully",
+      "unauthorized": "Authentication required",
+      "forbidden": "Access denied",
+      "not_found": "Resource not found",
+      "validation_failed": "Input validation failed",
+      "server_error": "Internal server error",
+      "service_unavailable": "Service temporarily unavailable"
+    }
+  }
+}

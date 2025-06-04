@@ -369,8 +369,8 @@ def test_core_modules_coverage():
     assert UserRoles.PHYSICIAN is not None
     assert ValidationStatus.PENDING is not None
     
-    exc = CardioAIException("Test error", "TEST_ERROR", 400)
-    assert exc.message == "Test error"
+    exc = CardioAIException(message_key="errors.test_error", error_code="TEST_ERROR", status_code=400)
+    assert "test error" in exc.message.lower()
     assert exc.error_code == "TEST_ERROR"
     assert exc.status_code == 400
 

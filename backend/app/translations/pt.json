@@ -1,0 +1,170 @@
+{
+  "errors": {
+    "validation_error": "Falha na validação",
+    "authentication_error": "Falha na autenticação",
+    "permission_denied": "Permissão negada",
+    "not_found": "Recurso não encontrado",
+    "conflict": "Conflito de recurso",
+    "ecg_processing_error": "Erro no processamento do ECG",
+    "ml_model_error": "Erro no modelo de aprendizado de máquina",
+    "validation_not_found": "Validação {validation_id} não encontrada",
+    "analysis_not_found": "Análise {analysis_id} não encontrada",
+    "validation_already_exists": "Validação para análise {analysis_id} já existe",
+    "insufficient_permissions": "Permissões insuficientes. Necessário: {required_permission}",
+    "rate_limit_exceeded": "Limite de taxa excedido",
+    "file_processing_error": "Erro no processamento do arquivo",
+    "database_error": "Erro no banco de dados",
+    "external_service_error": "Erro no serviço externo"
+  },
+  "schemas": {
+    "user": {
+      "username": {
+        "description": "Nome de usuário para login (3-50 caracteres)"
+      },
+      "email": {
+        "description": "Endereço de email para notificações e recuperação de conta"
+      },
+      "first_name": {
+        "description": "Primeiro nome do usuário"
+      },
+      "last_name": {
+        "description": "Sobrenome do usuário"
+      },
+      "phone": {
+        "description": "Número de telefone para contato e notificações"
+      },
+      "role": {
+        "description": "Função do usuário determinando permissões do sistema"
+      },
+      "license_number": {
+        "description": "Número da licença médica para profissionais de saúde"
+      },
+      "specialty": {
+        "description": "Especialidade médica ou área de expertise"
+      },
+      "institution": {
+        "description": "Instituição de saúde ou organização"
+      },
+      "experience_years": {
+        "description": "Anos de experiência médica profissional"
+      },
+      "password": {
+        "description": "Senha segura (mínimo 8 caracteres com maiúscula, minúscula, dígito e caractere especial)",
+        "error": {
+          "too_short": "A senha deve ter pelo menos 8 caracteres",
+          "no_uppercase": "A senha deve conter pelo menos uma letra maiúscula",
+          "no_lowercase": "A senha deve conter pelo menos uma letra minúscula",
+          "no_digit": "A senha deve conter pelo menos um dígito",
+          "no_special": "A senha deve conter pelo menos um caractere especial"
+        }
+      },
+      "current_password": {
+        "description": "Senha atual para verificação"
+      },
+      "new_password": {
+        "description": "Nova senha para substituir a atual"
+      },
+      "reset_token": {
+        "description": "Token de redefinição de senha recebido por email"
+      },
+      "api_key_name": {
+        "description": "Nome descritivo para a chave da API"
+      },
+      "api_key_scopes": {
+        "description": "Lista de permissões concedidas a esta chave da API"
+      },
+      "api_key_expires": {
+        "description": "Data de expiração opcional para a chave da API"
+      }
+    },
+    "notification": {
+      "title": {
+        "description": "Título ou assunto da notificação"
+      },
+      "message": {
+        "description": "Conteúdo ou texto da notificação"
+      },
+      "type": {
+        "description": "Tipo de notificação (info, aviso, erro, sucesso)"
+      },
+      "priority": {
+        "description": "Nível de prioridade (baixa, média, alta, crítica)"
+      },
+      "channels": {
+        "description": "Canais de entrega (email, sms, push, in-app)"
+      },
+      "metadata": {
+        "description": "Metadados adicionais da notificação"
+      },
+      "expires_at": {
+        "description": "Data de expiração opcional para a notificação"
+      }
+    },
+    "patient": {
+      "first_name": {
+        "description": "Primeiro nome do paciente"
+      },
+      "last_name": {
+        "description": "Sobrenome do paciente"
+      },
+      "date_of_birth": {
+        "description": "Data de nascimento do paciente"
+      },
+      "gender": {
+        "description": "Gênero do paciente"
+      },
+      "phone": {
+        "description": "Número de telefone de contato do paciente"
+      },
+      "email": {
+        "description": "Endereço de email do paciente"
+      },
+      "medical_record_number": {
+        "description": "Identificador único do prontuário médico"
+      },
+      "emergency_contact": {
+        "description": "Informações de contato de emergência"
+      }
+    },
+    "ecg_analysis": {
+      "patient_id": {
+        "description": "ID do paciente para esta análise de ECG"
+      },
+      "file_path": {
+        "description": "Caminho para o arquivo ECG sendo analisado"
+      },
+      "analysis_type": {
+        "description": "Tipo de análise de ECG a ser realizada"
+      },
+      "priority": {
+        "description": "Nível de prioridade da análise"
+      },
+      "metadata": {
+        "description": "Metadados adicionais da análise"
+      },
+      "results": {
+        "description": "Resultados e achados da análise de ECG"
+      },
+      "confidence": {
+        "description": "Nível de confiança dos resultados da análise"
+      },
+      "recommendations": {
+        "description": "Recomendações clínicas baseadas na análise"
+      }
+    }
+  },
+  "api": {
+    "responses": {
+      "success": "Operação concluída com sucesso",
+      "created": "Recurso criado com sucesso",
+      "updated": "Recurso atualizado com sucesso",
+      "deleted": "Recurso excluído com sucesso",
+      "unauthorized": "Autenticação necessária",
+      "forbidden": "Acesso negado",
+      "not_found": "Recurso não encontrado",
+      "validation_failed": "Falha na validação de entrada",
+      "server_error": "Erro interno do servidor",
+      "service_unavailable": "Serviço temporariamente indisponível"
+    }
+  }
+}
