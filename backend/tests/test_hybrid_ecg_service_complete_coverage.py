@@ -224,7 +224,7 @@ class TestAdvancedPreprocessorComplete:
         preprocessor = AdvancedPreprocessor()
         signal = np.random.randn(500).astype(np.float64)
         
-        result = preprocessor._apply_bandpass_filter(signal, 250)
+        result = preprocessor._bandpass_filter(signal, 250)
         assert isinstance(result, np.ndarray)
         assert len(result) == len(signal)
     
@@ -330,8 +330,9 @@ class TestFeatureExtractorComplete:
         """Test nonlinear feature extraction."""
         extractor = FeatureExtractor()
         signal = np.random.randn(1000, 1).astype(np.float64)
+        r_peaks = np.array([100, 200, 300, 400, 500], dtype=np.int64)
         
-        features = extractor._extract_nonlinear_features(signal)
+        features = extractor._extract_nonlinear_features(signal, r_peaks)
         assert isinstance(features, dict)
     
     def test_sample_entropy(self):

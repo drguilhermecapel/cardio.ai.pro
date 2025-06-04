@@ -68,7 +68,7 @@ class UniversalECGReader:
         else:
             raise ValueError(f"Unsupported format: {ext}")
 
-    def _read_mitbih(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
+    def _read_mitbih(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any] | None:
         """Read MIT-BIH files"""
         try:
             record = wfdb.rdrecord(filepath.replace('.dat', ''))
@@ -79,10 +79,10 @@ class UniversalECGReader:
                 'metadata': {'units': record.units, 'comments': record.comments}
             }
         except Exception as e:
-            logger.warning(f"MIT-BIH reading failed: {e}, using fallback")
-            return self._read_csv(filepath, sampling_rate)
+            logger.warning(f"MIT-BIH reading failed: {e}")
+            return None
 
-    def _read_edf(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
+    def _read_edf(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any] | None:
         """Read EDF files"""
         try:
             import pyedflib
@@ -105,31 +105,42 @@ class UniversalECGReader:
                 'metadata': {'patient_info': 'EDF_patient'}
             }
         except ImportError:
-            logger.warning("pyedflib not available, using fallback")
-            return self._read_csv(filepath, sampling_rate)
+            logger.warning("pyedflib not available")
+            return None
+        except Exception as e:
+            logger.error(f"EDF reading error: {e}")
+            return None
 
-    def _read_csv(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
+    def _read_csv(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any] | None:
         """Read CSV files"""
-        data = pd.read_csv(filepath)
-        return {
-            'signal': data.values,
-            'sampling_rate': sampling_rate or 500,
-            'labels': list(data.columns),
-            'metadata': {'source': 'csv'}
-        }
+        try:
+            data = pd.read_csv(filepath)
+            return {
+                'signal': data.values,
+                'sampling_rate': sampling_rate or 500,
+                'labels': list(data.columns),
+                'metadata': {'source': 'csv'}
+            }
+        except Exception as e:
+            logger.error(f"CSV reading error: {e}")
+            return None
 
-    def _read_text(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
+    def _read_text(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any] | None:
         """Read text files"""
-        data = np.loadtxt(filepath)
-        if data.ndim == 1:
-            data = data.reshape(-1, 1)
+        try:
+            data = np.loadtxt(filepath)
+            if data.ndim == 1:
+                data = data.reshape(-1, 1)
 
-        return {
-            'signal': data,
-            'sampling_rate': sampling_rate or 500,
-            'labels': [f'Lead_{i+1}' for i in range(data.shape[1])],
-            'metadata': {'source': 'text'}
-        }
+            return {
+                'signal': data,
+                'sampling_rate': sampling_rate or 500,
+                'labels': [f'Lead_{i+1}' for i in range(data.shape[1])],
+                'metadata': {'source': 'text'}
+            }
+        except Exception as e:
+            logger.error(f"Text reading error: {e}")
+            return None
 
     async def _read_image(self, filepath: str, sampling_rate: int = 500) -> dict[str, Any]:
         """Digitize ECG from images using advanced document scanner"""
@@ -212,33 +223,50 @@ class AdvancedPreprocessor:
 
     def _remove_baseline_wandering(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Remove baseline wandering using median filter"""
-        from scipy.ndimage import median_filter
-        window_size = int(0.6 * self.fs)
-        baseline = median_filter(signal_data, size=window_size)
-        return signal_data - baseline
+        try:
+            from scipy.ndimage import median_filter
+            window_size = int(0.6 * self.fs)
+            baseline = median_filter(signal_data, size=window_size)
+            return signal_data - baseline
+        except Exception as e:
+            logger.warning(f"Baseline wandering removal failed: {e}")
+            return signal_data
 
     def _remove_powerline_interference(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Remove 50/60 Hz interference"""
-        for freq in [50, 60]:
-            b, a = signal.iirnotch(freq, Q=30, fs=self.fs)
-            signal_data = np.array(signal.filtfilt(b, a, signal_data), dtype=np.float64)
-        return signal_data
+        try:
+            for freq in [50, 60]:
+                b, a = signal.iirnotch(freq, Q=30, fs=self.fs)
+                signal_data = np.array(signal.filtfilt(b, a, signal_data), dtype=np.float64)
+            return signal_data
+        except Exception as e:
+            logger.warning(f"Powerline interference removal failed: {e}")
+            return signal_data
 
-    def _bandpass_filter(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        """Bandpass filter 0.5-40 Hz"""
-        nyquist = self.fs / 2
-        low = 0.5 / nyquist
-        high = 40 / nyquist
-        b, a = signal.butter(4, [low, high], btype='band')
-        return np.array(signal.filtfilt(b, a, signal_data), dtype=np.float64)
+
+    def _bandpass_filter(self, signal_data: npt.NDArray[np.float64], sampling_rate: int = 250) -> npt.NDArray[np.float64]:
+        """Apply bandpass filter with exception handling"""
+        try:
+            nyquist = sampling_rate / 2
+            low = 0.5 / nyquist
+            high = 40 / nyquist
+            b, a = signal.butter(4, [low, high], btype='band')
+            return np.array(signal.filtfilt(b, a, signal_data), dtype=np.float64)
+        except Exception as e:
+            logger.warning(f"Bandpass filter failed: {e}")
+            return signal_data
 
     def _wavelet_denoise(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Denoising using wavelets"""
-        coeffs = pywt.wavedec(signal_data, 'db4', level=9)
-        threshold = 0.04
-        coeffs_thresh = [pywt.threshold(c, threshold*np.max(c), mode='soft')
-                        for c in coeffs]
-        return np.array(pywt.waverec(coeffs_thresh, 'db4')[:len(signal_data)], dtype=np.float64)
+        try:
+            coeffs = pywt.wavedec(signal_data, 'db4', level=9)
+            threshold = 0.04
+            coeffs_thresh = [pywt.threshold(c, threshold*np.max(c), mode='soft')
+                            for c in coeffs]
+            return np.array(pywt.waverec(coeffs_thresh, 'db4')[:len(signal_data)], dtype=np.float64)
+        except Exception as e:
+            logger.warning(f"Wavelet denoising failed: {e}")
+            return signal_data
 
 
 class FeatureExtractor:
@@ -273,49 +301,60 @@ class FeatureExtractor:
             logger.warning(f"R peak detection failed: {e}")
             return np.array([], dtype=np.int64)
 
-    def _extract_morphological_features(self, signal_data: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64]) -> dict[str, Any]:
+    def _extract_morphological_features(self, signal_data: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64], sampling_rate: int = 500) -> dict[str, Any]:
         """Extract morphological wave features"""
-        features = {}
+        try:
+            features = {}
 
-        if len(r_peaks) > 0:
-            features['r_peak_amplitude_mean'] = np.mean([signal_data[peak, 0] for peak in r_peaks if peak < len(signal_data)])
-            features['r_peak_amplitude_std'] = np.std([signal_data[peak, 0] for peak in r_peaks if peak < len(signal_data)])
-        else:
-            features['r_peak_amplitude_mean'] = 0.0
-            features['r_peak_amplitude_std'] = 0.0
-
-        features['signal_amplitude_range'] = np.max(signal_data) - np.min(signal_data)
-        features['signal_mean'] = np.mean(signal_data)
-        features['signal_std'] = np.std(signal_data)
-
-        return features
-
-    def _extract_interval_features(self, signal_data: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64]) -> dict[str, Any]:
-        """Extract interval features"""
-        features = {}
-
-        if len(r_peaks) > 1:
-            rr_intervals = np.diff(r_peaks) / self.fs * 1000
-            features['rr_mean'] = np.mean(rr_intervals)
-            features['rr_std'] = np.std(rr_intervals)
-            features['rr_min'] = np.min(rr_intervals)
-            features['rr_max'] = np.max(rr_intervals)
-
-            features['pr_interval_mean'] = np.mean(rr_intervals) * 0.16
-            features['qt_interval_mean'] = np.mean(rr_intervals) * 0.4
-
-            rr_mean_seconds = np.mean(rr_intervals) / 1000
-            if rr_mean_seconds > 0:
-                features['qtc_bazett'] = features['qt_interval_mean'] / np.sqrt(rr_mean_seconds)
+            if len(r_peaks) > 0:
+                features['r_peak_amplitude_mean'] = np.mean([signal_data[peak, 0] for peak in r_peaks if peak < len(signal_data)])
+                features['r_peak_amplitude_std'] = np.std([signal_data[peak, 0] for peak in r_peaks if peak < len(signal_data)])
             else:
-                features['qtc_bazett'] = 0.0
-        else:
-            features.update({
-                'rr_mean': 0.0, 'rr_std': 0.0, 'rr_min': 0.0, 'rr_max': 0.0,
-                'pr_interval_mean': 0.0, 'qt_interval_mean': 0.0, 'qtc_bazett': 0.0
-            })
+                features['r_peak_amplitude_mean'] = 0.0
+                features['r_peak_amplitude_std'] = 0.0
 
-        return features
+            features['signal_amplitude_range'] = np.max(signal_data) - np.min(signal_data)
+            features['signal_mean'] = np.mean(signal_data)
+            features['signal_std'] = np.std(signal_data)
+
+            return features
+        except Exception as e:
+            logger.warning(f"Morphological feature extraction failed: {e}")
+            return {}
+
+    def _extract_interval_features(self, r_peaks: npt.NDArray[np.int64], sampling_rate: int = 500) -> dict[str, Any]:
+        """Extract interval features"""
+        try:
+            features = {}
+
+            if len(r_peaks) > 1:
+                rr_intervals = np.diff(r_peaks) / sampling_rate * 1000
+                features['rr_mean'] = np.mean(rr_intervals)
+                features['rr_std'] = np.std(rr_intervals)
+                features['rr_min'] = np.min(rr_intervals)
+                features['rr_max'] = np.max(rr_intervals)
+
+                features['pr_interval_mean'] = np.mean(rr_intervals) * 0.16
+                features['qt_interval_mean'] = np.mean(rr_intervals) * 0.4
+
+                rr_mean_seconds = np.mean(rr_intervals) / 1000
+                if rr_mean_seconds > 0:
+                    features['qtc_bazett'] = features['qt_interval_mean'] / np.sqrt(rr_mean_seconds)
+                else:
+                    features['qtc_bazett'] = 0.0
+                
+                features['heart_rate'] = 60000 / np.mean(rr_intervals) if np.mean(rr_intervals) > 0 else 0.0
+            else:
+                features.update({
+                    'rr_mean': 0.0, 'rr_std': 0.0, 'rr_min': 0.0, 'rr_max': 0.0,
+                    'pr_interval_mean': 0.0, 'qt_interval_mean': 0.0, 'qtc_bazett': 0.0,
+                    'heart_rate': 0.0
+                })
+
+            return features
+        except Exception as e:
+            logger.warning(f"Interval feature extraction failed: {e}")
+            return {'heart_rate': 0.0}
 
     def _extract_hrv_features(self, r_peaks: npt.NDArray[np.int64]) -> dict[str, Any]:
         """Extract HRV features"""
@@ -344,60 +383,72 @@ class FeatureExtractor:
 
         return features
 
-    def _extract_spectral_features(self, signal_data: npt.NDArray[np.float64]) -> dict[str, Any]:
+    def _extract_spectral_features(self, signal_data: npt.NDArray[np.float64], sampling_rate: int = 500) -> dict[str, Any]:
         """Extract spectral features"""
-        features = {}
+        try:
+            features = {}
 
-        lead_signal = signal_data[:, 0] if signal_data.ndim > 1 else signal_data
+            lead_signal = signal_data[:, 0] if signal_data.ndim > 1 else signal_data
 
-        # Use larger nperseg for better frequency resolution
-        nperseg = min(len(lead_signal), 2048)  # Use full signal or 2048, whichever is smaller
-        freqs, psd = signal.welch(lead_signal, fs=self.fs, nperseg=nperseg, noverlap=nperseg//2)
+            # Use larger nperseg for better frequency resolution
+            nperseg = min(len(lead_signal), 2048)  # Use full signal or 2048, whichever is smaller
+            freqs, psd = signal.welch(lead_signal, fs=sampling_rate, nperseg=nperseg, noverlap=nperseg//2)
 
-        dominant_freq_idx = np.argmax(psd)
-        features['dominant_frequency'] = float(freqs[dominant_freq_idx])
+            dominant_freq_idx = np.argmax(psd)
+            features['dominant_frequency'] = float(freqs[dominant_freq_idx])
 
-        psd_norm = psd / (np.sum(psd) + 1e-10)  # Avoid division by zero
-        features['spectral_entropy'] = float(entropy(psd_norm + 1e-10))  # Avoid log(0)
+            psd_norm = psd / (np.sum(psd) + 1e-10)  # Avoid division by zero
+            features['spectral_entropy'] = float(entropy(psd_norm + 1e-10))  # Avoid log(0)
 
-        features['power_total'] = float(np.sum(psd))
+            features['power_total'] = float(np.sum(psd))
 
-        return features
+            return features
+        except Exception as e:
+            logger.warning(f"Spectral feature extraction failed: {e}")
+            return {}
 
     def _extract_wavelet_features(self, signal_data: npt.NDArray[np.float64]) -> dict[str, Any]:
         """Extract wavelet features"""
-        features = {}
+        try:
+            features = {}
 
-        coeffs = pywt.wavedec(signal_data[:, 0] if signal_data.ndim > 1 else signal_data, 'db4', level=5)
+            coeffs = pywt.wavedec(signal_data[:, 0] if signal_data.ndim > 1 else signal_data, 'db4', level=5)
 
-        for i, coeff in enumerate(coeffs):
-            features[f'wavelet_energy_level_{i}'] = np.sum(coeff**2)
+            for i, coeff in enumerate(coeffs):
+                features[f'wavelet_energy_level_{i}'] = np.sum(coeff**2)
 
-        all_coeffs = np.concatenate(coeffs)
-        features['wavelet_mean'] = np.mean(all_coeffs)
-        features['wavelet_std'] = np.std(all_coeffs)
-        features['wavelet_kurtosis'] = kurtosis(all_coeffs)
-        features['wavelet_skewness'] = skew(all_coeffs)
+            all_coeffs = np.concatenate(coeffs)
+            features['wavelet_mean'] = np.mean(all_coeffs)
+            features['wavelet_std'] = np.std(all_coeffs)
+            features['wavelet_kurtosis'] = kurtosis(all_coeffs)
+            features['wavelet_skewness'] = skew(all_coeffs)
 
-        return features
+            return features
+        except Exception as e:
+            logger.warning(f"Wavelet feature extraction failed: {e}")
+            return {}
 
-    def _extract_nonlinear_features(self, signal_data: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64]) -> dict[str, Any]:
+    def _extract_nonlinear_features(self, signal_data: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] | None = None) -> dict[str, Any]:
         """Extract simplified non-linear features to avoid performance issues"""
-        features = {}
+        try:
+            features = {}
 
-        lead_signal = signal_data[:, 0] if signal_data.ndim > 1 else signal_data
+            lead_signal = signal_data[:, 0] if signal_data.ndim > 1 else signal_data
 
-        features['signal_complexity'] = float(np.std(np.diff(lead_signal)))
-        features['signal_variability'] = float(np.var(lead_signal))
+            features['signal_complexity'] = float(np.std(np.diff(lead_signal)))
+            features['signal_variability'] = float(np.var(lead_signal))
 
-        if len(lead_signal) > 0:
-            features['sample_entropy'] = float(min(np.log(np.var(lead_signal) + 1e-10), 10.0))
-            features['approximate_entropy'] = float(min(np.log(np.std(lead_signal) + 1e-10), 10.0))
-        else:
-            features['sample_entropy'] = 0.0
-            features['approximate_entropy'] = 0.0
+            if len(lead_signal) > 0:
+                features['sample_entropy'] = float(min(np.log(np.var(lead_signal) + 1e-10), 10.0))
+                features['approximate_entropy'] = float(min(np.log(np.std(lead_signal) + 1e-10), 10.0))
+            else:
+                features['sample_entropy'] = 0.0
+                features['approximate_entropy'] = 0.0
 
-        return features
+            return features
+        except Exception as e:
+            logger.warning(f"Nonlinear feature extraction failed: {e}")
+            return {}
 
     def _sample_entropy(self, signal_data: npt.NDArray[np.float64], m: int = 2, r: float = 0.2) -> float:
         """Calculate sample entropy with performance optimization"""
