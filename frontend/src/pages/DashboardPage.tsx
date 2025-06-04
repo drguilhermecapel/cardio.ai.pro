@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react'
 import { Grid, Card, CardContent, Typography, Box, Chip, LinearProgress } from '@mui/material'
 import { MonitorHeart, People, Assignment, Warning } from '@mui/icons-material'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchAnalyses } from '../store/slices/ecgSlice'
 import { fetchUnreadCount } from '../store/slices/notificationSlice'
+import { useFormatters } from '../utils/formatters'
 
 interface StatCardProps {
   title: string
@@ -35,6 +37,8 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color, subtitle
 )
 
 const DashboardPage: React.FC = () => {
+  const { t } = useTranslation()
+  const formatters = useFormatters()
   const dispatch = useAppDispatch()
   const { analyses, isLoading } = useAppSelector(state => state.ecg)
   const { unreadCount } = useAppSelector(state => state.notification)
@@ -53,7 +57,7 @@ const DashboardPage: React.FC = () => {
     return (
       <Box sx={{ width: '100%' }}>
         <LinearProgress />
-        <Typography sx={{ mt: 2 }}>Loading dashboard...</Typography>
+        <Typography sx={{ mt: 2 }}>{t('common.loading')}</Typography>
       </Box>
     )
   }
@@ -61,44 +65,44 @@ const DashboardPage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Dashboard
+        {t('dashboard.title')}
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Total Analyses"
+            title={t('dashboard.totalAnalyses')}
             value={totalAnalyses}
             icon={<MonitorHeart />}
             color="#1976d2"
-            subtitle="All time"
+            subtitle={t('dashboard.allTime')}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Pending"
+            title={t('dashboard.pending')}
             value={pendingAnalyses}
             icon={<Assignment />}
             color="#ed6c02"
-            subtitle="Awaiting processing"
+            subtitle={t('dashboard.awaitingProcessing')}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Critical"
+            title={t('dashboard.critical')}
             value={criticalAnalyses}
             icon={<Warning />}
             color="#d32f2f"
-            subtitle="Require immediate attention"
+            subtitle={t('dashboard.requireImmediateAttention')}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Notifications"
+            title={t('notifications.title')}
             value={unreadCount}
             icon={<People />}
             color="#2e7d32"
-            subtitle="Unread messages"
+            subtitle={t('dashboard.unreadMessages')}
           />
         </Grid>
       </Grid>
@@ -108,7 +112,7 @@ const DashboardPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Recent ECG Analyses
+                {t('dashboard.recentECGAnalyses')}
               </Typography>
               {analyses.slice(0, 5).map(analysis => (
                 <Box
@@ -122,9 +126,9 @@ const DashboardPage: React.FC = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant="body1">Analysis #{analysis.analysisId}</Typography>
+                    <Typography variant="body1">{t('dashboard.analysisNumber', { id: analysis.analysisId })}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Patient ID: {analysis.patientId}
+                      {t('dashboard.patientId')}: {analysis.patientId}
                     </Typography>
                   </Box>
                   <Box sx={{ textAlign: 'right' }}>
@@ -140,7 +144,7 @@ const DashboardPage: React.FC = () => {
                       size="small"
                     />
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                      {new Date(analysis.createdAt).toLocaleDateString()}
+                      {formatters.formatDate(new Date(analysis.createdAt))}
                     </Typography>
                   </Box>
                 </Box>
@@ -153,11 +157,11 @@ const DashboardPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                System Status
+                {t('dashboard.systemStatus')}
               </Typography>
               <Box sx={{ mb: 2 }}>
                 <Typography variant="body2" gutterBottom>
-                  Processing Queue
+                  {t('dashboard.processingQueue')}
                 </Typography>
                 <LinearProgress
                   variant="determinate"
@@ -165,15 +169,15 @@ const DashboardPage: React.FC = () => {
                   sx={{ mb: 1 }}
                 />
                 <Typography variant="body2" color="text.secondary">
-                  {completedAnalyses} of {totalAnalyses} completed
+                  {t('dashboard.completedOf', { completed: completedAnalyses, total: totalAnalyses })}
                 </Typography>
               </Box>
 
               <Box>
                 <Typography variant="body2" gutterBottom>
-                  AI Model Status
+                  {t('dashboard.aiModelStatus')}
                 </Typography>
-                <Chip label="Online" color="success" size="small" />
+                <Chip label={t('dashboard.online')} color="success" size="small" />
               </Box>
             </CardContent>
           </Card>

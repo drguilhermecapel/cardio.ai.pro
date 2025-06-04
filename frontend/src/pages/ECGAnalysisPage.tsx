@@ -26,11 +26,15 @@ import {
   Paper,
 } from '@mui/material'
 import { CloudUpload, Visibility } from '@mui/icons-material'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { uploadECG, fetchAnalyses, clearError } from '../store/slices/ecgSlice'
 import { fetchPatients } from '../store/slices/patientSlice'
+import { useFormatters } from '../utils/formatters'
 
 const ECGAnalysisPage: React.FC = () => {
+  const { t } = useTranslation()
+  const formatters = useFormatters()
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [selectedPatientId, setSelectedPatientId] = useState<number | ''>('')
@@ -104,13 +108,13 @@ const ECGAnalysisPage: React.FC = () => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">ECG Analysis</Typography>
+        <Typography variant="h4">{t('ecgAnalysis.title')}</Typography>
         <Button
           variant="contained"
           startIcon={<CloudUpload />}
           onClick={() => setUploadDialogOpen(true)}
         >
-          Upload ECG
+          {t('ecgAnalysis.uploadECG')}
         </Button>
       </Box>
 
@@ -125,20 +129,20 @@ const ECGAnalysisPage: React.FC = () => {
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            ECG Analyses
+            {t('ecgAnalysis.title')}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Analysis ID</TableCell>
-                  <TableCell>Patient ID</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Diagnosis</TableCell>
-                  <TableCell>Urgency</TableCell>
-                  <TableCell>Confidence</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell>{t('ecgAnalysis.analysisId')}</TableCell>
+                  <TableCell>{t('patients.patientId')}</TableCell>
+                  <TableCell>{t('validations.status')}</TableCell>
+                  <TableCell>{t('ecgAnalysis.diagnosis')}</TableCell>
+                  <TableCell>{t('ecgAnalysis.urgency')}</TableCell>
+                  <TableCell>{t('ecgAnalysis.confidence')}</TableCell>
+                  <TableCell>{t('ecgAnalysis.date')}</TableCell>
+                  <TableCell>{t('patients.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -153,7 +157,7 @@ const ECGAnalysisPage: React.FC = () => {
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>{analysis.diagnosis || 'Pending'}</TableCell>
+                    <TableCell>{analysis.diagnosis || t('validations.pending')}</TableCell>
                     <TableCell>
                       <Chip
                         label={analysis.clinicalUrgency}
@@ -162,12 +166,12 @@ const ECGAnalysisPage: React.FC = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      {analysis.confidence ? `${(analysis.confidence * 100).toFixed(1)}%` : 'N/A'}
+                      {analysis.confidence ? `${(analysis.confidence * 100).toFixed(1)}%` : t('common.notAvailable')}
                     </TableCell>
-                    <TableCell>{new Date(analysis.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell>{formatters.formatDate(new Date(analysis.createdAt))}</TableCell>
                     <TableCell>
                       <Button size="small" startIcon={<Visibility />} onClick={() => {}}>
-                        View
+                        {t('validations.view')}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -184,16 +188,16 @@ const ECGAnalysisPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Upload ECG File</DialogTitle>
+        <DialogTitle>{t('ecgAnalysis.uploadECGFile')}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel>Select Patient</InputLabel>
+                <InputLabel>{t('ecgAnalysis.selectPatient')}</InputLabel>
                 <Select
                   value={selectedPatientId}
                   onChange={e => setSelectedPatientId(e.target.value as number)}
-                  label="Select Patient"
+                  label={t('ecgAnalysis.selectPatient')}
                 >
                   {patients.map(patient => (
                     <MenuItem key={patient.id} value={patient.id}>
@@ -205,7 +209,7 @@ const ECGAnalysisPage: React.FC = () => {
             </Grid>
             <Grid item xs={12}>
               <Button variant="outlined" component="label" fullWidth sx={{ height: 56 }}>
-                {selectedFile ? selectedFile.name : 'Choose ECG File'}
+                {selectedFile ? selectedFile.name : t('ecgAnalysis.chooseECGFile')}
                 <input
                   type="file"
                   hidden
@@ -218,20 +222,20 @@ const ECGAnalysisPage: React.FC = () => {
               <Grid item xs={12}>
                 <LinearProgress variant="determinate" value={uploadProgress} />
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Uploading... {uploadProgress}%
+                  {t('ecgAnalysis.uploading', { progress: uploadProgress })}
                 </Typography>
               </Grid>
             )}
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setUploadDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setUploadDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button
             onClick={handleUpload}
             variant="contained"
             disabled={!selectedFile || !selectedPatientId || isLoading}
           >
-            Upload
+            {t('ecgAnalysis.upload')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -11,10 +11,13 @@ import {
   Container,
 } from '@mui/material'
 import { MonitorHeart } from '@mui/icons-material'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { login, clearError } from '../store/slices/authSlice'
+import LanguageSelector from '../components/LanguageSelector'
 
 const LoginPage: React.FC = () => {
+  const { t } = useTranslation()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const dispatch = useAppDispatch()
@@ -30,6 +33,16 @@ const LoginPage: React.FC = () => {
 
   return (
     <Container component="main" maxWidth="sm">
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          zIndex: 1000,
+        }}
+      >
+        <LanguageSelector />
+      </Box>
       <Box
         sx={{
           marginTop: 8,
@@ -50,10 +63,10 @@ const LoginPage: React.FC = () => {
             >
               <MonitorHeart sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
               <Typography component="h1" variant="h4" gutterBottom>
-                CardioAI Pro
+                {t('login.title')}
               </Typography>
               <Typography variant="body2" color="text.secondary" align="center">
-                AI-powered ECG analysis system for healthcare professionals
+                {t('login.subtitle')}
               </Typography>
             </Box>
 
@@ -69,7 +82,7 @@ const LoginPage: React.FC = () => {
                 required
                 fullWidth
                 id="username"
-                label="Username"
+                label={t('login.username')}
                 name="username"
                 autoComplete="username"
                 autoFocus
@@ -82,7 +95,7 @@ const LoginPage: React.FC = () => {
                 required
                 fullWidth
                 name="password"
-                label="Password"
+                label={t('login.password')}
                 type="password"
                 id="password"
                 autoComplete="current-password"
@@ -97,12 +110,12 @@ const LoginPage: React.FC = () => {
                 sx={{ mt: 3, mb: 2 }}
                 disabled={isLoading || !username || !password}
               >
-                {isLoading ? <CircularProgress size={24} /> : 'Sign In'}
+                {isLoading ? <CircularProgress size={24} /> : t('login.signIn')}
               </Button>
             </Box>
 
             <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
-              For demo purposes, use: admin / admin123
+              {t('login.demoCredentials')}
             </Typography>
           </CardContent>
         </Card>

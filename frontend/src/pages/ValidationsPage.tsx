@@ -17,10 +17,14 @@ import {
   Alert,
 } from '@mui/material'
 import { Assignment, CheckCircle } from '@mui/icons-material'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchMyValidations } from '../store/slices/validationSlice'
+import { useFormatters } from '../utils/formatters'
 
 const ValidationsPage: React.FC = () => {
+  const { t } = useTranslation()
+  const formatters = useFormatters()
   const dispatch = useAppDispatch()
   const { validations, isLoading, error } = useAppSelector(state => state.validation)
 
@@ -46,7 +50,7 @@ const ValidationsPage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Validations
+        {t('validations.title')}
       </Typography>
 
       {error && (
@@ -60,19 +64,19 @@ const ValidationsPage: React.FC = () => {
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            My Validation Assignments
+            {t('validations.myAssignments')}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Validation ID</TableCell>
-                  <TableCell>Analysis ID</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Approved</TableCell>
-                  <TableCell>Clinical Notes</TableCell>
-                  <TableCell>Created Date</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell>{t('validations.validationId')}</TableCell>
+                  <TableCell>{t('validations.analysisId')}</TableCell>
+                  <TableCell>{t('validations.status')}</TableCell>
+                  <TableCell>{t('validations.approved')}</TableCell>
+                  <TableCell>{t('validations.clinicalNotes')}</TableCell>
+                  <TableCell>{t('validations.createdDate')}</TableCell>
+                  <TableCell>{t('validations.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -90,12 +94,12 @@ const ValidationsPage: React.FC = () => {
                     <TableCell>
                       {validation.approved !== undefined ? (
                         <Chip
-                          label={validation.approved ? 'Yes' : 'No'}
+                          label={validation.approved ? t('common.yes') : t('common.no')}
                           color={validation.approved ? 'success' : 'error'}
                           size="small"
                         />
                       ) : (
-                        'Pending'
+                        t('validations.pending')
                       )}
                     </TableCell>
                     <TableCell>
@@ -104,10 +108,10 @@ const ValidationsPage: React.FC = () => {
                           {validation.clinicalNotes}
                         </Typography>
                       ) : (
-                        'No notes'
+                        t('validations.noNotes')
                       )}
                     </TableCell>
-                    <TableCell>{new Date(validation.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell>{formatters.formatDate(new Date(validation.createdAt))}</TableCell>
                     <TableCell>
                       {validation.status === 'pending' ? (
                         <Button
@@ -116,7 +120,7 @@ const ValidationsPage: React.FC = () => {
                           startIcon={<Assignment />}
                           onClick={() => {}}
                         >
-                          Review
+                          {t('validations.review')}
                         </Button>
                       ) : (
                         <Button
@@ -125,7 +129,7 @@ const ValidationsPage: React.FC = () => {
                           startIcon={<CheckCircle />}
                           onClick={() => {}}
                         >
-                          View
+                          {t('validations.view')}
                         </Button>
                       )}
                     </TableCell>

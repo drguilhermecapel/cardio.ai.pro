@@ -28,8 +28,10 @@ import {
   Logout,
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { logout } from '../store/slices/authSlice'
+import LanguageSelector from './LanguageSelector'
 
 const drawerWidth = 240
 
@@ -38,6 +40,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const navigate = useNavigate()
@@ -47,11 +50,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { unreadCount } = useAppSelector(state => state.notification)
 
   const menuItems = [
-    { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
-    { text: 'ECG Analysis', icon: <MonitorHeart />, path: '/ecg-analysis' },
-    { text: 'Patients', icon: <People />, path: '/patients' },
-    { text: 'Validations', icon: <Assignment />, path: '/validations' },
-    { text: 'Notifications', icon: <Notifications />, path: '/notifications' },
+    { text: t('dashboard.title'), icon: <Dashboard />, path: '/dashboard' },
+    { text: t('ecgAnalysis.title'), icon: <MonitorHeart />, path: '/ecg-analysis' },
+    { text: t('patients.title'), icon: <People />, path: '/patients' },
+    { text: t('validations.title'), icon: <Assignment />, path: '/validations' },
+    { text: t('notifications.title'), icon: <Notifications />, path: '/notifications' },
   ]
 
   const handleDrawerToggle = (): void => {
@@ -80,7 +83,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div>
       <Toolbar>
         <Typography variant="h6" noWrap component="div">
-          CardioAI Pro
+          {t('login.title')}
         </Typography>
       </Toolbar>
       <List>
@@ -128,8 +131,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {menuItems.find(item => item.path === location.pathname)?.text || 'CardioAI Pro'}
+            {menuItems.find(item => item.path === location.pathname)?.text || t('login.title')}
           </Typography>
+          <Box sx={{ mr: 2 }}>
+            <LanguageSelector />
+          </Box>
           <IconButton
             size="large"
             edge="end"
@@ -161,13 +167,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <ListItemIcon>
                 <AccountCircle fontSize="small" />
               </ListItemIcon>
-              Profile
+              {t('common.profile')}
             </MenuItem>
             <MenuItem onClick={handleLogout}>
               <ListItemIcon>
                 <Logout fontSize="small" />
               </ListItemIcon>
-              Logout
+              {t('common.logout')}
             </MenuItem>
           </Menu>
         </Toolbar>

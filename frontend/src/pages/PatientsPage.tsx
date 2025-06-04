@@ -27,8 +27,10 @@ import {
   SelectChangeEvent,
 } from '@mui/material'
 import { Add, Edit } from '@mui/icons-material'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchPatients, createPatient, clearError } from '../store/slices/patientSlice'
+import { useFormatters } from '../utils/formatters'
 
 interface PatientFormData {
   patientId: string
@@ -41,6 +43,8 @@ interface PatientFormData {
 }
 
 const PatientsPage: React.FC = () => {
+  const { t } = useTranslation()
+  const formatters = useFormatters()
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [formData, setFormData] = useState<PatientFormData>({
     patientId: '',
@@ -101,9 +105,9 @@ const PatientsPage: React.FC = () => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Patients</Typography>
+        <Typography variant="h4">{t('patients.title')}</Typography>
         <Button variant="contained" startIcon={<Add />} onClick={() => setCreateDialogOpen(true)}>
-          Add Patient
+          {t('patients.addPatient')}
         </Button>
       </Box>
 
@@ -118,19 +122,19 @@ const PatientsPage: React.FC = () => {
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Patient List
+            {t('patients.patientList')}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Patient ID</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Date of Birth</TableCell>
-                  <TableCell>Gender</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell>{t('patients.patientId')}</TableCell>
+                  <TableCell>{t('patients.name')}</TableCell>
+                  <TableCell>{t('patients.dateOfBirth')}</TableCell>
+                  <TableCell>{t('patients.gender')}</TableCell>
+                  <TableCell>{t('patients.phone')}</TableCell>
+                  <TableCell>{t('patients.email')}</TableCell>
+                  <TableCell>{t('patients.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -140,13 +144,13 @@ const PatientsPage: React.FC = () => {
                     <TableCell>
                       {patient.firstName} {patient.lastName}
                     </TableCell>
-                    <TableCell>{new Date(patient.dateOfBirth).toLocaleDateString()}</TableCell>
+                    <TableCell>{formatters.formatDate(new Date(patient.dateOfBirth))}</TableCell>
                     <TableCell>{patient.gender}</TableCell>
-                    <TableCell>{patient.phone || 'N/A'}</TableCell>
-                    <TableCell>{patient.email || 'N/A'}</TableCell>
+                    <TableCell>{patient.phone || t('common.notAvailable')}</TableCell>
+                    <TableCell>{patient.email || t('common.notAvailable')}</TableCell>
                     <TableCell>
                       <Button size="small" startIcon={<Edit />} onClick={() => {}}>
-                        Edit
+                        {t('common.edit')}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -163,13 +167,13 @@ const PatientsPage: React.FC = () => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>Add New Patient</DialogTitle>
+        <DialogTitle>{t('patients.addNewPatient')}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Patient ID"
+                label={t('patients.patientId')}
                 value={formData.patientId}
                 onChange={handleInputChange('patientId')}
                 required
@@ -177,18 +181,18 @@ const PatientsPage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth required>
-                <InputLabel>Gender</InputLabel>
-                <Select value={formData.gender} onChange={handleGenderChange} label="Gender">
-                  <MenuItem value="male">Male</MenuItem>
-                  <MenuItem value="female">Female</MenuItem>
-                  <MenuItem value="other">Other</MenuItem>
+                <InputLabel>{t('patients.gender')}</InputLabel>
+                <Select value={formData.gender} onChange={handleGenderChange} label={t('patients.gender')}>
+                  <MenuItem value="male">{t('patients.male')}</MenuItem>
+                  <MenuItem value="female">{t('patients.female')}</MenuItem>
+                  <MenuItem value="other">{t('patients.other')}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="First Name"
+                label={t('patients.firstName')}
                 value={formData.firstName}
                 onChange={handleInputChange('firstName')}
                 required
@@ -197,7 +201,7 @@ const PatientsPage: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Last Name"
+                label={t('patients.lastName')}
                 value={formData.lastName}
                 onChange={handleInputChange('lastName')}
                 required
@@ -206,7 +210,7 @@ const PatientsPage: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Date of Birth"
+                label={t('patients.dateOfBirth')}
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={handleInputChange('dateOfBirth')}
@@ -217,7 +221,7 @@ const PatientsPage: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Phone"
+                label={t('patients.phone')}
                 value={formData.phone}
                 onChange={handleInputChange('phone')}
               />
@@ -225,7 +229,7 @@ const PatientsPage: React.FC = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Email"
+                label={t('patients.email')}
                 type="email"
                 value={formData.email}
                 onChange={handleInputChange('email')}
@@ -234,13 +238,13 @@ const PatientsPage: React.FC = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setCreateDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button
             onClick={handleCreatePatient}
             variant="contained"
             disabled={!isFormValid || isLoading}
           >
-            Create Patient
+            {t('patients.createPatient')}
           </Button>
         </DialogActions>
       </Dialog>

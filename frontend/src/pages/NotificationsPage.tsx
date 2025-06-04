@@ -14,10 +14,14 @@ import {
   IconButton,
 } from '@mui/material'
 import { Notifications, Warning, Info, CheckCircle, MarkEmailRead } from '@mui/icons-material'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchNotifications, markAsRead } from '../store/slices/notificationSlice'
+import { useFormatters } from '../utils/formatters'
 
 const NotificationsPage: React.FC = () => {
+  const { t } = useTranslation()
+  const formatters = useFormatters()
   const dispatch = useAppDispatch()
   const { notifications, isLoading, error } = useAppSelector(state => state.notification)
 
@@ -62,7 +66,7 @@ const NotificationsPage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Notifications
+        {t('notifications.title')}
       </Typography>
 
       {error && (
@@ -76,7 +80,7 @@ const NotificationsPage: React.FC = () => {
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Recent Notifications
+            {t('notifications.recentNotifications')}
           </Typography>
           <List>
             {notifications.map(notification => (
@@ -92,7 +96,7 @@ const NotificationsPage: React.FC = () => {
                   !notification.isRead && (
                     <IconButton
                       edge="end"
-                      aria-label="mark as read"
+                      aria-label={t('notifications.markAsRead')}
                       onClick={() => handleMarkAsRead(notification.id)}
                     >
                       <MarkEmailRead />
@@ -110,7 +114,7 @@ const NotificationsPage: React.FC = () => {
                         color={getPriorityColor(notification.priority)}
                         size="small"
                       />
-                      {!notification.isRead && <Chip label="New" color="primary" size="small" />}
+                      {!notification.isRead && <Chip label={t('notifications.new')} color="primary" size="small" />}
                     </Box>
                   }
                   secondary={
@@ -119,7 +123,7 @@ const NotificationsPage: React.FC = () => {
                         {notification.message}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {new Date(notification.createdAt).toLocaleString()}
+                        {formatters.formatDateTime(new Date(notification.createdAt))}
                       </Typography>
                     </Box>
                   }
@@ -128,7 +132,7 @@ const NotificationsPage: React.FC = () => {
             ))}
             {notifications.length === 0 && !isLoading && (
               <ListItem>
-                <ListItemText primary="No notifications" secondary="You're all caught up!" />
+                <ListItemText primary={t('notifications.noNotifications')} secondary={t('notifications.allCaughtUp')} />
               </ListItem>
             )}
           </List>
