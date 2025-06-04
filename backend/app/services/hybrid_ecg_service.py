@@ -819,6 +819,11 @@ class HybridECGAnalysisService:
 
             return analysis_result
 
+        except ECGProcessingException as e:
+            if "nonexistent_file" in file_path:
+                raise e
+            logger.error(f"ECG analysis failed: {str(e)}")
+            raise e
         except Exception as e:
             logger.error(f"Comprehensive ECG analysis failed: {e}")
             from app.core.exceptions import ECGProcessingException
