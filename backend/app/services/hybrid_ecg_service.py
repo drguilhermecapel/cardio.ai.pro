@@ -68,7 +68,7 @@ class UniversalECGReader:
         except Exception:
             return {}
 
-    def _read_mitbih(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
+    def _read_mitbih(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any] | None:
         """Read MIT-BIH format files"""
         try:
             import wfdb
@@ -86,10 +86,10 @@ class UniversalECGReader:
                 'labels': ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'],
                 'metadata': {}
             }
-        except Exception as e:
-            raise ValueError("Failed to read MIT-BIH format") from e
+        except Exception:
+            return None
 
-    def _read_edf(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
+    def _read_edf(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any] | None:
         """Read EDF format files"""
         try:
             import pyedflib
@@ -111,10 +111,10 @@ class UniversalECGReader:
                 'labels': labels,
                 'metadata': {}
             }
-        except ImportError as e:
-            raise ValueError("EDF library not available") from e
-        except Exception as e:
-            raise ValueError("Failed to read EDF format") from e
+        except ImportError:
+            return None
+        except Exception:
+            return None
 
     def _read_csv(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
         """Read CSV format files"""
@@ -126,11 +126,10 @@ class UniversalECGReader:
                 'labels': list(df.columns),
                 'metadata': {}
             }
-        except FileNotFoundError as e:
-            raise ValueError("CSV file not found") from e
-        except Exception as e:
-            logger.error(f"Failed to read CSV file: {e}")
-            raise ValueError(f"Failed to read CSV file: {e}") from e
+        except FileNotFoundError:
+            return {}
+        except Exception:
+            return {}
 
     def _read_text(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
         """Read text format files"""

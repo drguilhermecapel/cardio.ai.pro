@@ -114,6 +114,11 @@ module = [
     "shap.*",
     "lime.*",
     "plotly.*",
+    "wfdb.*",
+    "pyedflib.*",
+    "pywt.*",
+    "sklearn.*",
+    "biosppy.*",
 ]
 ignore_missing_imports = true
 

@@ -89,7 +89,7 @@ class ECGHybridProcessor:
             logger.error(f"ECG processing failed: {e}")
             raise ECGProcessingException(f"ECG processing failed: {e}") from e
 
-    def _validate_signal(self, signal: npt.NDArray[np.float64]) -> bool:
+    def _validate_signal(self, signal: npt.NDArray[np.float64] | None) -> bool:
         """
         Validate ECG signal
 
@@ -516,8 +516,9 @@ class ECGHybridProcessor:
             result = analysis_result.copy()
 
             if require_regulatory_compliance:
-                if hasattr(self, 'regulatory_service') and self.regulatory_service:
-                    regulatory_validation = await self.regulatory_service.validate_analysis_comprehensive(analysis_result)
+                regulatory_service = getattr(self, 'regulatory_service', None)
+                if regulatory_service is not None:
+                    regulatory_validation = await regulatory_service.validate_analysis_comprehensive(analysis_result)
                     result['regulatory_compliant'] = regulatory_validation.get('status') == 'compliant'
                 else:
                     detected_findings = [
