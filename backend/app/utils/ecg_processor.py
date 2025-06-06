@@ -59,26 +59,6 @@ class ECGProcessor:
             logger.error("Failed to load ECG file %s: %s", file_path, str(e))
             raise ECGProcessingException(f"Failed to load ECG file: {str(e)}") from e
 
-    def _load_csv(self, file_path: str) -> NDArray[np.float64]:
-        """Load ECG data from CSV file."""
-        try:
-            data = np.loadtxt(file_path, delimiter=',', skiprows=1)
-            if data.ndim == 1:
-                data = data.reshape(-1, 1)
-            return data
-        except Exception as e:
-            raise ECGProcessingException(f"Failed to load CSV file: {str(e)}") from e
-
-    def _load_text(self, file_path: str) -> NDArray[np.float64]:
-        """Load ECG data from text file."""
-        try:
-            data = np.loadtxt(file_path)
-            if data.ndim == 1:
-                data = data.reshape(-1, 1)
-            return data
-        except Exception as e:
-            raise ECGProcessingException(f"Failed to load text file: {str(e)}") from e
-
     def _load_xml(self, file_path: str) -> NDArray[np.float64]:
         """Load ECG data from XML file (simplified implementation)."""
         try:

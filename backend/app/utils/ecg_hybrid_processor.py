@@ -211,7 +211,7 @@ class ECGHybridProcessor:
 
             return np.array(fallback_peaks, dtype=np.int64)
 
-    def _extract_comprehensive_features(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] = None) -> dict[str, float]:
+    def _extract_comprehensive_features(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] | None = None) -> dict[str, float]:
         """
         Extract comprehensive ECG features
 
@@ -431,7 +431,7 @@ class ECGHybridProcessor:
 
         return quality
 
-    def _analyze_heart_rate(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] = None) -> dict[str, float]:
+    def _analyze_heart_rate(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] | None = None) -> dict[str, float]:
         """
         Analyze heart rate from R peaks
 
