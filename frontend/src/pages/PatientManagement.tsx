@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
 interface Patient {
-  id: number;
-  cpf: string;
-  name: string;
-  birth_date: string;
-  gender: string;
-  phone?: string;
-  email?: string;
-  created_at: string;
+  id: number
+  cpf: string
+  name: string
+  birth_date: string
+  gender: string
+  phone?: string
+  email?: string
+  created_at: string
 }
 
 const PatientManagement: React.FC = (): JSX.Element => {
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [showForm, setShowForm] = useState(false);
+  const [patients, setPatients] = useState<Patient[]>([])
+  const [showForm, setShowForm] = useState(false)
   const [formData, setFormData] = useState({
     cpf: '',
     name: '',
@@ -21,42 +21,42 @@ const PatientManagement: React.FC = (): JSX.Element => {
     gender: '',
     phone: '',
     email: '',
-  });
+  })
 
   useEffect(() => {
-    fetchPatients();
-  }, []);
+    fetchPatients()
+  }, [])
 
   const fetchPatients = async (): Promise<void> => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       const response = await fetch(`${import.meta.env.VITE_API_URL}/patients`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      });
+      })
       if (response.ok) {
-        const data = await response.json();
-        setPatients(data);
+        const data = await response.json()
+        setPatients(data)
       }
     } catch (error) {
-      console.error('Error fetching patients:', error);
+      console.error('Error fetching patients:', error)
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       const response = await fetch(`${import.meta.env.VITE_API_URL}/patients`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-      });
+      })
 
       if (response.ok) {
         setFormData({
@@ -66,14 +66,14 @@ const PatientManagement: React.FC = (): JSX.Element => {
           gender: '',
           phone: '',
           email: '',
-        });
-        setShowForm(false);
-        fetchPatients();
+        })
+        setShowForm(false)
+        fetchPatients()
       }
     } catch (error) {
-      console.error('Error creating patient:', error);
+      console.error('Error creating patient:', error)
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -98,7 +98,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 value={formData.cpf}
-                onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                onChange={e => setFormData({ ...formData, cpf: e.target.value })}
               />
             </div>
             <div>
@@ -108,7 +108,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
             <div>
@@ -118,7 +118,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 value={formData.birth_date}
-                onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                onChange={e => setFormData({ ...formData, birth_date: e.target.value })}
               />
             </div>
             <div>
@@ -127,7 +127,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 value={formData.gender}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                onChange={e => setFormData({ ...formData, gender: e.target.value })}
               >
                 <option value="">Selecione</option>
                 <option value="M">Masculino</option>
@@ -141,7 +141,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
                 type="tel"
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={e => setFormData({ ...formData, phone: e.target.value })}
               />
             </div>
             <div>
@@ -150,7 +150,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
                 type="email"
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
             <div className="md:col-span-2 flex space-x-4">
@@ -174,9 +174,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
 
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-            Lista de Pacientes
-          </h3>
+          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Lista de Pacientes</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -199,7 +197,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {patients.map((patient) => (
+                {patients.map(patient => (
                   <tr key={patient.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {patient.name}
@@ -224,7 +222,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PatientManagement;
+export default PatientManagement

@@ -1,54 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import React, { useState, useEffect } from 'react'
+import { useAuth } from '../hooks/useAuth'
 
 interface DashboardStats {
-  totalPatients: number;
-  totalRecords: number;
-  totalConsultations: number;
-  aiDiagnostics: number;
+  totalPatients: number
+  totalRecords: number
+  totalConsultations: number
+  aiDiagnostics: number
 }
 
 const Dashboard: React.FC = (): JSX.Element => {
-  const { user } = useAuth();
+  const { user } = useAuth()
   const [stats, setStats] = useState<DashboardStats>({
     totalPatients: 0,
     totalRecords: 0,
     totalConsultations: 0,
     aiDiagnostics: 0,
-  });
+  })
 
   useEffect(() => {
     const fetchStats = async (): Promise<void> => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token')
         const headers = {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-        };
+        }
 
         const [patientsRes, recordsRes, consultationsRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/patients`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/medical-records`, { headers }),
           fetch(`${import.meta.env.VITE_API_URL}/consultations`, { headers }),
-        ]);
+        ])
 
-        const patients = await patientsRes.json();
-        const records = await recordsRes.json();
-        const consultations = await consultationsRes.json();
+        const patients = await patientsRes.json()
+        const records = await recordsRes.json()
+        const consultations = await consultationsRes.json()
 
         setStats({
           totalPatients: patients.length || 0,
           totalRecords: records.length || 0,
           totalConsultations: consultations.length || 0,
           aiDiagnostics: Math.floor(Math.random() * 50) + 10,
-        });
+        })
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error('Error fetching stats:', error)
       }
-    };
+    }
 
-    fetchStats();
-  }, []);
+    fetchStats()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -68,12 +68,8 @@ const Dashboard: React.FC = (): JSX.Element => {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total de Pacientes
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {stats.totalPatients}
-                  </dd>
+                  <dt className="text-sm font-medium text-gray-500 truncate">Total de Pacientes</dt>
+                  <dd className="text-lg font-medium text-gray-900">{stats.totalPatients}</dd>
                 </dl>
               </div>
             </div>
@@ -90,12 +86,8 @@ const Dashboard: React.FC = (): JSX.Element => {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Prontuários
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {stats.totalRecords}
-                  </dd>
+                  <dt className="text-sm font-medium text-gray-500 truncate">Prontuários</dt>
+                  <dd className="text-lg font-medium text-gray-900">{stats.totalRecords}</dd>
                 </dl>
               </div>
             </div>
@@ -112,12 +104,8 @@ const Dashboard: React.FC = (): JSX.Element => {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Consultas
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {stats.totalConsultations}
-                  </dd>
+                  <dt className="text-sm font-medium text-gray-500 truncate">Consultas</dt>
+                  <dd className="text-lg font-medium text-gray-900">{stats.totalConsultations}</dd>
                 </dl>
               </div>
             </div>
@@ -134,12 +122,8 @@ const Dashboard: React.FC = (): JSX.Element => {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Diagnósticos IA
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {stats.aiDiagnostics}
-                  </dd>
+                  <dt className="text-sm font-medium text-gray-500 truncate">Diagnósticos IA</dt>
+                  <dd className="text-lg font-medium text-gray-900">{stats.aiDiagnostics}</dd>
                 </dl>
               </div>
             </div>
@@ -149,13 +133,9 @@ const Dashboard: React.FC = (): JSX.Element => {
 
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
-            Conformidade Regulatória
-          </h3>
+          <h3 className="text-lg leading-6 font-medium text-gray-900">Conformidade Regulatória</h3>
           <div className="mt-2 max-w-xl text-sm text-gray-500">
-            <p>
-              Sistema em conformidade com ANVISA, FDA e regulamentações da União Europeia.
-            </p>
+            <p>Sistema em conformidade com ANVISA, FDA e regulamentações da União Europeia.</p>
           </div>
           <div className="mt-5">
             <div className="flex items-center space-x-4">
@@ -173,7 +153,7 @@ const Dashboard: React.FC = (): JSX.Element => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

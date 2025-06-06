@@ -1,65 +1,81 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { 
-  Calendar, 
-  FileText, 
-  Users, 
-  BrainCircuit, 
-  Video, 
-  Bell, 
-  Search, 
-  Menu, 
-  X, 
-  Sun, 
-  Moon, 
-  Wifi, 
-  WifiOff, 
-  Shield, 
-  ChevronRight, 
-  LogOut, 
-  User, 
-  Eye, 
-  Microscope, 
-  TrendingUp, 
-  TrendingDown, 
-  Activity, 
-  AlertTriangle, 
-  Pill, 
-  ScanLine, 
-  Sparkles 
-} from 'lucide-react';
-import { AuthProvider } from './contexts/AuthContext';
-import { useAuth } from './hooks/useAuth';
-import LoginPage from './pages/LoginPage';
+import { useState, useEffect } from 'react'
+import { BrowserRouter as Router } from 'react-router-dom'
+import {
+  Calendar,
+  FileText,
+  Users,
+  BrainCircuit,
+  Video,
+  Bell,
+  Search,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  Wifi,
+  WifiOff,
+  Shield,
+  ChevronRight,
+  LogOut,
+  User,
+  Eye,
+  Microscope,
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  AlertTriangle,
+  Pill,
+  ScanLine,
+  Sparkles,
+} from 'lucide-react'
+import { AuthProvider } from './contexts/AuthContext'
+import { useAuth } from './hooks/useAuth'
+import LoginPage from './pages/LoginPage'
 
 const SPEIApp = (): JSX.Element => {
-  const [activeModule, setActiveModule] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [theme, setTheme] = useState('dark');
-  const [isOnline] = useState(true);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
+  const [activeModule, setActiveModule] = useState('dashboard')
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [theme, setTheme] = useState('dark')
+  const [isOnline] = useState(true)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [aiAssistantOpen, setAiAssistantOpen] = useState(false)
   const [notifications] = useState([
     { id: 1, type: 'alert', message: 'Paciente João Silva requer atenção imediata', time: '2 min' },
     { id: 2, type: 'info', message: 'Nova atualização do sistema disponível', time: '1h' },
-    { id: 3, type: 'success', message: 'Backup realizado com sucesso', time: '3h' }
-  ]);
+    { id: 3, type: 'success', message: 'Backup realizado com sucesso', time: '3h' },
+  ])
 
   const [userProfile] = useState({
     name: 'Dr. Admin',
     specialty: 'Clínico Geral',
-    photo: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&h=100&fit=crop&crop=face',
+    photo:
+      'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&h=100&fit=crop&crop=face',
     performanceScore: 98,
-    aiLevel: 'Expert'
-  });
+    aiLevel: 'Expert',
+  })
 
   const modules = [
     { id: 'dashboard', name: 'Dashboard', icon: Activity, color: 'from-blue-500 to-cyan-500' },
     { id: 'patients', name: 'Pacientes', icon: Users, color: 'from-green-500 to-emerald-500' },
-    { id: 'medical-records', name: 'Prontuários', icon: FileText, color: 'from-purple-500 to-pink-500' },
-    { id: 'ai-diagnostics', name: 'IA Diagnóstica', icon: BrainCircuit, color: 'from-orange-500 to-red-500' },
-    { id: 'telemedicine', name: 'Telemedicina', icon: Video, color: 'from-indigo-500 to-purple-500' }
-  ];
+    {
+      id: 'medical-records',
+      name: 'Prontuários',
+      icon: FileText,
+      color: 'from-purple-500 to-pink-500',
+    },
+    {
+      id: 'ai-diagnostics',
+      name: 'IA Diagnóstica',
+      icon: BrainCircuit,
+      color: 'from-orange-500 to-red-500',
+    },
+    {
+      id: 'telemedicine',
+      name: 'Telemedicina',
+      icon: Video,
+      color: 'from-indigo-500 to-purple-500',
+    },
+  ]
 
   const NotificationPanel = (): JSX.Element => (
     <div className="absolute top-12 right-0 w-80 bg-gray-900/95 backdrop-blur-xl rounded-xl border border-gray-700 shadow-2xl z-50">
@@ -67,14 +83,21 @@ const SPEIApp = (): JSX.Element => {
         <h3 className="text-lg font-semibold text-white">Notificações</h3>
       </div>
       <div className="max-h-96 overflow-y-auto">
-        {notifications.map((notification) => (
-          <div key={notification.id} className="p-4 border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+        {notifications.map(notification => (
+          <div
+            key={notification.id}
+            className="p-4 border-b border-gray-800 hover:bg-gray-800/50 transition-colors"
+          >
             <div className="flex items-start space-x-3">
-              <div className={`w-2 h-2 rounded-full mt-2 ${
-                notification.type === 'alert' ? 'bg-red-500' :
-                notification.type === 'info' ? 'bg-blue-500' :
-                'bg-green-500'
-              }`} />
+              <div
+                className={`w-2 h-2 rounded-full mt-2 ${
+                  notification.type === 'alert'
+                    ? 'bg-red-500'
+                    : notification.type === 'info'
+                      ? 'bg-blue-500'
+                      : 'bg-green-500'
+                }`}
+              />
               <div className="flex-1">
                 <p className="text-sm text-white">{notification.message}</p>
                 <p className="text-xs text-gray-400 mt-1">{notification.time} atrás</p>
@@ -84,16 +107,12 @@ const SPEIApp = (): JSX.Element => {
         ))}
       </div>
     </div>
-  );
+  )
 
   const AIAssistant = (): JSX.Element | null => {
-    const [messages] = useState([
-      { id: 1, type: 'ai', content: 'Olá! Como posso ajudá-lo hoje?' }
-    ]);
+    const [messages] = useState([{ id: 1, type: 'ai', content: 'Olá! Como posso ajudá-lo hoje?' }])
 
-
-
-    if (!aiAssistantOpen) return null;
+    if (!aiAssistantOpen) return null
 
     return (
       <div className="fixed bottom-20 right-6 w-96 h-96 bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-gray-700 shadow-2xl z-50">
@@ -102,7 +121,7 @@ const SPEIApp = (): JSX.Element => {
             <Sparkles className="w-5 h-5 text-purple-400" />
             Assistente IA
           </h3>
-          <button 
+          <button
             onClick={() => setAiAssistantOpen(false)}
             className="p-1 rounded-lg hover:bg-gray-700 transition-colors"
           >
@@ -110,21 +129,24 @@ const SPEIApp = (): JSX.Element => {
           </button>
         </div>
         <div className="flex-1 p-4 h-80 overflow-y-auto">
-          {messages.map((message) => (
-            <div key={message.id} className={`mb-3 ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
-              <div className={`inline-block p-3 rounded-xl max-w-xs ${
-                message.type === 'user' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-800 text-gray-200'
-              }`}>
+          {messages.map(message => (
+            <div
+              key={message.id}
+              className={`mb-3 ${message.type === 'user' ? 'text-right' : 'text-left'}`}
+            >
+              <div
+                className={`inline-block p-3 rounded-xl max-w-xs ${
+                  message.type === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-200'
+                }`}
+              >
                 <p className="text-sm">{message.content}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   const Header = (): JSX.Element => {
     return (
@@ -137,7 +159,7 @@ const SPEIApp = (): JSX.Element => {
             >
               <Menu className="w-5 h-5 text-gray-400 group-hover:text-white" />
             </button>
-            
+
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -165,13 +187,13 @@ const SPEIApp = (): JSX.Element => {
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <button 
+              <button
                 onClick={() => {}}
                 className="p-2 rounded-xl hover:bg-gray-800 transition-all group"
               >
                 <ScanLine className="w-5 h-5 text-gray-400 group-hover:text-white" />
               </button>
-              <button 
+              <button
                 onClick={() => setAiAssistantOpen(!aiAssistantOpen)}
                 className="p-2 rounded-xl hover:bg-gray-800 transition-all group bg-gradient-to-r from-purple-600/10 to-pink-600/10"
               >
@@ -179,16 +201,20 @@ const SPEIApp = (): JSX.Element => {
               </button>
             </div>
 
-            <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl text-sm ${
-              isOnline 
-                ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
-                : 'bg-red-500/10 text-red-400 border border-red-500/20'
-            }`}>
+            <div
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl text-sm ${
+                isOnline
+                  ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                  : 'bg-red-500/10 text-red-400 border border-red-500/20'
+              }`}
+            >
               <div className="relative">
                 {isOnline ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
-                <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${
-                  isOnline ? 'bg-green-400' : 'bg-red-400'
-                } animate-pulse`} />
+                <span
+                  className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${
+                    isOnline ? 'bg-green-400' : 'bg-red-400'
+                  } animate-pulse`}
+                />
               </div>
               <span className="hidden sm:inline">{isOnline ? 'Online' : 'Offline'}</span>
             </div>
@@ -221,8 +247,8 @@ const SPEIApp = (): JSX.Element => {
 
             <div className="flex items-center space-x-3 pl-4 border-l border-gray-800">
               <div className="relative">
-                <img 
-                  src={userProfile.photo} 
+                <img
+                  src={userProfile.photo}
                   alt={userProfile.name}
                   className="w-10 h-10 rounded-xl ring-2 ring-cyan-500/20"
                 />
@@ -241,18 +267,20 @@ const SPEIApp = (): JSX.Element => {
           </div>
         </div>
       </header>
-    );
-  };
+    )
+  }
 
   const Sidebar = (): JSX.Element => (
-    <aside className={`fixed left-0 top-16 h-full bg-gray-900/90 backdrop-blur-xl text-white transition-all duration-300 z-30 border-r border-gray-800 ${
-      sidebarOpen ? 'w-64' : 'w-20'
-    }`}>
+    <aside
+      className={`fixed left-0 top-16 h-full bg-gray-900/90 backdrop-blur-xl text-white transition-all duration-300 z-30 border-r border-gray-800 ${
+        sidebarOpen ? 'w-64' : 'w-20'
+      }`}
+    >
       <nav className="mt-8 px-4">
-        {modules.map((module) => {
-          const Icon = module.icon;
-          const isActive = activeModule === module.id;
-          
+        {modules.map(module => {
+          const Icon = module.icon
+          const isActive = activeModule === module.id
+
           return (
             <button
               key={module.id}
@@ -262,26 +290,26 @@ const SPEIApp = (): JSX.Element => {
               }`}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
-              
-              <div className={`relative flex items-center space-x-3 px-4 py-3 ${
-                isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
-              }`}>
+
+              <div
+                className={`relative flex items-center space-x-3 px-4 py-3 ${
+                  isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                }`}
+              >
                 <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'animate-pulse' : ''}`} />
                 {sidebarOpen && (
                   <>
                     <span className="font-medium">{module.name}</span>
-                    {isActive && (
-                      <ChevronRight className="w-4 h-4 ml-auto" />
-                    )}
+                    {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
                   </>
                 )}
               </div>
-              
+
               {isActive && (
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full shadow-lg shadow-white/50" />
               )}
             </button>
-          );
+          )
         })}
       </nav>
 
@@ -294,90 +322,90 @@ const SPEIApp = (): JSX.Element => {
         </button>
       </div>
     </aside>
-  );
+  )
 
   const DashboardModule = (): JSX.Element => {
     const stats = [
-      { 
-        title: 'Pacientes Hoje', 
-        value: '24', 
-        change: '+12%', 
-        icon: Users, 
+      {
+        title: 'Pacientes Hoje',
+        value: '24',
+        change: '+12%',
+        icon: Users,
         color: 'from-blue-500 to-cyan-500',
         bgGlow: 'bg-blue-500/20',
-        trend: 'up'
+        trend: 'up',
       },
-      { 
-        title: 'Consultas Realizadas', 
-        value: '18', 
-        change: '+5%', 
-        icon: Calendar, 
+      {
+        title: 'Consultas Realizadas',
+        value: '18',
+        change: '+5%',
+        icon: Calendar,
         color: 'from-green-500 to-emerald-500',
         bgGlow: 'bg-green-500/20',
-        trend: 'up'
+        trend: 'up',
       },
-      { 
-        title: 'Exames Pendentes', 
-        value: '7', 
-        change: '-3%', 
-        icon: Microscope, 
+      {
+        title: 'Exames Pendentes',
+        value: '7',
+        change: '-3%',
+        icon: Microscope,
         color: 'from-yellow-500 to-orange-500',
         bgGlow: 'bg-yellow-500/20',
-        trend: 'down'
+        trend: 'down',
       },
-      { 
-        title: 'IA Insights', 
-        value: '12', 
-        change: '+28%', 
-        icon: BrainCircuit, 
+      {
+        title: 'IA Insights',
+        value: '12',
+        change: '+28%',
+        icon: BrainCircuit,
         color: 'from-purple-500 to-pink-500',
         bgGlow: 'bg-purple-500/20',
-        trend: 'up'
-      }
-    ];
+        trend: 'up',
+      },
+    ]
 
     const recentPatients = [
-      { 
-        id: 1, 
-        name: 'Maria Silva', 
-        age: 45, 
-        lastVisit: '10:30', 
-        status: 'Em consulta', 
+      {
+        id: 1,
+        name: 'Maria Silva',
+        age: 45,
+        lastVisit: '10:30',
+        status: 'Em consulta',
         priority: 'high',
         aiRisk: 85,
-        conditions: ['Hipertensão', 'Diabetes']
+        conditions: ['Hipertensão', 'Diabetes'],
       },
-      { 
-        id: 2, 
-        name: 'João Santos', 
-        age: 62, 
-        lastVisit: '09:45', 
-        status: 'Aguardando', 
+      {
+        id: 2,
+        name: 'João Santos',
+        age: 62,
+        lastVisit: '09:45',
+        status: 'Aguardando',
         priority: 'medium',
         aiRisk: 60,
-        conditions: ['Cardiopatia']
+        conditions: ['Cardiopatia'],
       },
-      { 
-        id: 3, 
-        name: 'Ana Costa', 
-        age: 28, 
-        lastVisit: '09:00', 
-        status: 'Finalizado', 
+      {
+        id: 3,
+        name: 'Ana Costa',
+        age: 28,
+        lastVisit: '09:00',
+        status: 'Finalizado',
         priority: 'low',
         aiRisk: 15,
-        conditions: []
-      }
-    ];
+        conditions: [],
+      },
+    ]
 
     const ActivityChart = (): JSX.Element => {
-      const [data, setData] = useState(Array.from({ length: 20 }, () => Math.random() * 100));
-      
+      const [data, setData] = useState(Array.from({ length: 20 }, () => Math.random() * 100))
+
       useEffect(() => {
         const interval = setInterval(() => {
-          setData(prev => [...prev.slice(1), Math.random() * 100]);
-        }, 1000);
-        return () => clearInterval(interval);
-      }, []);
+          setData(prev => [...prev.slice(1), Math.random() * 100])
+        }, 1000)
+        return () => clearInterval(interval)
+      }, [])
 
       return (
         <div className="h-32 flex items-end space-x-1">
@@ -389,8 +417,8 @@ const SPEIApp = (): JSX.Element => {
             />
           ))}
         </div>
-      );
-    };
+      )
+    }
 
     return (
       <div className="space-y-6">
@@ -409,19 +437,23 @@ const SPEIApp = (): JSX.Element => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, idx) => {
-            const Icon = stat.icon;
+            const Icon = stat.icon
             return (
               <div key={idx} className="relative group">
-                <div className={`absolute inset-0 ${stat.bgGlow} rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300`} />
-                
+                <div
+                  className={`absolute inset-0 ${stat.bgGlow} rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300`}
+                />
+
                 <div className="relative bg-gray-900/80 backdrop-blur-xl rounded-2xl p-6 border border-gray-700 hover:border-gray-600 transition-all duration-300">
                   <div className="flex items-center justify-between mb-4">
                     <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <div className={`flex items-center space-x-1 text-sm font-medium ${
-                      stat.trend === 'up' ? 'text-green-400' : 'text-red-400'
-                    }`}>
+                    <div
+                      className={`flex items-center space-x-1 text-sm font-medium ${
+                        stat.trend === 'up' ? 'text-green-400' : 'text-red-400'
+                      }`}
+                    >
                       {stat.trend === 'up' ? (
                         <TrendingUp className="w-4 h-4" />
                       ) : (
@@ -432,7 +464,7 @@ const SPEIApp = (): JSX.Element => {
                   </div>
                   <h3 className="text-3xl font-bold text-white mb-1">{stat.value}</h3>
                   <p className="text-sm text-gray-400">{stat.title}</p>
-                  
+
                   <div className="mt-4 h-8 flex items-end space-x-0.5">
                     {Array.from({ length: 8 }, (_, i) => (
                       <div
@@ -444,7 +476,7 @@ const SPEIApp = (): JSX.Element => {
                   </div>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
 
@@ -482,7 +514,7 @@ const SPEIApp = (): JSX.Element => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
-                {recentPatients.map((patient) => (
+                {recentPatients.map(patient => (
                   <tr key={patient.id} className="hover:bg-gray-800/30 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -490,35 +522,47 @@ const SPEIApp = (): JSX.Element => {
                           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
                             <User className="w-5 h-5 text-gray-400" />
                           </div>
-                          <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full ${
-                            patient.priority === 'high' ? 'bg-red-500' :
-                            patient.priority === 'medium' ? 'bg-yellow-500' :
-                            'bg-green-500'
-                          } ring-2 ring-gray-900`} />
+                          <div
+                            className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full ${
+                              patient.priority === 'high'
+                                ? 'bg-red-500'
+                                : patient.priority === 'medium'
+                                  ? 'bg-yellow-500'
+                                  : 'bg-green-500'
+                            } ring-2 ring-gray-900`}
+                          />
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-white">{patient.name}</div>
-                          <div className="text-xs text-gray-400">{patient.age} anos • {patient.conditions.join(', ') || 'Sem condições'}</div>
+                          <div className="text-xs text-gray-400">
+                            {patient.age} anos • {patient.conditions.join(', ') || 'Sem condições'}
+                          </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
                         <div className="w-24 bg-gray-700 rounded-full h-2 overflow-hidden">
-                          <div 
+                          <div
                             className={`h-full rounded-full bg-gradient-to-r ${
-                              patient.aiRisk > 70 ? 'from-red-500 to-orange-500' :
-                              patient.aiRisk > 40 ? 'from-yellow-500 to-orange-500' :
-                              'from-green-500 to-emerald-500'
+                              patient.aiRisk > 70
+                                ? 'from-red-500 to-orange-500'
+                                : patient.aiRisk > 40
+                                  ? 'from-yellow-500 to-orange-500'
+                                  : 'from-green-500 to-emerald-500'
                             }`}
                             style={{ width: `${patient.aiRisk}%` }}
                           />
                         </div>
-                        <span className={`text-xs font-medium ${
-                          patient.aiRisk > 70 ? 'text-red-400' :
-                          patient.aiRisk > 40 ? 'text-yellow-400' :
-                          'text-green-400'
-                        }`}>
+                        <span
+                          className={`text-xs font-medium ${
+                            patient.aiRisk > 70
+                              ? 'text-red-400'
+                              : patient.aiRisk > 40
+                                ? 'text-yellow-400'
+                                : 'text-green-400'
+                          }`}
+                        >
                           {patient.aiRisk}%
                         </span>
                       </div>
@@ -527,13 +571,15 @@ const SPEIApp = (): JSX.Element => {
                       {patient.lastVisit}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        patient.status === 'Em consulta' 
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-                        patient.status === 'Aguardando' 
-                          ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
-                        'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                      }`}>
+                      <span
+                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          patient.status === 'Em consulta'
+                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                            : patient.status === 'Aguardando'
+                              ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                              : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                        }`}
+                      >
                         {patient.status}
                       </span>
                     </td>
@@ -620,9 +666,9 @@ const SPEIApp = (): JSX.Element => {
                 <span className="text-xs text-gray-400">Live</span>
               </div>
             </div>
-            
+
             <ActivityChart />
-            
+
             <div className="grid grid-cols-3 gap-4 mt-6">
               <div className="text-center">
                 <p className="text-2xl font-bold text-cyan-400">98.2%</p>
@@ -645,9 +691,9 @@ const SPEIApp = (): JSX.Element => {
             { icon: Calendar, label: 'Nova Consulta', color: 'from-blue-500 to-cyan-500' },
             { icon: Pill, label: 'Prescrição Rápida', color: 'from-green-500 to-emerald-500' },
             { icon: Microscope, label: 'Solicitar Exame', color: 'from-purple-500 to-pink-500' },
-            { icon: BrainCircuit, label: 'Análise IA', color: 'from-orange-500 to-red-500' }
+            { icon: BrainCircuit, label: 'Análise IA', color: 'from-orange-500 to-red-500' },
           ].map((action, idx) => {
-            const Icon = action.icon;
+            const Icon = action.icon
             return (
               <button
                 key={idx}
@@ -661,17 +707,17 @@ const SPEIApp = (): JSX.Element => {
                   <span className="text-sm text-gray-300">{action.label}</span>
                 </div>
               </button>
-            );
+            )
           })}
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   const renderModule = (): JSX.Element => {
     switch (activeModule) {
       case 'dashboard':
-        return <DashboardModule />;
+        return <DashboardModule />
       default:
         return (
           <div className="flex items-center justify-center h-[calc(100vh-200px)]">
@@ -686,9 +732,9 @@ const SPEIApp = (): JSX.Element => {
               <p className="text-gray-500 text-sm mt-2">Em breve novas funcionalidades</p>
             </div>
           </div>
-        );
+        )
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-950">
@@ -697,10 +743,10 @@ const SPEIApp = (): JSX.Element => {
       <div className="relative z-10">
         <Header />
         <Sidebar />
-        
-        <main className={`transition-all duration-300 ${
-          sidebarOpen ? 'ml-64' : 'ml-20'
-        } mt-16 p-6`}>
+
+        <main
+          className={`transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-20'} mt-16 p-6`}
+        >
           {renderModule()}
         </main>
 
@@ -715,17 +761,17 @@ const SPEIApp = (): JSX.Element => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
 function App(): JSX.Element {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth()
 
   if (!isAuthenticated) {
-    return <LoginPage />;
+    return <LoginPage />
   }
 
-  return <SPEIApp />;
+  return <SPEIApp />
 }
 
 function AppWithAuth(): JSX.Element {
@@ -735,7 +781,7 @@ function AppWithAuth(): JSX.Element {
         <App />
       </Router>
     </AuthProvider>
-  );
+  )
 }
 
-export default AppWithAuth;
+export default AppWithAuth

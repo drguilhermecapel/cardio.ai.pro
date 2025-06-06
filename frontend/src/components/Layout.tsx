@@ -1,28 +1,28 @@
-import React from 'react';
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import React from 'react'
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 const Layout: React.FC = (): JSX.Element | null => {
-  const { user, logout, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { user, logout, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   React.useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate('/login')
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate])
 
   if (!isAuthenticated) {
-    return null;
+    return null
   }
 
   const handleLogout = (): void => {
-    logout();
-    navigate('/login');
-  };
+    logout()
+    navigate('/login')
+  }
 
-  const isActive = (path: string): boolean => location.pathname === path;
+  const isActive = (path: string): boolean => location.pathname === path
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -108,7 +108,7 @@ const Layout: React.FC = (): JSX.Element | null => {
         </main>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Layout;
+export default Layout
