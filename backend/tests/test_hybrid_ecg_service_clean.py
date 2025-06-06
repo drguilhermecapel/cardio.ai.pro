@@ -102,16 +102,16 @@ class TestHybridECGAnalysisServiceComprehensive:
         """Test signal validation - covers lines 871-918"""
         ecg_data, fs = sample_ecg_data
         
-        is_valid, issues = service.validate_signal(sample_signal)
+        is_valid, issues = service.validate_signal(valid_signal)
         assert isinstance(is_valid, bool)
         assert isinstance(issues, list)
         
         short_signal = np.array([1, 2, 3])
-        is_valid, issues = service.validate_signal(sample_signal)
+        is_valid, issues = service.validate_signal(valid_signal)
         assert is_valid == False
         assert len(issues) > 0
         
-        is_valid, issues = service.validate_signal(sample_signal)
+        is_valid, issues = service.validate_signal(valid_signal)
         assert is_valid == False
         assert 'Invalid sampling rate' in str(issues)
     
@@ -214,7 +214,7 @@ class TestHybridECGAnalysisServiceComprehensive:
     
     def test_get_supported_formats(self, service):
         """Test supported formats - covers lines 1635-1637"""
-        formats = service.supported_formats)
+        formats = service.supported_formats
         
         assert isinstance(formats, list)
         assert len(formats) > 0
@@ -267,30 +267,30 @@ class TestAdvancedPreprocessor:
         return AdvancedPreprocessor()
     
     @pytest.fixture
-    def sample_signal(self):
+    def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
     
     def test_preprocessor_initialization(self, preprocessor):
         """Test preprocessor initialization - covers lines 283-285"""
         assert preprocessor is not None
     
-    def test_preprocess_signal(self, preprocessor, sample_signal):
+    def test_preprocess_signal(self, preprocessor, valid_signal):
         """Test signal preprocessing - covers lines 287-342"""
         fs = 500
         
-        processed = await preprocessor.preprocess_signal(sample_signal, fs)
+        processed = await preprocessor.preprocess_signal(valid_signal, fs)
         
         assert isinstance(processed, np.ndarray)
-        assert len(processed) == len(sample_signal)
+        assert len(processed) == len(valid_signal)
     
-    def test_filter_signal(self, preprocessor, sample_signal):
+    def test_filter_signal(self, preprocessor, valid_signal):
         """Test signal filtering - covers lines 361-373"""
         fs = 500
         
-        filtered = preprocessor.filter_signal(sample_signal, fs)
+        filtered = preprocessor.filter_signal(valid_signal, fs)
         
         assert isinstance(filtered, np.ndarray)
-        assert len(filtered) == len(sample_signal)
+        assert len(filtered) == len(valid_signal)
 
 
 class TestFeatureExtractor:
@@ -301,43 +301,43 @@ class TestFeatureExtractor:
         return FeatureExtractor()
     
     @pytest.fixture
-    def sample_signal(self):
+    def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
     
     def test_extractor_initialization(self, extractor):
         """Test extractor initialization - covers lines 421-423"""
         assert extractor is not None
     
-    def test_extract_all_features(self, extractor, sample_signal):
+    def test_extract_all_features(self, extractor, valid_signal):
         """Test feature extraction - covers lines 425-448"""
         fs = 500
         
-        features = extractor.extract_all_features(sample_signal, fs)
+        features = extractor.extract_all_features(valid_signal, fs)
         
         assert isinstance(features, dict)
         assert len(features) > 0
     
-    def test_extract_time_domain_features(self, extractor, sample_signal):
+    def test_extract_time_domain_features(self, extractor, valid_signal):
         """Test time domain features - covers lines 485-498"""
         fs = 500
         
-        features = extractor.extract_time_domain_features(sample_signal, fs)
+        features = extractor.extract_time_domain_features(valid_signal, fs)
         
         assert isinstance(features, dict)
         assert 'heart_rate' in features or 'rr_intervals' in features
     
-    def test_extract_frequency_domain_features(self, extractor, sample_signal):
+    def test_extract_frequency_domain_features(self, extractor, valid_signal):
         """Test frequency domain features - covers lines 500-517"""
         fs = 500
         
-        features = extractor.extract_frequency_domain_features(sample_signal, fs)
+        features = extractor.extract_frequency_domain_features(valid_signal, fs)
         
         assert isinstance(features, dict)
     
-    def test_extract_morphological_features(self, extractor, sample_signal):
+    def test_extract_morphological_features(self, extractor, valid_signal):
         """Test morphological features - covers lines 519-546"""
         fs = 500
         
-        features = extractor.extract_morphological_features(sample_signal, fs)
+        features = extractor.extract_morphological_features(valid_signal, fs)
         
         assert isinstance(features, dict)

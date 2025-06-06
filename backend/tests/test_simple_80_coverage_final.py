@@ -27,7 +27,7 @@ class TestSimple80CoverageFinal:
         status = service.get_model_info()
         assert isinstance(status, dict)
         
-        formats = service.supported_formats)
+        formats = service.supported_formats
         assert isinstance(formats, list)
     
     def test_ecg_hybrid_processor_basic_instantiation(self):
@@ -41,7 +41,7 @@ class TestSimple80CoverageFinal:
         
         signal = np.random.randn(1000).astype(np.float64)
         
-        validation = processor.validate_signal(sample_signal))
+        validation = processor.validate_signal(valid_signal))
         
         r_peaks = processor.detect_r_peaks(signal)
         assert isinstance(r_peaks, np.ndarray)

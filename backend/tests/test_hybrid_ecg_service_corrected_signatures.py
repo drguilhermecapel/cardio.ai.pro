@@ -105,7 +105,7 @@ class TestHybridECGAnalysisServiceCorrected:
         """Test signal validation - covers lines 871-918"""
         ecg_data, fs = sample_ecg_data
         
-        result = service.validate_signal(sample_signal)
+        result = service.validate_signal(valid_signal)
         
         assert isinstance(result, dict)
         assert 'is_valid' in result
@@ -114,7 +114,7 @@ class TestHybridECGAnalysisServiceCorrected:
         assert 'sampling_rate' in result
         
         empty_signal = np.array([])
-        result_empty = service.validate_signal(sample_signal)
+        result_empty = service.validate_signal(valid_signal)
         
         assert result_empty['is_valid'] is False
         assert len(result_empty['issues']) > 0
@@ -224,7 +224,7 @@ class TestHybridECGAnalysisServiceCorrected:
     
     def test_get_supported_formats(self, service):
         """Test supported formats - covers lines 1635-1637"""
-        formats = service.supported_formats)
+        formats = service.supported_formats
         
         assert isinstance(formats, list)
         assert len(formats) > 0
@@ -279,30 +279,30 @@ class TestAdvancedPreprocessorCorrected:
         return AdvancedPreprocessor()
     
     @pytest.fixture
-    def sample_signal(self):
+    def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
     
     def test_preprocessor_initialization(self, preprocessor):
         """Test preprocessor initialization - covers lines 283-285"""
         assert preprocessor is not None
     
-    def test_preprocess_signal(self, preprocessor, sample_signal):
+    def test_preprocess_signal(self, preprocessor, valid_signal):
         """Test signal preprocessing - covers lines 287-342"""
         fs = 500
         
-        processed = await preprocessor.preprocess_signal(sample_signal, fs)
+        processed = await preprocessor.preprocess_signal(valid_signal, fs)
         
         assert isinstance(processed, np.ndarray)
-        assert len(processed) == len(sample_signal)
+        assert len(processed) == len(valid_signal)
     
-    def test_filter_signal(self, preprocessor, sample_signal):
+    def test_filter_signal(self, preprocessor, valid_signal):
         """Test signal filtering - covers lines 361-373"""
         fs = 500
         
-        filtered = preprocessor.filter_signal(sample_signal, fs)
+        filtered = preprocessor.filter_signal(valid_signal, fs)
         
         assert isinstance(filtered, np.ndarray)
-        assert len(filtered) == len(sample_signal)
+        assert len(filtered) == len(valid_signal)
 
 
 class TestFeatureExtractorCorrected:
@@ -313,16 +313,16 @@ class TestFeatureExtractorCorrected:
         return FeatureExtractor()
     
     @pytest.fixture
-    def sample_signal(self):
+    def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
     
     def test_extractor_initialization(self, extractor):
         """Test extractor initialization - covers lines 421-423"""
         assert extractor is not None
     
-    def test_extract_all_features(self, extractor, sample_signal):
+    def test_extract_all_features(self, extractor, valid_signal):
         """Test comprehensive feature extraction - covers lines 425-448"""
-        features = extractor.extract_all_features(sample_signal)
+        features = extractor.extract_all_features(valid_signal)
         
         assert isinstance(features, dict)
         assert len(features) > 0
@@ -332,24 +332,24 @@ class TestFeatureExtractorCorrected:
             if feature in features:  # Some features may not be present if no R peaks detected
                 assert isinstance(features[feature], (int, float))
     
-    def test_extract_time_domain_features(self, extractor, sample_signal):
+    def test_extract_time_domain_features(self, extractor, valid_signal):
         """Test time domain features - covers lines 485-498"""
-        features = extractor.extract_time_domain_features(sample_signal)
+        features = extractor.extract_time_domain_features(valid_signal)
         
         assert isinstance(features, dict)
         assert 'mean' in features
         assert 'std' in features
     
-    def test_extract_frequency_domain_features(self, extractor, sample_signal):
+    def test_extract_frequency_domain_features(self, extractor, valid_signal):
         """Test frequency domain features - covers lines 500-517"""
-        features = extractor.extract_frequency_domain_features(sample_signal)
+        features = extractor.extract_frequency_domain_features(valid_signal)
         
         assert isinstance(features, dict)
         assert 'dominant_frequency' in features
     
-    def test_extract_morphological_features(self, extractor, sample_signal):
+    def test_extract_morphological_features(self, extractor, valid_signal):
         """Test morphological features - covers lines 519-546"""
-        features = extractor.extract_morphological_features(sample_signal)
+        features = extractor.extract_morphological_features(valid_signal)
         
         assert isinstance(features, dict)
         assert 'qrs_duration' in features

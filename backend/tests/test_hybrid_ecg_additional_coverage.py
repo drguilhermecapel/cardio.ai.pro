@@ -188,10 +188,10 @@ class TestHybridECGAdditionalCoverage:
     def test_hybrid_service_validate_signal_edge_cases(self, hybrid_service):
         """Test validate_signal with edge cases"""
         short_signal = np.random.randn(10).astype(np.float64)
-        result = hybrid_service.validate_signal(sample_signal)
+        result = hybrid_service.validate_signal(valid_signal)
 
         long_signal = np.random.randn(100000).astype(np.float64)
-        result = hybrid_service.validate_signal(sample_signal)
+        result = hybrid_service.validate_signal(valid_signal)
 
     def test_hybrid_service_detect_atrial_fibrillation_edge_cases(self, hybrid_service):
         """Test _detect_atrial_fibrillation with edge cases"""
@@ -236,8 +236,7 @@ class TestHybridECGAdditionalCoverage:
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_hybrid_service_analyze_ecg_comprehensive_async_edge_cases(self, hybrid_service):
+    async def test_hybrid_service_analyze_ecg_comprehensive_async_edge_cases(self, hybrid_service):
         """Test analyze_ecg_comprehensive_async with edge cases"""
         try:
             ecg_data = np.ones(1000).astype(np.float64)
@@ -294,8 +293,7 @@ async def test_hybrid_service_analyze_ecg_comprehensive_async_edge_cases(self, h
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_hybrid_service_assess_signal_quality_edge_cases(self, hybrid_service):
+    async def test_hybrid_service_assess_signal_quality_edge_cases(self, hybrid_service):
         """Test _assess_signal_quality with edge cases"""
         constant_signal = np.ones(1000)
         result = await hybrid_service._assess_signal_quality(constant_signal)

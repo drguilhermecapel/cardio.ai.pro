@@ -14,7 +14,7 @@ def notification_service(test_db):
 
 
 @pytest.mark.asyncio
-async def test_send_validation_assignment(notification_service):
+    async def test_send_validation_assignment(notification_service):
     """Test sending validation assignment notification."""
     notification_service.repository.create_notification = AsyncMock()
     notification_service._send_notification = AsyncMock()
@@ -30,7 +30,7 @@ async def test_send_validation_assignment(notification_service):
 
 
 @pytest.mark.asyncio
-async def test_send_urgent_validation_alert(notification_service):
+    async def test_send_urgent_validation_alert(notification_service):
     """Test sending urgent validation alert."""
     notification_service.repository.create_notification = AsyncMock()
     notification_service._send_notification = AsyncMock()
@@ -45,7 +45,7 @@ async def test_send_urgent_validation_alert(notification_service):
 
 
 @pytest.mark.asyncio
-async def test_send_validation_complete(notification_service):
+    async def test_send_validation_complete(notification_service):
     """Test sending validation complete notification."""
     notification_service.repository.create_notification = AsyncMock()
     notification_service._send_notification = AsyncMock()
@@ -61,7 +61,7 @@ async def test_send_validation_complete(notification_service):
 
 
 @pytest.mark.asyncio
-async def test_send_analysis_complete(notification_service):
+    async def test_send_analysis_complete(notification_service):
     """Test sending analysis complete notification."""
     notification_service.repository.create_notification = AsyncMock()
     notification_service._send_notification = AsyncMock()
@@ -77,7 +77,7 @@ async def test_send_analysis_complete(notification_service):
 
 
 @pytest.mark.asyncio
-async def test_get_user_notifications(notification_service):
+    async def test_get_user_notifications(notification_service):
     """Test getting user notifications."""
     mock_notifications = [Notification(), Notification()]
     notification_service.repository.get_user_notifications = AsyncMock(return_value=mock_notifications)
@@ -92,7 +92,7 @@ async def test_get_user_notifications(notification_service):
 
 
 @pytest.mark.asyncio
-async def test_mark_notification_read(notification_service):
+    async def test_mark_notification_read(notification_service):
     """Test marking notification as read."""
     notification_service.repository.mark_notification_read = AsyncMock(return_value=True)
     
@@ -105,7 +105,7 @@ async def test_mark_notification_read(notification_service):
 
 
 @pytest.mark.asyncio
-async def test_mark_all_read(notification_service):
+    async def test_mark_all_read(notification_service):
     """Test marking all notifications as read."""
     notification_service.repository.mark_all_read = AsyncMock(return_value=5)
     
@@ -115,7 +115,7 @@ async def test_mark_all_read(notification_service):
 
 
 @pytest.mark.asyncio
-async def test_get_unread_count(notification_service):
+    async def test_get_unread_count(notification_service):
     """Test getting unread notification count."""
     notification_service.repository.get_unread_count = AsyncMock(return_value=3)
     

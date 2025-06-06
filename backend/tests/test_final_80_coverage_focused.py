@@ -30,12 +30,12 @@ class TestFinal80CoverageFocused:
         status = service.get_model_info()
         assert isinstance(status, dict)
         
-        formats = service.supported_formats)
+        formats = service.supported_formats
         assert isinstance(formats, list)
         
         signal = np.random.randn(1000).astype(np.float64)
         
-        validation_result = service.validate_signal(sample_signal)
+        validation_result = service.validate_signal(valid_signal)
         
         analysis_result = await service.analyze_ecg_comprehensive(signal)
         assert isinstance(analysis_result, dict)
@@ -98,7 +98,7 @@ class TestFinal80CoverageFocused:
         
         signal = np.random.randn(1000).astype(np.float64)
         
-        validation = processor.validate_signal(sample_signal))
+        validation = processor.validate_signal(valid_signal))
         
         r_peaks = processor.detect_r_peaks(signal)
         assert isinstance(r_peaks, np.ndarray)
@@ -136,7 +136,7 @@ class TestFinal80CoverageFocused:
         info = processor.get_processing_info()
         assert isinstance(info, dict)
         
-        formats = processor.supported_formats)
+        formats = processor.supported_formats
         assert isinstance(formats, list)
         
         standards = processor.get_regulatory_standards()
@@ -184,7 +184,7 @@ class TestFinal80CoverageFocused:
         hr = processor.calculate_heart_rate([100, 200, 300], sampling_rate=500)
         assert isinstance(hr, (int, float))
         
-        validation = processor.validate_signal(sample_signal))
+        validation = processor.validate_signal(valid_signal))
         
         intervals = processor.calculate_intervals([100, 200, 300], sampling_rate=500)
         assert isinstance(intervals, dict)

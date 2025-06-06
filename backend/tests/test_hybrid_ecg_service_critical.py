@@ -102,8 +102,7 @@ class TestECGCriticalSafety:
         assert hasattr(service, 'ecg_logger')
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_stemi_detection_emergency_timing(self, ecg_service, stemi_signal):
+    async def test_stemi_detection_emergency_timing(self, ecg_service, stemi_signal):
         """CRITICAL: STEMI detection must complete within emergency timeframe."""
         start_time = time.time()
         
@@ -135,8 +134,7 @@ async def test_stemi_detection_emergency_timing(self, ecg_service, stemi_signal)
         assert result["clinical_urgency"] == "critical"
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_normal_ecg_no_false_alarms(self, ecg_service, normal_signal):
+    async def test_normal_ecg_no_false_alarms(self, ecg_service, normal_signal):
         """CRITICAL: Normal ECG must not generate false critical alarms."""
         with patch.object(ecg_service.ecg_reader, 'read_ecg', return_value={
             'signal': np.array([[0.1, 0.2, 0.3, 0.2, 0.1, 0.0, -0.1] * 1000]),
@@ -179,8 +177,7 @@ async def test_normal_ecg_no_false_alarms(self, ecg_service, normal_signal):
                 ecg_service._validate_ecg_signal(invalid_signal)
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_vfib_emergency_detection(self, ecg_service, vfib_signal):
+    async def test_vfib_emergency_detection(self, ecg_service, vfib_signal):
         """CRITICAL: Ventricular fibrillation must be detected immediately."""
         start_time = time.time()
         
@@ -212,8 +209,7 @@ async def test_vfib_emergency_detection(self, ecg_service, vfib_signal):
         assert result["clinical_urgency"] == "critical"
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_timeout_handling_emergency(self, ecg_service):
+    async def test_timeout_handling_emergency(self, ecg_service):
         """CRITICAL: Analysis timeout must provide safe fallback."""
         with pytest.raises(ECGProcessingException) as exc_info:
             await eawait cg_service.analyze_ecg_comprehensive(
@@ -225,8 +221,7 @@ async def test_timeout_handling_emergency(self, ecg_service):
         assert "analysis failed" in str(exc_info.value).lower()
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_model_failure_fallback_safety(self, ecg_service):
+    async def test_model_failure_fallback_safety(self, ecg_service):
         """CRITICAL: AI model failure must have safe medical fallback."""
         import tempfile
         import os

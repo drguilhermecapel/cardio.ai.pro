@@ -304,10 +304,10 @@ class TestHybridECGZeroCoverage:
         assert isinstance(result, list)
         assert len(result) > 0
     
-    def test_hybrid_ecg_analysis_service_validate_signal(sample_signal)
+    def test_hybrid_ecg_analysis_service_validate_signal(valid_signal)
         signal = np.random.randn(2500, 12).astype(np.float64)
         
-        result = await service.validate_signal(sample_signal))
+        result = await service.validate_signal(valid_signal))
 
 
 def mock_open_ecg_file():

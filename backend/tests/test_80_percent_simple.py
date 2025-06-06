@@ -9,7 +9,7 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test.db"
 
 
 @pytest.mark.asyncio
-async def test_achieve_80_percent_coverage():
+    async def test_achieve_80_percent_coverage():
     """Test to achieve exactly 80% coverage by targeting specific missing lines."""
     
     from app.core.security import verify_password, get_password_hash

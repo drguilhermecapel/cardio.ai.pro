@@ -153,7 +153,7 @@ class TestHybridECGAnalysisService:
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.array([1.0, 2.0, 3.0], dtype=np.float64)
         
-        result = await service.validate_signal(sample_signal)
+        result = await service.validate_signal(valid_signal)
         assert result is True
     
     def test_validate_signal_invalid_empty(self, mock_db, mock_validation_service):
@@ -161,7 +161,7 @@ class TestHybridECGAnalysisService:
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.array([], dtype=np.float64)
         
-        result = await service.validate_signal(sample_signal)
+        result = await service.validate_signal(valid_signal)
         assert result is False
     
     def test_get_supported_pathologies(self, mock_db, mock_validation_service):
@@ -186,12 +186,11 @@ class TestHybridECGAnalysisService:
         assert 'confidence' in result
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_analyze_ecg_comprehensive_with_data(self, mock_db, mock_validation_service, ecg_sample_data):
+    async def test_analyze_ecg_comprehensive_with_data(self, mock_db, mock_validation_service, ecg_sample_data):
         """Test comprehensive ECG analysis with direct data."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         
-        result = await sawait ervice.analyze_ecg_comprehensive(
+        result = await service.analyze_ecg_comprehensive(
             ecg_data=ecg_sample_data,
             patient_id=1,
             analysis_id="test_123"
@@ -203,8 +202,7 @@ async def test_analyze_ecg_comprehensive_with_data(self, mock_db, mock_validatio
         assert result['patient_id'] == 1
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_analyze_ecg_comprehensive_no_input(self, mock_db, mock_validation_service):
+    async def test_analyze_ecg_comprehensive_no_input(self, mock_db, mock_validation_service):
         """Test comprehensive ECG analysis with no input."""
         from app.core.exceptions import ECGProcessingException
         
@@ -214,8 +212,7 @@ async def test_analyze_ecg_comprehensive_no_input(self, mock_db, mock_validation
             await service.analyze_ecg_comprehensive()
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_assess_signal_quality(self, mock_db, mock_validation_service):
+    async def test_assess_signal_quality(self, mock_db, mock_validation_service):
         """Test signal quality assessment."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.random.randn(1000).astype(np.float64)

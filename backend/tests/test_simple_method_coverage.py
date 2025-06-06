@@ -100,15 +100,14 @@ class TestSimpleMethodCoverage:
         assert isinstance(pathologies, list)
         
         signal = np.random.randn(2000, 12)
-        result = await service.validate_signal(sample_signal)
+        result = await service.validate_signal(valid_signal)
         
         predictions = service._simulate_predictions(signal)
         assert isinstance(predictions, dict)
         assert len(predictions) > 0
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_hybrid_ecg_service_async_basic(self):
+    async def test_hybrid_ecg_service_async_basic(self):
         """Test HybridECGAnalysisService async methods"""
         mock_db = Mock()
         mock_ml_service = Mock()

@@ -14,12 +14,11 @@ class TestLowCoverageServicesTargeted:
         return AsyncMock()
     
     @pytest.fixture
-    def sample_signal(self):
+    def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_notification_service_coverage(self, mock_db):
+    async def test_notification_service_coverage(self, mock_db):
         """Test notification service with 15% coverage"""
         from app.services.notification_service import NotificationService
         from app.core.constants import ClinicalUrgency, NotificationPriority
@@ -56,8 +55,7 @@ async def test_notification_service_coverage(self, mock_db):
             assert isinstance(result, int)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_patient_service_coverage(self, mock_db):
+    async def test_patient_service_coverage(self, mock_db):
         """Test patient service with 20% coverage"""
         from app.services.patient_service import PatientService
         from app.schemas.patient import PatientCreate
@@ -122,8 +120,7 @@ async def test_patient_service_coverage(self, mock_db):
             assert isinstance(result, tuple)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_user_service_coverage(self, mock_db):
+    async def test_user_service_coverage(self, mock_db):
         """Test user service with 32% coverage"""
         from app.services.user_service import UserService
         from app.schemas.user import UserCreate
@@ -169,8 +166,7 @@ async def test_user_service_coverage(self, mock_db):
             assert result is None
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_ecg_repository_coverage(self, mock_db):
+    async def test_ecg_repository_coverage(self, mock_db):
         """Test ECG repository with 20% coverage"""
         from app.repositories.ecg_repository import ECGRepository
         from app.models.ecg_analysis import ECGAnalysis
@@ -210,8 +206,7 @@ async def test_ecg_repository_coverage(self, mock_db):
             assert isinstance(result, bool)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_validation_repository_coverage(self, mock_db):
+    async def test_validation_repository_coverage(self, mock_db):
         """Test validation repository with 29% coverage"""
         from app.repositories.validation_repository import ValidationRepository
         from app.models.validation import Validation

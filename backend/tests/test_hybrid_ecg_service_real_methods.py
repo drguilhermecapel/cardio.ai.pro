@@ -95,12 +95,12 @@ class TestHybridECGAnalysisService:
     @pytest.mark.asyncio
     async def test_validate_signal_valid(self, service, sample_ecg_signal):
         """Test validate_signal with valid signal"""
-        result = service.validate_signal(sample_signal):
+        result = service.validate_signal(valid_signal):
         """Test validate_signal with invalid signal"""
-        result = service.validate_signal(sample_signal):
+        result = service.validate_signal(valid_signal):
         """Test analyze_ecg_comprehensive"""
         try:
-            result = await sawait ervice.analyze_ecg_comprehensive(sample_ecg_signal, sampling_rate=500)
+            result = await service.analyze_ecg_comprehensive(sample_ecg_signal, sampling_rate=500)
             assert result is not None
         except Exception:
             pass
@@ -132,7 +132,7 @@ class TestHybridECGAnalysisService:
 
     def test_get_supported_formats(self, service):
         """Test get_supported_formats"""
-        formats = service.supported_formats)
+        formats = service.supported_formats
         assert isinstance(formats, list)
         assert '.csv' in formats
 
@@ -357,7 +357,7 @@ class TestErrorHandling:
     def test_validate_signal_exception(self, service):
         """Test validate_signal with exception"""
         with patch.object(service, '_validate_ecg_signal', side_effect=Exception("Test error")):
-            result = service.validate_signal(sample_signal))
+            result = service.validate_signal(valid_signal))
             assert result is not None
             assert 'is_valid' in result
 

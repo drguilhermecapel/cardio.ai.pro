@@ -24,7 +24,7 @@ class TestBasicCoverageBoost:
         processor = ECGHybridProcessor()
         
         valid_signal = np.random.randn(2000).astype(np.float64)
-        assert processor._validate_signal(sample_signal)
+        assert processor._validate_signal(valid_signal)
         assert result.dtype == np.float64
     
     def test_ecg_hybrid_processor_r_peaks(self):
@@ -60,8 +60,7 @@ class TestECGServiceCoverage:
         assert ecg_service is not None
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_create_analysis_async(self, ecg_service):
+    async def test_create_analysis_async(self, ecg_service):
         """Test async ECG analysis creation"""
         if hasattr(ecg_service, 'create_analysis'):
             with patch.object(ecg_service.repository, 'create_analysis', return_value=Mock()):
@@ -168,8 +167,7 @@ class TestValidationServiceCoverage:
         assert validation_service is not None
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_create_validation(self, validation_service):
+    async def test_create_validation(self, validation_service):
         """Test validation creation"""
         if hasattr(validation_service, 'create_validation'):
             with patch.object(validation_service.repository, 'get_validation_by_analysis', return_value=None):
@@ -202,8 +200,7 @@ async def test_create_validation(self, validation_service):
             assert isinstance(result, bool)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_run_automated_validation_rules(self, validation_service):
+    async def test_run_automated_validation_rules(self, validation_service):
         """Test automated validation rules"""
         if hasattr(validation_service, 'run_automated_validation_rules'):
             mock_analysis = Mock()

@@ -134,8 +134,7 @@ class TestHybridECGServiceSimple:
         assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_hybrid_service_init(self, hybrid_service):
+    async def test_hybrid_service_init(self, hybrid_service):
         """Test HybridECGAnalysisService initialization"""
         assert hybrid_service is not None
         assert hasattr(hybrid_service, 'analyze_ecg_comprehensive')
@@ -144,8 +143,7 @@ async def test_hybrid_service_init(self, hybrid_service):
         assert hasattr(hybrid_service, 'feature_extractor')
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_hybrid_service_analyze_ecg_comprehensive_simple(self, hybrid_service, sample_ecg_data):
+    async def test_hybrid_service_analyze_ecg_comprehensive_simple(self, hybrid_service, sample_ecg_data):
         """Test comprehensive ECG analysis - simplified"""
         with patch.object(hybrid_service.ecg_reader, 'read_ecg', return_value={'signal': sample_ecg_data, 'sampling_rate': 500}):
             with patch.object(hybrid_service.preprocessor, 'preprocess_signal', return_value=sample_ecg_data):

@@ -51,8 +51,7 @@ class TestServicesBasicCoverage:
         assert service.notification_service is not None
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_ecg_service_get_analysis_by_id(self):
+    async def test_ecg_service_get_analysis_by_id(self):
         """Test ECGAnalysisService get_analysis_by_id"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -65,8 +64,7 @@ async def test_ecg_service_get_analysis_by_id(self):
             assert result is None
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_ecg_service_get_analyses_by_patient(self):
+    async def test_ecg_service_get_analyses_by_patient(self):
         """Test ECGAnalysisService get_analyses_by_patient"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -79,8 +77,7 @@ async def test_ecg_service_get_analyses_by_patient(self):
             assert isinstance(result, list)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_ecg_service_search_analyses(self):
+    async def test_ecg_service_search_analyses(self):
         """Test ECGAnalysisService search_analyses"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -93,8 +90,7 @@ async def test_ecg_service_search_analyses(self):
             assert isinstance(result, tuple)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_ecg_service_delete_analysis(self):
+    async def test_ecg_service_delete_analysis(self):
         """Test ECGAnalysisService delete_analysis"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -107,8 +103,7 @@ async def test_ecg_service_delete_analysis(self):
             assert result is True
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_ecg_service_calculate_file_info(self):
+    async def test_ecg_service_calculate_file_info(self):
         """Test ECGAnalysisService _calculate_file_info"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -124,8 +119,7 @@ async def test_ecg_service_calculate_file_info(self):
             assert len(result) == 2
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_ecg_service_extract_measurements(self):
+    async def test_ecg_service_extract_measurements(self):
         """Test ECGAnalysisService _extract_measurements"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -139,8 +133,7 @@ async def test_ecg_service_extract_measurements(self):
             assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_ecg_service_generate_annotations(self):
+    async def test_ecg_service_generate_annotations(self):
         """Test ECGAnalysisService _generate_annotations"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -155,8 +148,7 @@ async def test_ecg_service_generate_annotations(self):
             assert isinstance(result, list)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_ecg_service_assess_clinical_urgency(self):
+    async def test_ecg_service_assess_clinical_urgency(self):
         """Test ECGAnalysisService _assess_clinical_urgency"""
         mock_db = Mock()
         mock_ml_service = Mock()

@@ -88,7 +88,8 @@ class TestCorrectedCriticalServices:
         assert hasattr(preprocessor, 'fs')
         assert preprocessor.fs == 250
     
-    def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
+    @pytest.mark.asyncio
+    async def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
         """Test signal preprocessing with correct method name"""
         preprocessor = AdvancedPreprocessor()
         
@@ -182,18 +183,21 @@ class TestCorrectedCriticalServices:
                         service = ECGAnalysisService(mock_db, Mock(), Mock())
                         assert service is not None
     
-    def test_hybrid_ecg_service_validate_signal(sample_signal):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_service_validate_signal(self, valid_signal):
         """Test signal validation"""
         service = HybridECGAnalysisService()
-        result = await service.validate_signal(sample_signal)
+        result = await service.validate_signal(valid_signal)
     
-    def test_hybrid_ecg_service_get_supported_pathologies(self):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_service_get_supported_pathologies(self):
         """Test getting supported pathologies"""
         service = HybridECGAnalysisService()
         result = await service.get_supported_pathologies()
         assert isinstance(result, list)
     
-    def test_hybrid_ecg_service_analyze_ecg_file(self, sample_ecg_data):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_service_analyze_ecg_file(self, sample_ecg_data):
         """Test ECG file analysis"""
         service = HybridECGAnalysisService()
         
@@ -209,7 +213,8 @@ class TestCorrectedCriticalServices:
                 result = await service.analyze_ecg_file("/fake/test.csv")
                 assert isinstance(result, dict)
     
-    def test_hybrid_ecg_service_analyze_ecg_signal(self, sample_ecg_data):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_service_analyze_ecg_signal(self, sample_ecg_data):
         """Test ECG signal analysis"""
         service = HybridECGAnalysisService()
         
@@ -219,8 +224,7 @@ class TestCorrectedCriticalServices:
                 assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
+    async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
         """Test comprehensive ECG analysis"""
         service = HybridECGAnalysisService()
         
@@ -234,5 +238,5 @@ async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_dat
         with patch.object(service.ecg_reader, 'read_ecg', return_value=mock_ecg_data):
             with patch.object(service.preprocessor, 'preprocess_signal', return_value=sample_ecg_data):
                 with patch.object(service.feature_extractor, 'extract_all_features', return_value={}):
-                    result = await sawait ervice.analyze_ecg_comprehensive("/fake/test.csv")
+                    result = await service.analyze_ecg_comprehensive("/fake/test.csv")
                     assert isinstance(result, dict)

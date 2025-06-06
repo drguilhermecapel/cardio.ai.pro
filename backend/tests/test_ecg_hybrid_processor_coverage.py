@@ -20,7 +20,7 @@ class TestECGHybridProcessorCoverage:
         """Test signal validation with valid signal"""
         processor = ECGHybridProcessor()
         valid_signal = np.random.randn(2000).astype(np.float64)
-        result = processor._validate_signal(sample_signal)
+        result = processor._validate_signal(valid_signal)
         assert len(result) > 0
     
     def test_detect_r_peaks(self):
@@ -122,12 +122,11 @@ class TestECGHybridProcessorCoverage:
     def test_get_supported_formats(self):
         """Test get supported formats"""
         processor = ECGHybridProcessor()
-        formats = processor.supported_formats)
+        formats = processor.supported_formats
         assert isinstance(formats, list)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_get_system_status(self):
+    async def test_get_system_status(self):
         """Test get system status"""
         processor = ECGHybridProcessor()
         status = await processor.get_model_info()

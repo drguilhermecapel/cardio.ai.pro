@@ -9,7 +9,7 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test.db"
 
 
 @pytest.mark.asyncio
-async def test_ecg_endpoints_specific_lines():
+    async def test_ecg_endpoints_specific_lines():
     """Test specific ECG endpoint lines for coverage boost."""
     from fastapi.testclient import TestClient
     from app.main import app
@@ -39,7 +39,7 @@ async def test_ecg_endpoints_specific_lines():
 
 
 @pytest.mark.asyncio
-async def test_ecg_service_specific_lines():
+    async def test_ecg_service_specific_lines():
     """Test specific ECG service lines for coverage boost."""
     from app.services.ecg_service import ECGAnalysisService
     
@@ -67,7 +67,7 @@ async def test_ecg_service_specific_lines():
 
 
 @pytest.mark.asyncio
-async def test_ml_model_service_specific_lines():
+    async def test_ml_model_service_specific_lines():
     """Test specific ML model service lines for coverage boost."""
     from app.services.ml_model_service import MLModelService
     
@@ -90,7 +90,7 @@ async def test_ml_model_service_specific_lines():
 
 
 @pytest.mark.asyncio
-async def test_validation_service_specific_lines():
+    async def test_validation_service_specific_lines():
     """Test specific validation service lines for coverage boost."""
     from app.services.validation_service import ValidationService
     
@@ -112,7 +112,7 @@ async def test_validation_service_specific_lines():
 
 
 @pytest.mark.asyncio
-async def test_user_service_specific_lines():
+    async def test_user_service_specific_lines():
     """Test specific user service lines for coverage boost."""
     from app.services.user_service import UserService
     
@@ -133,7 +133,7 @@ async def test_user_service_specific_lines():
 
 
 @pytest.mark.asyncio
-async def test_notification_service_specific_lines():
+    async def test_notification_service_specific_lines():
     """Test specific notification service lines for coverage boost."""
     from app.services.notification_service import NotificationService
     
@@ -154,7 +154,7 @@ async def test_notification_service_specific_lines():
 
 
 @pytest.mark.asyncio
-async def test_patient_service_specific_lines():
+    async def test_patient_service_specific_lines():
     """Test specific patient service lines for coverage boost."""
     from app.services.patient_service import PatientService
     
@@ -175,7 +175,7 @@ async def test_patient_service_specific_lines():
 
 
 @pytest.mark.asyncio
-async def test_utils_specific_lines():
+    async def test_utils_specific_lines():
     """Test specific utility lines for coverage boost."""
     try:
         from app.utils.ecg_processor import ECGProcessor
@@ -206,7 +206,7 @@ async def test_utils_specific_lines():
 
 
 @pytest.mark.asyncio
-async def test_security_specific_lines():
+    async def test_security_specific_lines():
     """Test specific security lines for coverage boost."""
     from app.core.security import create_access_token, verify_password, get_password_hash
     

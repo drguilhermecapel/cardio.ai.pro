@@ -67,9 +67,9 @@ class TestHybridECGDirectImport:
         pathologies = hybrid_service.get_supported_pathologies()
         assert isinstance(pathologies, list)
 
-    def test_validate_signal(sample_signal):
+    def test_validate_signal(valid_signal):
         """Test validate_signal method"""
-        result = hybrid_service.validate_signal(sample_signal)
+        result = hybrid_service.validate_signal(valid_signal)
         assert "is_valid" in result
 
     def test_simulate_predictions(self, hybrid_service):
@@ -159,8 +159,7 @@ class TestHybridECGDirectImport:
         assert "quality" in result
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
+    async def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
         """Test _assess_signal_quality method"""
         signal_1d = sample_ecg_signal[:, 0]
         result = await hybrid_service._assess_signal_quality(signal_1d)
@@ -207,7 +206,7 @@ async def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
 
     def test_get_supported_formats(self, hybrid_service):
         """Test get_supported_formats method"""
-        result = hybrid_service.supported_formats)
+        result = hybrid_service.supported_formats
         assert isinstance(result, list)
         assert len(result) > 0
 
@@ -217,8 +216,7 @@ async def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_analyze_ecg_comprehensive_async(self, hybrid_service):
+    async def test_analyze_ecg_comprehensive_async(self, hybrid_service):
         """Test analyze_ecg_comprehensive_async method"""
         with patch.object(hybrid_service.reader, 'read_ecg') as mock_read:
             mock_read.return_value = np.random.randn(1000).astype(np.float64)
@@ -243,8 +241,7 @@ async def test_analyze_ecg_comprehensive_async(self, hybrid_service):
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_run_simplified_analysis(self, hybrid_service):
+    async def test_run_simplified_analysis(self, hybrid_service):
         """Test _run_simplified_analysis method"""
         signal_data = {"test": "data"}
         features = {"heart_rate": 75}
@@ -254,8 +251,7 @@ async def test_run_simplified_analysis(self, hybrid_service):
         assert "simplified" in result
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-async def test_detect_pathologies(self, hybrid_service):
+    async def test_detect_pathologies(self, hybrid_service):
         """Test _detect_pathologies method"""
         signal_data = {"test": "data"}
         features = {"heart_rate": 105, "qt_interval": 460}

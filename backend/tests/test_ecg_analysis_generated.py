@@ -8,5 +8,5 @@ from unittest.mock import Mock, AsyncMock, patch
 import numpy as np
 from datetime import datetime
 
-from app.endpoints.ecg_analysis import 
+from app.api.v1.endpoints.ecg_analysis import router  
 

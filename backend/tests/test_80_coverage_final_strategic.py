@@ -14,7 +14,8 @@ from typing import Any, Dict, List
 class Test80CoverageFinalStrategic:
     """Strategic test suite targeting 80% coverage with maximum impact"""
     
-    def test_hybrid_ecg_service_zero_coverage_828_lines(self):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_service_zero_coverage_828_lines(self):
         """Test HybridECGAnalysisService - 828 lines at 0% coverage = massive impact"""
         from app.services.hybrid_ecg_service import HybridECGAnalysisService
         
@@ -31,11 +32,11 @@ class Test80CoverageFinalStrategic:
         status = service.get_model_info()
         assert isinstance(status, dict)
         
-        formats = service.supported_formats)
+        formats = service.supported_formats
         assert isinstance(formats, list)
         
         signal = np.random.randn(1000)
-        validation_result = service.validate_signal(sample_signal)
+        validation_result = service.validate_signal(signal)
         
         analysis_result = await service.analyze_ecg_comprehensive(signal)
         assert isinstance(analysis_result, dict)
@@ -58,7 +59,7 @@ class Test80CoverageFinalStrategic:
         
         signal = np.random.randn(1000).astype(np.float64)
         
-        validation = processor.validate_signal(sample_signal))
+        validation = processor.validate_signal(signal)
         
         r_peaks = processor.detect_r_peaks(signal)
         assert isinstance(r_peaks, np.ndarray)
@@ -78,7 +79,7 @@ class Test80CoverageFinalStrategic:
         info = processor.get_processing_info()
         assert isinstance(info, dict)
         
-        formats = processor.supported_formats)
+        formats = processor.supported_formats
         assert isinstance(formats, list)
         
         standards = processor.get_regulatory_standards()
@@ -90,7 +91,8 @@ class Test80CoverageFinalStrategic:
         processor.reset_processor()
         processor.clear_cache()
     
-    def test_ecg_processor_low_coverage_271_lines(self):
+    @pytest.mark.asyncio
+    async def test_ecg_processor_low_coverage_271_lines(self):
         """Test ECGProcessor - 271 lines at 12% coverage = good impact"""
         from app.utils.ecg_processor import ECGProcessor
         
@@ -113,7 +115,7 @@ class Test80CoverageFinalStrategic:
         hr = processor.calculate_heart_rate([100, 200, 300], sampling_rate=500)
         assert isinstance(hr, (int, float))
         
-        validation = processor.validate_signal(sample_signal))
+        validation = processor.validate_signal(signal)
         
         intervals = processor.calculate_intervals([100, 200, 300], sampling_rate=500)
         assert isinstance(intervals, dict)
