@@ -3,13 +3,13 @@ Hybrid ECG Analysis Service
 Integrates multiple AI architectures for comprehensive ECG analysis
 """
 
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import datetime
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
 import structlog
-from datetime import datetime
 
 try:
     import wfdb
@@ -154,7 +154,7 @@ class UniversalECGReader:
             return None
         except Exception:
             return None
-    
+
     def _read_xml(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any] | None:
         """Read XML format ECG files"""
         try:
@@ -167,10 +167,10 @@ class UniversalECGReader:
                 }
             import xml.etree.ElementTree as ET
             tree = ET.parse(filepath)
-            root = tree.getroot()
-            
+            _ = tree.getroot()  # Parse but don't store unused root
+
             signal_data = np.random.randn(1000, 12).astype(np.float64)  # Placeholder
-            
+
             return {
                 'signal': signal_data,
                 'sampling_rate': sampling_rate or 500,
@@ -262,7 +262,7 @@ class UniversalECGReader:
         import logging
         logger = logging.getLogger(__name__)
         logger.warning(f"Image reading not yet implemented for {filepath}")
-        
+
         return {
             'signal': np.random.randn(1000, 1).astype(np.float64) * 0.1,
             'sampling_rate': 500,
@@ -353,11 +353,11 @@ class AdvancedPreprocessor:
 
         baseline = sig.medfilt(signal, kernel_size=window_size)
         return signal - baseline
-    
+
     def remove_baseline_wander(self, signal: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Remove baseline wander from ECG signal"""
         return self._remove_baseline_wandering(signal)
-    
+
     def filter_signal(self, signal: npt.NDArray[np.float64], filter_type: str = 'bandpass') -> npt.NDArray[np.float64]:
         """Apply filtering to ECG signal"""
         try:
@@ -371,7 +371,7 @@ class AdvancedPreprocessor:
         except Exception as e:
             logger.error(f"Signal filtering failed: {str(e)}")
             return signal
-    
+
     def remove_powerline_interference(self, signal: npt.NDArray[np.float64], freq: float = 50.0) -> npt.NDArray[np.float64]:
         """Remove powerline interference (50/60 Hz)"""
         return self._remove_powerline_interference(signal)
@@ -481,66 +481,66 @@ class FeatureExtractor:
             features['r_amplitude_std'] = 0.0
 
         return features
-    
+
     def extract_time_domain_features(self, signal: npt.NDArray[np.float64]) -> dict[str, float]:
         """Extract time domain features from ECG signal"""
         try:
             features = {}
-            
+
             features['mean'] = float(np.mean(signal))
             features['std'] = float(np.std(signal))
             features['variance'] = float(np.var(signal))
             features['rms'] = float(np.sqrt(np.mean(signal**2)))
             features['peak_to_peak'] = float(np.ptp(signal))
-            
+
             return features
         except Exception:
             return {}
-    
+
     def extract_frequency_domain_features(self, signal: npt.NDArray[np.float64]) -> dict[str, float]:
         """Extract frequency domain features from ECG signal"""
         try:
             features = {}
-            
+
             # FFT-based features
             fft = np.fft.fft(signal)
             freqs = np.fft.fftfreq(len(signal), 1/self.fs)
             power_spectrum = np.abs(fft)**2
-            
+
             dominant_freq_idx = np.argmax(power_spectrum[:len(power_spectrum)//2])
             features['dominant_frequency'] = float(freqs[dominant_freq_idx])
-            
+
             features['spectral_centroid'] = float(np.sum(freqs[:len(freqs)//2] * power_spectrum[:len(power_spectrum)//2]) / np.sum(power_spectrum[:len(power_spectrum)//2]))
-            
+
             return features
         except Exception:
             return {}
-    
+
     def extract_morphological_features(self, signal: npt.NDArray[np.float64]) -> dict[str, float]:
         """Extract morphological features from ECG signal"""
         try:
             features = {}
-            
+
             features['signal_length'] = float(len(signal))
             features['zero_crossings'] = float(np.sum(np.diff(np.sign(signal)) != 0))
             features['amplitude_range'] = float(np.max(signal) - np.min(signal))
-            
+
             from scipy.signal import find_peaks
             peaks, _ = find_peaks(signal, height=np.std(signal))
             features['peak_count'] = float(len(peaks))
-            
+
             if len(peaks) > 1:
                 features['mean_peak_interval'] = float(np.mean(np.diff(peaks)))
             else:
                 features['mean_peak_interval'] = 0.0
-            
+
             # Add expected features for tests
             features['qrs_duration'] = 0.08  # typical QRS duration in seconds
             features['pr_interval'] = 0.16   # typical PR interval in seconds
             features['qt_interval'] = 0.40   # typical QT interval in seconds
             features['p_wave_amplitude'] = 0.1  # typical P wave amplitude
             features['t_wave_amplitude'] = 0.3  # typical T wave amplitude
-            
+
             return features
         except Exception:
             return {}
@@ -750,11 +750,11 @@ class HybridECGAnalysisService:
         self.feature_extractor = FeatureExtractor(sampling_rate)
         self.repository = db  # Repository alias for test compatibility
         self.ecg_logger = logger  # Logger for test compatibility
-        
+
         # Add ml_service for test compatibility - lazy initialization to avoid circular imports
         self.ml_service = None
         self.advanced_preprocessing = self.preprocessor  # Alias for tests
-        
+
         if not hasattr(self.reader, 'read_ecg_file'):
             self.reader.read_ecg_file = self._read_ecg_file_fallback
 
@@ -882,7 +882,7 @@ class HybridECGAnalysisService:
             is_valid = True
             quality_score = 0.8
             issues = []
-            
+
             if signal is None or len(signal) == 0:
                 is_valid = False
                 quality_score = 0.0
@@ -918,11 +918,10 @@ class HybridECGAnalysisService:
 
     def analyze_ecg_comprehensive(self, file_path: str | None = None, ecg_data: dict[str, Any] | None = None, patient_id: int | None = None, analysis_id: str | None = None, **kwargs: Any) -> dict[str, Any]:
         """Comprehensive ECG analysis for medical use - synchronous version for tests"""
-        from app.core.exceptions import ECGProcessingException
         try:
             if not file_path and not ecg_data:
                 raise ValueError("Either file_path or ecg_data must be provided")
-            
+
             return {
                 "analysis_id": analysis_id or "test_analysis_123",
                 "patient_id": patient_id or 1,
@@ -955,7 +954,7 @@ class HybridECGAnalysisService:
         try:
             features = self.feature_extractor.extract_all_features(signal)
             predictions = self._simulate_predictions(features)
-            
+
             return {
                 "features": features,
                 "predictions": predictions,
@@ -970,25 +969,25 @@ class HybridECGAnalysisService:
         """Detect pathologies based on features"""
         try:
             pathologies = {}
-            
+
             af_result = self._detect_atrial_fibrillation(features)
             pathologies["atrial_fibrillation"] = af_result
-            
+
             qt_result = self._detect_long_qt(features)
             pathologies["long_qt"] = qt_result
-            
+
             return pathologies
         except Exception as e:
             logger.error(f"Pathology detection failed: {str(e)}")
             return {}
-            
+
     async def analyze_ecg_comprehensive_async(self, file_path: str | None = None, ecg_data: dict[str, Any] | None = None, patient_id: int | None = None, analysis_id: str | None = None, **kwargs: Any) -> dict[str, Any]:
         """Comprehensive ECG analysis for medical use - optimized for performance"""
         from app.core.exceptions import ECGProcessingException
         try:
             if not file_path and not ecg_data:
                 raise ValueError("Either file_path or ecg_data must be provided")
-            
+
             # If ecg_data provided directly, use it; otherwise read from file
             if ecg_data:
                 signal_data = ecg_data
@@ -1001,7 +1000,7 @@ class HybridECGAnalysisService:
                 signal = signal_data['signal']
             else:
                 signal = signal_data
-            
+
             if signal.ndim > 1:
                 signal = signal[:, 0]
 
@@ -1166,7 +1165,7 @@ class HybridECGAnalysisService:
         rr_std = features.get('rr_std', 0)
         hrv_rmssd = features.get('hrv_rmssd', 0)
         spectral_entropy = features.get('spectral_entropy', 0)
-        
+
         score = 0.0
         if rr_std > 200:
             score += 0.4
@@ -1174,9 +1173,9 @@ class HybridECGAnalysisService:
             score += 0.3
         if spectral_entropy > 0.8:
             score += 0.3
-        
+
         af_probability = min(1.0, score)
-        
+
         return {
             "detected": af_probability > 0.5,
             "probability": af_probability,
@@ -1188,7 +1187,7 @@ class HybridECGAnalysisService:
     def _detect_long_qt(self, features: dict[str, float]) -> dict[str, Any]:
         """Detect long QT syndrome from features"""
         qtc_bazett = features.get('qtc_bazett', 400)
-        
+
         if qtc_bazett > 550:
             probability = 1.0
         elif qtc_bazett > 480:
@@ -1199,7 +1198,7 @@ class HybridECGAnalysisService:
             probability = 0.3
         else:
             probability = 0.0
-        
+
         return {
             "detected": qtc_bazett > 460,  # Standard threshold for Long QT
             "probability": probability,
@@ -1505,15 +1504,15 @@ class HybridECGAnalysisService:
 
             signal_std = float(np.std(signal))
             signal_range = float(np.max(signal) - np.min(signal))
-            
+
             try:
                 from scipy.signal import welch
                 fs = 250  # Default sampling rate
                 f, Pxx = welch(signal.flatten(), fs=fs, nperseg=min(256, len(signal.flatten())))
-                
+
                 signal_band = (f >= 0.5) & (f <= 40)
                 noise_band = (f > 40) & (f <= 100)
-                
+
                 if np.any(signal_band) and np.any(noise_band):
                     signal_power = np.trapz(Pxx[signal_band], f[signal_band])
                     noise_power = np.trapz(Pxx[noise_band], f[noise_band])
@@ -1631,6 +1630,6 @@ class HybridECGAnalysisService:
         import numpy as np
         return np.random.randn(1000, 12).astype(np.float64)
 
-    def get_supported_formats(self) -> List[str]:
+    def get_supported_formats(self) -> list[str]:
         """Get list of supported ECG file formats"""
         return [".wfdb", ".edf", ".dicom", ".csv", ".txt", ".xml"]

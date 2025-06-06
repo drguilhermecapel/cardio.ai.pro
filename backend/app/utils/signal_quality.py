@@ -18,18 +18,18 @@ class SignalQualityAnalyzer:
         """Assess signal quality (synchronous for tests)"""
         try:
             quality_score = 0.8  # Default good quality
-            
+
             if np.std(signal) < 0.01:
                 quality_score = 0.0
-            
+
             if np.max(np.abs(signal)) > 10:
                 quality_score -= 0.3
-            
+
             if np.var(signal) > 5:
                 quality_score -= 0.2
-            
+
             quality_score = max(0.0, quality_score)
-            
+
             return {
                 "quality_score": quality_score,
                 "overall_score": quality_score,
@@ -63,16 +63,16 @@ class SignalQualityAnalyzer:
                 "quality_issues": [],
             }
 
-            lead_scores = []
+
 
             if ecg_data.ndim > 1:
                 signal_1d = ecg_data[:, 0] if ecg_data.shape[1] > 0 else ecg_data.flatten()
             else:
                 signal_1d = ecg_data
-            
+
             lead_quality = self._analyze_lead_quality_sync(signal_1d)
             quality_metrics["overall_score"] = lead_quality["score"]
-            
+
             artifacts = lead_quality.get("artifacts", [])
             if isinstance(artifacts, list):
                 quality_metrics["artifacts_detected"] = artifacts
@@ -234,16 +234,16 @@ class SignalQualityAnalyzer:
         """Detect artifacts in ECG signal."""
         try:
             artifacts = []
-            
+
             if np.max(np.abs(signal)) > 10:
                 artifacts.append("saturation")
-            
+
             if np.std(signal) < 0.01:
                 artifacts.append("flat_line")
-            
+
             if np.var(signal) > 5:
                 artifacts.append("high_noise")
-            
+
             return {"artifacts": artifacts}
         except Exception as e:
             logger.error("Artifact detection failed: %s", str(e))

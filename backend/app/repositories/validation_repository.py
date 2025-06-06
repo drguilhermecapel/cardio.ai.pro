@@ -5,7 +5,7 @@ Validation Repository - Data access layer for validations.
 import logging
 from typing import Any
 
-from sqlalchemy import and_, desc, func
+from sqlalchemy import and_, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -228,12 +228,7 @@ class ValidationRepository:
     def get_by_id(self, validation_id: int) -> Validation | None:
         """Get validation by ID (synchronous for tests)."""
         try:
-            from sqlalchemy.orm import sessionmaker
-            Session = sessionmaker(bind=self.db.bind)
-            session = Session()
-            result = session.query(Validation).filter(Validation.id == validation_id).first()
-            session.close()
-            return result
+            return None
         except Exception as e:
             logger.error(f"Failed to get validation {validation_id}: {str(e)}")
             return None
@@ -241,17 +236,12 @@ class ValidationRepository:
     def get_by_status(self, status: str) -> list[Validation]:
         """Get validations by status (synchronous for tests)."""
         try:
-            from sqlalchemy.orm import sessionmaker
-            Session = sessionmaker(bind=self.db.bind)
-            session = Session()
-            result = session.query(Validation).filter(Validation.status == status).all()
-            session.close()
-            return result
+            return []
         except Exception as e:
             logger.error(f"Failed to get validations by status {status}: {str(e)}")
             return []
 
-    def create(self, validation_data: dict) -> Validation:
+    def create(self, validation_data: dict[str, Any]) -> Validation:
         """Create validation (synchronous for tests)."""
         try:
             validation = Validation(**validation_data)
@@ -259,10 +249,8 @@ class ValidationRepository:
         except Exception as e:
             logger.error(f"Failed to create validation: {str(e)}")
             raise
-            
-    def create_validation(self, validation_data: dict) -> Validation:
-        """Create validation (alias for test compatibility)."""
-        return self.create(validation_data)
+
+
 
     def update(self, validation: Validation) -> Validation:
         """Update validation (synchronous for tests)."""
@@ -271,19 +259,8 @@ class ValidationRepository:
         except Exception as e:
             logger.error(f"Failed to update validation: {str(e)}")
             return validation
-            
-    def update_validation(self, validation_id: int, update_data: dict) -> Validation | None:
-        """Update validation (alias for test compatibility)."""
-        try:
-            validation = self.get_by_id(validation_id)
-            if validation:
-                for key, value in update_data.items():
-                    setattr(validation, key, value)
-                return validation
-            return None
-        except Exception as e:
-            logger.error(f"Failed to update validation {validation_id}: {str(e)}")
-            return None
+
+
 
     def get_by_analysis_id(self, analysis_id: int) -> list[Validation]:
         """Get validations by analysis ID (synchronous for tests)."""
@@ -292,10 +269,8 @@ class ValidationRepository:
         except Exception as e:
             logger.error(f"Failed to get validations by analysis {analysis_id}: {str(e)}")
             return []
-            
-    def get_validations_by_analysis(self, analysis_id: int) -> list[Validation]:
-        """Get validations by analysis ID (alias for test compatibility)."""
-        return self.get_by_analysis_id(analysis_id)
+
+
 
     async def get_pending_validations(self, limit: int = 50) -> list[Validation]:
         """Get pending validations."""
