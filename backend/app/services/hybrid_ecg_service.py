@@ -760,9 +760,7 @@ class HybridECGAnalysisService:
         self.advanced_preprocessing = self.preprocessor  # Alias for tests
 
         if not hasattr(self.reader, 'read_ecg'):
-            def read_ecg_fallback(filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
-                return self._read_ecg_file_fallback(filepath)
-            self.reader.read_ecg = read_ecg_fallback
+            self.reader.read_ecg = self._read_ecg_file_fallback
 
         self.pathology_classes = [
             'normal', 'atrial_fibrillation', 'atrial_flutter', 'ventricular_tachycardia',
