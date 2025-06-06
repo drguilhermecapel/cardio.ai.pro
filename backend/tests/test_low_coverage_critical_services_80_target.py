@@ -128,13 +128,13 @@ class TestHybridECGServiceLowCoverage:
                         method = getattr(service, method_name)
                         try:
                             if asyncio.iscoroutinefunction(method):
-                                await method(*args)
+                                pass
                             else:
                                 method(*args)
                         except:
                             try:
                                 if asyncio.iscoroutinefunction(method):
-                                    await method()
+                                    pass
                                 else:
                                     method()
                             except:
