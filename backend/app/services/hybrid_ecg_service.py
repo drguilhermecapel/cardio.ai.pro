@@ -756,7 +756,9 @@ class HybridECGAnalysisService:
         self.advanced_preprocessing = self.preprocessor  # Alias for tests
 
         if not hasattr(self.reader, 'read_ecg'):
-            self.reader.read_ecg = self._read_ecg_file_fallback
+            def read_ecg_wrapper(file_path: str, sampling_rate: int | None = None) -> dict[str, Any]:
+                return self._read_ecg_file_fallback(file_path)
+            self.reader.read_ecg = read_ecg_wrapper
 
         self.pathology_classes = [
             'normal', 'atrial_fibrillation', 'atrial_flutter', 'ventricular_tachycardia',
@@ -1537,18 +1539,18 @@ class HybridECGAnalysisService:
             "last_updated": datetime.utcnow().isoformat()
         }
 
-    def _apply_advanced_preprocessing(self, signal: np.ndarray, sampling_rate: int) -> np.ndarray:
+    def _apply_advanced_preprocessing(self, signal: npt.NDArray[np.float64], sampling_rate: int) -> npt.NDArray[np.float64]:
         """Apply advanced preprocessing to ECG signal."""
         try:
             # Mock advanced preprocessing
             processed = signal.copy()
             processed = (processed - np.mean(processed)) / (np.std(processed) + 1e-8)
-            return processed
+            return np.asarray(processed, dtype=np.float64)
         except Exception as e:
             logger.error(f"Advanced preprocessing failed: {str(e)}")
             return signal
 
-    def _extract_comprehensive_features(self, signal: np.ndarray, sampling_rate: int) -> dict[str, Any]:
+    def _extract_comprehensive_features(self, signal: npt.NDArray[np.float64], sampling_rate: int) -> dict[str, Any]:
         """Extract comprehensive features from ECG signal."""
         try:
             return {
@@ -1560,7 +1562,7 @@ class HybridECGAnalysisService:
             logger.error(f"Feature extraction failed: {str(e)}")
             return {}
 
-    def _analyze_leads(self, signal: np.ndarray, leads: list[str]) -> dict[str, Any]:
+    def _analyze_leads(self, signal: npt.NDArray[np.float64], leads: list[str]) -> dict[str, Any]:
         """Analyze individual ECG leads."""
         try:
             leads_analysis = {}
@@ -1577,7 +1579,7 @@ class HybridECGAnalysisService:
             logger.error(f"Lead analysis failed: {str(e)}")
             return {}
 
-    def _analyze_rhythm_patterns(self, signal: np.ndarray, sampling_rate: int) -> dict[str, Any]:
+    def _analyze_rhythm_patterns(self, signal: npt.NDArray[np.float64], sampling_rate: int) -> dict[str, Any]:
         """Analyze rhythm patterns in ECG signal."""
         try:
             return {
