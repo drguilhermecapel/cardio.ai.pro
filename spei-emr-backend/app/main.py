@@ -6,6 +6,7 @@ from typing import List
 import jwt
 from datetime import datetime, timedelta
 import bcrypt
+import os
 from .database import SessionLocal, engine
 from .models import Base, User, Patient, MedicalRecord, Consultation
 from .schemas import UserCreate, UserLogin, PatientCreate, PatientResponse, MedicalRecordCreate, MedicalRecordResponse, ConsultationCreate, ConsultationResponse, DiagnosticRequest, DiagnosticResponse
@@ -27,7 +28,7 @@ app.add_middleware(
 )
 
 security = HTTPBearer()
-SECRET_KEY = "your-secret-key-here"
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 
 def get_db():
     db = SessionLocal()
