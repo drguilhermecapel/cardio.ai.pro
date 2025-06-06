@@ -492,10 +492,10 @@ class ValidationService:
             logger.error(f"Failed to update validation {validation_id}: {str(e)}")
             return None
 
-    def get_validations_by_analysis(self, analysis_id: int) -> list[Validation]:
+    async def get_validations_by_analysis(self, analysis_id: int) -> list[Validation]:
         """Get validations by analysis ID (synchronous for tests)."""
         try:
-            return self.repository.get_validations_by_analysis(analysis_id)
+            return await self.repository.get_validations_by_analysis(analysis_id)
         except Exception as e:
             logger.error(f"Failed to get validations for analysis {analysis_id}: {str(e)}")
             return []

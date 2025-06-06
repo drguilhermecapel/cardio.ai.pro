@@ -640,7 +640,7 @@ class ECGHybridProcessor:
 
         return hr_analysis
 
-    def analyze_rhythm(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] = None) -> dict[str, Any]:
+    def analyze_rhythm(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] | None = None) -> dict[str, Any]:
         """Public interface for rhythm analysis"""
         if r_peaks is None:
             r_peaks = self._detect_r_peaks(signal)
@@ -657,7 +657,7 @@ class ECGHybridProcessor:
 
         return self._analyze_rhythm(signal, r_peaks)
 
-    def extract_features(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] = None) -> dict[str, Any]:
+    def extract_features(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] | None = None) -> dict[str, Any]:
         """Public interface for feature extraction"""
         if r_peaks is None:
             r_peaks = self._detect_r_peaks(signal)
@@ -674,7 +674,7 @@ class ECGHybridProcessor:
 
         return features
 
-    def _detect_afib(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] = None) -> tuple[bool, float]:
+    def _detect_afib(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] | None = None) -> tuple[bool, float]:
         """Detect atrial fibrillation"""
         try:
             if r_peaks is None:

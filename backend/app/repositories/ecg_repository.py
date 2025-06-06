@@ -321,7 +321,8 @@ class ECGRepository:
         result = await self.db.execute(
             select(func.count(ECGAnalysis.id))
         )
-        return result.scalar()
+        count = result.scalar()
+        return count if count is not None else 0
 
     async def get_recent_analyses(self, limit: int = 10) -> list[ECGAnalysis]:
         """Get recent analyses"""
@@ -330,7 +331,7 @@ class ECGRepository:
             .order_by(ECGAnalysis.created_at.desc())
             .limit(limit)
         )
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def get_analyses_by_status(self, status: str, limit: int = 50) -> list[ECGAnalysis]:
         """Get analyses by status."""

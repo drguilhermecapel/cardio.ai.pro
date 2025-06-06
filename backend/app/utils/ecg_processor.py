@@ -118,10 +118,10 @@ class ECGProcessor:
             }
 
             if path.suffix.lower() == '.xml':
-                xml_metadata = await self._extract_xml_metadata(file_path)
+                xml_metadata = self._extract_xml_metadata(file_path)
                 metadata.update(xml_metadata)
 
-            data = await self.load_ecg_file(file_path)
+            data = self.load_ecg_file(file_path)
             metadata["leads_count"] = data.shape[1]
             sample_rate = metadata.get("sample_rate", 500)
             if isinstance(sample_rate, int | float):

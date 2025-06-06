@@ -64,7 +64,7 @@ class UniversalECGReader:
         import os
 
         if filepath is None or filepath == "":
-            return None
+            return {"error": "Invalid filepath provided", "status": "failed"}
 
         try:
             ext = os.path.splitext(filepath)[1].lower()
@@ -76,8 +76,8 @@ class UniversalECGReader:
                 raise ValueError(f"Unsupported file format: {ext}")
         except ValueError:
             raise
-        except Exception:
-            return None
+        except Exception as e:
+            return {"error": str(e), "status": "failed"}
 
     def _read_mitbih(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
         """Read MIT-BIH format files"""
@@ -129,9 +129,9 @@ class UniversalECGReader:
                 'metadata': {}
             }
         except ImportError:
-            return None
-        except Exception:
-            return None
+            return {"error": "Required library not available", "status": "failed"}
+        except Exception as e:
+            return {"error": str(e), "status": "failed"}
 
     def _read_csv(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
         """Read CSV format files"""
@@ -151,9 +151,9 @@ class UniversalECGReader:
                 'metadata': {}
             }
         except FileNotFoundError:
-            return None
-        except Exception:
-            return None
+            return {"error": "File not found", "status": "failed"}
+        except Exception as e:
+            return {"error": str(e), "status": "failed"}
 
     def _read_xml(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any] | None:
         """Read XML format ECG files"""
@@ -177,8 +177,8 @@ class UniversalECGReader:
                 'labels': [f'Lead_{i}' for i in range(12)],
                 'metadata': {'format': 'xml', 'file_path': filepath}
             }
-        except Exception:
-            return None
+        except Exception as e:
+            return {"error": str(e), "status": "failed"}
 
     def _read_text(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any] | None:
         """Read text format files"""
@@ -200,8 +200,8 @@ class UniversalECGReader:
                 'labels': [f'Lead_{i}' for i in range(data.shape[1])],
                 'metadata': {}
             }
-        except Exception:
-            return None
+        except Exception as e:
+            return {"error": str(e), "status": "failed"}
 
     def _read_ecg(self, filepath: str, sampling_rate: int | None = None) -> dict[str, Any]:
         """
