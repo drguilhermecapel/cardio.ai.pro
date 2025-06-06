@@ -35,7 +35,8 @@ class TestSimpleMethodCoverage:
         result = reader.read_ecg(None)
         assert result is None
     
-    def test_advanced_preprocessor_methods(self):
+    @pytest.mark.asyncio
+    async def test_advanced_preprocessor_methods(self):
         """Test AdvancedPreprocessor methods with correct signatures"""
         preprocessor = AdvancedPreprocessor()
         signal = np.random.randn(1000)
@@ -84,7 +85,8 @@ class TestSimpleMethodCoverage:
         wavelet = extractor._extract_wavelet_features(signal)
         assert isinstance(wavelet, dict)
     
-    def test_hybrid_ecg_service_basic_methods(self):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_service_basic_methods(self):
         """Test HybridECGAnalysisService basic methods"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -100,7 +102,7 @@ class TestSimpleMethodCoverage:
         assert isinstance(pathologies, list)
         
         signal = np.random.randn(2000, 12)
-        result = await service.validate_signal(valid_signal)
+        result = await service.validate_signal(signal)
         
         predictions = service._simulate_predictions(signal)
         assert isinstance(predictions, dict)

@@ -120,7 +120,7 @@ class TestECGCriticalSafety:
             "clinical_urgency": "critical",
             "findings": ["ST elevation in V1-V3", "Anterior STEMI pattern"]
         }):
-            result = await eawait cg_service.analyze_ecg_comprehensive(
+            result = await ecg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/test_stemi.ecg",
                 patient_id=1,
                 analysis_id="EMERGENCY_STEMI_001"
@@ -150,7 +150,7 @@ class TestECGCriticalSafety:
             "clinical_urgency": "low",
             "findings": ["Normal sinus rhythm", "No acute changes"]
         }):
-            result = await eawait cg_service.analyze_ecg_comprehensive(
+            result = await ecg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/test_normal.ecg",
                 patient_id=2,
                 analysis_id="ROUTINE_001"
@@ -195,7 +195,7 @@ class TestECGCriticalSafety:
             "clinical_urgency": "critical",
             "findings": ["Ventricular fibrillation", "Immediate defibrillation required"]
         }):
-            result = await eawait cg_service.analyze_ecg_comprehensive(
+            result = await ecg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/test_vfib.ecg",
                 patient_id=3,
                 analysis_id="EMERGENCY_VFIB_001"
@@ -212,7 +212,7 @@ class TestECGCriticalSafety:
     async def test_timeout_handling_emergency(self, ecg_service):
         """CRITICAL: Analysis timeout must provide safe fallback."""
         with pytest.raises(ECGProcessingException) as exc_info:
-            await eawait cg_service.analyze_ecg_comprehensive(
+            await ecg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/nonexistent_file.ecg",
                 patient_id=4,
                 analysis_id="TIMEOUT_001"
@@ -232,7 +232,7 @@ class TestECGCriticalSafety:
         
         try:
             with pytest.raises(ECGProcessingException) as exc_info:
-                await eawait cg_service.analyze_ecg_comprehensive(
+                await ecg_service.analyze_ecg_comprehensive(
                     file_path=temp_file,
                     patient_id=5,
                     analysis_id="MODEL_FAIL_001"
