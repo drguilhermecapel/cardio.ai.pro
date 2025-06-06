@@ -227,7 +227,8 @@ class TestECGCriticalSafety:
         if not np.isnan(quality_metrics['overall_score']):
             assert 0.0 <= quality_metrics['overall_score'] <= 1.0
 
-    def test_memory_constraints_medical_environment(self, ecg_service):
+    @pytest.mark.asyncio
+    async def test_memory_constraints_medical_environment(self, ecg_service):
         """CRITICAL: Memory usage must be controlled for hospital environment."""
         import psutil
         
@@ -372,7 +373,8 @@ class TestECGPerformanceMedical:
         assert extraction_time < 10.0, f"Feature extraction too slow: {extraction_time:.2f}s"
         assert features is not None
 
-    def test_resource_cleanup_medical_safety(self, ecg_service):
+    @pytest.mark.asyncio
+    async def test_resource_cleanup_medical_safety(self, ecg_service):
         """PERFORMANCE: Resources must be properly cleaned up for medical safety."""
         for i in range(5):
             test_signal = np.array([[0.1, 0.2, 0.3] * 100])
