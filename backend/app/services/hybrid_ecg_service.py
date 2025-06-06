@@ -71,7 +71,7 @@ class UniversalECGReader:
 
             if ext in self.supported_formats:
                 result = self.supported_formats[ext](filepath, sampling_rate)
-                return result if result is not None else None
+                return result if result is not None else {}
             else:
                 raise ValueError(f"Unsupported file format: {ext}")
         except ValueError:
@@ -755,8 +755,8 @@ class HybridECGAnalysisService:
         self.ml_service = None
         self.advanced_preprocessing = self.preprocessor  # Alias for tests
 
-        if not hasattr(self.reader, 'read_ecg_file'):
-            self.reader.read_ecg_file = self._read_ecg_file_fallback
+        if not hasattr(self.reader, 'read_ecg'):
+            self.reader.read_ecg = self._read_ecg_file_fallback
 
         self.pathology_classes = [
             'normal', 'atrial_fibrillation', 'atrial_flutter', 'ventricular_tachycardia',
@@ -992,7 +992,10 @@ class HybridECGAnalysisService:
             if ecg_data:
                 signal_data = ecg_data
             else:
-                signal_data = self.ecg_reader.read_ecg(file_path)
+                if file_path is not None:
+                    signal_data = self.ecg_reader.read_ecg(file_path)
+                else:
+                    raise ValueError("File path cannot be None")
                 if signal_data is None or (hasattr(signal_data, 'size') and signal_data.size == 0):
                     raise ValueError("Failed to read ECG data")
 

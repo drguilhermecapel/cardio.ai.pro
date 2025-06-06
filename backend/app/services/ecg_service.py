@@ -126,7 +126,7 @@ class ECGAnalysisService:
             )
 
             ai_results = await self.ml_service.analyze_ecg(
-                preprocessed_data.astype(np.float32),
+                preprocessed_data,
                 analysis.sample_rate,
                 analysis.leads_names,
             )
@@ -136,7 +136,7 @@ class ECGAnalysisService:
             )
 
             annotations = self._generate_annotations(
-                preprocessed_data, ai_results, analysis.sample_rate
+                ai_results, analysis.sample_rate
             )
 
             clinical_assessment = self._assess_clinical_urgency(ai_results, measurements)
@@ -405,7 +405,7 @@ class ECGAnalysisService:
     ) -> dict[str, Any]:
         """Analyze ECG data and return results."""
         try:
-            ml_results = self.ml_service.analyze_ecg(ecg_data, sampling_rate, leads)
+            ml_results = await self.ml_service.analyze_ecg(ecg_data, sampling_rate, leads)
 
             processed_signal = self.processor.preprocess_signal(ecg_data)
 

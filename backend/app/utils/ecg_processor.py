@@ -9,6 +9,7 @@ from typing import Any
 
 import neurokit2 as nk
 import numpy as np
+import numpy.typing as npt
 from numpy.typing import NDArray
 
 from app.core.exceptions import ECGProcessingException
@@ -294,7 +295,7 @@ class ECGProcessor:
             return peaks.astype(np.int64)
 
         except ImportError:
-            peaks = []
+            peaks: list[int] = []
             for i in range(1, len(signal) - 1):
                 if signal[i] > signal[i-1] and signal[i] > signal[i+1] and signal[i] > 0.5:
                     peaks.append(i)
@@ -414,7 +415,7 @@ class ECGProcessor:
         """Get list of supported file formats"""
         return [".csv", ".txt", ".xml", ".json", ".edf", ".dat"]
 
-    def detect_artifacts(self, signal: np.ndarray) -> list[dict]:
+    def detect_artifacts(self, signal: npt.NDArray[np.float64]) -> list[dict[str, Any]]:
         """Detect artifacts in ECG signal"""
         artifacts = []
 
