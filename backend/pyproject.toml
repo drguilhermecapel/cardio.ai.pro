@@ -160,8 +160,10 @@ markers = [
     "timeout: marks tests with timeout limits for CI optimization",
     "slow: marks tests as slow running",
     "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests"
+    "unit: marks tests as unit tests",
+    "asyncio: marks tests as asyncio tests"
 ]
+
 
 
 [tool.coverage.run]

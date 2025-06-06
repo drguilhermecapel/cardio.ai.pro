@@ -36,7 +36,7 @@ def sample_signal():
     import numpy as np
     return np.sin(np.linspace(0, 10, 1000))
 
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def test_db():
     """Create test database session with proper table creation."""
     database_url = "sqlite+aiosqlite:///:memory:"
