@@ -28,7 +28,8 @@ import {
   ScanLine, 
   Sparkles 
 } from 'lucide-react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage';
 
 const SPEIApp = (): JSX.Element => {
