@@ -8,6 +8,10 @@ import numpy as np
 from unittest.mock import Mock, AsyncMock
 
 
+@pytest.mark.timeout(30)
+
+
+
 def test_hybrid_ecg_service_basic():
     """Test HybridECGAnalysisService basic instantiation - 828 lines at 13%"""
     from app.services.hybrid_ecg_service import HybridECGAnalysisService
@@ -17,12 +21,20 @@ def test_hybrid_ecg_service_basic():
     assert service.db == mock_db
 
 
+@pytest.mark.timeout(30)
+
+
+
 def test_ecg_hybrid_processor_basic():
     """Test ECGHybridProcessor basic instantiation - 380 lines at 12%"""
     from app.utils.ecg_hybrid_processor import ECGHybridProcessor
     
     processor = ECGHybridProcessor()
     assert processor.sample_rate == 500
+
+
+@pytest.mark.timeout(30)
+
 
 
 def test_ecg_types_import():

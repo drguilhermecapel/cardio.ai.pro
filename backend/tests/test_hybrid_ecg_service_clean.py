@@ -36,6 +36,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         ecg = 0.5 * np.sin(2 * np.pi * 1.2 * t) + 0.1 * np.random.randn(len(t))
         return ecg.astype(np.float64), fs
     
+    @pytest.mark.timeout(30)
+
+    
     def test_service_initialization(self, service):
         """Test service initialization - covers lines 740-766"""
         assert service is not None
@@ -47,6 +50,8 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert isinstance(service.feature_extractor, FeatureExtractor)
     
     @patch('app.services.hybrid_ecg_service.UniversalECGReader.read_ecg')
+    @pytest.mark.timeout(30)
+
     def test_analyze_ecg_file_success(self, mock_read_ecg, service, sample_ecg_data):
         """Test ECG file analysis - covers lines 768-801"""
         ecg_data, fs = sample_ecg_data
@@ -66,6 +71,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 'processing_info' in result
         mock_read_ecg.assert_called_once()
     
+    @pytest.mark.timeout(30)
+
+    
     def test_analyze_ecg_signal_comprehensive(self, service, sample_ecg_data):
         """Test ECG signal analysis - covers lines 803-838"""
         ecg_data, fs = sample_ecg_data
@@ -77,6 +85,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 'confidence' in result
         assert 'pathologies' in result
         assert 'clinical_assessment' in result
+    
+    @pytest.mark.timeout(30)
+
     
     def test_simulate_predictions(self, service):
         """Test prediction simulation - covers lines 840-865"""
@@ -90,6 +101,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 'ventricular_tachycardia' in predictions
         assert all(0 <= v <= 1 for v in predictions.values())
     
+    @pytest.mark.timeout(30)
+
+    
     def test_get_supported_pathologies(self, service):
         """Test supported pathologies - covers lines 867-869"""
         pathologies = service.get_supported_pathologies()
@@ -97,6 +111,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert isinstance(pathologies, list)
         assert len(pathologies) > 0
         assert 'atrial_fibrillation' in pathologies
+    
+    @pytest.mark.timeout(30)
+
     
     def test_validate_signal_comprehensive(self, service, sample_ecg_data):
         """Test signal validation - covers lines 871-918"""
@@ -116,7 +133,8 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 'Invalid sampling rate' in str(issues)
     
     @pytest.mark.asyncio
-    async def test_analyze_ecg_comprehensive_sync(self, service, sample_ecg_data):
+    async @pytest.mark.timeout(30)
+ def test_analyze_ecg_comprehensive_sync(self, service, sample_ecg_data):
         """Test comprehensive ECG analysis - covers lines 920-952"""
         ecg_data, fs = sample_ecg_data
         
@@ -129,6 +147,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 'pathology_predictions' in result
         assert 'clinical_assessment' in result
     
+    @pytest.mark.timeout(30)
+
+    
     def test_detect_atrial_fibrillation(self, service):
         """Test AF detection - covers lines 1165-1187"""
         features = {
@@ -140,6 +161,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         
         assert isinstance(af_probability, float)
         assert 0 <= af_probability <= 1
+    
+    @pytest.mark.timeout(30)
+
     
     def test_detect_long_qt(self, service):
         """Test Long QT detection - covers lines 1189-1210"""
@@ -155,7 +179,8 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 0 <= long_qt_probability <= 1
     
     @pytest.mark.asyncio
-    async def test_generate_clinical_assessment(self, service):
+    async @pytest.mark.timeout(30)
+ def test_generate_clinical_assessment(self, service):
         """Test clinical assessment generation - covers lines 1212-1251"""
         predictions = {
             'normal': 0.3,
@@ -174,6 +199,9 @@ class TestHybridECGAnalysisServiceComprehensive:
             ClinicalUrgency.HIGH, ClinicalUrgency.CRITICAL
         ]
     
+    @pytest.mark.timeout(30)
+
+    
     def test_analyze_emergency_patterns(self, service):
         """Test emergency pattern analysis - covers lines 1252-1284"""
         predictions = {
@@ -188,6 +216,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 'is_emergency' in emergency_assessment
         assert 'emergency_type' in emergency_assessment
         assert 'immediate_actions' in emergency_assessment
+    
+    @pytest.mark.timeout(30)
+
     
     def test_generate_audit_trail(self, service):
         """Test audit trail generation - covers lines 1286-1310"""
@@ -205,6 +236,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 'processing_steps' in audit_trail
         assert 'system_version' in audit_trail
     
+    @pytest.mark.timeout(30)
+
+    
     def test_get_system_status(self, service):
         """Test system status - covers lines 1567-1575"""
         status = service.get_model_info()
@@ -213,6 +247,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 'status' in status
         assert 'version' in status
         assert 'supported_formats' in status
+    
+    @pytest.mark.timeout(30)
+
     
     def test_get_supported_formats(self, service):
         """Test supported formats - covers lines 1635-1637"""
@@ -230,6 +267,9 @@ class TestUniversalECGReader:
     def reader(self):
         return UniversalECGReader()
     
+    @pytest.mark.timeout(30)
+
+    
     def test_reader_initialization(self, reader):
         """Test reader initialization - covers lines 39-51"""
         assert reader is not None
@@ -238,6 +278,8 @@ class TestUniversalECGReader:
         assert '.txt' in reader.supported_formats
     
     @patch('numpy.loadtxt')
+    @pytest.mark.timeout(30)
+
     def test_read_csv_format(self, mock_loadtxt, reader):
         """Test CSV reading - covers lines 136-156"""
         mock_loadtxt.return_value = np.random.randn(1000)
@@ -250,6 +292,8 @@ class TestUniversalECGReader:
         mock_loadtxt.assert_called_once()
     
     @patch('numpy.loadtxt')
+    @pytest.mark.timeout(30)
+
     def test_read_text_format(self, mock_loadtxt, reader):
         """Test text reading - covers lines 183-204"""
         mock_loadtxt.return_value = np.random.randn(1000)
@@ -272,12 +316,16 @@ class TestAdvancedPreprocessor:
     def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_preprocessor_initialization(self, preprocessor):
         """Test preprocessor initialization - covers lines 283-285"""
         assert preprocessor is not None
     
     @pytest.mark.asyncio
-    async def test_preprocess_signal(self, preprocessor, valid_signal):
+    async @pytest.mark.timeout(30)
+ def test_preprocess_signal(self, preprocessor, valid_signal):
         """Test signal preprocessing - covers lines 287-342"""
         fs = 500
         
@@ -285,6 +333,9 @@ class TestAdvancedPreprocessor:
         
         assert isinstance(processed, np.ndarray)
         assert len(processed) == len(valid_signal)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_filter_signal(self, preprocessor, valid_signal):
         """Test signal filtering - covers lines 361-373"""
@@ -307,9 +358,15 @@ class TestFeatureExtractor:
     def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_extractor_initialization(self, extractor):
         """Test extractor initialization - covers lines 421-423"""
         assert extractor is not None
+    
+    @pytest.mark.timeout(30)
+
     
     def test_extract_all_features(self, extractor, valid_signal):
         """Test feature extraction - covers lines 425-448"""
@@ -320,6 +377,9 @@ class TestFeatureExtractor:
         assert isinstance(features, dict)
         assert len(features) > 0
     
+    @pytest.mark.timeout(30)
+
+    
     def test_extract_time_domain_features(self, extractor, valid_signal):
         """Test time domain features - covers lines 485-498"""
         fs = 500
@@ -329,6 +389,9 @@ class TestFeatureExtractor:
         assert isinstance(features, dict)
         assert 'heart_rate' in features or 'rr_intervals' in features
     
+    @pytest.mark.timeout(30)
+
+    
     def test_extract_frequency_domain_features(self, extractor, valid_signal):
         """Test frequency domain features - covers lines 500-517"""
         fs = 500
@@ -336,6 +399,9 @@ class TestFeatureExtractor:
         features = extractor.extract_frequency_domain_features(valid_signal, fs)
         
         assert isinstance(features, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_extract_morphological_features(self, extractor, valid_signal):
         """Test morphological features - covers lines 519-546"""

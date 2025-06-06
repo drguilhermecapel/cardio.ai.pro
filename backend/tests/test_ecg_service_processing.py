@@ -28,7 +28,8 @@ def ecg_service():
 
 
 @pytest.mark.asyncio
-async def test_process_analysis_async_success(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_process_analysis_async_success(ecg_service):
     """Test successful ECG analysis processing - covers lines 107-184."""
     mock_analysis = Mock()
     mock_analysis.id = 1
@@ -80,7 +81,8 @@ async def test_process_analysis_async_success(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_process_analysis_async_failure_with_retry(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_process_analysis_async_failure_with_retry(ecg_service):
     """Test ECG analysis processing failure with retry - covers lines 188-205."""
     mock_analysis = Mock()
     mock_analysis.retry_count = 1
@@ -100,7 +102,8 @@ async def test_process_analysis_async_failure_with_retry(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_process_analysis_async_critical_validation(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_process_analysis_async_critical_validation(ecg_service):
     """Test ECG analysis with critical validation - covers lines 181-182."""
     mock_analysis = Mock()
     mock_analysis.id = 1
@@ -135,7 +138,8 @@ async def test_process_analysis_async_critical_validation(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_calculate_file_info(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_calculate_file_info(ecg_service):
     """Test file info calculation - covers lines 207-221."""
     with patch('app.services.ecg_service.Path') as mock_path, \
          patch('app.services.ecg_service.hashlib.sha256') as mock_hash:
@@ -156,7 +160,8 @@ async def test_calculate_file_info(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_calculate_file_info_file_not_found(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_calculate_file_info_file_not_found(ecg_service):
     """Test file info calculation with missing file - covers lines 210-211."""
     with patch('pathlib.Path') as mock_path:
         mock_file = Mock()
@@ -168,7 +173,8 @@ async def test_calculate_file_info_file_not_found(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_extract_measurements_success(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_extract_measurements_success(ecg_service):
     """Test ECG measurements extraction - covers lines 223-272."""
     ecg_data = np.random.rand(5000, 12)
     sample_rate = 500
@@ -189,7 +195,8 @@ async def test_extract_measurements_success(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_extract_measurements_error_handling(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_extract_measurements_error_handling(ecg_service):
     """Test ECG measurements extraction error handling - covers lines 270-272."""
     ecg_data = np.random.rand(5000, 12)
     sample_rate = 500
@@ -202,7 +209,8 @@ async def test_extract_measurements_error_handling(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_generate_annotations_success(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_generate_annotations_success(ecg_service):
     """Test ECG annotations generation - covers lines 274-316."""
     ecg_data = np.random.rand(5000, 12)
     ai_results = {
@@ -225,7 +233,8 @@ async def test_generate_annotations_success(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_generate_annotations_error_handling(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_generate_annotations_error_handling(ecg_service):
     """Test ECG annotations generation error handling - covers lines 314-316."""
     ecg_data = np.random.rand(5000, 12)
     ai_results = {}
@@ -238,7 +247,8 @@ async def test_generate_annotations_error_handling(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_assess_clinical_urgency_critical(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_assess_clinical_urgency_critical(ecg_service):
     """Test clinical urgency assessment critical - covers lines 318-381."""
     ai_results = {
         "predictions": {
@@ -256,7 +266,8 @@ async def test_assess_clinical_urgency_critical(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_assess_clinical_urgency_high_priority(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_assess_clinical_urgency_high_priority(ecg_service):
     """Test clinical urgency assessment high priority - covers lines 355-370."""
     ai_results = {
         "predictions": {
@@ -274,7 +285,8 @@ async def test_assess_clinical_urgency_high_priority(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_assess_clinical_urgency_low_confidence(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_assess_clinical_urgency_low_confidence(ecg_service):
     """Test clinical urgency with low AI confidence - covers lines 372-375."""
     ai_results = {
         "predictions": {"normal": 0.6},
@@ -287,7 +299,8 @@ async def test_assess_clinical_urgency_low_confidence(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_assess_clinical_urgency_error_handling(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_assess_clinical_urgency_error_handling(ecg_service):
     """Test clinical urgency assessment error handling - covers lines 379-381."""
     ai_results = None
     
@@ -299,7 +312,8 @@ async def test_assess_clinical_urgency_error_handling(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_get_analysis_by_id(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_get_analysis_by_id(ecg_service):
     """Test get analysis by ID - covers lines 383-385."""
     mock_analysis = Mock()
     ecg_service.repository.get_analysis_by_id = AsyncMock(return_value=mock_analysis)
@@ -311,7 +325,8 @@ async def test_get_analysis_by_id(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_get_analyses_by_patient(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_get_analyses_by_patient(ecg_service):
     """Test get analyses by patient - covers lines 387-391."""
     mock_analyses = [Mock(), Mock()]
     ecg_service.repository.get_analyses_by_patient = AsyncMock(return_value=mock_analyses)
@@ -323,7 +338,8 @@ async def test_get_analyses_by_patient(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_search_analyses(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_search_analyses(ecg_service):
     """Test search analyses - covers lines 393-400."""
     mock_analyses = [Mock(), Mock()]
     ecg_service.repository.search_analyses = AsyncMock(return_value=(mock_analyses, 2))
@@ -336,7 +352,8 @@ async def test_search_analyses(ecg_service):
 
 
 @pytest.mark.asyncio
-async def test_delete_analysis(ecg_service):
+async @pytest.mark.timeout(30)
+ def test_delete_analysis(ecg_service):
     """Test delete analysis - covers lines 402-404."""
     ecg_service.repository.delete_analysis = AsyncMock(return_value=True)
     

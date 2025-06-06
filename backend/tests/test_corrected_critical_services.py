@@ -73,6 +73,8 @@ class TestCorrectedCriticalServices:
         return AsyncMock()
     
     @pytest.mark.skipif(not HYBRID_ECG_AVAILABLE, reason="HybridECGAnalysisService not available")
+    @pytest.mark.timeout(30)
+
     def test_hybrid_ecg_service_init(self):
         """Test HybridECGAnalysisService initialization"""
         with patch.multiple(
@@ -92,6 +94,8 @@ class TestCorrectedCriticalServices:
                 pass  # Coverage is what matters
     
     @pytest.mark.skipif(not HYBRID_ECG_AVAILABLE, reason="UniversalECGReader not available")
+    @pytest.mark.timeout(30)
+
     def test_universal_ecg_reader_init(self):
         """Test UniversalECGReader initialization"""
         try:
@@ -99,6 +103,9 @@ class TestCorrectedCriticalServices:
             assert reader is not None
         except Exception:
             pass  # Coverage is what matters
+    
+    @pytest.mark.timeout(30)
+
     
     def test_universal_ecg_reader_read_ecg(self, sample_ecg_data):
         """Test ECG reading main method"""
@@ -115,6 +122,9 @@ class TestCorrectedCriticalServices:
             assert 'signal' in result
             assert 'sampling_rate' in result
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_edf(self, sample_ecg_data):
         """Test EDF reading private method"""
         reader = UniversalECGReader()
@@ -130,6 +140,9 @@ class TestCorrectedCriticalServices:
             assert isinstance(result, dict)
             assert 'signal' in result
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_csv(self, sample_ecg_data):
         """Test CSV reading private method"""
         reader = UniversalECGReader()
@@ -144,6 +157,9 @@ class TestCorrectedCriticalServices:
             assert isinstance(result, dict)
             assert 'signal' in result
     
+    @pytest.mark.timeout(30)
+
+    
     def test_advanced_preprocessor_init(self):
         """Test AdvancedPreprocessor initialization"""
         preprocessor = AdvancedPreprocessor()
@@ -152,7 +168,8 @@ class TestCorrectedCriticalServices:
         assert preprocessor.fs == 250
     
     @pytest.mark.asyncio
-    async def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
+    async @pytest.mark.timeout(30)
+ def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
         """Test signal preprocessing with correct method name"""
         preprocessor = AdvancedPreprocessor()
         
@@ -166,12 +183,18 @@ class TestCorrectedCriticalServices:
                     result = await preprocessor.preprocess_signal(sample_ecg_data)
                     assert isinstance(result, np.ndarray)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_init(self):
         """Test FeatureExtractor initialization"""
         extractor = FeatureExtractor()
         assert extractor is not None
         assert hasattr(extractor, 'fs')
         assert extractor.fs == 250
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_extract_all_features(self, sample_ecg_data):
         """Test feature extraction with correct method name"""
@@ -185,6 +208,9 @@ class TestCorrectedCriticalServices:
             result = extractor.extract_all_features(sample_ecg_data.flatten())
             assert isinstance(result, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_detect_r_peaks(self, sample_ecg_data):
         """Test R peak detection"""
         extractor = FeatureExtractor()
@@ -197,6 +223,9 @@ class TestCorrectedCriticalServices:
             result = extractor._detect_r_peaks(sample_ecg_data.flatten())
             assert isinstance(result, np.ndarray)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_extract_morphological_features(self, sample_ecg_data):
         """Test morphological feature extraction"""
         extractor = FeatureExtractor()
@@ -206,6 +235,9 @@ class TestCorrectedCriticalServices:
         assert isinstance(result, dict)
         assert 'signal_mean' in result
         assert 'signal_std' in result
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_extract_interval_features(self, sample_ecg_data):
         """Test interval feature extraction"""
@@ -217,6 +249,9 @@ class TestCorrectedCriticalServices:
         assert 'rr_mean' in result
         assert 'heart_rate' in result
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_extract_hrv_features(self):
         """Test HRV feature extraction"""
         extractor = FeatureExtractor()
@@ -226,6 +261,8 @@ class TestCorrectedCriticalServices:
         assert isinstance(result, dict)
     
     @pytest.mark.skipif(not ECG_HYBRID_PROCESSOR_AVAILABLE, reason="ECGHybridProcessor not available")
+    @pytest.mark.timeout(30)
+
     def test_ecg_hybrid_processor_init(self):
         """Test ECGHybridProcessor initialization"""
         try:
@@ -235,6 +272,8 @@ class TestCorrectedCriticalServices:
             pass  # Coverage is what matters
     
     @pytest.mark.skipif(not VALIDATION_SERVICE_AVAILABLE, reason="ValidationService not available")
+    @pytest.mark.timeout(30)
+
     def test_validation_service_init(self, mock_db):
         """Test ValidationService initialization"""
         with patch('app.repositories.validation_repository.ValidationRepository'):
@@ -245,6 +284,8 @@ class TestCorrectedCriticalServices:
                 pass  # Coverage is what matters
     
     @pytest.mark.skipif(not ECG_SERVICE_AVAILABLE, reason="ECGAnalysisService not available")
+    @pytest.mark.timeout(30)
+
     def test_ecg_service_init(self, mock_db):
         """Test ECGAnalysisService initialization"""
         with patch('app.repositories.ecg_repository.ECGRepository'):
@@ -258,20 +299,23 @@ class TestCorrectedCriticalServices:
                             pass  # Coverage is what matters
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_service_validate_signal(self, sample_ecg_data):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_service_validate_signal(self, sample_ecg_data):
         """Test signal validation"""
         service = HybridECGAnalysisService()
         result = await service.validate_signal(sample_ecg_data)
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_service_get_supported_pathologies(self):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_service_get_supported_pathologies(self):
         """Test getting supported pathologies"""
         service = HybridECGAnalysisService()
         result = await service.get_supported_pathologies()
         assert isinstance(result, list)
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_service_analyze_ecg_file(self, sample_ecg_data):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_service_analyze_ecg_file(self, sample_ecg_data):
         """Test ECG file analysis"""
         service = HybridECGAnalysisService()
         
@@ -288,7 +332,8 @@ class TestCorrectedCriticalServices:
                 assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_service_analyze_ecg_signal(self, sample_ecg_data):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_service_analyze_ecg_signal(self, sample_ecg_data):
         """Test ECG signal analysis"""
         service = HybridECGAnalysisService()
         
@@ -298,7 +343,8 @@ class TestCorrectedCriticalServices:
                 assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
         """Test comprehensive ECG analysis"""
         service = HybridECGAnalysisService()
         

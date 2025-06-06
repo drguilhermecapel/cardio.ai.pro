@@ -41,14 +41,16 @@ def sample_ecg_data():
 
 
 @pytest.mark.asyncio
-async def test__load_models_success(ml_service):
+async @pytest.mark.timeout(30)
+ def test__load_models_success(ml_service):
     """Test successful model loading."""
     assert isinstance(ml_service.models, dict)
     assert isinstance(ml_service.model_metadata, dict)
 
 
 @pytest.mark.asyncio
-async def test__load_models_file_not_found():
+async @pytest.mark.timeout(30)
+ def test__load_models_file_not_found():
     """Test model loading with missing files."""
     service = MLModelService()
     
@@ -56,7 +58,8 @@ async def test__load_models_file_not_found():
 
 
 @pytest.mark.asyncio
-async def test_analyze_ecg_success(ml_service, sample_ecg_data):
+async @pytest.mark.timeout(30)
+ def test_analyze_ecg_success(ml_service, sample_ecg_data):
     """Test successful ECG analysis."""
     mock_ecg_model = Mock()
     mock_ecg_model.run.return_value = [np.array([[0.1, 0.9, 0.8, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2, 0.3, 0.4]])]
@@ -86,7 +89,8 @@ async def test_analyze_ecg_success(ml_service, sample_ecg_data):
 
 
 @pytest.mark.asyncio
-async def test_analyze_ecg_not_loaded():
+async @pytest.mark.timeout(30)
+ def test_analyze_ecg_not_loaded():
     """Test ECG analysis when models not loaded."""
     service = MLModelService()
     service.models = {}  # Empty models dictionary
@@ -105,7 +109,8 @@ async def test_analyze_ecg_not_loaded():
 
 
 @pytest.mark.asyncio
-async def test_analyze_ecg_invalid_data(ml_service):
+async @pytest.mark.timeout(30)
+ def test_analyze_ecg_invalid_data(ml_service):
     """Test ECG analysis with invalid data."""
     invalid_data = np.array([[1, 2]], dtype=np.float32)  # Wrong shape
     
@@ -122,7 +127,8 @@ async def test_analyze_ecg_invalid_data(ml_service):
 
 
 @pytest.mark.asyncio
-async def test_error_handling_corrupted_model(ml_service, sample_ecg_data):
+async @pytest.mark.timeout(30)
+ def test_error_handling_corrupted_model(ml_service, sample_ecg_data):
     """Test handling of corrupted model files."""
     ml_service.models["ecg_classifier"].run.side_effect = Exception("Model corrupted")
     
@@ -139,7 +145,8 @@ async def test_error_handling_corrupted_model(ml_service, sample_ecg_data):
 
 
 @pytest.mark.asyncio
-async def test_concurrent_inference(ml_service, mock_onnx_session):
+async @pytest.mark.timeout(30)
+ def test_concurrent_inference(ml_service, mock_onnx_session):
     """Test concurrent model inference."""
     ecg_data = np.random.randn(12, 5000).astype(np.float32)
     

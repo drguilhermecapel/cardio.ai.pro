@@ -21,6 +21,9 @@ class TestValidationService:
         # TODO: Add proper initialization
         return ValidationService()
 
+    @pytest.mark.timeout(30)
+
+
     def test___init__(self, validationservice_instance):
         """Test __init__ method"""
         service = ValidationService()
@@ -31,6 +34,8 @@ class TestValidationService:
         assert hasattr(service, 'repository')
 
     @patch('app.services.validation_service.ValidationService._apply_validation_rules')
+    @pytest.mark.timeout(30)
+
     def test_run_automated_validation_rules(self, mock_apply_rules, validationservice_instance):
         """Test run_automated_validation_rules method"""
         # Arrange
@@ -45,6 +50,9 @@ class TestValidationService:
         assert 'status' in result
         mock_apply_rules.assert_called_once()
 
+    @pytest.mark.timeout(30)
+
+
     def test_get_validation_by_id(self, validationservice_instance):
         """Test get_validation_by_id method"""
         # Arrange
@@ -56,6 +64,9 @@ class TestValidationService:
         # Assert
         # TODO: Add assertions
         assert True  # Replace with actual assertion
+
+    @pytest.mark.timeout(30)
+
 
     def test_update_validation_status(self, validationservice_instance):
         """Test update_validation_status method"""
@@ -69,6 +80,9 @@ class TestValidationService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test_get_validations_by_status(self, validationservice_instance):
         """Test get_validations_by_status method"""
         # Arrange
@@ -80,6 +94,9 @@ class TestValidationService:
         # Assert
         # TODO: Add assertions
         assert True  # Replace with actual assertion
+
+    @pytest.mark.timeout(30)
+
 
     def test_update_validation(self, validationservice_instance):
         """Test update_validation method"""
@@ -93,6 +110,9 @@ class TestValidationService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test_get_validations_by_analysis(self, validationservice_instance):
         """Test get_validations_by_analysis method"""
         # Arrange
@@ -104,6 +124,9 @@ class TestValidationService:
         # Assert
         # TODO: Add assertions
         assert True  # Replace with actual assertion
+
+    @pytest.mark.timeout(30)
+
 
     def test_validate_analysis(self, validationservice_instance):
         """Test validate_analysis method"""
@@ -117,10 +140,16 @@ class TestValidationService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test_validationservice_edge_cases(self, validationservice_instance):
         """Test edge cases and error handling"""
         # TODO: Test boundary conditions
         pass
+
+    @pytest.mark.timeout(30)
+
 
     def test_validationservice_integration(self):
         """Test integration with other components"""

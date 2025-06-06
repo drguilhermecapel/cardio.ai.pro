@@ -33,11 +33,15 @@ class TestECGRepository:
         return Mock()
 
     @pytest.mark.skipif(not ECG_REPOSITORY_AVAILABLE, reason="ECGRepository not available")
+    @pytest.mark.timeout(30)
+
     def test_ecg_repository_import(self):
         """Test that ECGRepository can be imported"""
         assert ECGRepository is not None
 
     @pytest.mark.skipif(not ECG_REPOSITORY_AVAILABLE, reason="ECGRepository not available")
+    @pytest.mark.timeout(30)
+
     def test_ecg_repository_instantiation(self, mock_db_session):
         """Test ECGRepository instantiation with mocked dependencies"""
         with patch('app.repositories.ecg_repository.SessionLocal', return_value=mock_db_session):
@@ -48,6 +52,8 @@ class TestECGRepository:
                 pass
 
     @pytest.mark.skipif(not ECG_REPOSITORY_AVAILABLE, reason="ECGRepository not available")
+    @pytest.mark.timeout(30)
+
     def test_ecg_repository_methods(self, mock_db_session):
         """Test ECGRepository methods with mocked dependencies"""
         with patch('app.repositories.ecg_repository.SessionLocal', return_value=mock_db_session):
@@ -72,9 +78,15 @@ class TestECGRepository:
             except Exception:
                 pass
 
+    @pytest.mark.timeout(30)
+
+
     def test_ecg_repository_edge_cases(self):
         """Test edge cases and error handling"""
         assert True  # Basic test to ensure this runs
+
+    @pytest.mark.timeout(30)
+
 
     def test_ecg_repository_integration(self):
         """Test integration with other components"""

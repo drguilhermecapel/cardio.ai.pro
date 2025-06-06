@@ -16,12 +16,18 @@ from app.services.hybrid_ecg_service import (
 class TestHybridECGZeroCoverage:
     """Target zero-coverage methods in hybrid ECG service"""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_clinical_urgency_constants(self):
         """Test ClinicalUrgency constants"""
         assert ClinicalUrgency.LOW == "low"
         assert ClinicalUrgency.MEDIUM == "medium"
         assert ClinicalUrgency.HIGH == "high"
         assert ClinicalUrgency.CRITICAL == "critical"
+    
+    @pytest.mark.timeout(30)
+
     
     def test_universal_ecg_reader_init(self):
         """Test UniversalECGReader initialization"""
@@ -32,11 +38,17 @@ class TestHybridECGZeroCoverage:
         assert '.edf' in reader.supported_formats
         assert '.png' in reader.supported_formats
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_ecg_none_path(self):
         """Test reading ECG with None path"""
         reader = UniversalECGReader()
         result = reader.read_ecg(None)
         assert result is None
+    
+    @pytest.mark.timeout(30)
+
     
     def test_universal_ecg_reader_read_ecg_empty_path(self):
         """Test reading ECG with empty path"""
@@ -44,11 +56,17 @@ class TestHybridECGZeroCoverage:
         result = reader.read_ecg("")
         assert result is None
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_ecg_unsupported_format(self):
         """Test reading ECG with unsupported format"""
         reader = UniversalECGReader()
         with pytest.raises(ValueError, match="Unsupported file format"):
             reader.read_ecg("/fake/test.xyz")
+    
+    @pytest.mark.timeout(30)
+
     
     def test_universal_ecg_reader_read_image(self):
         """Test reading ECG from image"""
@@ -61,6 +79,9 @@ class TestHybridECGZeroCoverage:
         assert 'metadata' in result
         assert result['sampling_rate'] == 500
         assert len(result['labels']) == 1
+    
+    @pytest.mark.timeout(30)
+
     
     def test_universal_ecg_reader_read_csv(self):
         """Test reading CSV file"""
@@ -76,6 +97,9 @@ class TestHybridECGZeroCoverage:
             assert 'signal' in result
             assert 'sampling_rate' in result
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_text(self):
         """Test reading text file"""
         reader = UniversalECGReader()
@@ -85,11 +109,17 @@ class TestHybridECGZeroCoverage:
             result = reader._read_text("/fake/test.txt", 250)
             assert isinstance(result, dict) or result is None
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_edf(self):
         """Test reading EDF file"""
         reader = UniversalECGReader()
         result = reader._read_edf("/fake/test.edf")
         assert result is None  # Expected since pyedflib not available
+    
+    @pytest.mark.timeout(30)
+
     
     def test_universal_ecg_reader_read_mitbih(self):
         """Test reading MIT-BIH file"""
@@ -97,11 +127,17 @@ class TestHybridECGZeroCoverage:
         result = reader._read_mitbih("/fake/test.dat")
         assert isinstance(result, dict)  # wfdb is available
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_ecg_custom(self):
         """Test reading custom ECG file"""
         reader = UniversalECGReader()
         with pytest.raises(Exception):  # Expect exception for non-existent file
             reader._read_ecg("/fake/test.ecg")
+    
+    @pytest.mark.timeout(30)
+
     
     def test_advanced_preprocessor_init(self):
         """Test AdvancedPreprocessor initialization"""
@@ -109,7 +145,8 @@ class TestHybridECGZeroCoverage:
         assert preprocessor.sample_rate == 250
     
     @pytest.mark.asyncio
-    async def test_advanced_preprocessor_preprocess_signal(self):
+    async @pytest.mark.timeout(30)
+ def test_advanced_preprocessor_preprocess_signal(self):
         """Test signal preprocessing"""
         preprocessor = AdvancedPreprocessor(250)
         signal = np.random.randn(1000).astype(np.float64)
@@ -117,6 +154,9 @@ class TestHybridECGZeroCoverage:
         result = await preprocessor.preprocess_signal(signal)
         assert isinstance(result, np.ndarray)
         assert result.dtype == np.float64
+    
+    @pytest.mark.timeout(30)
+
     
     def test_advanced_preprocessor_remove_baseline_wandering(self):
         """Test baseline wandering removal"""
@@ -126,6 +166,9 @@ class TestHybridECGZeroCoverage:
         result = preprocessor._remove_baseline_wandering(signal)
         assert isinstance(result, np.ndarray)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_advanced_preprocessor_remove_powerline_interference(self):
         """Test powerline interference removal"""
         preprocessor = AdvancedPreprocessor(250)
@@ -133,6 +176,9 @@ class TestHybridECGZeroCoverage:
         
         result = preprocessor._remove_powerline_interference(signal)
         assert isinstance(result, np.ndarray)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_advanced_preprocessor_bandpass_filter(self):
         """Test bandpass filtering"""
@@ -142,6 +188,9 @@ class TestHybridECGZeroCoverage:
         result = preprocessor._bandpass_filter(signal)
         assert isinstance(result, np.ndarray)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_advanced_preprocessor_wavelet_denoise(self):
         """Test wavelet denoising"""
         preprocessor = AdvancedPreprocessor(250)
@@ -150,10 +199,16 @@ class TestHybridECGZeroCoverage:
         result = preprocessor._wavelet_denoise(signal)
         assert isinstance(result, np.ndarray)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_init(self):
         """Test FeatureExtractor initialization"""
         extractor = FeatureExtractor(250)
         assert extractor.sample_rate == 250
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_extract_all_features(self):
         """Test extracting all features"""
@@ -164,6 +219,9 @@ class TestHybridECGZeroCoverage:
         assert isinstance(result, dict)
         assert isinstance(result, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_detect_r_peaks(self):
         """Test R-peak detection"""
         extractor = FeatureExtractor(250)
@@ -171,6 +229,9 @@ class TestHybridECGZeroCoverage:
         
         result = extractor._detect_r_peaks(signal)
         assert isinstance(result, np.ndarray)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_extract_morphological_features(self):
         """Test morphological feature extraction"""
@@ -181,6 +242,9 @@ class TestHybridECGZeroCoverage:
         result = extractor._extract_morphological_features(signal, r_peaks)
         assert isinstance(result, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_extract_interval_features(self):
         """Test interval feature extraction"""
         extractor = FeatureExtractor(250)
@@ -190,6 +254,9 @@ class TestHybridECGZeroCoverage:
         result = extractor._extract_interval_features(signal, r_peaks)
         assert isinstance(result, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_extract_hrv_features(self):
         """Test HRV feature extraction"""
         extractor = FeatureExtractor(250)
@@ -197,6 +264,9 @@ class TestHybridECGZeroCoverage:
         
         result = extractor._extract_hrv_features(r_peaks)
         assert isinstance(result, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_extract_spectral_features(self):
         """Test spectral feature extraction"""
@@ -206,6 +276,9 @@ class TestHybridECGZeroCoverage:
         result = extractor._extract_spectral_features(signal)
         assert isinstance(result, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_extract_wavelet_features(self):
         """Test wavelet feature extraction"""
         extractor = FeatureExtractor(250)
@@ -213,6 +286,9 @@ class TestHybridECGZeroCoverage:
         
         result = extractor._extract_wavelet_features(signal)
         assert isinstance(result, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_extract_nonlinear_features(self):
         """Test nonlinear feature extraction"""
@@ -222,6 +298,9 @@ class TestHybridECGZeroCoverage:
         result = extractor._extract_nonlinear_features(signal)
         assert isinstance(result, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_sample_entropy(self):
         """Test sample entropy calculation"""
         extractor = FeatureExtractor(250)
@@ -230,6 +309,9 @@ class TestHybridECGZeroCoverage:
         result = extractor._sample_entropy(signal, 2, 0.2)
         assert isinstance(result, float)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_approximate_entropy(self):
         """Test approximate entropy calculation"""
         extractor = FeatureExtractor(250)
@@ -237,6 +319,9 @@ class TestHybridECGZeroCoverage:
         
         result = extractor._approximate_entropy(signal, 2, 0.2)
         assert isinstance(result, float)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_hybrid_ecg_analysis_service_init(self):
         """Test HybridECGAnalysisService initialization"""
@@ -250,7 +335,8 @@ class TestHybridECGZeroCoverage:
         assert hasattr(service, 'validation_service')
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_analysis_service_analyze_ecg_file(self):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_analysis_service_analyze_ecg_file(self):
         """Test ECG file analysis"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -270,7 +356,8 @@ class TestHybridECGZeroCoverage:
             assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_analysis_service_analyze_ecg_signal(self):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_analysis_service_analyze_ecg_signal(self):
         """Test ECG signal analysis"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -283,7 +370,8 @@ class TestHybridECGZeroCoverage:
         assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_analysis_service_simulate_predictions(self):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_analysis_service_simulate_predictions(self):
         """Test prediction simulation"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -296,7 +384,8 @@ class TestHybridECGZeroCoverage:
         assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_analysis_service_get_supported_pathologies(self):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_analysis_service_get_supported_pathologies(self):
         """Test getting supported pathologies"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -307,6 +396,9 @@ class TestHybridECGZeroCoverage:
         result = await service.get_supported_pathologies()
         assert isinstance(result, list)
         assert len(result) > 0
+    
+    @pytest.mark.timeout(30)
+
     
     def test_hybrid_ecg_analysis_service_validate_signal(self):
         """Test signal validation"""

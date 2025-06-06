@@ -11,6 +11,10 @@ def client():
     return TestClient(app)
 
 
+@pytest.mark.timeout(30)
+
+
+
 def test_health_endpoint(client):
     """Test health endpoint returns correct response."""
     response = client.get("/health")

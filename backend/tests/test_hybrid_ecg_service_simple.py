@@ -31,6 +31,9 @@ class TestHybridECGServiceSimple:
         """Sample ECG data"""
         return np.random.randn(5000, 12).astype(np.float64)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_init(self):
         """Test UniversalECGReader initialization"""
         reader = UniversalECGReader()
@@ -40,6 +43,9 @@ class TestHybridECGServiceSimple:
         assert hasattr(reader, '_read_mitbih')
         assert hasattr(reader, '_read_csv')
         assert hasattr(reader, 'supported_formats')
+    
+    @pytest.mark.timeout(30)
+
     
     def test_universal_ecg_reader_read_csv_direct(self):
         """Test reading CSV files directly"""
@@ -58,6 +64,9 @@ class TestHybridECGServiceSimple:
             assert 'labels' in result
             assert result['sampling_rate'] == 250
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_mitbih(self):
         """Test reading MIT-BIH files"""
         reader = UniversalECGReader()
@@ -66,6 +75,9 @@ class TestHybridECGServiceSimple:
         assert isinstance(result, dict)
         assert 'signal' in result
         assert 'sampling_rate' in result
+    
+    @pytest.mark.timeout(30)
+
     
     def test_advanced_preprocessor_init(self):
         """Test AdvancedPreprocessor initialization"""
@@ -78,12 +90,16 @@ class TestHybridECGServiceSimple:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
+    async @pytest.mark.timeout(30)
+ def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
         """Test preprocessing ECG data"""
         preprocessor = AdvancedPreprocessor(sampling_rate=500)
         result = await preprocessor.preprocess_signal(sample_ecg_data)
         assert result is not None
         assert isinstance(result, np.ndarray)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_advanced_preprocessor_remove_baseline_wandering(self, sample_ecg_data):
         """Test baseline wandering removal"""
@@ -92,12 +108,18 @@ class TestHybridECGServiceSimple:
         assert result is not None
         assert isinstance(result, np.ndarray)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_advanced_preprocessor_bandpass_filter(self, sample_ecg_data):
         """Test bandpass filtering"""
         preprocessor = AdvancedPreprocessor(sampling_rate=500)
         result = preprocessor._bandpass_filter(sample_ecg_data.flatten())
         assert result is not None
         assert isinstance(result, np.ndarray)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_init(self):
         """Test FeatureExtractor initialization"""
@@ -107,6 +129,9 @@ class TestHybridECGServiceSimple:
         assert hasattr(extractor, '_extract_morphological_features')
         assert hasattr(extractor, '_extract_spectral_features')
         assert hasattr(extractor, '_detect_r_peaks')
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_extract_all_features(self, sample_ecg_data):
         """Test feature extraction"""
@@ -120,6 +145,9 @@ class TestHybridECGServiceSimple:
             assert result is not None
             assert isinstance(result, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_feature_extractor_extract_morphological_features(self, sample_ecg_data):
         """Test morphological feature extraction"""
         extractor = FeatureExtractor(sampling_rate=500)
@@ -127,6 +155,9 @@ class TestHybridECGServiceSimple:
         result = extractor._extract_morphological_features(sample_ecg_data, r_peaks)
         assert result is not None
         assert isinstance(result, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_extract_spectral_features(self, sample_ecg_data):
         """Test spectral feature extraction"""
@@ -137,7 +168,8 @@ class TestHybridECGServiceSimple:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_hybrid_service_init(self, hybrid_service):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_service_init(self, hybrid_service):
         """Test HybridECGAnalysisService initialization"""
         assert hybrid_service is not None
         assert hasattr(hybrid_service, 'analyze_ecg_comprehensive')
@@ -147,7 +179,8 @@ class TestHybridECGServiceSimple:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_hybrid_service_analyze_ecg_comprehensive_simple(self, hybrid_service, sample_ecg_data):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_service_analyze_ecg_comprehensive_simple(self, hybrid_service, sample_ecg_data):
         """Test comprehensive ECG analysis - simplified"""
         with patch.object(hybrid_service.ecg_reader, 'read_ecg', return_value={'signal': sample_ecg_data, 'sampling_rate': 500}):
             with patch.object(hybrid_service.preprocessor, 'preprocess_signal', return_value=sample_ecg_data):
@@ -163,6 +196,9 @@ class TestHybridECGServiceSimple:
                         assert result is not None
                         assert isinstance(result, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_ecg_numpy(self):
         """Test reading ECG with numpy extension"""
         reader = UniversalECGReader()
@@ -170,6 +206,9 @@ class TestHybridECGServiceSimple:
             mock_load.return_value = np.random.randn(1000, 12)
             with pytest.raises(ValueError, match="Unsupported format: .npy"):
                 reader.read_ecg("/fake/test.npy")
+    
+    @pytest.mark.timeout(30)
+
     
     def test_universal_ecg_reader_read_ecg_csv(self):
         """Test reading ECG with csv extension"""
@@ -186,11 +225,17 @@ class TestHybridECGServiceSimple:
             assert 'signal' in result
             mock_read.assert_called_once()
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_read_ecg_unsupported(self):
         """Test reading ECG with unsupported extension"""
         reader = UniversalECGReader()
         with pytest.raises(ValueError, match="Unsupported format"):
             reader.read_ecg("/fake/test.xyz")
+    
+    @pytest.mark.timeout(30)
+
     
     def test_advanced_preprocessor_remove_powerline_interference(self, sample_ecg_data):
         """Test powerline interference removal"""
@@ -198,6 +243,9 @@ class TestHybridECGServiceSimple:
         result = preprocessor._remove_powerline_interference(sample_ecg_data.flatten())
         assert result is not None
         assert isinstance(result, np.ndarray)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_detect_r_peaks(self, sample_ecg_data):
         """Test R peak detection"""

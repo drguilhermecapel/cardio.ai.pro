@@ -35,6 +35,9 @@ def mock_validation_service():
 class TestUniversalECGReader:
     """Test UniversalECGReader critical paths."""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_init_supported_formats(self):
         """Test initialization includes all supported formats."""
         reader = UniversalECGReader()
@@ -44,11 +47,17 @@ class TestUniversalECGReader:
         assert '.dat' in reader.supported_formats
         assert '.png' in reader.supported_formats
     
+    @pytest.mark.timeout(30)
+
+    
     def test_read_ecg_none_input(self):
         """Test read_ecg with None input."""
         reader = UniversalECGReader()
         result = reader.read_ecg(None)
         assert result is None
+    
+    @pytest.mark.timeout(30)
+
     
     def test_read_ecg_empty_string(self):
         """Test read_ecg with empty string."""
@@ -56,12 +65,18 @@ class TestUniversalECGReader:
         result = reader.read_ecg('')
         assert result is None
     
+    @pytest.mark.timeout(30)
+
+    
     def test_read_ecg_unsupported_format(self):
         """Test read_ecg with unsupported format."""
         reader = UniversalECGReader()
         
         with pytest.raises(ValueError, match="Unsupported format"):
             reader.read_ecg('/fake/test.xyz')
+    
+    @pytest.mark.timeout(30)
+
     
     def test_read_image_placeholder(self):
         """Test PNG image reading placeholder."""
@@ -77,6 +92,9 @@ class TestUniversalECGReader:
 class TestAdvancedPreprocessor:
     """Test AdvancedPreprocessor critical paths."""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_init_default_params(self):
         """Test initialization with default parameters."""
         preprocessor = AdvancedPreprocessor()
@@ -84,7 +102,8 @@ class TestAdvancedPreprocessor:
         assert preprocessor.fs == 250  # Default sampling rate
     
     @pytest.mark.asyncio
-    async def test_preprocess_signal_basic(self):
+    async @pytest.mark.timeout(30)
+ def test_preprocess_signal_basic(self):
         """Test basic signal preprocessing."""
         preprocessor = AdvancedPreprocessor()
         signal = np.array([[1.0, 2.0, 3.0]], dtype=np.float64)
@@ -93,6 +112,9 @@ class TestAdvancedPreprocessor:
         
         assert isinstance(result, np.ndarray)
         assert result.dtype == np.float64
+    
+    @pytest.mark.timeout(30)
+
     
     def test_remove_baseline_wandering(self):
         """Test baseline wandering removal."""
@@ -108,11 +130,17 @@ class TestAdvancedPreprocessor:
 class TestFeatureExtractor:
     """Test FeatureExtractor critical paths."""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_init_default_params(self):
         """Test initialization with default parameters."""
         extractor = FeatureExtractor()
         
         assert extractor.fs == 250  # Default sampling rate
+    
+    @pytest.mark.timeout(30)
+
     
     def test_extract_all_features_basic(self):
         """Test basic feature extraction."""
@@ -124,6 +152,9 @@ class TestFeatureExtractor:
         assert isinstance(result, dict)
         assert 'signal_mean' in result
         assert 'signal_std' in result
+    
+    @pytest.mark.timeout(30)
+
     
     def test_detect_r_peaks(self):
         """Test R peak detection."""
@@ -139,6 +170,9 @@ class TestFeatureExtractor:
 class TestHybridECGAnalysisService:
     """Test HybridECGAnalysisService critical paths."""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_init_service(self, mock_db, mock_validation_service):
         """Test service initialization."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
@@ -150,7 +184,8 @@ class TestHybridECGAnalysisService:
         assert hasattr(service, 'feature_extractor')
     
     @pytest.mark.asyncio
-    async def test_validate_signal_valid(self, mock_db, mock_validation_service):
+    async @pytest.mark.timeout(30)
+ def test_validate_signal_valid(self, mock_db, mock_validation_service):
         """Test signal validation with valid signal."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.array([1.0, 2.0, 3.0], dtype=np.float64)
@@ -159,7 +194,8 @@ class TestHybridECGAnalysisService:
         assert result is True
     
     @pytest.mark.asyncio
-    async def test_validate_signal_invalid_empty(self, mock_db, mock_validation_service):
+    async @pytest.mark.timeout(30)
+ def test_validate_signal_invalid_empty(self, mock_db, mock_validation_service):
         """Test signal validation with empty signal."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.array([], dtype=np.float64)
@@ -168,7 +204,8 @@ class TestHybridECGAnalysisService:
         assert result is False
     
     @pytest.mark.asyncio
-    async def test_get_supported_pathologies(self, mock_db, mock_validation_service):
+    async @pytest.mark.timeout(30)
+ def test_get_supported_pathologies(self, mock_db, mock_validation_service):
         """Test getting supported pathologies."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         
@@ -179,7 +216,8 @@ class TestHybridECGAnalysisService:
         assert 'Atrial Fibrillation' in result
     
     @pytest.mark.asyncio
-    async def test_simulate_predictions(self, mock_db, mock_validation_service):
+    async @pytest.mark.timeout(30)
+ def test_simulate_predictions(self, mock_db, mock_validation_service):
         """Test prediction simulation."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         features = {'heart_rate': 75.0}
@@ -192,7 +230,8 @@ class TestHybridECGAnalysisService:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_analyze_ecg_comprehensive_with_data(self, mock_db, mock_validation_service, ecg_sample_data):
+    async @pytest.mark.timeout(30)
+ def test_analyze_ecg_comprehensive_with_data(self, mock_db, mock_validation_service, ecg_sample_data):
         """Test comprehensive ECG analysis with direct data."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         
@@ -209,7 +248,8 @@ class TestHybridECGAnalysisService:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_analyze_ecg_comprehensive_no_input(self, mock_db, mock_validation_service):
+    async @pytest.mark.timeout(30)
+ def test_analyze_ecg_comprehensive_no_input(self, mock_db, mock_validation_service):
         """Test comprehensive ECG analysis with no input."""
         from app.core.exceptions import ECGProcessingException
         
@@ -220,7 +260,8 @@ class TestHybridECGAnalysisService:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_assess_signal_quality(self, mock_db, mock_validation_service):
+    async @pytest.mark.timeout(30)
+ def test_assess_signal_quality(self, mock_db, mock_validation_service):
         """Test signal quality assessment."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.random.randn(1000).astype(np.float64)

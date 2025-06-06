@@ -13,12 +13,16 @@ except ImportError:
 class TestECGAnalysisServiceSimple:
     """Testes que funcionam"""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_service_exists(self):
         """Verifica se serviço existe"""
         assert ECGAnalysisService is not None
     
     @pytest.mark.asyncio
-    async def test_analyze_ecg_basic(self):
+    async @pytest.mark.timeout(30)
+ def test_analyze_ecg_basic(self):
         """Teste básico de análise"""
         service = ECGAnalysisService() if callable(ECGAnalysisService) else MagicMock()
         
@@ -34,6 +38,9 @@ class TestECGAnalysisServiceSimple:
         result = await service.analyze(ecg_data)
         assert result is not None
         assert 'heart_rate' in result or hasattr(result, '__getitem__')
+    
+    @pytest.mark.timeout(30)
+
     
     def test_all_analysis_methods(self):
         """Testa todos os métodos de análise"""
@@ -54,7 +61,8 @@ class TestECGAnalysisServiceSimple:
     
     @pytest.mark.asyncio
     @pytest.mark.parametrize("signal_length", [1000, 5000, 10000])
-    async def test_different_signal_lengths(self, signal_length):
+    async @pytest.mark.timeout(30)
+ def test_different_signal_lengths(self, signal_length):
         """Testa diferentes tamanhos de sinal"""
         service = MagicMock()
         service.analyze.return_value = {'status': 'complete'}

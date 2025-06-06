@@ -88,6 +88,9 @@ class TestECGCriticalSafety:
             "patient_id": "VFIB_001"
         }
 
+    @pytest.mark.timeout(30)
+
+
     def test_service_initialization_critical(self, mock_db, mock_validation_service):
         """CRITICAL: Service must initialize properly for medical use."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
@@ -102,7 +105,8 @@ class TestECGCriticalSafety:
         assert hasattr(service, 'ecg_logger')
 
     @pytest.mark.asyncio
-    async def test_stemi_detection_emergency_timing(self, ecg_service, stemi_signal):
+    async @pytest.mark.timeout(30)
+ def test_stemi_detection_emergency_timing(self, ecg_service, stemi_signal):
         """CRITICAL: STEMI detection must complete within emergency timeframe."""
         start_time = time.time()
         
@@ -134,7 +138,8 @@ class TestECGCriticalSafety:
         assert result["clinical_urgency"] == "critical"
 
     @pytest.mark.asyncio
-    async def test_normal_ecg_no_false_alarms(self, ecg_service, normal_signal):
+    async @pytest.mark.timeout(30)
+ def test_normal_ecg_no_false_alarms(self, ecg_service, normal_signal):
         """CRITICAL: Normal ECG must not generate false critical alarms."""
         with patch.object(ecg_service.ecg_reader, 'read_ecg', return_value={
             'signal': np.array([[0.1, 0.2, 0.3, 0.2, 0.1, 0.0, -0.1] * 1000]),
@@ -161,6 +166,9 @@ class TestECGCriticalSafety:
         assert result["abnormalities"]["vtach"]["detected"] is False
         assert result["clinical_urgency"] in ["low", "medium"]
 
+    @pytest.mark.timeout(30)
+
+
     def test_signal_quality_validation_critical(self, ecg_service):
         """CRITICAL: Invalid signals must be rejected to prevent misdiagnosis."""
         invalid_signals = [
@@ -177,7 +185,8 @@ class TestECGCriticalSafety:
                 ecg_service._validate_ecg_signal(invalid_signal)
 
     @pytest.mark.asyncio
-    async def test_vfib_emergency_detection(self, ecg_service, vfib_signal):
+    async @pytest.mark.timeout(30)
+ def test_vfib_emergency_detection(self, ecg_service, vfib_signal):
         """CRITICAL: Ventricular fibrillation must be detected immediately."""
         start_time = time.time()
         
@@ -209,7 +218,8 @@ class TestECGCriticalSafety:
         assert result["clinical_urgency"] == "critical"
 
     @pytest.mark.asyncio
-    async def test_timeout_handling_emergency(self, ecg_service):
+    async @pytest.mark.timeout(30)
+ def test_timeout_handling_emergency(self, ecg_service):
         """CRITICAL: Analysis timeout must provide safe fallback."""
         with pytest.raises(ECGProcessingException) as exc_info:
             await ecg_service.analyze_ecg_comprehensive(
@@ -221,7 +231,8 @@ class TestECGCriticalSafety:
         assert "analysis failed" in str(exc_info.value).lower()
 
     @pytest.mark.asyncio
-    async def test_model_failure_fallback_safety(self, ecg_service):
+    async @pytest.mark.timeout(30)
+ def test_model_failure_fallback_safety(self, ecg_service):
         """CRITICAL: AI model failure must have safe medical fallback."""
         import tempfile
         import os
@@ -241,6 +252,9 @@ class TestECGCriticalSafety:
             assert "analysis failed" in str(exc_info.value).lower()
         finally:
             os.unlink(temp_file)
+
+    @pytest.mark.timeout(30)
+
 
     def test_memory_constraints_medical_environment(self, ecg_service):
         """CRITICAL: Memory usage must be controlled for hospital environment."""
@@ -268,6 +282,9 @@ class TestECGCriticalSafety:
         memory_used = memory_after - memory_before
         
         assert memory_used < 500, f"Excessive memory usage: {memory_used:.1f}MB"
+
+    @pytest.mark.timeout(30)
+
 
     def test_concurrent_analysis_stability(self, ecg_service):
         """CRITICAL: Multiple simultaneous analyses must not interfere."""
@@ -307,6 +324,9 @@ class TestECGRegulatoryCompliance:
         """ECG service for regulatory testing."""
         return HybridECGAnalysisService(Mock(), Mock())
     
+    @pytest.mark.timeout(30)
+
+    
     def test_audit_trail_completeness(self, ecg_service):
         """REGULATORY: All processing steps must be auditable."""
         signal = {
@@ -330,6 +350,9 @@ class TestECGRegulatoryCompliance:
             assert "validation_checksums" in audit_trail
             assert len(audit_trail["processing_steps"]) >= 3
 
+    @pytest.mark.timeout(30)
+
+
     def test_data_integrity_validation(self, ecg_service):
         """REGULATORY: Data integrity must be maintained throughout processing."""
         original_signal = {
@@ -346,6 +369,9 @@ class TestECGRegulatoryCompliance:
         for lead_name in original_signal["leads"]:
             assert lead_name in processed_signal["leads"]
             assert len(processed_signal["leads"][lead_name]) > 0
+
+    @pytest.mark.timeout(30)
+
 
     def test_error_handling_medical_standards(self, ecg_service):
         """REGULATORY: Error handling must meet medical device standards."""
@@ -371,6 +397,9 @@ class TestECGPerformanceMedical:
         """ECG service for performance testing."""
         return HybridECGAnalysisService(Mock(), Mock())
     
+    @pytest.mark.timeout(30)
+
+    
     def test_emergency_response_time_requirement(self, ecg_service):
         """PERFORMANCE: Emergency analysis must complete within time limits."""
         emergency_signal = {
@@ -392,6 +421,9 @@ class TestECGPerformanceMedical:
         
         assert processing_time < 15.0, f"Emergency preprocessing too slow: {processing_time:.2f}s"
 
+    @pytest.mark.timeout(30)
+
+
     def test_signal_processing_accuracy(self, ecg_service):
         """PERFORMANCE: Signal processing must maintain medical accuracy."""
         test_signal = {
@@ -412,6 +444,9 @@ class TestECGPerformanceMedical:
         for lead_name, lead_data in processed["leads"].items():
             assert len(lead_data) > 0, f"Lead {lead_name} should not be empty after processing"
             assert all(isinstance(x, (int, float)) for x in lead_data[:10]), f"Lead {lead_name} should contain numeric data"
+
+    @pytest.mark.timeout(30)
+
 
     def test_resource_cleanup_medical_safety(self, ecg_service):
         """PERFORMANCE: Resources must be properly cleaned up for medical safety."""

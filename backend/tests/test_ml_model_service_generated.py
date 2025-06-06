@@ -21,6 +21,9 @@ class TestMLModelService:
         # TODO: Add proper initialization
         return MLModelService()
 
+    @pytest.mark.timeout(30)
+
+
     def test___init__(self, mlmodelservice_instance):
         """Test __init__ method"""
         service = MLModelService()
@@ -31,6 +34,8 @@ class TestMLModelService:
         assert hasattr(service, 'model_configs')
 
     @patch('app.services.ml_model_service.MLModelService._load_model')
+    @pytest.mark.timeout(30)
+
     def test_classify_ecg(self, mock__load_model, mlmodelservice_instance):
         """Test classify_ecg method"""
         # Arrange
@@ -47,6 +52,8 @@ class TestMLModelService:
         mock_predict.assert_called_once()
 
     @patch('app.services.ml_model_service.MLModelService.classify_ecg')
+    @pytest.mark.timeout(30)
+
     def test_analyze_ecg_sync(self, mock_classify, mlmodelservice_instance):
         """Test analyze_ecg_sync method"""
         # Arrange
@@ -60,6 +67,9 @@ class TestMLModelService:
         assert result is not None
         mock_classify.assert_called_once_with(ecg_data)
 
+    @pytest.mark.timeout(30)
+
+
     def test_analyze_ecg(self, mlmodelservice_instance):
         """Test analyze_ecg method"""
         # Arrange
@@ -71,6 +81,9 @@ class TestMLModelService:
         # Assert
         # TODO: Add assertions
         assert True  # Replace with actual assertion
+
+    @pytest.mark.timeout(30)
+
 
     def test_generate_interpretability(self, mlmodelservice_instance):
         """Test generate_interpretability method"""
@@ -84,6 +97,9 @@ class TestMLModelService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test__load_model(self, mlmodelservice_instance):
         """Test _load_model method"""
         # Arrange
@@ -95,6 +111,9 @@ class TestMLModelService:
         # Assert
         # TODO: Add assertions
         assert True  # Replace with actual assertion
+
+    @pytest.mark.timeout(30)
+
 
     def test_detect_rhythm(self, mlmodelservice_instance):
         """Test detect_rhythm method"""
@@ -108,6 +127,9 @@ class TestMLModelService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test_assess_quality(self, mlmodelservice_instance):
         """Test assess_quality method"""
         # Arrange
@@ -119,6 +141,9 @@ class TestMLModelService:
         # Assert
         # TODO: Add assertions
         assert True  # Replace with actual assertion
+
+    @pytest.mark.timeout(30)
+
 
     def test_get_model_info(self, mlmodelservice_instance):
         """Test get_model_info method"""
@@ -132,6 +157,9 @@ class TestMLModelService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test_predict_arrhythmia(self, mlmodelservice_instance):
         """Test predict_arrhythmia method"""
         # Arrange
@@ -143,6 +171,9 @@ class TestMLModelService:
         # Assert
         # TODO: Add assertions
         assert True  # Replace with actual assertion
+
+    @pytest.mark.timeout(30)
+
 
     def test_extract_features(self, mlmodelservice_instance):
         """Test extract_features method"""
@@ -156,6 +187,9 @@ class TestMLModelService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test_un_load_model(self, mlmodelservice_instance):
         """Test un_load_model method"""
         # Arrange
@@ -167,6 +201,9 @@ class TestMLModelService:
         # Assert
         # TODO: Add assertions
         assert True  # Replace with actual assertion
+
+    @pytest.mark.timeout(30)
+
 
     def test_is_model_loaded(self, mlmodelservice_instance):
         """Test is_model_loaded method"""
@@ -180,6 +217,9 @@ class TestMLModelService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test_get_loaded_models(self, mlmodelservice_instance):
         """Test get_loaded_models method"""
         # Arrange
@@ -192,10 +232,16 @@ class TestMLModelService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test_mlmodelservice_edge_cases(self, mlmodelservice_instance):
         """Test edge cases and error handling"""
         # TODO: Test boundary conditions
         pass
+
+    @pytest.mark.timeout(30)
+
 
     def test_mlmodelservice_integration(self):
         """Test integration with other components"""

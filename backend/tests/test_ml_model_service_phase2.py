@@ -27,6 +27,9 @@ class TestMLModelServiceComprehensive:
         model.run = Mock(return_value=[np.array([[0.1, 0.9]])])
         return model
     
+    @pytest.mark.timeout(30)
+
+    
     def test__load_models_success(self, ml_service):
         """Test loading ML models - covers __load_models method"""
         with patch('onnxruntime.InferenceSession') as mock_session:
@@ -35,6 +38,9 @@ class TestMLModelServiceComprehensive:
             ml_service.__load_models()
             
             assert isinstance(ml_service.models, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_analyze_ecg_all_models(self, ml_service, mock_model):
         """Test ECG analysis with all models - covers lines 171-178"""
@@ -55,6 +61,9 @@ class TestMLModelServiceComprehensive:
         assert 'rhythm' in result
         assert result['confidence'] >= 0
     
+    @pytest.mark.timeout(30)
+
+    
     def test_predict_arrhythmia_comprehensive(self, ml_service, mock_model):
         """Test arrhythmia prediction - covers lines 513-538"""
         ml_service.models['rhythm_detector'] = mock_model
@@ -69,6 +78,9 @@ class TestMLModelServiceComprehensive:
         result_afib = ml_service.predict_arrhythmia(ecg_afib)
         assert 'arrhythmia_type' in result_afib
     
+    @pytest.mark.timeout(30)
+
+    
     def test_extract_features(self, ml_service):
         """Test feature extraction - covers lines 540-554"""
         ecg_data = np.random.randn(5000).astype(np.float32)
@@ -78,12 +90,18 @@ class TestMLModelServiceComprehensive:
         assert isinstance(features, dict)
         assert len(features) >= 0
     
+    @pytest.mark.timeout(30)
+
+    
     def test_get_model_info(self, ml_service):
         """Test model info retrieval - covers lines 503-511"""
         info = ml_service.get_model_info()
         
         assert isinstance(info, dict)
         assert 'loaded_models' in info
+    
+    @pytest.mark.timeout(30)
+
     
     def test_is_model_loaded(self, ml_service):
         """Test model loading status - covers lines 583-585"""
@@ -92,6 +110,9 @@ class TestMLModelServiceComprehensive:
         status = ml_service.is_model_loaded(model_name)
         
         assert isinstance(status, bool)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_get_loaded_models(self, ml_service):
         """Test getting loaded models list - covers lines 587-589"""

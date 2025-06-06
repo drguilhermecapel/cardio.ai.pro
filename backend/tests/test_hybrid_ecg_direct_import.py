@@ -40,20 +40,32 @@ class TestHybridECGDirectImport:
         """Sample ECG signal data"""
         return np.random.randn(5000, 12).astype(np.float64)
 
+    @pytest.mark.timeout(30)
+
+
     def test_universal_ecg_reader_init(self):
         """Test UniversalECGReader initialization"""
         reader = UniversalECGReader()
         assert reader is not None
+
+    @pytest.mark.timeout(30)
+
 
     def test_advanced_preprocessor_init(self):
         """Test AdvancedPreprocessor initialization"""
         preprocessor = AdvancedPreprocessor()
         assert preprocessor is not None
 
+    @pytest.mark.timeout(30)
+
+
     def test_feature_extractor_init(self):
         """Test FeatureExtractor initialization"""
         extractor = FeatureExtractor()
         assert extractor is not None
+
+    @pytest.mark.timeout(30)
+
 
     def test_hybrid_service_init(self, hybrid_service):
         """Test HybridECGAnalysisService initialization"""
@@ -62,15 +74,24 @@ class TestHybridECGDirectImport:
         assert hasattr(hybrid_service, 'preprocessor')
         assert hasattr(hybrid_service, 'feature_extractor')
 
+    @pytest.mark.timeout(30)
+
+
     def test_get_supported_pathologies(self, hybrid_service):
         """Test get_supported_pathologies method"""
         pathologies = hybrid_service.get_supported_pathologies()
         assert isinstance(pathologies, list)
 
+    @pytest.mark.timeout(30)
+
+
     def test_validate_signal(valid_signal):
         """Test validate_signal method"""
         result = hybrid_service.validate_signal(valid_signal)
         assert "is_valid" in result
+
+    @pytest.mark.timeout(30)
+
 
     def test_simulate_predictions(self, hybrid_service):
         """Test _simulate_predictions method"""
@@ -80,6 +101,9 @@ class TestHybridECGDirectImport:
         assert "class_probabilities" in result
         assert "confidence" in result
 
+    @pytest.mark.timeout(30)
+
+
     def test_detect_atrial_fibrillation(self, hybrid_service):
         """Test _detect_atrial_fibrillation method"""
         features = {"rr_std": 250, "hrv_rmssd": 60, "spectral_entropy": 0.9}
@@ -87,6 +111,9 @@ class TestHybridECGDirectImport:
         assert isinstance(result, dict)
         assert "detected" in result
         assert "probability" in result
+
+    @pytest.mark.timeout(30)
+
 
     def test_detect_long_qt(self, hybrid_service):
         """Test _detect_long_qt method"""
@@ -97,7 +124,8 @@ class TestHybridECGDirectImport:
         assert "probability" in result
 
     @pytest.mark.asyncio
-    async def test_generate_clinical_assessment(self, hybrid_service):
+    async @pytest.mark.timeout(30)
+ def test_generate_clinical_assessment(self, hybrid_service):
         """Test _generate_clinical_assessment method"""
         ai_predictions = {"normal": 0.8}
         pathology_results = {"atrial_fibrillation": {"detected": False}}
@@ -110,6 +138,9 @@ class TestHybridECGDirectImport:
         assert "clinical_urgency" in result
         assert "assessment" in result
 
+    @pytest.mark.timeout(30)
+
+
     def test_analyze_emergency_patterns(self, hybrid_service, sample_ecg_signal):
         """Test _analyze_emergency_patterns method"""
         signal_1d = sample_ecg_signal[:, 0]
@@ -117,6 +148,9 @@ class TestHybridECGDirectImport:
         assert isinstance(result, dict)
         assert "stemi_detected" in result
         assert "vfib_detected" in result
+
+    @pytest.mark.timeout(30)
+
 
     def test_generate_audit_trail(self, hybrid_service):
         """Test _generate_audit_trail method"""
@@ -126,11 +160,17 @@ class TestHybridECGDirectImport:
         assert "timestamp" in result
         assert "analysis_id" in result
 
+    @pytest.mark.timeout(30)
+
+
     def test_preprocess_signal(self, hybrid_service, sample_ecg_signal):
         """Test _preprocess_signal method"""
         signal_1d = sample_ecg_signal[:, 0]
         result = hybrid_service._preprocess_signal(signal_1d)
         assert isinstance(result, np.ndarray)
+
+    @pytest.mark.timeout(30)
+
 
     def test_analyze_with_ai(self, hybrid_service, sample_ecg_signal):
         """Test _analyze_with_ai method"""
@@ -139,6 +179,9 @@ class TestHybridECGDirectImport:
         assert isinstance(result, dict)
         assert "classification" in result
         assert "confidence" in result
+
+    @pytest.mark.timeout(30)
+
 
     def test_validate_ecg_signal(self, hybrid_service):
         """Test _validate_ecg_signal method"""
@@ -151,6 +194,9 @@ class TestHybridECGDirectImport:
         result = hybrid_service._validate_ecg_signal(signal_data)
         assert result is True
 
+    @pytest.mark.timeout(30)
+
+
     def test_validate_signal_quality(self, hybrid_service, sample_ecg_signal):
         """Test _validate_signal_quality method"""
         signal_1d = sample_ecg_signal[:, 0]
@@ -161,13 +207,17 @@ class TestHybridECGDirectImport:
 
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
+    async @pytest.mark.timeout(30)
+ def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
         """Test _assess_signal_quality method"""
         signal_1d = sample_ecg_signal[:, 0]
         result = await hybrid_service._assess_signal_quality(signal_1d)
         assert isinstance(result, dict)
         assert "quality" in result
         assert "score" in result
+
+    @pytest.mark.timeout(30)
+
 
     def test_get_system_status(self, hybrid_service):
         """Test get_system_status method"""
@@ -176,11 +226,17 @@ class TestHybridECGDirectImport:
         assert "status" in result
         assert "version" in result
 
+    @pytest.mark.timeout(30)
+
+
     def test_apply_advanced_preprocessing(self, hybrid_service, sample_ecg_signal):
         """Test _apply_advanced_preprocessing method"""
         signal_1d = sample_ecg_signal[:, 0]
         result = hybrid_service._apply_advanced_preprocessing(signal_1d, 500)
         assert isinstance(result, np.ndarray)
+
+    @pytest.mark.timeout(30)
+
 
     def test_extract_comprehensive_features(self, hybrid_service, sample_ecg_signal):
         """Test _extract_comprehensive_features method"""
@@ -188,11 +244,17 @@ class TestHybridECGDirectImport:
         result = hybrid_service._extract_comprehensive_features(signal_1d, 500)
         assert isinstance(result, dict)
 
+    @pytest.mark.timeout(30)
+
+
     def test_analyze_leads(self, hybrid_service, sample_ecg_signal):
         """Test _analyze_leads method"""
         leads = ["I", "II", "III"]
         result = hybrid_service._analyze_leads(sample_ecg_signal, leads)
         assert isinstance(result, dict)
+
+    @pytest.mark.timeout(30)
+
 
     def test_analyze_rhythm_patterns(self, hybrid_service, sample_ecg_signal):
         """Test _analyze_rhythm_patterns method"""
@@ -201,16 +263,25 @@ class TestHybridECGDirectImport:
         assert isinstance(result, dict)
         assert "rhythm" in result
 
+    @pytest.mark.timeout(30)
+
+
     def test_read_ecg_file_fallback(self, hybrid_service):
         """Test _read_ecg_file_fallback method"""
         result = hybrid_service._read_ecg_file_fallback("test.wfdb")
         assert isinstance(result, np.ndarray)
+
+    @pytest.mark.timeout(30)
+
 
     def test_get_supported_formats(self, hybrid_service):
         """Test get_supported_formats method"""
         result = hybrid_service.supported_formats
         assert isinstance(result, list)
         assert len(result) > 0
+
+    @pytest.mark.timeout(30)
+
 
     def test_analyze_ecg_signal(self, hybrid_service, sample_ecg_signal):
         """Test analyze_ecg_signal method"""
@@ -219,7 +290,8 @@ class TestHybridECGDirectImport:
 
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_analyze_ecg_comprehensive_async(self, hybrid_service):
+    async @pytest.mark.timeout(30)
+ def test_analyze_ecg_comprehensive_async(self, hybrid_service):
         """Test analyze_ecg_comprehensive_async method"""
         with patch.object(hybrid_service.reader, 'read_ecg') as mock_read:
             mock_read.return_value = np.random.randn(1000).astype(np.float64)
@@ -232,7 +304,8 @@ class TestHybridECGDirectImport:
             assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    async def test_analyze_ecg_comprehensive(self, hybrid_service, sample_ecg_signal):
+    async @pytest.mark.timeout(30)
+ def test_analyze_ecg_comprehensive(self, hybrid_service, sample_ecg_signal):
         """Test analyze_ecg_comprehensive method"""
         signal_data = {
             "leads": {
@@ -246,7 +319,8 @@ class TestHybridECGDirectImport:
 
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_run_simplified_analysis(self, hybrid_service):
+    async @pytest.mark.timeout(30)
+ def test_run_simplified_analysis(self, hybrid_service):
         """Test _run_simplified_analysis method"""
         signal_data = {"test": "data"}
         features = {"heart_rate": 75}
@@ -257,7 +331,8 @@ class TestHybridECGDirectImport:
 
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_detect_pathologies(self, hybrid_service):
+    async @pytest.mark.timeout(30)
+ def test_detect_pathologies(self, hybrid_service):
         """Test _detect_pathologies method"""
         signal_data = {"test": "data"}
         features = {"heart_rate": 105, "qt_interval": 460}

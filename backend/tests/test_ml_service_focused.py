@@ -14,7 +14,8 @@ def ml_service():
 
 
 @pytest.mark.asyncio
-async def test_analyze_ecg_success(ml_service):
+async @pytest.mark.timeout(30)
+ def test_analyze_ecg_success(ml_service):
     """Test successful ECG analysis."""
     mock_ecg_model = Mock()
     mock_ecg_model.run.return_value = [np.array([[0.1, 0.9, 0.8, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2, 0.3, 0.4]])]
@@ -52,7 +53,8 @@ async def test_analyze_ecg_success(ml_service):
 
 
 @pytest.mark.asyncio
-async def test_analyze_ecg_no_models(ml_service):
+async @pytest.mark.timeout(30)
+ def test_analyze_ecg_no_models(ml_service):
     """Test ECG analysis when no models are loaded."""
     ml_service.models = {}  # No models loaded
     
@@ -69,6 +71,10 @@ async def test_analyze_ecg_no_models(ml_service):
     assert result is not None
     assert result["confidence"] == 0.0
     assert result["rhythm"] == "Unknown"
+
+
+@pytest.mark.timeout(30)
+
 
 
 def test_get_model_info(ml_service):
@@ -90,6 +96,10 @@ def test_get_model_info(ml_service):
     assert "rhythm_detector" in info["loaded_models"]
 
 
+@pytest.mark.timeout(30)
+
+
+
 def test_un_load_model_success(ml_service):
     """Test successful model unloading."""
     ml_service.models = {
@@ -106,6 +116,10 @@ def test_un_load_model_success(ml_service):
     assert success is True
     assert "ecg_classifier" not in ml_service.models
     assert "ecg_classifier" not in ml_service.model_metadata
+
+
+@pytest.mark.timeout(30)
+
 
 
 def test_un_load_model_not_found(ml_service):

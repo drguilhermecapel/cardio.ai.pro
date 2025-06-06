@@ -15,7 +15,8 @@ class Test80CoverageFinalStrategic:
     """Strategic test suite targeting 80% coverage with maximum impact"""
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_service_zero_coverage_828_lines(self):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_service_zero_coverage_828_lines(self):
         """Test HybridECGAnalysisService - 828 lines at 0% coverage = massive impact"""
         try:
             from app.services.hybrid_ecg_service import HybridECGAnalysisService
@@ -50,6 +51,9 @@ class Test80CoverageFinalStrategic:
                     assert isinstance(status, dict)
         except ImportError:
             pytest.skip("HybridECGAnalysisService not available")
+    
+    @pytest.mark.timeout(30)
+
     
     def test_ecg_hybrid_processor_zero_coverage_380_lines(self):
         """Test ECGHybridProcessor - 380 lines at 0% coverage = high impact"""
@@ -105,7 +109,8 @@ class Test80CoverageFinalStrategic:
             pytest.skip("ECGHybridProcessor not available")
     
     @pytest.mark.asyncio
-    async def test_ecg_processor_low_coverage_271_lines(self):
+    async @pytest.mark.timeout(30)
+ def test_ecg_processor_low_coverage_271_lines(self):
         """Test ECGProcessor - 271 lines at 12% coverage = good impact"""
         try:
             from app.utils.ecg_processor import ECGProcessor
@@ -148,6 +153,9 @@ class Test80CoverageFinalStrategic:
                     pass
         except ImportError:
             pytest.skip("ECGProcessor not available")
+    
+    @pytest.mark.timeout(30)
+
     
     def test_ml_model_service_low_coverage_275_lines(self):
         """Test MLModelService - 275 lines at 13% coverage = good impact"""
@@ -193,6 +201,9 @@ class Test80CoverageFinalStrategic:
         except ImportError:
             pytest.skip("MLModelService not available")
     
+    @pytest.mark.timeout(30)
+
+    
     def test_ecg_service_low_coverage_261_lines(self):
         """Test ECGAnalysisService - 261 lines at 17% coverage = good impact"""
         try:
@@ -231,6 +242,9 @@ class Test80CoverageFinalStrategic:
                         pass
         except ImportError:
             pytest.skip("ECGAnalysisService not available")
+    
+    @pytest.mark.timeout(30)
+
     
     def test_validation_service_low_coverage_258_lines(self):
         """Test ValidationService - 258 lines at 14% coverage = good impact"""
@@ -286,6 +300,9 @@ class Test80CoverageFinalStrategic:
         except ImportError:
             pytest.skip("ValidationService not available")
     
+    @pytest.mark.timeout(30)
+
+    
     def test_notification_service_low_coverage_207_lines(self):
         """Test NotificationService - 207 lines at 15% coverage = good impact"""
         from app.services.notification_service import NotificationService
@@ -326,6 +343,9 @@ class Test80CoverageFinalStrategic:
             assert result == mock_notification
             mock_create.assert_called_once()
     
+    @pytest.mark.timeout(30)
+
+    
     def test_repositories_low_coverage_combined(self):
         """Test repositories with low coverage - combined impact"""
         from app.repositories.ecg_repository import ECGRepository
@@ -351,6 +371,9 @@ class Test80CoverageFinalStrategic:
             assert result == mock_analysis
             mock_get.assert_called_once()
     
+    @pytest.mark.timeout(30)
+
+    
     def test_zero_coverage_modules_combined(self):
         """Test zero coverage modules for maximum impact"""
         from app.tasks.ecg_tasks import process_ecg_analysis
@@ -374,6 +397,9 @@ class Test80CoverageFinalStrategic:
         assert ECGDataFrame is not None
         assert ECGSchema is not None
         assert ECGAnalysisResult is not None
+    
+    @pytest.mark.timeout(30)
+
     
     def test_signal_quality_medium_coverage_154_lines(self):
         """Test SignalQualityAnalyzer - 154 lines at 9% coverage = medium impact"""
@@ -405,6 +431,9 @@ class Test80CoverageFinalStrategic:
         
         snr_sync = analyzer._calculate_snr_sync(signal)
         assert isinstance(snr_sync, float)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_api_endpoints_combined_coverage(self):
         """Test API endpoints for additional coverage"""

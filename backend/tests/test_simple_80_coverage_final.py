@@ -11,6 +11,9 @@ from unittest.mock import Mock, patch, AsyncMock
 class TestSimple80CoverageFinal:
     """Simple test suite targeting 80% coverage with zero-coverage modules"""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_hybrid_ecg_service_basic_instantiation(self):
         """Test HybridECGAnalysisService basic instantiation - 828 lines at 0%"""
         from app.services.hybrid_ecg_service import HybridECGAnalysisService
@@ -30,6 +33,9 @@ class TestSimple80CoverageFinal:
         formats = service.supported_formats
         assert isinstance(formats, list)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_ecg_hybrid_processor_basic_instantiation(self):
         """Test ECGHybridProcessor basic instantiation - 380 lines at 0%"""
         from app.utils.ecg_hybrid_processor import ECGHybridProcessor
@@ -46,6 +52,9 @@ class TestSimple80CoverageFinal:
         r_peaks = processor.detect_r_peaks(signal)
         assert isinstance(r_peaks, np.ndarray)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_ecg_types_basic_coverage(self):
         """Test ECG types - 4 lines at 0%"""
         from app.types.ecg_types import ECGDataFrame, ECGSchema, ECGAnalysisResult
@@ -54,17 +63,26 @@ class TestSimple80CoverageFinal:
         assert ECGSchema is not None
         assert ECGAnalysisResult is not None
     
+    @pytest.mark.timeout(30)
+
+    
     def test_celery_basic_coverage(self):
         """Test Celery - 4 lines at 0%"""
         from app.core.celery import celery_app
         
         assert celery_app is not None
     
+    @pytest.mark.timeout(30)
+
+    
     def test_ecg_tasks_basic_coverage(self):
         """Test ECG tasks - 31 lines at 0%"""
         from app.tasks.ecg_tasks import process_ecg_analysis
         
         assert callable(process_ecg_analysis)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_init_db_basic_coverage(self):
         """Test init_db - 40 lines at 0%"""

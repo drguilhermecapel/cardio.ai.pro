@@ -21,6 +21,9 @@ class TestNotificationService:
         # TODO: Add proper initialization
         return NotificationService()
 
+    @pytest.mark.timeout(30)
+
+
     def test___init__(self, notificationservice_instance):
         """Test __init__ method"""
         # Arrange
@@ -33,10 +36,16 @@ class TestNotificationService:
         # TODO: Add assertions
         assert True  # Replace with actual assertion
 
+    @pytest.mark.timeout(30)
+
+
     def test_notificationservice_edge_cases(self, notificationservice_instance):
         """Test edge cases and error handling"""
         # TODO: Test boundary conditions
         pass
+
+    @pytest.mark.timeout(30)
+
 
     def test_notificationservice_integration(self):
         """Test integration with other components"""

@@ -30,6 +30,9 @@ class TestECGHybridProcessorCritical:
         """ECG hybrid processor for testing."""
         return ECGHybridProcessor(mock_db, mock_validation_service)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_processor_initialization_critical(self, mock_db, mock_validation_service):
         """CRITICAL: Processor must initialize with required services."""
         processor = ECGHybridProcessor(mock_db, mock_validation_service)
@@ -40,7 +43,8 @@ class TestECGHybridProcessorCritical:
         assert hasattr(processor, 'hybrid_service')
 
     @pytest.mark.asyncio
-    async def test_process_ecg_with_validation_critical(self, processor):
+    async @pytest.mark.timeout(30)
+ def test_process_ecg_with_validation_critical(self, processor):
         """CRITICAL: ECG processing with validation must handle medical scenarios."""
         mock_analysis_result = {
             "abnormalities": {
@@ -73,7 +77,8 @@ class TestECGHybridProcessorCritical:
         assert result["clinical_urgency"] == "critical"
 
     @pytest.mark.asyncio
-    async def test_process_ecg_error_handling_medical(self, processor):
+    async @pytest.mark.timeout(30)
+ def test_process_ecg_error_handling_medical(self, processor):
         """CRITICAL: Error handling must be safe for medical environment."""
         with patch.object(processor.hybrid_service, 'analyze_ecg_comprehensive',
                          side_effect=Exception("ECG analysis failed")):
@@ -88,7 +93,8 @@ class TestECGHybridProcessorCritical:
             assert "Hybrid processing failed" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_validate_existing_analysis_placeholder(self, processor):
+    async @pytest.mark.timeout(30)
+ def test_validate_existing_analysis_placeholder(self, processor):
         """CRITICAL: Analysis validation must provide safe placeholder."""
         existing_analysis = {
             "abnormalities": {"stemi": {"detected": False}},
@@ -104,6 +110,9 @@ class TestECGHybridProcessorCritical:
         assert "overall_compliance" in result
         assert result["overall_compliance"] is True  # Placeholder compliance
 
+    @pytest.mark.timeout(30)
+
+
     def test_get_supported_formats_medical(self, processor):
         """CRITICAL: Supported formats must include medical standards."""
         with patch.object(processor.hybrid_service.ecg_reader, 'supported_formats', 
@@ -117,6 +126,9 @@ class TestECGHybridProcessorCritical:
             assert "EDF" in formats
             assert "DICOM" in formats
 
+    @pytest.mark.timeout(30)
+
+
     def test_get_regulatory_standards_compliance(self, processor):
         """CRITICAL: Must support required regulatory standards."""
         standards = processor.get_regulatory_standards()
@@ -129,7 +141,8 @@ class TestECGHybridProcessorCritical:
         assert "EU_MDR" in standards
 
     @pytest.mark.asyncio
-    async def test_get_system_status_medical_readiness(self, processor):
+    async @pytest.mark.timeout(30)
+ def test_get_system_status_medical_readiness(self, processor):
         """CRITICAL: System status must indicate medical readiness."""
         with patch.object(processor, 'get_supported_formats', return_value=["WFDB", "EDF", "DICOM"]):
             with patch.object(processor, 'get_regulatory_standards', return_value=["FDA", "ANVISA", "NMSA", "EU_MDR"]):
@@ -150,7 +163,8 @@ class TestECGHybridProcessorCritical:
                 assert status["system_version"] == "1.0.0"
 
     @pytest.mark.asyncio
-    async def test_regulatory_compliance_enforcement(self, processor):
+    async @pytest.mark.timeout(30)
+ def test_regulatory_compliance_enforcement(self, processor):
         """CRITICAL: Regulatory compliance must be enforced when required."""
         mock_analysis_result = {
             "abnormalities": {"stemi": {"detected": True, "confidence": 0.85}},  # Lower confidence
@@ -186,7 +200,8 @@ class TestECGHybridProcessorCritical:
             assert "FDA threshold" in result["compliance_issues"][0]
 
     @pytest.mark.asyncio
-    async def test_emergency_processing_priority(self, processor):
+    async @pytest.mark.timeout(30)
+ def test_emergency_processing_priority(self, processor):
         """CRITICAL: Emergency cases must be processed with priority."""
         emergency_analysis = {
             "abnormalities": {
@@ -216,6 +231,9 @@ class TestECGHybridProcessorCritical:
             assert result["abnormalities"]["vfib"]["detected"] is True
             assert result["clinical_urgency"] == "critical"
 
+    @pytest.mark.timeout(30)
+
+
     def test_processor_memory_efficiency_medical(self, processor):
         """CRITICAL: Memory usage must be efficient for medical environment."""
         import psutil
@@ -234,7 +252,8 @@ class TestECGHybridProcessorCritical:
         assert memory_increase < 50, f"Excessive memory usage: {memory_increase:.1f}MB"
 
     @pytest.mark.asyncio
-    async def test_concurrent_processing_medical_safety(self, processor):
+    async @pytest.mark.timeout(30)
+ def test_concurrent_processing_medical_safety(self, processor):
         """CRITICAL: Concurrent processing must be safe for medical use."""
         import concurrent.futures
         
@@ -275,7 +294,8 @@ class TestECGHybridProcessorIntegration:
         return ECGHybridProcessor(Mock(), Mock())
     
     @pytest.mark.asyncio
-    async def test_emergency_department_workflow_simulation(self, processor):
+    async @pytest.mark.timeout(30)
+ def test_emergency_department_workflow_simulation(self, processor):
         """INTEGRATION: Simulate complete emergency department workflow."""
         emergency_scenario = {
             "patient_id": 88888,
@@ -310,7 +330,8 @@ class TestECGHybridProcessorIntegration:
         assert result["regulatory_compliant"] is True
 
     @pytest.mark.asyncio
-    async def test_routine_screening_workflow_simulation(self, processor):
+    async @pytest.mark.timeout(30)
+ def test_routine_screening_workflow_simulation(self, processor):
         """INTEGRATION: Simulate routine cardiac screening workflow."""
         screening_scenario = {
             "patient_id": 77777,
@@ -344,6 +365,9 @@ class TestECGHybridProcessorIntegration:
         assert result["abnormalities"]["stemi"]["detected"] is False
         assert result["abnormalities"]["vfib"]["detected"] is False
         assert result["regulatory_compliant"] is True
+
+    @pytest.mark.timeout(30)
+
 
     def test_processor_error_recovery_medical(self, processor):
         """INTEGRATION: Error recovery must be robust for medical use."""

@@ -9,7 +9,8 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test.db"
 
 
 @pytest.mark.asyncio
-async def test_run_full_test_suite():
+async @pytest.mark.timeout(30)
+ def test_run_full_test_suite():
     """Run comprehensive tests to boost coverage to 80%."""
     
     from app.core.security import verify_password, get_password_hash, create_access_token, verify_token

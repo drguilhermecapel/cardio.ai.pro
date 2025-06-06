@@ -12,12 +12,16 @@ except ImportError:
 class TestNotificationServiceSimple:
     """Testes que FUNCIONAM"""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_notification_service_exists(self):
         """Testa se o serviço existe"""
         assert NotificationService is not None
     
     @pytest.mark.asyncio
-    async def test_mock_send_email(self):
+    async @pytest.mark.timeout(30)
+ def test_mock_send_email(self):
         """Testa envio de email com mock completo"""
         with patch('smtplib.SMTP') as mock_smtp:
             mock_instance = MagicMock()
@@ -32,6 +36,9 @@ class TestNotificationServiceSimple:
                 result = await service.send_email('test@test.com', 'Test', 'Body')
             
             assert result is not None
+    
+    @pytest.mark.timeout(30)
+
     
     def test_all_notification_methods(self):
         """Testa todos os métodos possíveis"""
@@ -57,7 +64,8 @@ class TestNotificationServiceCoverage:
         "notification@cardio.ai"
     ])
     @pytest.mark.asyncio
-    async def test_email_variations(self, email):
+    async @pytest.mark.timeout(30)
+ def test_email_variations(self, email):
         """Testa variações de email"""
         service = MagicMock()
         service.send_email.return_value = {'status': 'sent'}
@@ -70,7 +78,8 @@ class TestNotificationServiceCoverage:
         "emergency_alert"
     ])
     @pytest.mark.asyncio
-    async def test_template_variations(self, template):
+    async @pytest.mark.timeout(30)
+ def test_template_variations(self, template):
         """Testa templates"""
         service = MagicMock()
         service.send_template.return_value = {'sent': True}

@@ -13,6 +13,9 @@ from app.services.hybrid_ecg_service import (
 class TestSimpleMethodCoverage:
     """Simple tests to increase coverage by calling methods correctly"""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_universal_ecg_reader_methods(self):
         """Test UniversalECGReader methods with correct signatures"""
         reader = UniversalECGReader()
@@ -36,7 +39,8 @@ class TestSimpleMethodCoverage:
         assert result is None
     
     @pytest.mark.asyncio
-    async def test_advanced_preprocessor_methods(self):
+    async @pytest.mark.timeout(30)
+ def test_advanced_preprocessor_methods(self):
         """Test AdvancedPreprocessor methods with correct signatures"""
         preprocessor = AdvancedPreprocessor()
         signal = np.random.randn(1000)
@@ -58,6 +62,9 @@ class TestSimpleMethodCoverage:
         
         processed = await preprocessor.preprocess_signal(signal)
         assert isinstance(processed, np.ndarray)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_feature_extractor_methods(self):
         """Test FeatureExtractor methods with correct signatures"""
@@ -86,7 +93,8 @@ class TestSimpleMethodCoverage:
         assert isinstance(wavelet, dict)
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_service_basic_methods(self):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_service_basic_methods(self):
         """Test HybridECGAnalysisService basic methods"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -109,7 +117,8 @@ class TestSimpleMethodCoverage:
         assert len(predictions) > 0
     
     @pytest.mark.asyncio
-    async def test_hybrid_ecg_service_async_basic(self):
+    async @pytest.mark.timeout(30)
+ def test_hybrid_ecg_service_async_basic(self):
         """Test HybridECGAnalysisService async methods"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -130,6 +139,9 @@ class TestSimpleMethodCoverage:
         signal = np.random.randn(2000, 12)
         result = await service.analyze_ecg_signal(signal)
         assert isinstance(result, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_clinical_urgency_classification(self):
         """Test clinical urgency classification"""

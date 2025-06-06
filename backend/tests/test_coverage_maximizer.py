@@ -60,6 +60,8 @@ class TestHybridECGServiceMaxCoverage:
     """Target: hybrid_ecg_service.py (828 lines)"""
     
     @pytest.mark.skipif(not HYBRID_ECG_AVAILABLE, reason="HybridECGAnalysisService not available")
+    @pytest.mark.timeout(30)
+
     def test_import_and_instantiate_all_classes(self):
         """Force import of entire module"""
         with patch.multiple(
@@ -81,7 +83,8 @@ class TestHybridECGServiceMaxCoverage:
     
     @pytest.mark.skipif(not HYBRID_ECG_AVAILABLE, reason="HybridECGAnalysisService not available")
     @pytest.mark.asyncio
-    async def test_all_methods_minimal(self):
+    async @pytest.mark.timeout(30)
+ def test_all_methods_minimal(self):
         """Call every method with minimal args"""
         with patch.multiple(
             'app.services.hybrid_ecg_service',
@@ -123,6 +126,8 @@ class TestMLModelServiceMaxCoverage:
     """Target: ml_model_service.py (275 lines)"""
     
     @pytest.mark.skipif(not ML_MODEL_AVAILABLE, reason="MLModelService not available")
+    @pytest.mark.timeout(30)
+
     def test_all_ml_paths(self):
         """Test all ML service paths"""
         with patch('torch.load', return_value=Mock()):
@@ -152,7 +157,8 @@ class TestValidationServiceMaxCoverage:
     
     @pytest.mark.skipif(not VALIDATION_SERVICE_AVAILABLE, reason="ValidationService not available")
     @pytest.mark.asyncio
-    async def test_all_validation_paths(self):
+    async @pytest.mark.timeout(30)
+ def test_all_validation_paths(self):
         """Test all validation service paths"""
         with patch.object(ValidationService, '__init__', return_value=None):
             try:
@@ -184,6 +190,8 @@ class TestECGProcessorMaxCoverage:
     """Target: ecg_processor.py and ecg_hybrid_processor.py"""
     
     @pytest.mark.skipif(not ECG_PROCESSOR_AVAILABLE, reason="ECG processors not available")
+    @pytest.mark.timeout(30)
+
     def test_all_processing_methods(self):
         """Test all ECG processing methods"""
         try:

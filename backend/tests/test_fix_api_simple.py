@@ -19,6 +19,9 @@ class MockAPIClient:
 class TestAPIEndpointsSimple:
     """Testes para endpoints"""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_ecg_endpoints(self):
         """Testa endpoints de ECG"""
         client = MockAPIClient()
@@ -32,6 +35,9 @@ class TestAPIEndpointsSimple:
         response = client.request('GET', '/api/v1/ecg/')
         assert 'data' in response
     
+    @pytest.mark.timeout(30)
+
+    
     def test_patient_endpoints(self):
         """Testa endpoints de paciente"""
         client = MockAPIClient()
@@ -41,6 +47,9 @@ class TestAPIEndpointsSimple:
         
         response = client.request('PUT', '/api/v1/patients/P001')
         assert response['status'] == 'updated'
+    
+    @pytest.mark.timeout(30)
+
     
     def test_notification_endpoints(self):
         """Testa endpoints de notificação"""
@@ -56,6 +65,8 @@ class TestAPIEndpointsSimple:
         ('/api/v1/auth/login', 'POST'),
         ('/api/v1/health', 'GET')
     ])
+    @pytest.mark.timeout(30)
+
     def test_all_endpoints(self, endpoint, method):
         """Testa todos os endpoints"""
         client = MockAPIClient()

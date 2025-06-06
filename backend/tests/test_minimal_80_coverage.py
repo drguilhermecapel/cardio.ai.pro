@@ -8,6 +8,10 @@ import numpy as np
 from unittest.mock import Mock, patch, AsyncMock
 
 
+@pytest.mark.timeout(30)
+
+
+
 def test_hybrid_ecg_service_instantiation():
     """Test HybridECGAnalysisService - 828 lines at 0% coverage"""
     from app.services.hybrid_ecg_service import HybridECGAnalysisService
@@ -17,12 +21,20 @@ def test_hybrid_ecg_service_instantiation():
     assert service.db == mock_db
 
 
+@pytest.mark.timeout(30)
+
+
+
 def test_ecg_hybrid_processor_instantiation():
     """Test ECGHybridProcessor - 380 lines at 0% coverage"""
     from app.utils.ecg_hybrid_processor import ECGHybridProcessor
     
     processor = ECGHybridProcessor()
     assert processor.sample_rate == 500
+
+
+@pytest.mark.timeout(30)
+
 
 
 def test_ecg_types_import():
@@ -34,16 +46,28 @@ def test_ecg_types_import():
     assert ECGAnalysisResult is not None
 
 
+@pytest.mark.timeout(30)
+
+
+
 def test_celery_import():
     """Test Celery - 4 lines at 0% coverage"""
     from app.core.celery import celery_app
     assert celery_app is not None
 
 
+@pytest.mark.timeout(30)
+
+
+
 def test_ecg_tasks_import():
     """Test ECG tasks - 31 lines at 0% coverage"""
     from app.tasks.ecg_tasks import process_ecg_analysis
     assert callable(process_ecg_analysis)
+
+
+@pytest.mark.timeout(30)
+
 
 
 def test_init_db_import():

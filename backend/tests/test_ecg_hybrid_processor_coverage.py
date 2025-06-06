@@ -8,6 +8,9 @@ from app.utils.ecg_hybrid_processor import ECGHybridProcessor
 class TestECGHybridProcessorCoverage:
     """Tests to increase coverage for ECGHybridProcessor"""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_initialization(self):
         """Test ECGHybridProcessor initialization"""
         processor = ECGHybridProcessor()
@@ -16,6 +19,9 @@ class TestECGHybridProcessorCoverage:
         assert processor.min_signal_length == 1000
         assert processor.max_signal_length == 30000
     
+    @pytest.mark.timeout(30)
+
+    
     def test_validate_signal_valid(self):
         """Test signal validation with valid signal"""
         processor = ECGHybridProcessor()
@@ -23,12 +29,18 @@ class TestECGHybridProcessorCoverage:
         result = processor._validate_signal(valid_signal)
         assert len(result) > 0
     
+    @pytest.mark.timeout(30)
+
+    
     def test_detect_r_peaks(self):
         """Test R peak detection"""
         processor = ECGHybridProcessor()
         signal = np.random.randn(2000).astype(np.float64)
         r_peaks = processor._detect_r_peaks(signal)
         assert isinstance(r_peaks, np.ndarray)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_assess_signal_quality(self):
         """Test signal quality assessment"""
@@ -38,12 +50,18 @@ class TestECGHybridProcessorCoverage:
         assert isinstance(quality, dict)
         assert 'overall_score' in quality
     
+    @pytest.mark.timeout(30)
+
+    
     def test_extract_comprehensive_features(self):
         """Test comprehensive feature extraction"""
         processor = ECGHybridProcessor()
         signal = np.random.randn(2000).astype(np.float64)
         features = processor._extract_comprehensive_features(signal)
         assert isinstance(features, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_extract_time_domain_features(self):
         """Test time domain feature extraction"""
@@ -52,6 +70,9 @@ class TestECGHybridProcessorCoverage:
         features = processor._extract_time_domain_features(signal)
         assert isinstance(features, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_extract_frequency_domain_features(self):
         """Test frequency domain feature extraction"""
         processor = ECGHybridProcessor()
@@ -59,12 +80,18 @@ class TestECGHybridProcessorCoverage:
         features = processor._extract_frequency_domain_features(signal)
         assert isinstance(features, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_extract_statistical_features(self):
         """Test statistical feature extraction"""
         processor = ECGHybridProcessor()
         signal = np.random.randn(2000).astype(np.float64)
         features = processor._extract_statistical_features(signal)
         assert isinstance(features, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_extract_morphological_features(self):
         """Test morphological feature extraction"""
@@ -74,12 +101,18 @@ class TestECGHybridProcessorCoverage:
         features = processor._extract_morphological_features(signal, r_peaks)
         assert isinstance(features, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_extract_nonlinear_features(self):
         """Test nonlinear feature extraction"""
         processor = ECGHybridProcessor()
         signal = np.random.randn(2000).astype(np.float64)
         features = processor._extract_nonlinear_features(signal)
         assert isinstance(features, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_analyze_heart_rate(self):
         """Test heart rate analysis"""
@@ -89,6 +122,9 @@ class TestECGHybridProcessorCoverage:
         analysis = processor._analyze_heart_rate(r_peaks)
         assert isinstance(analysis, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_analyze_rhythm(self):
         """Test rhythm analysis"""
         processor = ECGHybridProcessor()
@@ -96,6 +132,9 @@ class TestECGHybridProcessorCoverage:
         r_peaks = processor._detect_r_peaks(signal)
         analysis = processor._analyze_rhythm(signal, r_peaks)
         assert isinstance(analysis, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_process_ecg_signal_complete(self):
         """Test complete ECG signal processing"""
@@ -105,6 +144,9 @@ class TestECGHybridProcessorCoverage:
         result = processor.process_ecg_signal(signal)
         assert isinstance(result, dict)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_process_ecg_signal_invalid(self):
         """Test ECG signal processing with invalid signal"""
         processor = ECGHybridProcessor()
@@ -113,11 +155,17 @@ class TestECGHybridProcessorCoverage:
         with pytest.raises(Exception):
             processor.process_ecg_signal(signal)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_get_processing_info(self):
         """Test get processing info"""
         processor = ECGHybridProcessor()
         info = processor.get_processing_info()
         assert isinstance(info, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_get_supported_formats(self):
         """Test get supported formats"""
@@ -127,7 +175,8 @@ class TestECGHybridProcessorCoverage:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async def test_get_system_status(self):
+    async @pytest.mark.timeout(30)
+ def test_get_system_status(self):
         """Test get system status"""
         processor = ECGHybridProcessor()
         status = await processor.get_model_info()

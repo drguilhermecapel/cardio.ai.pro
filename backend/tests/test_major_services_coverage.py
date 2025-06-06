@@ -11,6 +11,9 @@ from app.services.validation_service import ValidationService
 class TestBasicCoverageBoost:
     """Simple tests to boost coverage across multiple services"""
     
+    @pytest.mark.timeout(30)
+
+    
     def test_ecg_hybrid_processor_basic(self):
         """Test basic ECG hybrid processor functionality"""
         processor = ECGHybridProcessor()
@@ -18,6 +21,9 @@ class TestBasicCoverageBoost:
         assert processor.fs == 500
         assert processor.min_signal_length == 1000
         assert processor.max_signal_length == 30000
+    
+    @pytest.mark.timeout(30)
+
     
     def test_ecg_hybrid_processor_signal_validation(self):
         """Test signal validation methods"""
@@ -27,6 +33,9 @@ class TestBasicCoverageBoost:
         result = processor._validate_signal(valid_signal)
         assert result is not None
     
+    @pytest.mark.timeout(30)
+
+    
     def test_ecg_hybrid_processor_r_peaks(self):
         """Test R peak detection"""
         processor = ECGHybridProcessor()
@@ -34,6 +43,9 @@ class TestBasicCoverageBoost:
         
         result = processor._detect_r_peaks(signal)
         assert isinstance(result, np.ndarray)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_ecg_hybrid_processor_quality_assessment(self):
         """Test signal quality assessment"""
@@ -55,12 +67,16 @@ class TestECGServiceCoverage:
         mock_validation_service = Mock()
         return ECGAnalysisService(mock_db, mock_ml_service, mock_validation_service)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_service_initialization(self, ecg_service):
         """Test service initialization"""
         assert ecg_service is not None
     
     @pytest.mark.asyncio
-    async def test_create_analysis_async(self, ecg_service):
+    async @pytest.mark.timeout(30)
+ def test_create_analysis_async(self, ecg_service):
         """Test async ECG analysis creation"""
         if hasattr(ecg_service, 'create_analysis'):
             with patch.object(ecg_service.repository, 'create_analysis', return_value=Mock()):
@@ -68,11 +84,17 @@ class TestECGServiceCoverage:
                     result = await ecg_service.create_analysis(1, 'test_file.ecg', 'test.ecg')
                     assert result is not None
     
+    @pytest.mark.timeout(30)
+
+    
     def test_calculate_file_info(self, ecg_service):
         """Test file info calculation"""
         if hasattr(ecg_service, '_calculate_file_info'):
             result = ecg_service._calculate_file_info('test.ecg')
             assert isinstance(result, dict)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_extract_measurements(self, ecg_service):
         """Test ECG measurements extraction"""
@@ -81,12 +103,18 @@ class TestECGServiceCoverage:
             result = ecg_service._extract_measurements(mock_signal, 500)
             assert isinstance(result, list)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_generate_annotations(self, ecg_service):
         """Test ECG annotations generation"""
         if hasattr(ecg_service, '_generate_annotations'):
             mock_signal = np.random.randn(1000)
             result = ecg_service._generate_annotations(mock_signal, 500, {})
             assert isinstance(result, list)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_assess_clinical_urgency(self, ecg_service):
         """Test clinical urgency assessment"""
@@ -104,12 +132,18 @@ class TestMLModelServiceCoverage:
         with patch('pathlib.Path.exists', return_value=False):
             return MLModelService()
     
+    @pytest.mark.timeout(30)
+
+    
     def test_ml_service_initialization(self, ml_service):
         """Test ML service initialization"""
         assert ml_service is not None
         assert hasattr(ml_service, 'models')
         assert hasattr(ml_service, 'model_metadata')
         assert hasattr(ml_service, 'memory_monitor')
+    
+    @pytest.mark.timeout(30)
+
     
     def test__load_model_method(self, ml_service):
         """Test individual model loading"""
@@ -130,6 +164,9 @@ class TestMLModelServiceCoverage:
             ml_service.__load_model('test_model', 'test_path.onnx')
             assert 'test_model' in ml_service.models
     
+    @pytest.mark.timeout(30)
+
+    
     def test_get_model_info(self, ml_service):
         """Test model info retrieval"""
         result = ml_service.get_model_info()
@@ -137,6 +174,9 @@ class TestMLModelServiceCoverage:
         assert 'loaded_models' in result
         assert 'model_metadata' in result
         assert 'memory_usage' in result
+    
+    @pytest.mark.timeout(30)
+
     
     def test_un_load_model(self, ml_service):
         """Test model unloading"""
@@ -146,6 +186,9 @@ class TestMLModelServiceCoverage:
         result = ml_service.unload_model('test_model')
         assert result is True
         assert 'test_model' not in ml_service.models
+    
+    @pytest.mark.timeout(30)
+
     
     def test_unload_nonexistent_model(self, ml_service):
         """Test unloading non-existent model"""
@@ -162,12 +205,16 @@ class TestValidationServiceCoverage:
         mock_notification_service = Mock()
         return ValidationService(mock_db, mock_notification_service)
     
+    @pytest.mark.timeout(30)
+
+    
     def test_validation_service_initialization(self, validation_service):
         """Test validation service initialization"""
         assert validation_service is not None
     
     @pytest.mark.asyncio
-    async def test_create_validation(self, validation_service):
+    async @pytest.mark.timeout(30)
+ def test_create_validation(self, validation_service):
         """Test validation creation"""
         if hasattr(validation_service, 'create_validation'):
             with patch.object(validation_service.repository, 'get_validation_by_analysis', return_value=None):
@@ -176,12 +223,18 @@ class TestValidationServiceCoverage:
                     result = await validation_service.create_validation(1, 1, UserRoles.CARDIOLOGIST)
                     assert result is not None
     
+    @pytest.mark.timeout(30)
+
+    
     def test_can_validate(self, validation_service):
         """Test validation permission check"""
         if hasattr(validation_service, '_can_validate'):
             from app.core.constants import UserRoles
             result = validation_service._can_validate(UserRoles.CARDIOLOGIST, 5)
             assert isinstance(result, bool)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_calculate_quality_metrics(self, validation_service):
         """Test quality metrics calculation"""
@@ -190,6 +243,9 @@ class TestValidationServiceCoverage:
             mock_analysis.measurements = []
             result = validation_service._calculate_quality_metrics(mock_analysis)
             assert isinstance(result, list)
+    
+    @pytest.mark.timeout(30)
+
     
     def test_requires_second_opinion(self, validation_service):
         """Test second opinion requirement check"""
@@ -200,7 +256,8 @@ class TestValidationServiceCoverage:
             assert isinstance(result, bool)
     
     @pytest.mark.asyncio
-    async def test_run_automated_validation_rules(self, validation_service):
+    async @pytest.mark.timeout(30)
+ def test_run_automated_validation_rules(self, validation_service):
         """Test automated validation rules"""
         if hasattr(validation_service, 'run_automated_validation_rules'):
             mock_analysis = Mock()

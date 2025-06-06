@@ -33,6 +33,8 @@ class TestRepositoriesSimple:
         "NotificationRepository",
         "UserRepository"
     ])
+    @pytest.mark.timeout(30)
+
     def test_repository_crud(self, repo_name):
         """Testa CRUD básico"""
         repo = GenericRepository()
@@ -51,6 +53,9 @@ class TestRepositoriesSimple:
         
         items = repo.list_all()
         assert len(items) > 0
+    
+    @pytest.mark.timeout(30)
+
     
     def test_repository_queries(self):
         """Testa queries customizadas"""
