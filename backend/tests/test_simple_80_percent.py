@@ -85,7 +85,7 @@ async def test_run_full_test_suite():
     
     ml_service = MLModelService()
     try:
-        await ml_service.load_model("nonexistent_model")
+        await ml_service._load_model("nonexistent_model")
     except Exception:
         pass
     

@@ -51,7 +51,8 @@ class TestECGCriticalSafety:
         assert hasattr(service, 'ecg_logger')
 
     @pytest.mark.asyncio
-    async def test_comprehensive_analysis_emergency_timing(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_comprehensive_analysis_emergency_timing(self, ecg_service):
         """CRITICAL: ECG analysis must complete within emergency timeframe."""
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
             f.write("time,I,II\n")
@@ -62,7 +63,7 @@ class TestECGCriticalSafety:
         try:
             start_time = time.time()
             
-            result = await ecg_service.analyze_ecg_comprehensive(
+            result = await eawait cg_service.analyze_ecg_comprehensive(
                 file_path=temp_file,
                 patient_id=1,
                 analysis_id="EMERGENCY_001"
@@ -82,10 +83,11 @@ class TestECGCriticalSafety:
             os.unlink(temp_file)
 
     @pytest.mark.asyncio
-    async def test_invalid_file_error_handling(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_invalid_file_error_handling(self, ecg_service):
         """CRITICAL: Invalid files must be rejected to prevent misdiagnosis."""
         with pytest.raises(ECGProcessingException) as exc_info:
-            await ecg_service.analyze_ecg_comprehensive(
+            await eawait cg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/nonexistent_file.ecg",
                 patient_id=999,
                 analysis_id="INVALID_001"
@@ -94,7 +96,8 @@ class TestECGCriticalSafety:
         assert "analysis failed" in str(exc_info.value).lower()
 
     @pytest.mark.asyncio
-    async def test_unsupported_format_handling(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_unsupported_format_handling(self, ecg_service):
         """CRITICAL: Unsupported formats must be handled safely."""
         with tempfile.NamedTemporaryFile(mode='w', suffix='.unknown', delete=False) as f:
             f.write("invalid format")
@@ -102,7 +105,7 @@ class TestECGCriticalSafety:
         
         try:
             with pytest.raises(ECGProcessingException) as exc_info:
-                await ecg_service.analyze_ecg_comprehensive(
+                await eawait cg_service.analyze_ecg_comprehensive(
                     file_path=temp_file,
                     patient_id=5,
                     analysis_id="UNSUPPORTED_001"
@@ -116,7 +119,7 @@ class TestECGCriticalSafety:
         """CRITICAL: Signal preprocessing must maintain data integrity."""
         test_signal = np.array([0.1, 0.2, 0.3, 0.2, 0.1] * 250).reshape(-1, 1)
         
-        processed_signal = ecg_service.preprocessor.preprocess_signal(test_signal)
+        processed_signal = ecg_service.await preprocessor.preprocess_signal(test_signal)
         
         assert processed_signal is not None
         assert isinstance(processed_signal, np.ndarray)
@@ -152,7 +155,8 @@ class TestECGCriticalSafety:
             assert len(str(e)) > 0, "Error message should not be empty"
 
     @pytest.mark.asyncio
-    async def test_pathology_detection_functionality(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_pathology_detection_functionality(self, ecg_service):
         """CRITICAL: Pathology detection must function correctly."""
         test_signal = np.array([[0.1, 0.2, 0.3, 0.2, 0.1] * 200])
         
@@ -189,7 +193,8 @@ class TestECGCriticalSafety:
         assert qt_score > 0.0
 
     @pytest.mark.asyncio
-    async def test_clinical_assessment_generation(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_clinical_assessment_generation(self, ecg_service):
         """CRITICAL: Clinical assessment must be generated properly."""
         ai_results = {
             'predictions': {'normal': 0.8, 'atrial_fibrillation': 0.2},
@@ -202,7 +207,7 @@ class TestECGCriticalSafety:
         
         features = {'rr_mean': 800}
         
-        assessment = await ecg_service._generate_clinical_assessment(
+        assessment = await eawait cg_service._generate_clinical_assessment(
             ai_results, pathology_results, features
         )
         
@@ -212,7 +217,8 @@ class TestECGCriticalSafety:
         assert 'recommendations' in assessment
 
     @pytest.mark.asyncio
-    async def test_signal_quality_assessment(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_signal_quality_assessment(self, ecg_service):
         """CRITICAL: Signal quality assessment must work."""
         test_signal = np.array([[0.1 + 0.05*np.sin(2*np.pi*i/250) for i in range(1000)]])
         
@@ -236,7 +242,7 @@ class TestECGCriticalSafety:
         for i in range(10):
             test_signal = np.array([[0.1, 0.2, 0.3] * 100])
             try:
-                ecg_service.preprocessor.preprocess_signal(test_signal)
+                ecg_service.await preprocessor.preprocess_signal(test_signal)
             except Exception:
                 pass
         
@@ -246,7 +252,8 @@ class TestECGCriticalSafety:
         assert memory_used < 100, f"Excessive memory usage: {memory_used:.1f}MB"
 
     @pytest.mark.asyncio
-    async def test_complete_workflow_integration(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_complete_workflow_integration(self, ecg_service):
         """CRITICAL: Complete ECG analysis workflow must work end-to-end."""
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
             f.write("time,I,II\n")
@@ -255,7 +262,7 @@ class TestECGCriticalSafety:
             temp_file = f.name
         
         try:
-            result = await ecg_service.analyze_ecg_comprehensive(
+            result = await eawait cg_service.analyze_ecg_comprehensive(
                 file_path=temp_file,
                 patient_id=100,
                 analysis_id="WORKFLOW_001"
@@ -290,7 +297,8 @@ class TestECGRegulatoryCompliance:
         return HybridECGAnalysisService(Mock(), Mock())
     
     @pytest.mark.asyncio
-    async def test_regulatory_metadata_compliance(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_regulatory_metadata_compliance(self, ecg_service):
         """REGULATORY: All processing must include compliance metadata."""
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
             f.write("time,I,II\n")
@@ -299,7 +307,7 @@ class TestECGRegulatoryCompliance:
             temp_file = f.name
         
         try:
-            result = await ecg_service.analyze_ecg_comprehensive(
+            result = await eawait cg_service.analyze_ecg_comprehensive(
                 file_path=temp_file,
                 patient_id=100,
                 analysis_id="REGULATORY_001"
@@ -323,7 +331,7 @@ class TestECGRegulatoryCompliance:
         """REGULATORY: Data integrity must be maintained throughout processing."""
         test_signal = np.array([0.1, 0.2, 0.3, 0.2, 0.1] * 250).reshape(-1, 1)
         
-        processed_signal = ecg_service.preprocessor.preprocess_signal(test_signal)
+        processed_signal = ecg_service.await preprocessor.preprocess_signal(test_signal)
         
         assert processed_signal is not None
         assert isinstance(processed_signal, np.ndarray)
@@ -352,7 +360,7 @@ class TestECGPerformanceMedical:
         test_signal = np.array([0.1, 0.2, 0.3] * 500).reshape(-1, 1)
         
         start_time = time.time()
-        processed = ecg_service.preprocessor.preprocess_signal(test_signal)
+        processed = ecg_service.await preprocessor.preprocess_signal(test_signal)
         processing_time = time.time() - start_time
         
         assert processing_time < 5.0, f"Preprocessing too slow: {processing_time:.2f}s"
@@ -375,7 +383,7 @@ class TestECGPerformanceMedical:
             test_signal = np.array([[0.1, 0.2, 0.3] * 100])
             
             try:
-                ecg_service.preprocessor.preprocess_signal(test_signal)
+                ecg_service.await preprocessor.preprocess_signal(test_signal)
                 ecg_service.feature_extractor.extract_all_features(test_signal)
             except Exception:
                 pass  # Focus on resource management

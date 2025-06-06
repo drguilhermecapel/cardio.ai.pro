@@ -79,7 +79,7 @@ async def test_ml_model_service_specific_lines():
         pass
     
     try:
-        await service.load_model("nonexistent_model")
+        await service._load_model("nonexistent_model")
     except Exception:
         pass
     

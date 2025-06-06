@@ -102,7 +102,8 @@ class TestECGCriticalSafety:
         assert hasattr(service, 'ecg_logger')
 
     @pytest.mark.asyncio
-    async def test_stemi_detection_emergency_timing(self, ecg_service, stemi_signal):
+    @pytest.mark.asyncio
+async def test_stemi_detection_emergency_timing(self, ecg_service, stemi_signal):
         """CRITICAL: STEMI detection must complete within emergency timeframe."""
         start_time = time.time()
         
@@ -120,7 +121,7 @@ class TestECGCriticalSafety:
             "clinical_urgency": "critical",
             "findings": ["ST elevation in V1-V3", "Anterior STEMI pattern"]
         }):
-            result = await ecg_service.analyze_ecg_comprehensive(
+            result = await eawait cg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/test_stemi.ecg",
                 patient_id=1,
                 analysis_id="EMERGENCY_STEMI_001"
@@ -134,7 +135,8 @@ class TestECGCriticalSafety:
         assert result["clinical_urgency"] == "critical"
 
     @pytest.mark.asyncio
-    async def test_normal_ecg_no_false_alarms(self, ecg_service, normal_signal):
+    @pytest.mark.asyncio
+async def test_normal_ecg_no_false_alarms(self, ecg_service, normal_signal):
         """CRITICAL: Normal ECG must not generate false critical alarms."""
         with patch.object(ecg_service.ecg_reader, 'read_ecg', return_value={
             'signal': np.array([[0.1, 0.2, 0.3, 0.2, 0.1, 0.0, -0.1] * 1000]),
@@ -150,7 +152,7 @@ class TestECGCriticalSafety:
             "clinical_urgency": "low",
             "findings": ["Normal sinus rhythm", "No acute changes"]
         }):
-            result = await ecg_service.analyze_ecg_comprehensive(
+            result = await eawait cg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/test_normal.ecg",
                 patient_id=2,
                 analysis_id="ROUTINE_001"
@@ -177,7 +179,8 @@ class TestECGCriticalSafety:
                 ecg_service._validate_ecg_signal(invalid_signal)
 
     @pytest.mark.asyncio
-    async def test_vfib_emergency_detection(self, ecg_service, vfib_signal):
+    @pytest.mark.asyncio
+async def test_vfib_emergency_detection(self, ecg_service, vfib_signal):
         """CRITICAL: Ventricular fibrillation must be detected immediately."""
         start_time = time.time()
         
@@ -195,7 +198,7 @@ class TestECGCriticalSafety:
             "clinical_urgency": "critical",
             "findings": ["Ventricular fibrillation", "Immediate defibrillation required"]
         }):
-            result = await ecg_service.analyze_ecg_comprehensive(
+            result = await eawait cg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/test_vfib.ecg",
                 patient_id=3,
                 analysis_id="EMERGENCY_VFIB_001"
@@ -209,10 +212,11 @@ class TestECGCriticalSafety:
         assert result["clinical_urgency"] == "critical"
 
     @pytest.mark.asyncio
-    async def test_timeout_handling_emergency(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_timeout_handling_emergency(self, ecg_service):
         """CRITICAL: Analysis timeout must provide safe fallback."""
         with pytest.raises(ECGProcessingException) as exc_info:
-            await ecg_service.analyze_ecg_comprehensive(
+            await eawait cg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/nonexistent_file.ecg",
                 patient_id=4,
                 analysis_id="TIMEOUT_001"
@@ -221,7 +225,8 @@ class TestECGCriticalSafety:
         assert "analysis failed" in str(exc_info.value).lower()
 
     @pytest.mark.asyncio
-    async def test_model_failure_fallback_safety(self, ecg_service):
+    @pytest.mark.asyncio
+async def test_model_failure_fallback_safety(self, ecg_service):
         """CRITICAL: AI model failure must have safe medical fallback."""
         import tempfile
         import os
@@ -232,7 +237,7 @@ class TestECGCriticalSafety:
         
         try:
             with pytest.raises(ECGProcessingException) as exc_info:
-                await ecg_service.analyze_ecg_comprehensive(
+                await eawait cg_service.analyze_ecg_comprehensive(
                     file_path=temp_file,
                     patient_id=5,
                     analysis_id="MODEL_FAIL_001"

@@ -90,7 +90,7 @@ def test_get_model_info(ml_service):
     assert "rhythm_detector" in info["loaded_models"]
 
 
-def test_unload_model_success(ml_service):
+def test_un_load_model_success(ml_service):
     """Test successful model unloading."""
     ml_service.models = {
         "ecg_classifier": Mock(),
@@ -108,7 +108,7 @@ def test_unload_model_success(ml_service):
     assert "ecg_classifier" not in ml_service.model_metadata
 
 
-def test_unload_model_not_found(ml_service):
+def test_un_load_model_not_found(ml_service):
     """Test unloading non-existent model."""
     ml_service.models = {"rhythm_detector": Mock()}
     

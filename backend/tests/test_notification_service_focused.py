@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import AsyncMock
 from app.services.notification_service import NotificationService
-from app.models.notification import Notification
+from app.models.base import Base  # Ajustar conforme necessário
 from app.core.constants import ClinicalUrgency
 
 

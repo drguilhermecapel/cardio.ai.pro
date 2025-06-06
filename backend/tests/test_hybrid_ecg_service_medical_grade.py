@@ -172,7 +172,7 @@ class TestAdvancedPreprocessorMedicalGrade:
         preprocessor = AdvancedPreprocessor(sampling_rate=500)
         signal = np.random.randn(1000, 1).astype(np.float64)
         
-        result = preprocessor.preprocess_signal(signal)
+        result = await preprocessor.preprocess_signal(signal)
         assert isinstance(result, np.ndarray)
         assert result.shape[0] > 0
     
@@ -181,7 +181,7 @@ class TestAdvancedPreprocessorMedicalGrade:
         preprocessor = AdvancedPreprocessor()
         signal = np.random.randn(1000, 1).astype(np.float64)
         
-        result = preprocessor.preprocess_signal(signal)
+        result = await preprocessor.preprocess_signal(signal)
         assert isinstance(result, np.ndarray)
     
     def test_all_preprocessing_methods(self):
@@ -207,7 +207,7 @@ class TestAdvancedPreprocessorMedicalGrade:
         
         short_signal = np.random.randn(10, 1).astype(np.float64)
         try:
-            result = preprocessor.preprocess_signal(short_signal)
+            result = await preprocessor.preprocess_signal(short_signal)
             assert isinstance(result, np.ndarray)
         except Exception:
             pass
@@ -354,7 +354,7 @@ class TestHybridECGAnalysisServiceMedicalGrade:
             })
             test_data.to_csv(f.name, index=False)
             
-            result = ecg_service.analyze_ecg_comprehensive(
+            result = await ecg_service.analyze_ecg_comprehensive(
                 file_path=f.name,
                 patient_id=123,
                 analysis_id="TEST_001"
@@ -507,7 +507,7 @@ class TestHybridECGAnalysisServiceMedicalGrade:
         }
         features = {'rr_mean': 800, 'rr_std': 50}
         
-        assessment = ecg_service._generate_clinical_assessment(ai_results, pathology_results, features)
+        assessment = await ecg_service._generate_clinical_assessment(ai_results, pathology_results, features)
         assert isinstance(assessment, dict)
         assert 'primary_diagnosis' in assessment
         assert 'recommendations' in assessment
@@ -586,7 +586,7 @@ class TestECGRegulatoryComplianceBasic:
             'sampling_rate': 500
         }
         
-        result = ecg_service.analyze_ecg_comprehensive(
+        result = await ecg_service.analyze_ecg_comprehensive(
             ecg_data=ecg_data,
             patient_id="METADATA_001"
         )
@@ -621,7 +621,7 @@ class TestECGPerformanceRequirements:
             test_data.to_csv(f.name, index=False)
             
             start_time = time.time()
-            result = ecg_service.analyze_ecg_comprehensive(
+            result = await ecg_service.analyze_ecg_comprehensive(
                 file_path=f.name,
                 patient_id=123,
                 analysis_id="PERF_001"

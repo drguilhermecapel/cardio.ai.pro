@@ -49,7 +49,7 @@ async def test_get_model_info(ml_model_service):
 
 
 @pytest.mark.asyncio
-async def test_unload_model(ml_model_service):
+async def test_un_load_model(ml_model_service):
     """Test unloading a model."""
     ml_model_service.models["test_model"] = Mock()
     ml_model_service.model_metadata["test_model"] = {}

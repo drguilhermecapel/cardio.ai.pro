@@ -22,7 +22,7 @@ def test_ecg_hybrid_processor_basic():
     from app.utils.ecg_hybrid_processor import ECGHybridProcessor
     
     processor = ECGHybridProcessor()
-    assert processor.sampling_rate == 500
+    assert processor.sample_rate == 500
 
 
 def test_ecg_types_import():

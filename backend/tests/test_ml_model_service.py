@@ -41,14 +41,14 @@ def sample_ecg_data():
 
 
 @pytest.mark.asyncio
-async def test_load_models_success(ml_service):
+async def test__load_models_success(ml_service):
     """Test successful model loading."""
     assert isinstance(ml_service.models, dict)
     assert isinstance(ml_service.model_metadata, dict)
 
 
 @pytest.mark.asyncio
-async def test_load_models_file_not_found():
+async def test__load_models_file_not_found():
     """Test model loading with missing files."""
     service = MLModelService()
     
