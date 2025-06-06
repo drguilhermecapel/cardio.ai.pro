@@ -591,7 +591,8 @@ class ECGHybridProcessor:
             self.hybrid_service.ecg_reader is not None and
             hasattr(self.hybrid_service.ecg_reader, 'supported_formats')):
             return list(self.hybrid_service.ecg_reader.supported_formats.keys())
-        return ['WFDB', 'EDF', 'DICOM']
+        else:
+            return ['WFDB', 'EDF', 'DICOM']
 
     def get_regulatory_standards(self) -> dict[str, str]:
         """Get supported regulatory standards"""
