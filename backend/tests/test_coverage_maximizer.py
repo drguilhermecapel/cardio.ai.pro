@@ -1,6 +1,6 @@
 """
-Testes focados em maximizar coverage rapidamente
-Target: +40% coverage em um arquivo
+Tests targeting rapid coverage increase for CardioAI Pro
+Target: +40% coverage in one file
 """
 
 import pytest
@@ -24,7 +24,7 @@ class TestHybridECGServiceMaxCoverage:
     """Target: hybrid_ecg_service.py (828 lines)"""
     
     @pytest.fixture
-    def mock_dependencies(self):
+    def service_mocks(self):
         """Mock everything to avoid import errors"""
         with patch.multiple(
             'app.services.hybrid_ecg_service',
@@ -37,7 +37,7 @@ class TestHybridECGServiceMaxCoverage:
         ):
             yield
     
-    def test_import_and_instantiate_all_classes(self, mock_dependencies):
+    def test_import_and_instantiate_all_classes(self, service_mocks):
         """Force import of entire module"""
         from app.services import hybrid_ecg_service
         
@@ -59,7 +59,7 @@ class TestHybridECGServiceMaxCoverage:
                     pass  # Don't care about errors, just want coverage
     
     @pytest.mark.asyncio
-    async def test_all_methods_minimal(self, mock_dependencies):
+    async def test_all_methods_minimal(self, service_mocks):
         """Call every method with minimal args"""
         from app.services.hybrid_ecg_service import HybridECGAnalysisService
         
