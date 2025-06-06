@@ -22,7 +22,7 @@ class PatientService:
         self.db = db
         self.repository = PatientRepository(db)
 
-    async def create_patient(self, patient_data: PatientCreate | dict[str, Any], created_by: int | None = None) -> Patient:
+    async def create_patient(self, patient_data: PatientCreate, created_by: int | None = None) -> Patient:
         """Create a new patient."""
         today = date.today()
         age = today.year - patient_data.date_of_birth.year
