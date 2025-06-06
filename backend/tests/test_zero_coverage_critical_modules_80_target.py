@@ -27,7 +27,17 @@ mock_modules = {
     'fastapi': MagicMock(),
     'sqlalchemy': MagicMock(),
     'numpy': MagicMock(),
+    'neurokit2': MagicMock(),
+    'matplotlib': MagicMock(),
 }
+
+matplotlib_mock = MagicMock()
+matplotlib_mock.__version__ = "3.5.0"
+mock_modules['matplotlib'] = matplotlib_mock
+
+neurokit2_mock = MagicMock()
+neurokit2_mock.__version__ = "0.2.0"
+mock_modules['neurokit2'] = neurokit2_mock
 
 for module_name, mock_module in mock_modules.items():
     sys.modules[module_name] = mock_module
