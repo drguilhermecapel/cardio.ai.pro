@@ -61,6 +61,10 @@ celery-types = "^0.22.0"
 types-passlib = "^1.7.7"
 types-python-jose = "^3.3.4"
 types-requests = "^2.31.0"
+pandas-stubs = "^2.2.3.250527"
+wfdb = "^4.3.0"
+pyedflib = "^0.1.40"
+pywavelets = "^1.8.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -105,6 +109,7 @@ warn_no_return = true
 warn_unreachable = true
 strict_equality = true
 
+
 [[tool.mypy.overrides]]
 module = [
     "neurokit2.*",
@@ -113,6 +118,9 @@ module = [
     "shap.*",
     "lime.*",
     "plotly.*",
+    "wfdb.*",
+    "pyedflib.*",
+    "biosppy.*",
 ]
 ignore_missing_imports = true
 

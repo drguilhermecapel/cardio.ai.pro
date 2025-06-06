@@ -182,3 +182,25 @@ class ExternalServiceException(CardioAIException):
             status_code=502,
             details=details,
         )
+
+
+class NonECGImageException(CardioAIException):
+    """Non-ECG image detected exception with contextual response."""
+
+    def __init__(
+        self,
+        message: str,
+        category: str,
+        contextual_response: dict[str, Any],
+        confidence: float = 0.0
+    ) -> None:
+        super().__init__(
+            message=message,
+            error_code="NON_ECG_IMAGE_DETECTED",
+            status_code=422,
+            details={
+                "category": category,
+                "confidence": confidence,
+                "contextual_response": contextual_response
+            },
+        )
