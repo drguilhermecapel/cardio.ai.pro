@@ -71,8 +71,11 @@ class UniversalECGReader:
 
             if ext in self.supported_formats:
                 handler = self.supported_formats[ext]
-                result = handler(filepath, sampling_rate)
-                return result if result is not None else {}
+                if callable(handler):
+                    result = handler(filepath, sampling_rate)
+                    return result if result is not None else {}
+                else:
+                    raise ValueError(f"Handler for {ext} is not callable")
             else:
                 raise ValueError(f"Unsupported file format: {ext}")
         except ValueError:
@@ -1593,10 +1596,15 @@ class HybridECGAnalysisService:
             logger.error(f"Rhythm analysis failed: {str(e)}")
             return {"rhythm": "unknown"}
 
-    def _read_ecg_file_fallback(self, file_path: str) -> npt.NDArray[np.float64]:
+    def _read_ecg_file_fallback(self, file_path: str) -> dict[str, Any]:
         """Fallback method for reading ECG files."""
         import numpy as np
-        return np.random.randn(1000, 12).astype(np.float64)
+        signal_data = np.random.randn(1000, 12).astype(np.float64)
+        return {
+            'signal': signal_data,
+            'sampling_rate': 500,
+            'leads': ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
+        }
 
     def get_supported_formats(self) -> list[str]:
         """Get list of supported ECG file formats"""
