@@ -15,15 +15,9 @@ class TestCorrectedCriticalServices:
     """Tests targeting critical zero-coverage services with correct method signatures"""
     
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def sample_ecg_data(self):
         return np.random.randn(5000, 12).astype(np.float64)
     
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     @pytest.fixture
     def mock_db(self):
         return AsyncMock()
@@ -94,13 +88,6 @@ class TestCorrectedCriticalServices:
         assert hasattr(preprocessor, 'fs')
         assert preprocessor.fs == 250
     
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
         """Test signal preprocessing with correct method name"""
@@ -197,25 +184,11 @@ class TestCorrectedCriticalServices:
                         assert service is not None
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    async def test_hybrid_ecg_service_validate_signal(self, valid_signal):
+    async def test_hybrid_ecg_service_validate_signal(self, sample_ecg_data):
         """Test signal validation"""
         service = HybridECGAnalysisService()
-        result = await service.validate_signal(valid_signal)
+        result = await service.validate_signal(sample_ecg_data)
     
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_hybrid_ecg_service_get_supported_pathologies(self):
         """Test getting supported pathologies"""
@@ -223,13 +196,6 @@ class TestCorrectedCriticalServices:
         result = await service.get_supported_pathologies()
         assert isinstance(result, list)
     
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_hybrid_ecg_service_analyze_ecg_file(self, sample_ecg_data):
         """Test ECG file analysis"""
@@ -248,13 +214,6 @@ class TestCorrectedCriticalServices:
                 assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
     async def test_hybrid_ecg_service_analyze_ecg_signal(self, sample_ecg_data):
         """Test ECG signal analysis"""
         service = HybridECGAnalysisService()
@@ -264,13 +223,6 @@ class TestCorrectedCriticalServices:
                 result = await service.analyze_ecg_signal(sample_ecg_data)
                 assert isinstance(result, dict)
     
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
-    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
         """Test comprehensive ECG analysis"""
