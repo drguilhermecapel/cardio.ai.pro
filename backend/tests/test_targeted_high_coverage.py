@@ -38,6 +38,9 @@ class TestTargetedHighCoverage:
             assert 'memory_usage' in info
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_ml_model_service_analyze_ecg(self):
         """Test analyze_ecg method"""
         with patch('pathlib.Path.exists', return_value=False):
@@ -57,6 +60,9 @@ class TestTargetedHighCoverage:
         assert service.db is not None
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_notification_service_send_notification(self):
         """Test send notification method"""
         mock_db = Mock()
@@ -74,6 +80,9 @@ class TestTargetedHighCoverage:
         assert service is not None
         assert service.db is not None
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_patient_service_create_patient(self):
         """Test create patient method"""
@@ -97,6 +106,9 @@ class TestTargetedHighCoverage:
         assert service.db is not None
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_user_service_get_user_by_email(self):
         """Test get user by email method"""
         mock_db = Mock()
@@ -117,6 +129,9 @@ class TestTargetedHighCoverage:
         assert service.notification_service is not None
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_validation_service_create_validation(self):
         """Test create validation method"""
         mock_db = Mock()
@@ -136,6 +151,9 @@ class TestTargetedHighCoverage:
             assert result is not None
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_ecg_repository_create_analysis(self):
         """Test ECGRepository create analysis"""
         mock_db = Mock()
@@ -150,6 +168,9 @@ class TestTargetedHighCoverage:
             result = await repo.create_analysis(analysis_data)
             assert result is not None
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_patient_repository_create_patient(self):
         """Test PatientRepository create patient"""
@@ -166,6 +187,9 @@ class TestTargetedHighCoverage:
             assert result is not None
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_user_repository_create_user(self):
         """Test UserRepository create user"""
         mock_db = Mock()
@@ -181,6 +205,9 @@ class TestTargetedHighCoverage:
             assert result is not None
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_notification_repository_create_notification(self):
         """Test NotificationRepository create notification"""
         mock_db = Mock()
@@ -195,6 +222,9 @@ class TestTargetedHighCoverage:
             result = await repo.create_notification(notification_data)
             assert result is not None
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_validation_repository_create_validation(self):
         """Test ValidationRepository create validation"""
@@ -216,14 +246,20 @@ class TestTargetedHighCoverage:
         assert processor is not None
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_ecg_processor_preprocess_signal(self):
         """Test ECGProcessor preprocess signal"""
         processor = ECGProcessor()
         signal = np.random.randn(1000, 12).astype(np.float64)
         
-        result = await pawait rocessor.preprocess_signal(signal)
+        result = await processor.preprocess_signal(signal)
         assert isinstance(result, np.ndarray)
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_ecg_processor_load_ecg_file(self):
         """Test ECGProcessor load ECG file"""
@@ -233,6 +269,9 @@ class TestTargetedHighCoverage:
             with pytest.raises(Exception):
                 await processor.load_ecg_file('/fake/path.csv')
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_ecg_processor_extract_metadata(self):
         """Test ECGProcessor extract metadata"""
@@ -244,11 +283,17 @@ class TestTargetedHighCoverage:
             assert 'sample_rate' in metadata
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_signal_quality_analyzer_initialization(self):
         """Test SignalQualityAnalyzer initialization"""
         sqa = SignalQualityAnalyzer()
         assert sqa is not None
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_signal_quality_analyzer_analyze_quality(self):
         """Test SignalQualityAnalyzer analyze quality"""

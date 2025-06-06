@@ -12,11 +12,25 @@ class TestHybridECGAdditionalCoverage:
     """Additional tests targeting uncovered lines for 80% coverage"""
 
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def mock_db_session(self):
         """Mock database session"""
         session = AsyncMock()
         return session
 
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     @pytest.fixture
     def hybrid_service(self, mock_db_session):
         """Create hybrid ECG service instance"""
@@ -26,6 +40,13 @@ class TestHybridECGAdditionalCoverage:
             sampling_rate=500
         )
 
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     @pytest.fixture
     def sample_ecg_signal(self):
         """Sample ECG signal data"""
@@ -236,6 +257,13 @@ class TestHybridECGAdditionalCoverage:
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_hybrid_service_analyze_ecg_comprehensive_async_edge_cases(self, hybrid_service):
         """Test analyze_ecg_comprehensive_async with edge cases"""
         try:
@@ -292,6 +320,13 @@ class TestHybridECGAdditionalCoverage:
         result = hybrid_service._validate_signal_quality(clean_signal)
         assert isinstance(result, dict)
 
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_hybrid_service_assess_signal_quality_edge_cases(self, hybrid_service):
         """Test _assess_signal_quality with edge cases"""

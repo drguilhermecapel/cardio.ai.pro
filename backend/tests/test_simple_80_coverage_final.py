@@ -41,7 +41,7 @@ class TestSimple80CoverageFinal:
         
         signal = np.random.randn(1000).astype(np.float64)
         
-        validation = processor.validate_signal(valid_signal))
+        validation = processor.validate_signal(valid_signal)
         
         r_peaks = processor.detect_r_peaks(signal)
         assert isinstance(r_peaks, np.ndarray)

@@ -126,6 +126,7 @@ class TestECGHybridProcessorCoverage:
         assert isinstance(formats, list)
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_get_system_status(self):
         """Test get system status"""
         processor = ECGHybridProcessor()

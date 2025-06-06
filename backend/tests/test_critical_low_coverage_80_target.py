@@ -18,6 +18,9 @@ class TestCriticalLowCoverage80Target:
     """Tests targeting modules with lowest coverage for 80% compliance"""
 
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_signal_quality_assessment_all_methods(self):
         """Test SignalQualityAnalyzer comprehensive coverage"""
         sqa = SignalQualityAnalyzer()
@@ -32,6 +35,9 @@ class TestCriticalLowCoverage80Target:
         quality_async = await sqa.analyze_quality(signal_2d)
         assert isinstance(quality_async, dict)
 
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_validation_service_comprehensive_coverage(self):
         """Test ValidationService comprehensive coverage"""
@@ -54,6 +60,9 @@ class TestCriticalLowCoverage80Target:
         assert result is not None
         assert result.id == 1
 
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_ecg_service_comprehensive_coverage(self):
         """Test ECGAnalysisService comprehensive coverage"""
@@ -83,6 +92,9 @@ class TestCriticalLowCoverage80Target:
         result = await service.get_analyses_by_patient(1)
         assert isinstance(result, list)
 
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_notification_service_comprehensive_coverage(self):
         """Test NotificationService comprehensive coverage"""
@@ -114,6 +126,9 @@ class TestCriticalLowCoverage80Target:
         assert result == NotificationPriority.CRITICAL
 
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_additional_signal_quality_methods(self):
         """Test additional SignalQualityAnalyzer methods for coverage"""
         sqa = SignalQualityAnalyzer()
@@ -128,6 +143,9 @@ class TestCriticalLowCoverage80Target:
         snr = await sqa._calculate_snr(signal_2d)
         assert isinstance(snr, (float, int))
 
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_validation_service_advanced_methods(self):
         """Test advanced ValidationService methods for coverage"""
@@ -169,6 +187,9 @@ class TestCriticalLowCoverage80Target:
         assert isinstance(result, list)
 
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_ecg_service_advanced_methods(self):
         """Test advanced ECGAnalysisService methods for coverage"""
         mock_db = AsyncMock()
@@ -198,6 +219,9 @@ class TestCriticalLowCoverage80Target:
         result = await service.delete_analysis_sync(1)
         assert isinstance(result, bool)
 
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_notification_service_advanced_methods(self):
         """Test advanced NotificationService methods for coverage"""

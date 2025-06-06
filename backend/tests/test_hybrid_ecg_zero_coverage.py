@@ -108,7 +108,8 @@ class TestHybridECGZeroCoverage:
         preprocessor = AdvancedPreprocessor(250)
         assert preprocessor.sample_rate == 250
     
-    def test_advanced_preprocessor_preprocess_signal(self):
+    @pytest.mark.asyncio
+    async def test_advanced_preprocessor_preprocess_signal(self):
         """Test signal preprocessing"""
         preprocessor = AdvancedPreprocessor(250)
         signal = np.random.randn(1000).astype(np.float64)
@@ -248,7 +249,8 @@ class TestHybridECGZeroCoverage:
         assert hasattr(service, 'ml_service')
         assert hasattr(service, 'validation_service')
     
-    def test_hybrid_ecg_analysis_service_analyze_ecg_file(self):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_analysis_service_analyze_ecg_file(self):
         """Test ECG file analysis"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -267,7 +269,8 @@ class TestHybridECGZeroCoverage:
             result = await service.analyze_ecg_file("/fake/test.csv")
             assert isinstance(result, dict)
     
-    def test_hybrid_ecg_analysis_service_analyze_ecg_signal(self):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_analysis_service_analyze_ecg_signal(self):
         """Test ECG signal analysis"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -279,7 +282,8 @@ class TestHybridECGZeroCoverage:
         result = await service.analyze_ecg_signal(signal, 250)
         assert isinstance(result, dict)
     
-    def test_hybrid_ecg_analysis_service_simulate_predictions(self):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_analysis_service_simulate_predictions(self):
         """Test prediction simulation"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -290,9 +294,9 @@ class TestHybridECGZeroCoverage:
         
         result = await service._simulate_predictions(features)
         assert isinstance(result, dict)
-        assert isinstance(result, dict)
     
-    def test_hybrid_ecg_analysis_service_get_supported_pathologies(self):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_analysis_service_get_supported_pathologies(self):
         """Test getting supported pathologies"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -304,10 +308,17 @@ class TestHybridECGZeroCoverage:
         assert isinstance(result, list)
         assert len(result) > 0
     
-    def test_hybrid_ecg_analysis_service_validate_signal(valid_signal)
+    def test_hybrid_ecg_analysis_service_validate_signal(self):
+        """Test signal validation"""
+        mock_db = Mock()
+        mock_ml_service = Mock()
+        mock_validation_service = Mock()
+        
+        service = HybridECGAnalysisService(mock_db, mock_ml_service, mock_validation_service)
         signal = np.random.randn(2500, 12).astype(np.float64)
         
-        result = await service.validate_signal(valid_signal))
+        result = service.validate_signal(signal)
+        assert result is not None
 
 
 def mock_open_ecg_file():

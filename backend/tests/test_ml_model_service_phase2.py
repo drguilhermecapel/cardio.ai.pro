@@ -14,12 +14,26 @@ class TestMLModelServiceComprehensive:
     """Comprehensive tests for ML Model Service - targeting 70%+ coverage"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def ml_service(self):
         """Create ML service with mocked dependencies"""
         service = MLModelService()
         service._models = {}
         return service
     
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     @pytest.fixture
     def mock_model(self):
         """Create a mock ONNX model"""

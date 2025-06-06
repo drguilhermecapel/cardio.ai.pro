@@ -159,6 +159,7 @@ class TestHybridECGDirectImport:
         assert "quality" in result
 
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
         """Test _assess_signal_quality method"""
         signal_1d = sample_ecg_signal[:, 0]
@@ -216,6 +217,7 @@ class TestHybridECGDirectImport:
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_analyze_ecg_comprehensive_async(self, hybrid_service):
         """Test analyze_ecg_comprehensive_async method"""
         with patch.object(hybrid_service.reader, 'read_ecg') as mock_read:
@@ -241,6 +243,7 @@ class TestHybridECGDirectImport:
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_run_simplified_analysis(self, hybrid_service):
         """Test _run_simplified_analysis method"""
         signal_data = {"test": "data"}
@@ -250,6 +253,7 @@ class TestHybridECGDirectImport:
         assert isinstance(result, dict)
         assert "simplified" in result
 
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_detect_pathologies(self, hybrid_service):
         """Test _detect_pathologies method"""

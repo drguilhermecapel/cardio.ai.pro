@@ -98,7 +98,7 @@ class TestFinal80CoverageFocused:
         
         signal = np.random.randn(1000).astype(np.float64)
         
-        validation = processor.validate_signal(valid_signal))
+        validation = processor.validate_signal(valid_signal)
         
         r_peaks = processor.detect_r_peaks(signal)
         assert isinstance(r_peaks, np.ndarray)
@@ -184,7 +184,7 @@ class TestFinal80CoverageFocused:
         hr = processor.calculate_heart_rate([100, 200, 300], sampling_rate=500)
         assert isinstance(hr, (int, float))
         
-        validation = processor.validate_signal(valid_signal))
+        validation = processor.validate_signal(valid_signal)
         
         intervals = processor.calculate_intervals([100, 200, 300], sampling_rate=500)
         assert isinstance(intervals, dict)

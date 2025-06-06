@@ -12,6 +12,9 @@ class TestECGServiceComprehensive:
     """Comprehensive tests for ECG Service - targeting 70%+ coverage"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def ecg_service(self):
         """Create ECG service with mocked dependencies"""
         mock_db = Mock()
@@ -24,6 +27,9 @@ class TestECGServiceComprehensive:
         )
         return service
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_create_analysis_workflow(self, ecg_service):
         """Test ECG analysis creation workflow - covers lines 47-105"""
@@ -42,6 +48,9 @@ class TestECGServiceComprehensive:
             assert hasattr(result, 'analysis_id')
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_feature_extraction_comprehensive(self, ecg_service):
         """Test ECG feature extraction through _extract_measurements - covers lines 231-286"""
         signal = np.sin(np.linspace(0, 10, 5000))
@@ -53,6 +62,9 @@ class TestECGServiceComprehensive:
         if 'heart_rate' in measurements and measurements['heart_rate'] is not None:
             assert measurements['heart_rate'] > 0
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_arrhythmia_detection_all_types(self, ecg_service):
         """Test arrhythmia detection through _assess_clinical_urgency - covers lines 335-398"""
@@ -71,6 +83,9 @@ class TestECGServiceComprehensive:
         assert any(key in assessment for key in expected_keys)
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_quality_assessment_comprehensive(self, ecg_service):
         """Test signal quality assessment through _assess_signal_quality - covers lines 235-280"""
         signal = np.sin(np.linspace(0, 10, 5000)) + np.random.randn(5000) * 0.01
@@ -82,6 +97,9 @@ class TestECGServiceComprehensive:
         assert 'quality_score' in assessment
         assert assessment['quality_score'] >= 0
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_batch_processing(self, ecg_service):
         """Test batch ECG processing through create_analysis - covers lines 47-105"""
@@ -96,6 +114,9 @@ class TestECGServiceComprehensive:
             assert result is not None
             assert hasattr(result, 'analysis_id')
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_real_time_monitoring(self, ecg_service):
         """Test real-time ECG monitoring through _process_analysis_async - covers lines 100-150"""
@@ -115,6 +136,9 @@ class TestECGServiceComprehensive:
                 assert result is None  # Method returns None on success
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_clinical_reporting(self, ecg_service):
         """Test clinical report generation through _generate_annotations - covers lines 287-334"""
         ai_results = {
@@ -129,6 +153,9 @@ class TestECGServiceComprehensive:
         assert isinstance(annotations, list)
         assert len(annotations) >= 0
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_error_handling_and_recovery(self, ecg_service):
         """Test error handling through analyze_ecg - covers lines 431-455"""
@@ -156,6 +183,9 @@ class TestECGServiceComprehensive:
         assert result is not None
         assert result.id == 789
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_multi_lead_analysis(self, ecg_service):
         """Test multi-lead ECG analysis through get_analysis_by_patient - covers lines 485-545"""

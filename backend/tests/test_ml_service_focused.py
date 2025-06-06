@@ -14,7 +14,7 @@ def ml_service():
 
 
 @pytest.mark.asyncio
-    async def test_analyze_ecg_success(ml_service):
+async def test_analyze_ecg_success(ml_service):
     """Test successful ECG analysis."""
     mock_ecg_model = Mock()
     mock_ecg_model.run.return_value = [np.array([[0.1, 0.9, 0.8, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2, 0.3, 0.4]])]
@@ -52,7 +52,7 @@ def ml_service():
 
 
 @pytest.mark.asyncio
-    async def test_analyze_ecg_no_models(ml_service):
+async def test_analyze_ecg_no_models(ml_service):
     """Test ECG analysis when no models are loaded."""
     ml_service.models = {}  # No models loaded
     

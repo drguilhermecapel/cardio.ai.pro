@@ -49,6 +49,13 @@ class TestECGServiceCoverage:
     """Tests for ecg_service.py (16% -> 40% coverage target)"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def ecg_service(self):
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -59,6 +66,13 @@ class TestECGServiceCoverage:
         """Test service initialization"""
         assert ecg_service is not None
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_create_analysis_async(self, ecg_service):
         """Test async ECG analysis creation"""
@@ -99,6 +113,13 @@ class TestECGServiceCoverage:
 class TestMLModelServiceCoverage:
     """Tests for ml_model_service.py (17% -> 35% coverage target)"""
     
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     @pytest.fixture
     def ml_service(self):
         with patch('pathlib.Path.exists', return_value=False):
@@ -157,6 +178,13 @@ class TestValidationServiceCoverage:
     """Tests for validation_service.py (12% -> 35% coverage target)"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def validation_service(self):
         mock_db = Mock()
         mock_notification_service = Mock()
@@ -166,6 +194,13 @@ class TestValidationServiceCoverage:
         """Test validation service initialization"""
         assert validation_service is not None
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_create_validation(self, validation_service):
         """Test validation creation"""
@@ -199,6 +234,13 @@ class TestValidationServiceCoverage:
             result = validation_service._requires_second_opinion(mock_analysis)
             assert isinstance(result, bool)
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_run_automated_validation_rules(self, validation_service):
         """Test automated validation rules"""

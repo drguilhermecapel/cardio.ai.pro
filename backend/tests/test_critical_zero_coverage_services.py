@@ -31,6 +31,7 @@ class TestCriticalZeroCoverageServices:
         assert hasattr(service, 'feature_extractor')
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
         """Test comprehensive ECG analysis"""
         service = HybridECGAnalysisService()
@@ -48,6 +49,7 @@ class TestCriticalZeroCoverageServices:
         assert hasattr(reader, 'supported_formats')
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_universal_ecg_reader_read_csv(self, sample_ecg_data):
         """Test CSV reading"""
         reader = UniversalECGReader()
@@ -56,6 +58,7 @@ class TestCriticalZeroCoverageServices:
             result = await reader.read_csv("/fake/test.csv")
             assert isinstance(result, np.ndarray)
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_universal_ecg_reader_read_edf(self, sample_ecg_data):
         """Test EDF reading"""
@@ -69,6 +72,7 @@ class TestCriticalZeroCoverageServices:
             result = await reader.read_edf("/fake/test.edf")
             assert isinstance(result, np.ndarray)
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_universal_ecg_reader_read_wfdb(self, sample_ecg_data):
         """Test WFDB reading"""
@@ -88,6 +92,7 @@ class TestCriticalZeroCoverageServices:
         assert hasattr(preprocessor, 'sampling_rate')
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_advanced_preprocessor_preprocess(self, sample_ecg_data):
         """Test signal preprocessing"""
         preprocessor = AdvancedPreprocessor()
@@ -98,6 +103,7 @@ class TestCriticalZeroCoverageServices:
                 assert isinstance(result, np.ndarray)
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_advanced_preprocessor_remove_baseline_wander(self, sample_ecg_data):
         """Test baseline wander removal"""
         preprocessor = AdvancedPreprocessor()
@@ -106,6 +112,7 @@ class TestCriticalZeroCoverageServices:
             result = await preprocessor.remove_baseline_wander(sample_ecg_data[:, 0])
             assert isinstance(result, np.ndarray)
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_advanced_preprocessor_remove_powerline_interference(self, sample_ecg_data):
         """Test powerline interference removal"""
@@ -123,6 +130,7 @@ class TestCriticalZeroCoverageServices:
         assert hasattr(extractor, 'sampling_rate')
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_feature_extractor_extract_features(self, sample_ecg_data):
         """Test feature extraction"""
         extractor = FeatureExtractor()
@@ -136,6 +144,7 @@ class TestCriticalZeroCoverageServices:
             assert isinstance(result, dict)
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_feature_extractor_extract_time_domain_features(self, sample_ecg_data):
         """Test time domain feature extraction"""
         extractor = FeatureExtractor()
@@ -146,6 +155,7 @@ class TestCriticalZeroCoverageServices:
         assert "mean_rr" in result
         assert "sdnn" in result
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_feature_extractor_extract_frequency_domain_features(self, sample_ecg_data):
         """Test frequency domain feature extraction"""
@@ -163,6 +173,7 @@ class TestCriticalZeroCoverageServices:
         assert hasattr(processor, 'sampling_rate')
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_ecg_hybrid_processor_process_signal(self, sample_ecg_data):
         """Test signal processing"""
         processor = ECGHybridProcessor()
@@ -171,6 +182,7 @@ class TestCriticalZeroCoverageServices:
             result = await processor.process_signal(sample_ecg_data)
             assert isinstance(result, dict)
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_ecg_hybrid_processor_detect_arrhythmias(self, sample_ecg_data):
         """Test arrhythmia detection"""
@@ -185,6 +197,7 @@ class TestCriticalZeroCoverageServices:
             assert isinstance(result, dict)
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_ecg_hybrid_processor_calculate_hrv_metrics(self):
         """Test HRV metrics calculation"""
         processor = ECGHybridProcessor()
@@ -193,6 +206,7 @@ class TestCriticalZeroCoverageServices:
         result = await processor.calculate_hrv_metrics(rr_intervals)
         assert isinstance(result, dict)
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_ecg_hybrid_processor_extract_morphological_features(self, sample_ecg_data):
         """Test morphological feature extraction"""
@@ -207,6 +221,7 @@ class TestCriticalZeroCoverageServices:
             assert isinstance(result, dict)
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_validation_service_create_validation(self, mock_db):
         """Test validation creation"""
         with patch('app.repositories.validation_repository.ValidationRepository'):
@@ -217,6 +232,7 @@ class TestCriticalZeroCoverageServices:
             result = await service.create_validation(1, 1, "Test validation")
             assert result.id == 1
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_validation_service_get_validation_by_id(self, mock_db):
         """Test validation retrieval by ID"""
@@ -230,6 +246,7 @@ class TestCriticalZeroCoverageServices:
             assert result == mock_validation
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_validation_service_update_validation_status(self, mock_db):
         """Test validation status update"""
         with patch('app.repositories.validation_repository.ValidationRepository'):
@@ -240,6 +257,7 @@ class TestCriticalZeroCoverageServices:
             result = await service.update_validation_status(1, "approved")
             assert result is True
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_validation_service_get_pending_validations(self, mock_db):
         """Test pending validations retrieval"""
@@ -252,6 +270,7 @@ class TestCriticalZeroCoverageServices:
             result = await service.get_pending_validations()
             assert len(result) == 2
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_ecg_service_create_analysis(self, mock_db):
         """Test ECG analysis creation"""
@@ -272,6 +291,7 @@ class TestCriticalZeroCoverageServices:
                     assert result == mock_analysis
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_ecg_service_process_ecg_file(self, mock_db, sample_ecg_data):
         """Test ECG file processing"""
         with patch('app.repositories.ecg_repository.ECGRepository'):
@@ -288,6 +308,7 @@ class TestCriticalZeroCoverageServices:
                     result = await service._process_ecg_file("/fake/test.csv")
                     assert isinstance(result, dict)
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_ecg_service_validate_analysis_results(self, mock_db):
         """Test analysis results validation"""

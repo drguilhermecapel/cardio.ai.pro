@@ -10,10 +10,12 @@ class TestHybridECGServiceSimple:
     """Simple tests targeting Hybrid ECG Service for maximum coverage"""
     
     @pytest.fixture
+    @pytest.fixture
     def mock_db(self):
         """Mock database session"""
         return Mock()
     
+    @pytest.fixture
     @pytest.fixture
     def hybrid_service(self, mock_db):
         """Hybrid ECG Service instance with mocked dependencies"""
@@ -26,6 +28,7 @@ class TestHybridECGServiceSimple:
                     service.validation_service = Mock()
                     return service
     
+    @pytest.fixture
     @pytest.fixture
     def sample_ecg_data(self):
         """Sample ECG data"""
@@ -76,7 +79,9 @@ class TestHybridECGServiceSimple:
         assert hasattr(preprocessor, '_bandpass_filter')
         assert hasattr(preprocessor, '_remove_powerline_interference')
     
-    def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    async def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
         """Test preprocessing ECG data"""
         preprocessor = AdvancedPreprocessor(sampling_rate=500)
         result = await preprocessor.preprocess_signal(sample_ecg_data)
@@ -134,6 +139,7 @@ class TestHybridECGServiceSimple:
         assert isinstance(result, dict)
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_hybrid_service_init(self, hybrid_service):
         """Test HybridECGAnalysisService initialization"""
         assert hybrid_service is not None
@@ -143,6 +149,7 @@ class TestHybridECGServiceSimple:
         assert hasattr(hybrid_service, 'feature_extractor')
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_hybrid_service_analyze_ecg_comprehensive_simple(self, hybrid_service, sample_ecg_data):
         """Test comprehensive ECG analysis - simplified"""
         with patch.object(hybrid_service.ecg_reader, 'read_ecg', return_value={'signal': sample_ecg_data, 'sampling_rate': 500}):
@@ -150,7 +157,7 @@ class TestHybridECGServiceSimple:
                 with patch.object(hybrid_service.feature_extractor, 'extract_all_features', return_value={"heart_rate": 75}):
                     with patch.object(hybrid_service.ml_service, 'predict_arrhythmia', return_value={"normal": 0.8}):
                         
-                        result = await hawait ybrid_service.analyze_ecg_comprehensive(
+                        result = await hybrid_service.analyze_ecg_comprehensive(
                             file_path="/fake/test.csv",
                             patient_id=1,
                             analysis_id="test-123"

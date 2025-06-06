@@ -24,6 +24,9 @@ class TestHybridECGServiceMaxCoverage:
     """Target: hybrid_ecg_service.py (828 lines)"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def mock_all_dependencies(self):
         """Mock everything to avoid import errors"""
         with patch.multiple(
@@ -58,6 +61,9 @@ class TestHybridECGServiceMaxCoverage:
                 except:
                     pass  # Don't care about errors, just want coverage
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_all_methods_minimal(self, mock_all_dependencies):
         """Call every method with minimal args"""
@@ -122,6 +128,9 @@ class TestValidationServiceMaxCoverage:
     """Target: validation_service.py (258 lines)"""
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_all_validation_paths(self):
         """Test all validation service paths"""
         from app.services.validation_service import ValidationService
@@ -155,7 +164,10 @@ class TestValidationServiceMaxCoverage:
 class TestECGProcessorMaxCoverage:
     """Target: ecg_processor.py and ecg_hybrid_processor.py"""
     
-    @pytest.mark.asyncio  
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_all_processing_methods(self):
         """Test all ECG processing methods"""
         from app.utils.ecg_processor import ECGProcessor

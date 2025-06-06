@@ -15,6 +15,13 @@ class Test80CoverageFinalStrategic:
     """Strategic test suite targeting 80% coverage with maximum impact"""
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_hybrid_ecg_service_zero_coverage_828_lines(self):
         """Test HybridECGAnalysisService - 828 lines at 0% coverage = massive impact"""
         from app.services.hybrid_ecg_service import HybridECGAnalysisService
@@ -91,6 +98,13 @@ class Test80CoverageFinalStrategic:
         processor.reset_processor()
         processor.clear_cache()
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_ecg_processor_low_coverage_271_lines(self):
         """Test ECGProcessor - 271 lines at 12% coverage = good impact"""

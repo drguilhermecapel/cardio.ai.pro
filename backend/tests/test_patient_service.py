@@ -45,7 +45,7 @@ def sample_patient_data():
 
 
 @pytest.mark.asyncio
-    async def test_create_patient_success(patient_service, sample_patient_data):
+async def test_create_patient_success(patient_service, sample_patient_data):
     """Test successful patient creation."""
     mock_patient = Patient()
     mock_patient.id = 1
@@ -70,7 +70,7 @@ def sample_patient_data():
 
 
 @pytest.mark.asyncio
-    async def test_get_patient_by_patient_id(patient_service):
+async def test_get_patient_by_patient_id(patient_service):
     """Test getting patient by patient ID."""
     mock_patient = Patient()
     mock_patient.patient_id = "PAT123456"
@@ -87,7 +87,7 @@ def sample_patient_data():
 
 
 @pytest.mark.asyncio
-    async def test_get_patient_by_patient_id_not_found(patient_service):
+async def test_get_patient_by_patient_id_not_found(patient_service):
     """Test getting non-existent patient by patient ID."""
     patient_service.repository.get_patient_by_patient_id = AsyncMock(return_value=None)
     
@@ -97,7 +97,7 @@ def sample_patient_data():
 
 
 @pytest.mark.asyncio
-    async def test_update_patient(patient_service):
+async def test_update_patient(patient_service):
     """Test updating patient information."""
     mock_patient = Patient()
     mock_patient.id = 1
@@ -115,7 +115,7 @@ def sample_patient_data():
 
 
 @pytest.mark.asyncio
-    async def test_get_patients_paginated(patient_service):
+async def test_get_patients_paginated(patient_service):
     """Test getting patients with pagination."""
     mock_patients = [Patient(), Patient()]
     patient_service.repository.get_patients = AsyncMock(return_value=(mock_patients, 2))
@@ -128,7 +128,7 @@ def sample_patient_data():
 
 
 @pytest.mark.asyncio
-    async def test_search_patients(patient_service):
+async def test_search_patients(patient_service):
     """Test searching patients."""
     mock_patients = [Patient()]
     patient_service.repository.search_patients = AsyncMock(return_value=(mock_patients, 1))
@@ -146,7 +146,7 @@ def sample_patient_data():
 
 
 @pytest.mark.asyncio
-    async def test_patient_data_audit_trail(patient_service, sample_patient_data):
+async def test_patient_data_audit_trail(patient_service, sample_patient_data):
     """Ensure patient modifications are tracked for FDA compliance."""
     mock_patient = Patient()
     mock_patient.id = 1

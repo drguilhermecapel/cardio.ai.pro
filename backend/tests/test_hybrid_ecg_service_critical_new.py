@@ -62,7 +62,7 @@ class TestECGCriticalSafety:
         try:
             start_time = time.time()
             
-            result = await eawait cg_service.analyze_ecg_comprehensive(
+            result = await ecg_service.analyze_ecg_comprehensive(
                 file_path=temp_file,
                 patient_id=1,
                 analysis_id="EMERGENCY_001"
@@ -85,7 +85,7 @@ class TestECGCriticalSafety:
     async def test_invalid_file_error_handling(self, ecg_service):
         """CRITICAL: Invalid files must be rejected to prevent misdiagnosis."""
         with pytest.raises(ECGProcessingException) as exc_info:
-            await eawait cg_service.analyze_ecg_comprehensive(
+            await ecg_service.analyze_ecg_comprehensive(
                 file_path="/tmp/nonexistent_file.ecg",
                 patient_id=999,
                 analysis_id="INVALID_001"
@@ -102,7 +102,7 @@ class TestECGCriticalSafety:
         
         try:
             with pytest.raises(ECGProcessingException) as exc_info:
-                await eawait cg_service.analyze_ecg_comprehensive(
+                await ecg_service.analyze_ecg_comprehensive(
                     file_path=temp_file,
                     patient_id=5,
                     analysis_id="UNSUPPORTED_001"
@@ -112,11 +112,12 @@ class TestECGCriticalSafety:
         finally:
             os.unlink(temp_file)
 
-    def test_preprocessor_functionality(self, ecg_service):
+    @pytest.mark.asyncio
+    async def test_preprocessor_functionality(self, ecg_service):
         """CRITICAL: Signal preprocessing must maintain data integrity."""
         test_signal = np.array([0.1, 0.2, 0.3, 0.2, 0.1] * 250).reshape(-1, 1)
         
-        processed_signal = ecg_service.await preprocessor.preprocess_signal(test_signal)
+        processed_signal = await ecg_service.preprocessor.preprocess_signal(test_signal)
         
         assert processed_signal is not None
         assert isinstance(processed_signal, np.ndarray)
@@ -202,7 +203,7 @@ class TestECGCriticalSafety:
         
         features = {'rr_mean': 800}
         
-        assessment = await eawait cg_service._generate_clinical_assessment(
+        assessment = await ecg_service._generate_clinical_assessment(
             ai_results, pathology_results, features
         )
         
@@ -236,7 +237,7 @@ class TestECGCriticalSafety:
         for i in range(10):
             test_signal = np.array([[0.1, 0.2, 0.3] * 100])
             try:
-                ecg_service.await preprocessor.preprocess_signal(test_signal)
+                await ecg_service.preprocessor.preprocess_signal(test_signal)
             except Exception:
                 pass
         
@@ -255,7 +256,7 @@ class TestECGCriticalSafety:
             temp_file = f.name
         
         try:
-            result = await eawait cg_service.analyze_ecg_comprehensive(
+            result = await ecg_service.analyze_ecg_comprehensive(
                 file_path=temp_file,
                 patient_id=100,
                 analysis_id="WORKFLOW_001"
@@ -299,7 +300,7 @@ class TestECGRegulatoryCompliance:
             temp_file = f.name
         
         try:
-            result = await eawait cg_service.analyze_ecg_comprehensive(
+            result = await ecg_service.analyze_ecg_comprehensive(
                 file_path=temp_file,
                 patient_id=100,
                 analysis_id="REGULATORY_001"
@@ -319,11 +320,12 @@ class TestECGRegulatoryCompliance:
         finally:
             os.unlink(temp_file)
 
-    def test_data_integrity_validation(self, ecg_service):
+    @pytest.mark.asyncio
+    async def test_data_integrity_validation(self, ecg_service):
         """REGULATORY: Data integrity must be maintained throughout processing."""
         test_signal = np.array([0.1, 0.2, 0.3, 0.2, 0.1] * 250).reshape(-1, 1)
         
-        processed_signal = ecg_service.await preprocessor.preprocess_signal(test_signal)
+        processed_signal = await ecg_service.preprocessor.preprocess_signal(test_signal)
         
         assert processed_signal is not None
         assert isinstance(processed_signal, np.ndarray)
@@ -347,12 +349,13 @@ class TestECGPerformanceMedical:
         """ECG service for performance testing."""
         return HybridECGAnalysisService(Mock(), Mock())
     
-    def test_preprocessing_performance(self, ecg_service):
+    @pytest.mark.asyncio
+    async def test_preprocessing_performance(self, ecg_service):
         """PERFORMANCE: Preprocessing must complete within time limits."""
         test_signal = np.array([0.1, 0.2, 0.3] * 500).reshape(-1, 1)
         
         start_time = time.time()
-        processed = ecg_service.await preprocessor.preprocess_signal(test_signal)
+        processed = await ecg_service.preprocessor.preprocess_signal(test_signal)
         processing_time = time.time() - start_time
         
         assert processing_time < 5.0, f"Preprocessing too slow: {processing_time:.2f}s"
@@ -375,7 +378,7 @@ class TestECGPerformanceMedical:
             test_signal = np.array([[0.1, 0.2, 0.3] * 100])
             
             try:
-                ecg_service.await preprocessor.preprocess_signal(test_signal)
+                await ecg_service.preprocessor.preprocess_signal(test_signal)
                 ecg_service.feature_extractor.extract_all_features(test_signal)
             except Exception:
                 pass  # Focus on resource management

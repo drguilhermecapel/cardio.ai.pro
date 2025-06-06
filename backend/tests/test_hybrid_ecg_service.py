@@ -186,6 +186,7 @@ class TestHybridECGAnalysisService:
         assert 'confidence' in result
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_analyze_ecg_comprehensive_with_data(self, mock_db, mock_validation_service, ecg_sample_data):
         """Test comprehensive ECG analysis with direct data."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
@@ -202,6 +203,7 @@ class TestHybridECGAnalysisService:
         assert result['patient_id'] == 1
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_analyze_ecg_comprehensive_no_input(self, mock_db, mock_validation_service):
         """Test comprehensive ECG analysis with no input."""
         from app.core.exceptions import ECGProcessingException
@@ -211,6 +213,7 @@ class TestHybridECGAnalysisService:
         with pytest.raises(ECGProcessingException):
             await service.analyze_ecg_comprehensive()
     
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_assess_signal_quality(self, mock_db, mock_validation_service):
         """Test signal quality assessment."""

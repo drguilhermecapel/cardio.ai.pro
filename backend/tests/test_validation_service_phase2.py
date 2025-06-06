@@ -12,6 +12,9 @@ class TestValidationServiceComprehensive:
     """Comprehensive tests for Validation Service - targeting 70%+ coverage"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def validation_service(self):
         """Create validation service with mocked repositories"""
         mock_db = Mock()
@@ -23,6 +26,9 @@ class TestValidationServiceComprehensive:
             notification_service=mock_notification
         )
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_create_validation_all_types(self, validation_service):
         """Test validation creation - covers lines 39-87"""
@@ -39,6 +45,9 @@ class TestValidationServiceComprehensive:
         )
         assert validation is not None
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_automated_validation_rules(self, validation_service):
         """Test automated validation - covers lines 96-149"""
@@ -63,6 +72,9 @@ class TestValidationServiceComprehensive:
         assert 'overall_score' in result
         assert result['overall_score'] >= 0
         
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_validation_workflow_complete(self, validation_service):
         """Test complete validation workflow - covers lines 153-189"""
@@ -106,6 +118,9 @@ class TestValidationServiceComprehensive:
         assert submitted.completed_at is not None
         
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_quality_metrics_calculation(self, validation_service):
         """Test quality metrics - covers lines 195-224"""
         validation_data = {
@@ -129,6 +144,9 @@ class TestValidationServiceComprehensive:
         assert 'quality_metrics' in metrics
     
     @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_escalation_workflows(self, validation_service):
         """Test escalation logic - covers lines 233-250"""
         critical_validation = {
@@ -150,6 +168,9 @@ class TestValidationServiceComprehensive:
         
         assert escalated is None
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_multi_validator_consensus(self, validation_service):
         """Test consensus mechanisms - covers lines 258-287"""

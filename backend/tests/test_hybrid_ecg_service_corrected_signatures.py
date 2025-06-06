@@ -23,10 +23,16 @@ class TestHybridECGAnalysisServiceCorrected:
     """Corrected tests for Hybrid ECG Analysis Service - 829 uncovered lines"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def service(self):
         """Create service instance with mocked dependencies"""
         return HybridECGAnalysisService()
     
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     @pytest.fixture
     def sample_ecg_data(self):
         """Generate realistic ECG test data"""
@@ -234,6 +240,9 @@ class TestUniversalECGReaderCorrected:
     """Test Universal ECG Reader - covers lines 34-275"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def reader(self):
         return UniversalECGReader()
     
@@ -275,9 +284,15 @@ class TestAdvancedPreprocessorCorrected:
     """Test Advanced Preprocessor - covers lines 278-413"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def preprocessor(self):
         return AdvancedPreprocessor()
     
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     @pytest.fixture
     def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
@@ -309,9 +324,15 @@ class TestFeatureExtractorCorrected:
     """Test Feature Extractor - covers lines 416-732"""
     
     @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     def extractor(self):
         return FeatureExtractor()
     
+    @pytest.fixture
+    @pytest.fixture
+    @pytest.fixture
     @pytest.fixture
     def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
