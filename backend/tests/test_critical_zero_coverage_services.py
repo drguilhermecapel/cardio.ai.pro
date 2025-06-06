@@ -54,8 +54,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
         """Test comprehensive ECG analysis"""
@@ -82,8 +86,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_universal_ecg_reader_read_csv(self, sample_ecg_data):
         """Test CSV reading"""
@@ -95,8 +103,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_universal_ecg_reader_read_edf(self, sample_ecg_data):
         """Test EDF reading"""
@@ -112,8 +124,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_universal_ecg_reader_read_wfdb(self, sample_ecg_data):
         """Test WFDB reading"""
@@ -141,8 +157,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_advanced_preprocessor_preprocess(self, sample_ecg_data):
         """Test signal preprocessing"""
@@ -155,8 +175,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_advanced_preprocessor_remove_baseline_wander(self, sample_ecg_data):
         """Test baseline wander removal"""
@@ -168,8 +192,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_advanced_preprocessor_remove_powerline_interference(self, sample_ecg_data):
         """Test powerline interference removal"""
@@ -195,8 +223,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_feature_extractor_extract_features(self, sample_ecg_data):
         """Test feature extraction"""
@@ -212,8 +244,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_feature_extractor_extract_time_domain_features(self, sample_ecg_data):
         """Test time domain feature extraction"""
@@ -227,8 +263,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_feature_extractor_extract_frequency_domain_features(self, sample_ecg_data):
         """Test frequency domain feature extraction"""
@@ -254,8 +294,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_ecg_hybrid_processor_process_signal(self, sample_ecg_data):
         """Test signal processing"""
@@ -267,8 +311,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_ecg_hybrid_processor_detect_arrhythmias(self, sample_ecg_data):
         """Test arrhythmia detection"""
@@ -284,8 +332,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_ecg_hybrid_processor_calculate_hrv_metrics(self):
         """Test HRV metrics calculation"""
@@ -297,8 +349,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_ecg_hybrid_processor_extract_morphological_features(self, sample_ecg_data):
         """Test morphological feature extraction"""
@@ -314,8 +370,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_validation_service_create_validation(self, mock_db):
         """Test validation creation"""
@@ -329,8 +389,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_validation_service_get_validation_by_id(self, mock_db):
         """Test validation retrieval by ID"""
@@ -345,8 +409,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_validation_service_update_validation_status(self, mock_db):
         """Test validation status update"""
@@ -360,8 +428,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_validation_service_get_pending_validations(self, mock_db):
         """Test pending validations retrieval"""
@@ -376,8 +448,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_ecg_service_create_analysis(self, mock_db):
         """Test ECG analysis creation"""
@@ -399,8 +475,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_ecg_service_process_ecg_file(self, mock_db, sample_ecg_data):
         """Test ECG file processing"""
@@ -420,8 +500,12 @@ class TestCriticalZeroCoverageServices:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+    @pytest.mark.timeout(30)
+
+    @pytest.mark.skipif(not SERVICE_AVAILABLE, reason="Service not available")
+
+
+    async
 
  def test_ecg_service_validate_analysis_results(self, mock_db):
         """Test analysis results validation"""
