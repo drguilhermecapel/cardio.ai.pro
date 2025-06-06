@@ -118,10 +118,10 @@ class ECGAnalysisService:
             if not analysis:
                 raise ECGProcessingException(f"Analysis {analysis_id} not found")
 
-            ecg_data = await self.processor.load_ecg_file(analysis.file_path)
-            preprocessed_data = await self.processor.preprocess_signal(ecg_data)
+            ecg_data = self.processor.load_ecg_file(analysis.file_path)
+            preprocessed_data = self.processor.preprocess_signal(ecg_data)
 
-            quality_metrics = await self.quality_analyzer.analyze_quality(
+            quality_metrics = self.quality_analyzer.analyze_quality(
                 preprocessed_data
             )
 
@@ -131,15 +131,15 @@ class ECGAnalysisService:
                 analysis.leads_names,
             )
 
-            measurements = await self._extract_measurements(
+            measurements = self._extract_measurements(
                 preprocessed_data, analysis.sample_rate
             )
 
-            annotations = await self._generate_annotations(
+            annotations = self._generate_annotations(
                 preprocessed_data, ai_results, analysis.sample_rate
             )
 
-            clinical_assessment = await self._assess_clinical_urgency(ai_results)
+            clinical_assessment = self._assess_clinical_urgency(ai_results, measurements)
 
             end_time = datetime.utcnow()
             processing_duration_ms = int((end_time - start_time).total_seconds() * 1000)

@@ -568,7 +568,7 @@ class MLModelService:
             return True
         return False
 
-    def _postprocess_predictions(self, raw_predictions: np.ndarray) -> dict[str, Any]:
+    def _postprocess_predictions(self, raw_predictions: npt.NDArray[np.float64]) -> dict[str, Any]:
         """Postprocess raw model predictions"""
         if len(raw_predictions.shape) == 2 and raw_predictions.shape[0] > 0:
             predictions = raw_predictions[0] if raw_predictions.shape[0] == 1 else raw_predictions

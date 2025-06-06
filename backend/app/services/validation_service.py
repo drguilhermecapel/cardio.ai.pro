@@ -280,7 +280,7 @@ class ValidationService:
                 f"Failed to update analysis validation status: error={str(e)}, analysis_id={analysis_id}"
             )
 
-    def _calculate_quality_metrics(self, validations: list[Any], validation_data: dict[str, Any] = None) -> dict[str, Any]:
+    def _calculate_quality_metrics(self, validations: list[Any], validation_data: dict[str, Any] | None = None) -> dict[str, Any]:
         """Calculate quality metrics from validations (synchronous for tests)."""
         try:
             if not validations:
@@ -450,7 +450,7 @@ class ValidationService:
         try:
             validation = self.repository.get_by_id(validation_id)
             if validation:
-                validation.status = status
+                validation.status = ValidationStatus(status)
                 self.repository.update(validation)
                 return validation
             return None
@@ -474,7 +474,7 @@ class ValidationService:
             logger.error("Failed to get validations by validator %d: %s", validator_id, str(e))
             return []
 
-    def update_validation(self, validation_id: int, update_data: dict[str, Any], user_id: int = None) -> Validation | None:
+    def update_validation(self, validation_id: int, update_data: dict[str, Any], user_id: int | None = None) -> Validation | None:
         """Update validation (synchronous for tests)."""
         try:
             validation = self.repository.get_by_id(validation_id)
@@ -483,7 +483,7 @@ class ValidationService:
                     setattr(validation, key, value)
 
                 if user_id is not None:
-                    validation.updated_by = user_id
+                    validation.validator_id = user_id
 
                 self.repository.update(validation)
                 return validation
@@ -526,7 +526,7 @@ class ValidationService:
             logger.error("Failed to calculate consensus: %s", str(e))
             return {"final_status": "error", "confidence": 0.0}
 
-    def validate_analysis(self, analysis_id: int, validator_id: int) -> dict:
+    def validate_analysis(self, analysis_id: int, validator_id: int) -> dict[str, Any]:
         """Validate an analysis (synchronous version for tests)"""
         try:
             return {
