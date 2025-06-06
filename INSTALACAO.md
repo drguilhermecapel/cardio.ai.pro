@@ -47,10 +47,11 @@ docker-compose logs -f
 
 ## 🪟 Instalação no Windows
 
-### Método 1: Instalação com Clique Duplo (Recomendado)
+### Método 1: Instalação Automática com PowerShell (Recomendado)
 
 **Pré-requisitos:**
 - Windows 10 ou superior
+- PowerShell 5.1+ (incluído no Windows 10/11)
 - Privilégios de administrador
 - Conexão com internet
 
@@ -60,10 +61,25 @@ docker-compose logs -f
    https://github.com/drguilhermecapel/cardio.ai.pro
    ```
 
-2. **Execute o instalador**
+2. **Execute o instalador automático**
    - Clique com o botão direito em `install-cardioai-pro.bat`
    - Selecione "Executar como administrador"
    - Siga as instruções na tela
+
+### Método 1B: Instalação Manual (Sem PowerShell)
+
+**Para sistemas sem PowerShell ou com problemas de execução:**
+
+**Passos:**
+1. **Baixe os arquivos do repositório**
+   ```
+   https://github.com/drguilhermecapel/cardio.ai.pro
+   ```
+
+2. **Execute o instalador manual**
+   - Clique duas vezes em `install-cardioai-pro-simple.bat`
+   - Siga as instruções passo-a-passo na tela
+   - Cada passo será explicado detalhadamente
 
 3. **Aguarde a instalação automática**
    - O instalador irá automaticamente:

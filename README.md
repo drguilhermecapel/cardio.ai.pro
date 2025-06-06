@@ -4,12 +4,17 @@ Program to evaluate EKG
 ## Quick Installation
 
 ### Windows Installation (Recommended)
-**Double-click Installation:**
+**Double-click Installation (PowerShell):**
 1. Download the repository files
 2. Right-click `install-cardioai-pro.bat` and select "Run as administrator"
 3. Follow the automated installation process
 
-**Alternative PowerShell:**
+**Alternative Manual Installation (No PowerShell):**
+1. Download the repository files
+2. Double-click `install-cardioai-pro-simple.bat`
+3. Follow the step-by-step manual instructions
+
+**PowerShell Direct:**
 ```powershell
 # Run as Administrator
 .\install-cardioai-pro.ps1
