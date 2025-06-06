@@ -464,3 +464,7 @@ class ValidationService:
             logger.error(
                 f"Failed to send validation notifications: error={str(e)}, validation_id={validation.id}"
             )
+
+    async def get_validation_by_id(self, validation_id: int) -> Any:
+        """Get validation by ID."""
+        return await self.repository.get_validation_by_id(validation_id)

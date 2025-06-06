@@ -4,6 +4,7 @@ User Service - User management and authentication.
 
 import logging
 from datetime import datetime
+from typing import Any
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -121,3 +122,7 @@ class UserService:
             raise credentials_exception
 
         return user
+
+    async def update_user(self, user_id: int, update_data: dict[str, Any]) -> User | None:
+        """Update user with provided data."""
+        return await self.repository.update_user(user_id, update_data)
