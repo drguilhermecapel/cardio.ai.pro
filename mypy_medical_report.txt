@@ -1,0 +1,92 @@
+🏥 Análise MyPy - Sistema Médico Crítico
+============================================================
+
+ERROS DETECTADOS: 13 total
+
+🚨 ERROS CRÍTICOS (RESOLVER IMEDIATAMENTE): 11
+CATEGORIA: Dados de Paciente, Sinais ECG, Resultados Diagnósticos, Parâmetros de Segurança
+
+1. app/validation/iso13485_quality.py:291:13: Unsupported target for indexed assignment ("object") [index]
+   IMPACTO: ISO 13485 Quality Management System - Falha na verificação de controles de design
+   RISCO: Comprometimento da rastreabilidade de qualidade médica
+
+2. app/validation/iso13485_quality.py:299:17: "object" has no attribute "extend" [attr-defined]
+   IMPACTO: ISO 13485 Quality Management System - Falha na extensão de não-conformidades
+   RISCO: Perda de registros de qualidade críticos
+
+3. app/validation/iso13485_quality.py:325:13: Unsupported target for indexed assignment ("object") [index]
+   IMPACTO: ISO 14971 Risk Management - Falha na distribuição de riscos
+   RISCO: Análise de risco médico comprometida
+
+4. app/validation/iso13485_quality.py:336:13: Unsupported target for indexed assignment ("object") [index]
+   IMPACTO: ISO 14971 Risk Management - Falha na efetividade de controles de risco
+   RISCO: Controles de segurança do paciente comprometidos
+
+5. app/validation/clinical_validation.py:321:13: Unsupported target for indexed assignment ("object") [index]
+   IMPACTO: Clinical Validation Framework - Falha nos resultados de patologia
+   RISCO: Validação clínica de diagnósticos comprometida
+
+6. app/validation/robustness_validation.py:541:13: Unsupported target for indexed assignment ("object") [index]
+   IMPACTO: Robustness Validation - Falha nos resultados de testes de stress
+   RISCO: Validação de robustez do sistema médico comprometida
+
+7. app/validation/robustness_validation.py:556:17: "object" has no attribute "extend" [attr-defined]
+   IMPACTO: Robustness Validation - Falha na extensão de critérios falhados
+   RISCO: Perda de rastreabilidade de falhas de robustez
+
+8. app/validation/robustness_validation.py:601:13: Unsupported target for indexed assignment ("Collection[str]") [index]
+   IMPACTO: Robustness Report - Falha na taxa de sucesso geral
+   RISCO: Relatórios de robustez incorretos
+
+9. app/validation/robustness_validation.py:604:13: Unsupported target for indexed assignment ("Collection[str]") [index]
+   IMPACTO: Robustness Report - Falha nos resultados detalhados
+   RISCO: Análise de performance comprometida
+
+10. app/services/hybrid_ecg_service.py:61:20: Incompatible return value type (got "object", expected "dict[str, Any]") [return-value]
+    IMPACTO: Universal ECG Reader - Falha no retorno de dados de ECG
+    RISCO: Processamento de sinais ECG comprometido, diagnósticos incorretos
+
+11. app/validation/robustness_validation.py:346:21: Incompatible types in assignment (expression has type "float", variable has type "int") [assignment]
+    IMPACTO: Extreme Conditions Testing - Falha na contagem de testes
+    RISCO: Validação de condições extremas comprometida
+
+⚠️ ERROS IMPORTANTES (RESOLVER ANTES DO MERGE): 2
+CATEGORIA: Configurações do Sistema, Logging Médico, Validação de Entrada
+
+1. app/validation/robustness_validation.py:232:13: Statement is unreachable [unreachable]
+   IMPACTO: Noise Injection Testing - Código inalcançável na injeção de ruído
+   RISCO: Lógica de validação de ruído pode estar comprometida
+
+2. app/services/hybrid_ecg_service.py:134:13: Statement is unreachable [unreachable]
+   IMPACTO: Image Processing - Código inalcançável no processamento de imagens ECG
+   RISCO: Funcionalidade de análise de imagem pode estar comprometida
+
+ℹ️ ERROS MENORES (PODEM SER ADIADOS): 0
+
+CATEGORIZAÇÃO POR CRITICIDADE MÉDICA:
+=====================================
+
+CRÍTICOS (11/13 - 85%):
+- Todos os erros em validation/ são críticos pois afetam:
+  * ISO 13485 Quality Management System
+  * Clinical Validation Framework  
+  * Robustness Validation Framework
+- Erro em hybrid_ecg_service.py é crítico pois afeta:
+  * Processamento de sinais ECG
+  * Retorno de dados diagnósticos
+
+IMPORTANTES (2/13 - 15%):
+- Código inalcançável pode indicar lógica de validação comprometida
+
+ANÁLISE DE RISCO MÉDICO:
+========================
+🛑 MERGE BLOQUEADO: 11 erros críticos em sistema médico
+⚠️ RISCO ALTO: Falhas podem comprometer precisão diagnóstica
+🚨 IMPACTO CLÍNICO: Potenciais runtime errors durante análise ECG
+
+PRÓXIMAS AÇÕES OBRIGATÓRIAS:
+============================
+1. Corrigir TODOS os 11 erros críticos
+2. Corrigir os 2 erros importantes  
+3. Validar correções com testes rigorosos
+4. Re-executar MyPy até 100% type safety

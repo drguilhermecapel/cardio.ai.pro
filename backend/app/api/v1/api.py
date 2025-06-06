@@ -7,6 +7,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     auth,
     ecg_analysis,
+    medical_validation,
     notifications,
     patients,
     users,
@@ -21,3 +22,4 @@ api_router.include_router(users.router, prefix="/users", tags=["users"])
 api_router.include_router(patients.router, prefix="/patients", tags=["patients"])
 api_router.include_router(validations.router, prefix="/validations", tags=["validations"])
 api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
+api_router.include_router(medical_validation.router, prefix="/medical-validation", tags=["medical-validation"])

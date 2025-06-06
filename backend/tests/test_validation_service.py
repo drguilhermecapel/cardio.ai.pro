@@ -57,6 +57,8 @@ def sample_validation_data():
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_create_validation_success(validation_service, sample_validation_data, test_db):
     """Test successful validation creation."""
     from app.models.ecg_analysis import ECGAnalysis
@@ -120,6 +122,8 @@ async def test_create_validation_success(validation_service, sample_validation_d
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_submit_validation(validation_service, test_db):
     """Test submitting validation results."""
     from app.models.ecg_analysis import ECGAnalysis
@@ -196,6 +200,8 @@ async def test_submit_validation(validation_service, test_db):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_create_urgent_validation(validation_service, test_db):
     """Test creating urgent validation."""
     from app.models.ecg_analysis import ECGAnalysis
@@ -250,6 +256,8 @@ async def test_create_urgent_validation(validation_service, test_db):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_run_automated_validation_rules(validation_service, test_db):
     """Test running automated validation rules."""
     from app.models.ecg_analysis import ECGAnalysis

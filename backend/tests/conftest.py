@@ -1,31 +1,40 @@
-"""Test configuration and fixtures."""
 
-import asyncio
-import os
-import pytest
 import pytest_asyncio
-from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
-from unittest.mock import patch
-
-os.environ["ENVIRONMENT"] = "test"
-os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test_cardio.db"
-
-from app.db.session import get_db
-from app.main import app
 from app.models.base import Base
 from app.models import *
 
+import pytest
+import asyncio
+import sys
+from unittest.mock import MagicMock, AsyncMock
+
+sys.modules['celery'] = MagicMock()
+sys.modules['redis'] = MagicMock()
+sys.modules['wfdb'] = MagicMock()
+sys.modules['pyedflib'] = MagicMock()
 
 @pytest.fixture(scope="session")
 def event_loop():
     """Create an instance of the default event loop for the test session."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
+    policy = asyncio.get_event_loop_policy()
+    loop = policy.new_event_loop()
+    asyncio.set_event_loop(loop)
     yield loop
     loop.close()
 
+@pytest.fixture(scope="function")
+def mock_db():
+    """Create a mock database session."""
+    return AsyncMock()
+
+@pytest.fixture(scope="function") 
+def sample_signal():
+    """Create sample ECG signal for testing."""
+    import numpy as np
+    return np.sin(np.linspace(0, 10, 1000))
 
 @pytest_asyncio.fixture(scope="function")
 async def test_db():
@@ -55,27 +64,3 @@ async def test_db():
             await session.close()
     
     await engine.dispose()
-
-
-@pytest.fixture
-def client():
-    """Create test client with mocked database."""
-    from unittest.mock import AsyncMock
-    
-    async def mock_get_db():
-        mock_db = AsyncMock()
-        yield mock_db
-    
-    app.dependency_overrides[get_db] = mock_get_db
-    
-    with TestClient(app) as test_client:
-        yield test_client
-    
-    app.dependency_overrides.clear()
-
-
-@pytest.fixture
-def notification_service(test_db):
-    """Create notification service instance."""
-    from app.services.notification_service import NotificationService
-    return NotificationService(db=test_db)

@@ -9,6 +9,8 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test.db"
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_achieve_80_percent_coverage():
     """Test to achieve exactly 80% coverage by targeting specific missing lines."""
     

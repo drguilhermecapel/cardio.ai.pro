@@ -1,0 +1,12 @@
+app/validation/robustness_validation.py:232:13: error: Statement is unreachable  [unreachable]
+app/validation/robustness_validation.py:346:21: error: Incompatible types in assignment (expression has type "float", variable has type "int")  [assignment]
+app/services/hybrid_ecg_service.py:62:20: error: No overload variant of "dict" matches argument type "object"  [call-overload]
+app/services/hybrid_ecg_service.py:62:20: note: Possible overload variants:
+app/services/hybrid_ecg_service.py:62:20: note:     def [_KT, _VT] dict(self) -> dict[_KT, _VT]
+app/services/hybrid_ecg_service.py:62:20: note:     def [_KT, _VT] dict(self, **kwargs: _VT) -> dict[str, _VT]
+app/services/hybrid_ecg_service.py:62:20: note:     def [_KT, _VT] dict(self, SupportsKeysAndGetItem[_KT, _VT], /) -> dict[_KT, _VT]
+app/services/hybrid_ecg_service.py:62:20: note:     def [_KT, _VT] dict(self, SupportsKeysAndGetItem[str, _VT], /, **kwargs: _VT) -> dict[str, _VT]
+app/services/hybrid_ecg_service.py:62:20: note:     def [_KT, _VT] dict(self, Iterable[tuple[_KT, _VT]], /) -> dict[_KT, _VT]
+app/services/hybrid_ecg_service.py:62:20: note:     def [_KT, _VT] dict(self, Iterable[tuple[str, _VT]], /, **kwargs: _VT) -> dict[str, _VT]
+app/services/hybrid_ecg_service.py:62:20: note:     def [_KT, _VT] dict(self, Iterable[list[str]], /) -> dict[str, str]
+app/services/hybrid_ecg_service.py:62:20: note:     def [_KT, _VT] dict(self, Iterable[list[bytes]], /) -> dict[bytes, bytes]

@@ -1,0 +1,170 @@
+{
+  "errors": {
+    "validation_error": "Fallo en la validación",
+    "authentication_error": "Fallo en la autenticación",
+    "permission_denied": "Permiso denegado",
+    "not_found": "Recurso no encontrado",
+    "conflict": "Conflicto de recurso",
+    "ecg_processing_error": "Error en el procesamiento del ECG",
+    "ml_model_error": "Error en el modelo de aprendizaje automático",
+    "validation_not_found": "Validación {validation_id} no encontrada",
+    "analysis_not_found": "Análisis {analysis_id} no encontrado",
+    "validation_already_exists": "La validación para el análisis {analysis_id} ya existe",
+    "insufficient_permissions": "Permisos insuficientes. Requerido: {required_permission}",
+    "rate_limit_exceeded": "Límite de velocidad excedido",
+    "file_processing_error": "Error en el procesamiento del archivo",
+    "database_error": "Error en la base de datos",
+    "external_service_error": "Error en el servicio externo"
+  },
+  "schemas": {
+    "user": {
+      "username": {
+        "description": "Nombre de usuario para iniciar sesión (3-50 caracteres)"
+      },
+      "email": {
+        "description": "Dirección de correo electrónico para notificaciones y recuperación de cuenta"
+      },
+      "first_name": {
+        "description": "Nombre del usuario"
+      },
+      "last_name": {
+        "description": "Apellido del usuario"
+      },
+      "phone": {
+        "description": "Número de teléfono para contacto y notificaciones"
+      },
+      "role": {
+        "description": "Rol del usuario que determina los permisos del sistema"
+      },
+      "license_number": {
+        "description": "Número de licencia médica para profesionales de la salud"
+      },
+      "specialty": {
+        "description": "Especialidad médica o área de experiencia"
+      },
+      "institution": {
+        "description": "Institución de salud u organización"
+      },
+      "experience_years": {
+        "description": "Años de experiencia médica profesional"
+      },
+      "password": {
+        "description": "Contraseña segura (mínimo 8 caracteres con mayúscula, minúscula, dígito y carácter especial)",
+        "error": {
+          "too_short": "La contraseña debe tener al menos 8 caracteres",
+          "no_uppercase": "La contraseña debe contener al menos una letra mayúscula",
+          "no_lowercase": "La contraseña debe contener al menos una letra minúscula",
+          "no_digit": "La contraseña debe contener al menos un dígito",
+          "no_special": "La contraseña debe contener al menos un carácter especial"
+        }
+      },
+      "current_password": {
+        "description": "Contraseña actual para verificación"
+      },
+      "new_password": {
+        "description": "Nueva contraseña para reemplazar la actual"
+      },
+      "reset_token": {
+        "description": "Token de restablecimiento de contraseña recibido por correo electrónico"
+      },
+      "api_key_name": {
+        "description": "Nombre descriptivo para la clave de API"
+      },
+      "api_key_scopes": {
+        "description": "Lista de permisos otorgados a esta clave de API"
+      },
+      "api_key_expires": {
+        "description": "Fecha de expiración opcional para la clave de API"
+      }
+    },
+    "notification": {
+      "title": {
+        "description": "Título o asunto de la notificación"
+      },
+      "message": {
+        "description": "Contenido o texto de la notificación"
+      },
+      "type": {
+        "description": "Tipo de notificación (info, advertencia, error, éxito)"
+      },
+      "priority": {
+        "description": "Nivel de prioridad (baja, media, alta, crítica)"
+      },
+      "channels": {
+        "description": "Canales de entrega (email, sms, push, in-app)"
+      },
+      "metadata": {
+        "description": "Metadatos adicionales de la notificación"
+      },
+      "expires_at": {
+        "description": "Fecha de expiración opcional para la notificación"
+      }
+    },
+    "patient": {
+      "first_name": {
+        "description": "Nombre del paciente"
+      },
+      "last_name": {
+        "description": "Apellido del paciente"
+      },
+      "date_of_birth": {
+        "description": "Fecha de nacimiento del paciente"
+      },
+      "gender": {
+        "description": "Género del paciente"
+      },
+      "phone": {
+        "description": "Número de teléfono de contacto del paciente"
+      },
+      "email": {
+        "description": "Dirección de correo electrónico del paciente"
+      },
+      "medical_record_number": {
+        "description": "Identificador único del registro médico"
+      },
+      "emergency_contact": {
+        "description": "Información de contacto de emergencia"
+      }
+    },
+    "ecg_analysis": {
+      "patient_id": {
+        "description": "ID del paciente para este análisis de ECG"
+      },
+      "file_path": {
+        "description": "Ruta al archivo ECG que se está analizando"
+      },
+      "analysis_type": {
+        "description": "Tipo de análisis de ECG a realizar"
+      },
+      "priority": {
+        "description": "Nivel de prioridad del análisis"
+      },
+      "metadata": {
+        "description": "Metadatos adicionales del análisis"
+      },
+      "results": {
+        "description": "Resultados y hallazgos del análisis de ECG"
+      },
+      "confidence": {
+        "description": "Nivel de confianza de los resultados del análisis"
+      },
+      "recommendations": {
+        "description": "Recomendaciones clínicas basadas en el análisis"
+      }
+    }
+  },
+  "api": {
+    "responses": {
+      "success": "Operación completada exitosamente",
+      "created": "Recurso creado exitosamente",
+      "updated": "Recurso actualizado exitosamente",
+      "deleted": "Recurso eliminado exitosamente",
+      "unauthorized": "Autenticación requerida",
+      "forbidden": "Acceso denegado",
+      "not_found": "Recurso no encontrado",
+      "validation_failed": "Falló la validación de entrada",
+      "server_error": "Error interno del servidor",
+      "service_unavailable": "Servicio temporalmente no disponible"
+    }
+  }
+}

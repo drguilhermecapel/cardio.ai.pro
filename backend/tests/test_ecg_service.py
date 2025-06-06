@@ -73,6 +73,8 @@ def sample_ecg_data():
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_create_ecg_analysis_success(ecg_service, sample_ecg_data, mock_ml_service):
     """Test successful ECG analysis creation."""
     # Method process_file doesn't exist in ECGProcessor
@@ -80,6 +82,8 @@ async def test_create_ecg_analysis_success(ecg_service, sample_ecg_data, mock_ml
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_create_ecg_analysis_with_patient_creation(ecg_service, sample_patient_data):
     """Test ECG analysis creation with new patient."""
     ecg_data = ECGAnalysisCreate(
@@ -99,6 +103,8 @@ async def test_create_ecg_analysis_with_patient_creation(ecg_service, sample_pat
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_process_ecg_file_invalid_format(ecg_service):
     """Test processing invalid ECG file format."""
     # Method process_ecg_file doesn't exist in ECGAnalysisService
@@ -106,6 +112,8 @@ async def test_process_ecg_file_invalid_format(ecg_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_process_ecg_file_missing_file(ecg_service):
     """Test processing missing ECG file."""
     # Method process_ecg_file doesn't exist in ECGAnalysisService
@@ -113,6 +121,8 @@ async def test_process_ecg_file_missing_file(ecg_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_get_analysis_by_id(ecg_service, test_db):
     """Test retrieving ECG analysis by ID."""
     analysis = ECGAnalysis(
@@ -145,6 +155,8 @@ async def test_get_analysis_by_id(ecg_service, test_db):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_get_analysis_by_id_not_found(ecg_service):
     """Test retrieving non-existent ECG analysis."""
     result = await ecg_service.get_analysis_by_id(99999)
@@ -152,6 +164,8 @@ async def test_get_analysis_by_id_not_found(ecg_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_get_analyses_by_patient(ecg_service, test_db):
     """Test retrieving ECG analyses by patient ID."""
     patient_id = 999  # Use unique patient ID to avoid conflicts
@@ -186,6 +200,8 @@ async def test_get_analyses_by_patient(ecg_service, test_db):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_update_analysis_status(ecg_service, test_db):
     """Test updating ECG analysis status."""
     # Method update_analysis_status doesn't exist in ECGAnalysisService
@@ -193,6 +209,8 @@ async def test_update_analysis_status(ecg_service, test_db):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_delete_analysis(ecg_service, test_db):
     """Test deleting ECG analysis."""
     analysis = ECGAnalysis(
@@ -223,6 +241,8 @@ async def test_delete_analysis(ecg_service, test_db):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_validate_signal_quality_good(ecg_service):
     """Test signal quality validation for good quality signal."""
     # Method validate_signal_quality doesn't exist in ECGAnalysisService
@@ -230,6 +250,8 @@ async def test_validate_signal_quality_good(ecg_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_validate_signal_quality_poor(ecg_service):
     """Test signal quality validation for poor quality signal."""
     # Method validate_signal_quality doesn't exist in ECGAnalysisService
@@ -237,6 +259,8 @@ async def test_validate_signal_quality_poor(ecg_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_generate_report(ecg_service, test_db):
     """Test generating ECG analysis report."""
     # Method generate_report doesn't exist in ECGAnalysisService
@@ -244,6 +268,8 @@ async def test_generate_report(ecg_service, test_db):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_ml_service_error_handling(ecg_service, mock_ml_service, sample_ecg_data):
     """Test handling ML service errors."""
     # Method process_file doesn't exist in ECGProcessor
@@ -251,6 +277,8 @@ async def test_ml_service_error_handling(ecg_service, mock_ml_service, sample_ec
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_concurrent_analysis_processing(ecg_service, sample_ecg_data):
     """Test concurrent ECG analysis processing."""
     import asyncio

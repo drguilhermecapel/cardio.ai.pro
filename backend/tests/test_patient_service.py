@@ -45,6 +45,8 @@ def sample_patient_data():
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_create_patient_success(patient_service, sample_patient_data):
     """Test successful patient creation."""
     mock_patient = Patient()
@@ -70,6 +72,8 @@ async def test_create_patient_success(patient_service, sample_patient_data):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_get_patient_by_patient_id(patient_service):
     """Test getting patient by patient ID."""
     mock_patient = Patient()
@@ -87,6 +91,8 @@ async def test_get_patient_by_patient_id(patient_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_get_patient_by_patient_id_not_found(patient_service):
     """Test getting non-existent patient by patient ID."""
     patient_service.repository.get_patient_by_patient_id = AsyncMock(return_value=None)
@@ -97,6 +103,8 @@ async def test_get_patient_by_patient_id_not_found(patient_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_update_patient(patient_service):
     """Test updating patient information."""
     mock_patient = Patient()
@@ -115,6 +123,8 @@ async def test_update_patient(patient_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_get_patients_paginated(patient_service):
     """Test getting patients with pagination."""
     mock_patients = [Patient(), Patient()]
@@ -128,6 +138,8 @@ async def test_get_patients_paginated(patient_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_search_patients(patient_service):
     """Test searching patients."""
     mock_patients = [Patient()]
@@ -146,6 +158,8 @@ async def test_search_patients(patient_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_patient_data_audit_trail(patient_service, sample_patient_data):
     """Ensure patient modifications are tracked for FDA compliance."""
     mock_patient = Patient()

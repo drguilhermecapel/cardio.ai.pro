@@ -22,7 +22,7 @@ class PatientService:
         self.db = db
         self.repository = PatientRepository(db)
 
-    async def create_patient(self, patient_data: PatientCreate, created_by: int) -> Patient:
+    async def create_patient(self, patient_data: PatientCreate, created_by: int | None = None) -> Patient:
         """Create a new patient."""
         today = date.today()
         age = today.year - patient_data.date_of_birth.year
@@ -79,7 +79,7 @@ class PatientService:
         patient.insurance_number = patient_data.insurance_number
         patient.consent_for_research = patient_data.consent_for_research
         patient.consent_date = datetime.utcnow() if patient_data.consent_for_research else None
-        patient.created_by = created_by
+        patient.created_by = created_by or 0
 
         return await self.repository.create_patient(patient)
 

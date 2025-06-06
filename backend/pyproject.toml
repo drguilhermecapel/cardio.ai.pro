@@ -45,6 +45,9 @@ lime = "^0.2.0.1"
 plotly = "^5.19.0"
 websockets = "^12.0"
 aiosqlite = "^0.21.0"
+babel = "^2.12.1"
+pyedflib = "^0.1.30"
+wfdb = "^4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
@@ -61,6 +64,11 @@ celery-types = "^0.22.0"
 types-passlib = "^1.7.7"
 types-python-jose = "^3.3.4"
 types-requests = "^2.31.0"
+pandas-stubs = "^2.0.0"
+pyedflib = "^0.1.40"
+wfdb = "^4.3.0"
+pytest-timeout = "^2.4.0"
+pytest-mock = "^3.14.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -105,6 +113,9 @@ warn_no_return = true
 warn_unreachable = true
 strict_equality = true
 
+# Plugins para melhor suporte médico
+plugins = ["numpy.typing.mypy_plugin"]
+
 [[tool.mypy.overrides]]
 module = [
     "neurokit2.*",
@@ -113,8 +124,24 @@ module = [
     "shap.*",
     "lime.*",
     "plotly.*",
+    "wfdb.*",
+    "pyedflib.*",
+    "pywt.*",
+    "biosppy.*",
+    "sklearn.*",
+    "sklearn.preprocessing.*",
 ]
 ignore_missing_imports = true
+
+# Configurações específicas para bibliotecas médicas com stubs
+[[tool.mypy.overrides]]
+module = [
+    "numpy.*",
+    "scipy.*",
+    "scikit_learn.*",
+    "pandas.*",
+]
+ignore_missing_imports = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -129,7 +156,13 @@ addopts = [
     "--cov-report=html",
     "--cov-fail-under=80",
 ]
-asyncio_mode = "auto"
+markers = [
+    "timeout: marks tests with timeout limits for CI optimization",
+    "slow: marks tests as slow running",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests"
+]
+
 
 [tool.coverage.run]
 source = ["app"]

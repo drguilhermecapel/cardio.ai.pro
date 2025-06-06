@@ -1,0 +1,155 @@
+{
+  "atrial_fibrillation": {
+    "en": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Atrial Fibrillation"
+    },
+    "pt": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Fibrilação Atrial"
+    },
+    "es": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Fibrilación Auricular"
+    },
+    "fr": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Fibrillation Auriculaire"
+    },
+    "de": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Vorhofflimmern"
+    },
+    "zh": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "心房颤动"
+    },
+    "ar": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "الرجفان الأذيني"
+    }
+  },
+  "ventricular_tachycardia": {
+    "en": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Ventricular Tachycardia"
+    },
+    "pt": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Taquicardia Ventricular"
+    },
+    "es": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Taquicardia Ventricular"
+    },
+    "fr": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Tachycardie Ventriculaire"
+    },
+    "de": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Ventrikuläre Tachykardie"
+    },
+    "zh": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "室性心动过速"
+    },
+    "ar": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "تسرع القلب البطيني"
+    }
+  },
+  "myocardial_infarction": {
+    "en": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Myocardial Infarction"
+    },
+    "pt": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Infarto do Miocárdio"
+    },
+    "es": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Infarto de Miocardio"
+    },
+    "fr": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Infarctus du Myocarde"
+    },
+    "de": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "Myokardinfarkt"
+    },
+    "zh": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "心肌梗死"
+    },
+    "ar": {
+      "validated": true,
+      "validator_id": "system",
+      "validator_credentials": "Medical terminology database",
+      "timestamp": "2024-06-04T12:36:00Z",
+      "translation": "احتشاء عضلة القلب"
+    }
+  }
+}

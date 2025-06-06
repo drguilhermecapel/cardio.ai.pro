@@ -9,6 +9,8 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test.db"
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_run_full_test_suite():
     """Run comprehensive tests to boost coverage to 80%."""
     
@@ -85,7 +87,7 @@ async def test_run_full_test_suite():
     
     ml_service = MLModelService()
     try:
-        await ml_service.load_model("nonexistent_model")
+        await ml_service._load_model("nonexistent_model")
     except Exception:
         pass
     

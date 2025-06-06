@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import AsyncMock, Mock
 
 from app.services.notification_service import NotificationService
-from app.models.notification import Notification
+from app.models.base import Base  # Ajustar conforme necessário
 from app.core.constants import NotificationPriority, NotificationType, ClinicalUrgency
 
 
@@ -28,6 +28,8 @@ def sample_notification():
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_send_validation_assignment(notification_service):
     """Test sending validation assignment notification."""
     notification_service.repository.create_notification = AsyncMock()
@@ -44,6 +46,8 @@ async def test_send_validation_assignment(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_send_critical_rejection_alert(notification_service):
     """Test sending critical rejection alert."""
     notification_service.repository.get_critical_alert_recipients = AsyncMock(return_value=[
@@ -59,6 +63,8 @@ async def test_send_critical_rejection_alert(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_send_no_validator_alert(notification_service):
     """Test sending no validator alert."""
     notification_service.repository.get_administrators = AsyncMock(return_value=[
@@ -74,6 +80,8 @@ async def test_send_no_validator_alert(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_send_urgent_validation_alert(notification_service):
     """Test sending urgent validation alert."""
     notification_service.repository.create_notification = AsyncMock()
@@ -89,6 +97,8 @@ async def test_send_urgent_validation_alert(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_send_validation_complete(notification_service):
     """Test sending validation complete notification."""
     notification_service.repository.create_notification = AsyncMock()
@@ -105,6 +115,8 @@ async def test_send_validation_complete(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_send_analysis_complete(notification_service):
     """Test sending analysis complete notification."""
     notification_service.repository.create_notification = AsyncMock()
@@ -121,6 +133,8 @@ async def test_send_analysis_complete(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_send_quality_alert(notification_service):
     """Test sending quality alert notification."""
     notification_service.repository.create_notification = AsyncMock()
@@ -137,6 +151,8 @@ async def test_send_quality_alert(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_send_system_alert(notification_service):
     """Test sending system alert notification."""
     notification_service.repository.get_administrators = AsyncMock(return_value=[
@@ -156,6 +172,8 @@ async def test_send_system_alert(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_get_user_notifications(notification_service):
     """Test getting user notifications."""
     mock_notifications = [Notification(), Notification()]
@@ -167,6 +185,8 @@ async def test_get_user_notifications(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_mark_notification_read(notification_service):
     """Test marking notification as read."""
     notification_service.repository.mark_notification_read = AsyncMock(return_value=True)
@@ -180,6 +200,8 @@ async def test_mark_notification_read(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_mark_all_read(notification_service):
     """Test marking all notifications as read."""
     notification_service.repository.mark_all_read = AsyncMock(return_value=5)
@@ -190,6 +212,8 @@ async def test_mark_all_read(notification_service):
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(30)
+
 async def test_get_unread_count(notification_service):
     """Test getting unread notification count."""
     notification_service.repository.get_unread_count = AsyncMock(return_value=3)
