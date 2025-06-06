@@ -204,7 +204,6 @@ class ValidationService:
 
             critical_issues: list[str] = validation_results.setdefault("critical_issues", [])
             warnings: list[str] = validation_results.setdefault("warnings", [])
-            
             if not analysis_data.get("signal_data"):
                 critical_issues.append("Missing signal data")
                 validation_results["overall_score"] = 0.0

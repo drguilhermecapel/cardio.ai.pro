@@ -588,8 +588,8 @@ class ECGHybridProcessor:
 
     def get_supported_formats(self) -> list[str]:
         """Get supported ECG file formats"""
-        if (self.hybrid_service is not None and 
-            hasattr(self.hybrid_service, 'ecg_reader') and 
+        if (self.hybrid_service is not None and
+            hasattr(self.hybrid_service, 'ecg_reader') and
             self.hybrid_service.ecg_reader is not None and
             hasattr(self.hybrid_service.ecg_reader, 'supported_formats')):
             return list(self.hybrid_service.ecg_reader.supported_formats.keys())
