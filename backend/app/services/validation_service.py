@@ -204,8 +204,8 @@ class ValidationService:
 
             critical_issues_raw = validation_results.setdefault("critical_issues", [])
             warnings_raw = validation_results.setdefault("warnings", [])
-            critical_issues: list[str] = list(critical_issues_raw) if critical_issues_raw is not None else []
-            warnings: list[str] = list(warnings_raw) if warnings_raw is not None else []
+            critical_issues: list[str] = list(critical_issues_raw) if isinstance(critical_issues_raw, (list, tuple)) else []
+            warnings: list[str] = list(warnings_raw) if isinstance(warnings_raw, (list, tuple)) else []
             if not analysis_data.get("signal_data"):
                 critical_issues.append("Missing signal data")
                 validation_results["overall_score"] = 0.0

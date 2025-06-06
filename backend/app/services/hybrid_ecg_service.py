@@ -757,7 +757,7 @@ class HybridECGAnalysisService:
         self.advanced_preprocessing = self.preprocessor  # Alias for tests
 
         if not hasattr(self.reader, 'read_ecg'):
-            self.reader.read_ecg = self._read_ecg_file_fallback
+            self.reader.read_ecg = lambda filepath, sampling_rate=None: self._read_ecg_file_fallback(filepath)
 
         self.pathology_classes = [
             'normal', 'atrial_fibrillation', 'atrial_flutter', 'ventricular_tachycardia',
