@@ -295,11 +295,11 @@ class ECGProcessor:
             return peaks.astype(np.int64)
 
         except ImportError:
-            peaks: list[int] = []
+            fallback_peaks: list[int] = []
             for i in range(1, len(signal) - 1):
                 if signal[i] > signal[i-1] and signal[i] > signal[i+1] and signal[i] > 0.5:
-                    peaks.append(i)
-            return np.array(peaks, dtype=np.int64)
+                    fallback_peaks.append(i)
+            return np.array(fallback_peaks, dtype=np.int64)
         except Exception as e:
             logger.error(f"Failed to detect R-peaks: {str(e)}")
             return np.array([], dtype=np.int64)
