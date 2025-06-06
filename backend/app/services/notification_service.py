@@ -350,3 +350,7 @@ class NotificationService:
     async def get_unread_count(self, user_id: int) -> int:
         """Get unread notification count for a user."""
         return await self.repository.get_unread_count(user_id)
+
+    async def delete_notification(self, notification_id: int, user_id: int) -> bool:
+        """Delete a notification for a user."""
+        return await self.repository.delete_notification(notification_id, user_id)

@@ -282,3 +282,24 @@ class ExternalServiceException(CardioAIException):
             details=details,
             **kwargs,
         )
+
+
+class NotificationError(CardioAIException):
+    """Notification service error exception."""
+
+    def __init__(
+        self,
+        message_key: str = "errors.notification_error",
+        lang: str = "en",
+        notification_type: str | None = None,
+        **kwargs: Any,
+    ) -> None:
+        details = {"notification_type": notification_type} if notification_type else {}
+        super().__init__(
+            message_key=message_key,
+            lang=lang,
+            error_code="NOTIFICATION_ERROR",
+            status_code=500,
+            details=details,
+            **kwargs,
+        )
