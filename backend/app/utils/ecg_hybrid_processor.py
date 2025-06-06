@@ -532,18 +532,17 @@ class ECGHybridProcessor:
         try:
             if self.hybrid_service is None:
                 raise ValueError("Hybrid service not initialized")
-            analysis_result = self.hybrid_service.analyze_ecg_comprehensive(file_path)
-
-            result = analysis_result.copy()
+            
+            result = self.hybrid_service.analyze_ecg_comprehensive(file_path)
 
             if require_regulatory_compliance:
                 regulatory_service = getattr(self, 'regulatory_service', None)
                 if regulatory_service is not None:
-                    regulatory_validation = regulatory_service.validate_analysis_comprehensive(analysis_result)
+                    regulatory_validation = regulatory_service.validate_analysis_comprehensive(result)
                     result['regulatory_compliant'] = regulatory_validation.get('status') == 'compliant'
                 else:
                     detected_findings = [
-                        finding for finding in analysis_result.get('abnormalities', {}).values()
+                        finding for finding in result.get('abnormalities', {}).values()
                         if finding.get('detected', False)
                     ]
 
@@ -593,7 +592,8 @@ class ECGHybridProcessor:
             self.hybrid_service.ecg_reader is not None and
             hasattr(self.hybrid_service.ecg_reader, 'supported_formats')):
             return list(self.hybrid_service.ecg_reader.supported_formats.keys())
-        return ['WFDB', 'EDF', 'DICOM']
+        else:
+            return ['WFDB', 'EDF', 'DICOM']
 
     def get_regulatory_standards(self) -> dict[str, str]:
         """Get supported regulatory standards"""

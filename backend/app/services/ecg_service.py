@@ -125,8 +125,8 @@ class ECGAnalysisService:
                 preprocessed_data
             )
 
-            ai_results = self.ml_service.analyze_ecg(
-                preprocessed_data,
+            ai_results = await self.ml_service.analyze_ecg(
+                preprocessed_data.astype(np.float32),
                 analysis.sample_rate,
                 analysis.leads_names,
             )

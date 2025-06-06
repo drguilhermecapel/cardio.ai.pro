@@ -70,7 +70,8 @@ class UniversalECGReader:
             ext = os.path.splitext(filepath)[1].lower()
 
             if ext in self.supported_formats:
-                result = self.supported_formats[ext](filepath, sampling_rate)
+                handler = self.supported_formats[ext]
+                result = handler(filepath, sampling_rate)
                 return result if result is not None else {}
             else:
                 raise ValueError(f"Unsupported file format: {ext}")
@@ -756,9 +757,7 @@ class HybridECGAnalysisService:
         self.advanced_preprocessing = self.preprocessor  # Alias for tests
 
         if not hasattr(self.reader, 'read_ecg'):
-            def read_ecg_wrapper(file_path: str, sampling_rate: int | None = None) -> dict[str, Any]:
-                return self._read_ecg_file_fallback(file_path)
-            self.reader.read_ecg = read_ecg_wrapper
+            self.reader.read_ecg = self._read_ecg_file_fallback
 
         self.pathology_classes = [
             'normal', 'atrial_fibrillation', 'atrial_flutter', 'ventricular_tachycardia',
@@ -1117,7 +1116,7 @@ class HybridECGAnalysisService:
             return analysis_result
 
         except ECGProcessingException as e:
-            if "nonexistent_file" in file_path:
+            if file_path and "nonexistent_file" in file_path:
                 raise e
             logger.error(f"ECG analysis failed: {str(e)}")
             raise e
