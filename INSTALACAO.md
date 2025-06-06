@@ -45,6 +45,172 @@ docker-compose logs -f
 - ✅ Windows 10+ (com WSL2)
 - ✅ macOS 11+
 
+## 🪟 Instalação no Windows
+
+### Método 1: Instalação com Clique Duplo (Recomendado)
+
+**Pré-requisitos:**
+- Windows 10 ou superior
+- Privilégios de administrador
+- Conexão com internet
+
+**Passos:**
+1. **Baixe os arquivos do repositório**
+   ```
+   https://github.com/drguilhermecapel/cardio.ai.pro
+   ```
+
+2. **Execute o instalador**
+   - Clique com o botão direito em `install-cardioai-pro.bat`
+   - Selecione "Executar como administrador"
+   - Siga as instruções na tela
+
+3. **Aguarde a instalação automática**
+   - O instalador irá automaticamente:
+     - Verificar e instalar WSL2
+     - Baixar e instalar Docker Desktop
+     - Configurar Ubuntu no WSL2
+     - Instalar o CardioAI Pro
+
+### Método 2: Instalação via PowerShell
+
+**Execute como Administrador:**
+```powershell
+# Navegue até o diretório do projeto
+cd C:\caminho\para\cardio.ai.pro
+
+# Execute o instalador PowerShell
+.\install-cardioai-pro.ps1
+```
+
+### O que o Instalador Windows Faz Automaticamente
+
+1. **Verificação de Sistema**
+   - Confirma Windows 10+ 
+   - Verifica privilégios de administrador
+   - Testa conectividade de internet
+
+2. **Instalação WSL2**
+   - Habilita recurso Windows Subsystem for Linux
+   - Habilita plataforma de máquina virtual
+   - Baixa e instala atualização do kernel WSL2
+   - Define WSL2 como versão padrão
+
+3. **Instalação Docker Desktop**
+   - Baixa automaticamente a versão mais recente
+   - Instala silenciosamente
+   - Configura integração com WSL2
+
+4. **Configuração Ubuntu**
+   - Instala distribuição Ubuntu no WSL2
+   - Configura ambiente Linux
+
+5. **Instalação CardioAI Pro**
+   - Clona o repositório no ambiente WSL2
+   - Executa o instalador Linux dentro do WSL2
+   - Configura todos os serviços
+
+### Informações Pós-Instalação (Windows)
+
+**URLs de Acesso:**
+- Frontend: http://localhost:3000
+- API: http://localhost:8000  
+- Documentação: http://localhost:8000/docs
+
+**Credenciais Padrão:**
+- Usuário: admin@cardioai.pro
+- Senha: admin123
+
+**Comandos Úteis (PowerShell):**
+```powershell
+# Ver logs do sistema
+wsl -d Ubuntu -e docker-compose logs -f
+
+# Parar o sistema
+wsl -d Ubuntu -e docker-compose down
+
+# Reiniciar o sistema  
+wsl -d Ubuntu -e docker-compose restart
+
+# Acessar terminal Ubuntu
+wsl -d Ubuntu
+
+# Ver status dos containers
+wsl -d Ubuntu -e docker-compose ps
+```
+
+**Localização dos Arquivos:**
+- Arquivos do projeto: `\\wsl$\Ubuntu\tmp\cardio.ai.pro`
+- Logs: `\\wsl$\Ubuntu\tmp\cardio.ai.pro\logs`
+
+### Solução de Problemas (Windows)
+
+#### Problema: "WSL2 não está disponível"
+**Solução:**
+1. Verifique se a virtualização está habilitada no BIOS
+2. Execute como administrador:
+   ```powershell
+   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+   ```
+3. Reinicie o computador
+4. Execute o instalador novamente
+
+#### Problema: "Docker Desktop não inicia"
+**Solução:**
+1. Verifique se o Hyper-V está habilitado
+2. Reinicie o Docker Desktop manualmente
+3. Verifique se há conflitos com outros softwares de virtualização
+
+#### Problema: "Erro de permissão"
+**Solução:**
+1. Certifique-se de executar como administrador
+2. Desabilite temporariamente o antivírus
+3. Verifique as políticas de execução do PowerShell:
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+#### Problema: "Ubuntu não responde"
+**Solução:**
+1. Reinicie o WSL2:
+   ```powershell
+   wsl --shutdown
+   wsl -d Ubuntu
+   ```
+2. Verifique se o Docker está rodando:
+   ```powershell
+   docker ps
+   ```
+
+#### Problema: "Portas já em uso"
+**Solução:**
+1. Verifique processos usando as portas:
+   ```powershell
+   netstat -ano | findstr :3000
+   netstat -ano | findstr :8000
+   ```
+2. Termine processos conflitantes ou altere as portas no docker-compose.yml
+
+### Reinstalação (Windows)
+
+Para reinstalar completamente:
+
+1. **Parar todos os serviços:**
+   ```powershell
+   wsl -d Ubuntu -e docker-compose down
+   ```
+
+2. **Remover containers e volumes:**
+   ```powershell
+   wsl -d Ubuntu -e docker system prune -a --volumes
+   ```
+
+3. **Executar instalador novamente:**
+   ```powershell
+   .\install-cardioai-pro.ps1
+   ```
+
 ### Software Necessário
 ```bash
 # Ubuntu/Debian
