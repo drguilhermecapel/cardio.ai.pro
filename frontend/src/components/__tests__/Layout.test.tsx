@@ -6,7 +6,17 @@ import { ThemeProvider } from '@mui/material/styles'
 import { describe, it, expect, vi } from 'vitest'
 import { store } from '../../store'
 import { theme } from '../../theme'
+import { AuthProvider } from '../../contexts/AuthContext'
 import Layout from '../Layout'
+
+vi.mock('../../hooks/useAuth', () => ({
+  useAuth: vi.fn(() => ({
+    user: { username: 'Test User' },
+    isAuthenticated: true,
+    login: vi.fn(),
+    logout: vi.fn(),
+  })),
+}))
 
 vi.mock('../../hooks/redux', () => ({
   useAppSelector: vi.fn(() => ({
@@ -29,7 +39,9 @@ const renderWithProviders = (component: React.ReactElement): ReturnType<typeof r
   return render(
     <Provider store={store}>
       <BrowserRouter>
-        <ThemeProvider theme={theme}>{component}</ThemeProvider>
+        <ThemeProvider theme={theme}>
+          <AuthProvider>{component}</AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </Provider>
   )
@@ -38,11 +50,12 @@ const renderWithProviders = (component: React.ReactElement): ReturnType<typeof r
 describe('Layout', () => {
   it('renders layout component with navigation', () => {
     renderWithProviders(<Layout />)
-    expect(screen.getByText('SPEI - Sistema EMR')).toBeDefined()
+    expect(screen.getByRole('main')).toBeDefined()
   })
 
   it('displays navigation elements', () => {
     renderWithProviders(<Layout />)
     expect(screen.getByText('Dashboard')).toBeDefined()
+    expect(screen.getByText('SPEI - Sistema EMR')).toBeDefined()
   })
 })
