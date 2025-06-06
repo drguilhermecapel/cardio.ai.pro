@@ -13,7 +13,8 @@ from typing import Any, Dict, List
 class TestFinal80CoverageFocused:
     """Final focused test suite targeting 80% coverage"""
     
-    def test_hybrid_ecg_service_comprehensive_coverage(self):
+    @pytest.mark.asyncio
+    async def test_hybrid_ecg_service_comprehensive_coverage(self):
         """Test HybridECGAnalysisService - 828 lines at 13% coverage = massive impact"""
         from app.services.hybrid_ecg_service import HybridECGAnalysisService
         
@@ -35,7 +36,7 @@ class TestFinal80CoverageFocused:
         
         signal = np.random.randn(1000).astype(np.float64)
         
-        validation_result = service.validate_signal(valid_signal)
+        validation_result = service.validate_signal(signal)
         
         analysis_result = await service.analyze_ecg_comprehensive(signal)
         assert isinstance(analysis_result, dict)
@@ -87,7 +88,8 @@ class TestFinal80CoverageFocused:
         service.backup_configuration()
         service.restore_configuration({'backup': 'data'})
     
-    def test_ecg_hybrid_processor_comprehensive_coverage(self):
+    @pytest.mark.asyncio
+    async def test_ecg_hybrid_processor_comprehensive_coverage(self):
         """Test ECGHybridProcessor - 380 lines at 12% coverage = high impact"""
         from app.utils.ecg_hybrid_processor import ECGHybridProcessor
         
@@ -98,7 +100,7 @@ class TestFinal80CoverageFocused:
         
         signal = np.random.randn(1000).astype(np.float64)
         
-        validation = processor.validate_signal(valid_signal)
+        validation = processor.validate_signal(signal)
         
         r_peaks = processor.detect_r_peaks(signal)
         assert isinstance(r_peaks, np.ndarray)
@@ -185,7 +187,7 @@ class TestFinal80CoverageFocused:
         hr = processor.calculate_heart_rate([100, 200, 300], sampling_rate=500)
         assert isinstance(hr, (int, float))
         
-        validation = processor.validate_signal(valid_signal)
+        validation = processor.validate_signal(signal)
         
         intervals = processor.calculate_intervals([100, 200, 300], sampling_rate=500)
         assert isinstance(intervals, dict)

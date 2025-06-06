@@ -23,24 +23,10 @@ class TestHybridECGAnalysisServiceComprehensive:
     """Comprehensive tests for Hybrid ECG Analysis Service - 829 uncovered lines"""
     
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def service(self):
         """Create service instance with mocked dependencies"""
         return HybridECGAnalysisService()
     
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     @pytest.fixture
     def sample_ecg_data(self):
         """Generate realistic ECG test data"""
@@ -116,16 +102,16 @@ class TestHybridECGAnalysisServiceComprehensive:
         """Test signal validation - covers lines 871-918"""
         ecg_data, fs = sample_ecg_data
         
-        is_valid, issues = service.validate_signal(valid_signal)
+        is_valid, issues = service.validate_signal(ecg_data)
         assert isinstance(is_valid, bool)
         assert isinstance(issues, list)
         
         short_signal = np.array([1, 2, 3])
-        is_valid, issues = service.validate_signal(valid_signal)
+        is_valid, issues = service.validate_signal(short_signal)
         assert is_valid == False
         assert len(issues) > 0
         
-        is_valid, issues = service.validate_signal(valid_signal)
+        is_valid, issues = service.validate_signal(short_signal)
         assert is_valid == False
         assert 'Invalid sampling rate' in str(issues)
     
@@ -241,13 +227,6 @@ class TestUniversalECGReader:
     """Test Universal ECG Reader - covers lines 34-275"""
     
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def reader(self):
         return UniversalECGReader()
     
@@ -286,17 +265,9 @@ class TestAdvancedPreprocessor:
     """Test Advanced Preprocessor - covers lines 278-413"""
     
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def preprocessor(self):
         return AdvancedPreprocessor()
     
-    @pytest.fixture
     @pytest.fixture
     @pytest.fixture
     @pytest.fixture
@@ -335,17 +306,9 @@ class TestFeatureExtractor:
     """Test Feature Extractor - covers lines 416-732"""
     
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def extractor(self):
         return FeatureExtractor()
     
-    @pytest.fixture
     @pytest.fixture
     @pytest.fixture
     @pytest.fixture
