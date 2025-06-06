@@ -125,11 +125,12 @@ class ECGAnalysisService:
                 preprocessed_data
             )
 
-            ai_results = await self.ml_service.analyze_ecg(
+            ai_results_future = self.ml_service.analyze_ecg(
                 preprocessed_data.astype(np.float32),
                 analysis.sample_rate,
                 analysis.leads_names,
             )
+            ai_results = await ai_results_future if hasattr(ai_results_future, '__await__') else ai_results_future
 
             measurements = self._extract_measurements(
                 preprocessed_data, analysis.sample_rate

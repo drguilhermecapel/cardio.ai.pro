@@ -586,11 +586,11 @@ class ECGHybridProcessor:
 
     def get_supported_formats(self) -> list[str]:
         """Get supported ECG file formats"""
-        if (self.hybrid_service is not None and
-            hasattr(self.hybrid_service, 'ecg_reader') and
-            self.hybrid_service.ecg_reader is not None and
-            hasattr(self.hybrid_service.ecg_reader, 'supported_formats')):
-            return list(self.hybrid_service.ecg_reader.supported_formats.keys())
+        if self.hybrid_service is not None:
+            if (hasattr(self.hybrid_service, 'ecg_reader') and
+                self.hybrid_service.ecg_reader is not None and
+                hasattr(self.hybrid_service.ecg_reader, 'supported_formats')):
+                return list(self.hybrid_service.ecg_reader.supported_formats.keys())
         return ['WFDB', 'EDF', 'DICOM']
 
     def get_regulatory_standards(self) -> dict[str, str]:
@@ -636,8 +636,8 @@ class ECGHybridProcessor:
             hr_analysis['heart_rate'] = hr_analysis.get('mean_hr', 0)
 
         if len(r_peaks) > 1:
-            rr_intervals = np.diff(r_peaks) / self.fs * 1000  # in ms
-            hr_analysis['rr_intervals'] = rr_intervals.tolist()
+            rr_intervals_array = np.diff(r_peaks) / self.fs * 1000  # in ms
+            hr_analysis['rr_intervals'] = rr_intervals_array.tolist()
         else:
             hr_analysis['rr_intervals'] = []
 
