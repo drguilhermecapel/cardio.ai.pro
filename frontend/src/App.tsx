@@ -727,7 +727,7 @@ function App(): JSX.Element {
   return <SPEIApp />;
 }
 
-function AppWithAuth() {
+function AppWithAuth(): JSX.Element {
   return (
     <AuthProvider>
       <Router>

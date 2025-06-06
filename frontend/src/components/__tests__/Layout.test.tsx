@@ -36,21 +36,13 @@ const renderWithProviders = (component: React.ReactElement): ReturnType<typeof r
 }
 
 describe('Layout', () => {
-  it('renders layout component', () => {
-    renderWithProviders(
-      <Layout>
-        <div>Test Content</div>
-      </Layout>
-    )
-    expect(screen.getByText('Test Content')).toBeDefined()
+  it('renders layout component with navigation', () => {
+    renderWithProviders(<Layout />)
+    expect(screen.getByText('SPEI - Sistema EMR')).toBeDefined()
   })
 
   it('displays navigation elements', () => {
-    renderWithProviders(
-      <Layout>
-        <div>Test Content</div>
-      </Layout>
-    )
-    expect(screen.getAllByText('CardioAI Pro')[0]).toBeDefined()
+    renderWithProviders(<Layout />)
+    expect(screen.getByText('Dashboard')).toBeDefined()
   })
 })
