@@ -17,7 +17,8 @@ class TestECGAnalysisServiceSimple:
         """Verifica se serviço existe"""
         assert ECGAnalysisService is not None
     
-    def test_analyze_ecg_basic(self):
+    @pytest.mark.asyncio
+    async def test_analyze_ecg_basic(self):
         """Teste básico de análise"""
         service = ECGAnalysisService() if callable(ECGAnalysisService) else MagicMock()
         
@@ -51,8 +52,9 @@ class TestECGAnalysisServiceSimple:
             result = method(np.random.randn(1000))
             assert result is not None
     
+    @pytest.mark.asyncio
     @pytest.mark.parametrize("signal_length", [1000, 5000, 10000])
-    def test_different_signal_lengths(self, signal_length):
+    async def test_different_signal_lengths(self, signal_length):
         """Testa diferentes tamanhos de sinal"""
         service = MagicMock()
         service.analyze.return_value = {'status': 'complete'}

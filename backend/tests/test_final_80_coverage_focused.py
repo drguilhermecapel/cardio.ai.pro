@@ -165,7 +165,8 @@ class TestFinal80CoverageFocused:
         processor.save_state()
         processor.load_state({'state': 'data'})
     
-    def test_ecg_processor_additional_coverage(self):
+    @pytest.mark.asyncio
+    async def test_ecg_processor_additional_coverage(self):
         """Test ECGProcessor - 271 lines at 12% coverage = good impact"""
         from app.utils.ecg_processor import ECGProcessor
         

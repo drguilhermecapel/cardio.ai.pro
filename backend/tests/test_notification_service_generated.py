@@ -17,8 +17,6 @@ class TestNotificationService:
 
     @pytest.fixture
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def notificationservice_instance(self):
         """Create NotificationService instance for testing"""
         # TODO: Add proper initialization

@@ -96,7 +96,8 @@ class TestHybridECGDirectImport:
         assert "detected" in result
         assert "probability" in result
 
-    def test_generate_clinical_assessment(self, hybrid_service):
+    @pytest.mark.asyncio
+    async def test_generate_clinical_assessment(self, hybrid_service):
         """Test _generate_clinical_assessment method"""
         ai_predictions = {"normal": 0.8}
         pathology_results = {"atrial_fibrillation": {"detected": False}}
@@ -230,7 +231,8 @@ class TestHybridECGDirectImport:
             )
             assert isinstance(result, dict)
 
-    def test_analyze_ecg_comprehensive(self, hybrid_service, sample_ecg_signal):
+    @pytest.mark.asyncio
+    async def test_analyze_ecg_comprehensive(self, hybrid_service, sample_ecg_signal):
         """Test analyze_ecg_comprehensive method"""
         signal_data = {
             "leads": {

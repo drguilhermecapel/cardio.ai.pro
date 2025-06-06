@@ -13,8 +13,6 @@ class TestECGServiceComprehensive:
     
     @pytest.fixture
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def ecg_service(self):
         """Create ECG service with mocked dependencies"""
         mock_db = Mock()

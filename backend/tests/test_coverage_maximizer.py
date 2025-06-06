@@ -25,8 +25,6 @@ class TestHybridECGServiceMaxCoverage:
     
     @pytest.fixture
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def mock_all_dependencies(self):
         """Mock everything to avoid import errors"""
         with patch.multiple(

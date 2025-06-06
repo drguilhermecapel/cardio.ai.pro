@@ -83,7 +83,8 @@ class TestAdvancedPreprocessor:
         
         assert preprocessor.fs == 250  # Default sampling rate
     
-    def test_preprocess_signal_basic(self):
+    @pytest.mark.asyncio
+    async def test_preprocess_signal_basic(self):
         """Test basic signal preprocessing."""
         preprocessor = AdvancedPreprocessor()
         signal = np.array([[1.0, 2.0, 3.0]], dtype=np.float64)
@@ -148,7 +149,8 @@ class TestHybridECGAnalysisService:
         assert hasattr(service, 'preprocessor')
         assert hasattr(service, 'feature_extractor')
     
-    def test_validate_signal_valid(self, mock_db, mock_validation_service):
+    @pytest.mark.asyncio
+    async def test_validate_signal_valid(self, mock_db, mock_validation_service):
         """Test signal validation with valid signal."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.array([1.0, 2.0, 3.0], dtype=np.float64)
@@ -156,7 +158,8 @@ class TestHybridECGAnalysisService:
         result = await service.validate_signal(valid_signal)
         assert result is True
     
-    def test_validate_signal_invalid_empty(self, mock_db, mock_validation_service):
+    @pytest.mark.asyncio
+    async def test_validate_signal_invalid_empty(self, mock_db, mock_validation_service):
         """Test signal validation with empty signal."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.array([], dtype=np.float64)
@@ -164,7 +167,8 @@ class TestHybridECGAnalysisService:
         result = await service.validate_signal(valid_signal)
         assert result is False
     
-    def test_get_supported_pathologies(self, mock_db, mock_validation_service):
+    @pytest.mark.asyncio
+    async def test_get_supported_pathologies(self, mock_db, mock_validation_service):
         """Test getting supported pathologies."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         
@@ -174,7 +178,8 @@ class TestHybridECGAnalysisService:
         assert len(result) > 0
         assert 'Atrial Fibrillation' in result
     
-    def test_simulate_predictions(self, mock_db, mock_validation_service):
+    @pytest.mark.asyncio
+    async def test_simulate_predictions(self, mock_db, mock_validation_service):
         """Test prediction simulation."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         features = {'heart_rate': 75.0}

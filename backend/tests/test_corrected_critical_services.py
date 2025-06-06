@@ -18,17 +18,9 @@ class TestCorrectedCriticalServices:
     @pytest.fixture
     @pytest.fixture
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def sample_ecg_data(self):
         return np.random.randn(5000, 12).astype(np.float64)
     
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     @pytest.fixture
     @pytest.fixture
     @pytest.fixture

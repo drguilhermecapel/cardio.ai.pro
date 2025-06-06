@@ -129,7 +129,8 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert is_valid == False
         assert 'Invalid sampling rate' in str(issues)
     
-    def test_analyze_ecg_comprehensive_sync(self, service, sample_ecg_data):
+    @pytest.mark.asyncio
+    async def test_analyze_ecg_comprehensive_sync(self, service, sample_ecg_data):
         """Test comprehensive ECG analysis - covers lines 920-952"""
         ecg_data, fs = sample_ecg_data
         
@@ -167,7 +168,8 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert isinstance(long_qt_probability, float)
         assert 0 <= long_qt_probability <= 1
     
-    def test_generate_clinical_assessment(self, service):
+    @pytest.mark.asyncio
+    async def test_generate_clinical_assessment(self, service):
         """Test clinical assessment generation - covers lines 1212-1251"""
         predictions = {
             'normal': 0.3,
@@ -309,7 +311,8 @@ class TestAdvancedPreprocessor:
         """Test preprocessor initialization - covers lines 283-285"""
         assert preprocessor is not None
     
-    def test_preprocess_signal(self, preprocessor, valid_signal):
+    @pytest.mark.asyncio
+    async def test_preprocess_signal(self, preprocessor, valid_signal):
         """Test signal preprocessing - covers lines 287-342"""
         fs = 500
         

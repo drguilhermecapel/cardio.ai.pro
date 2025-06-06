@@ -17,20 +17,12 @@ class TestMLModelServiceComprehensive:
     @pytest.fixture
     @pytest.fixture
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def ml_service(self):
         """Create ML service with mocked dependencies"""
         service = MLModelService()
         service._models = {}
         return service
     
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     @pytest.fixture
     @pytest.fixture
     @pytest.fixture

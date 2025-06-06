@@ -16,7 +16,8 @@ class TestNotificationServiceSimple:
         """Testa se o serviço existe"""
         assert NotificationService is not None
     
-    def test_mock_send_email(self):
+    @pytest.mark.asyncio
+    async def test_mock_send_email(self):
         """Testa envio de email com mock completo"""
         with patch('smtplib.SMTP') as mock_smtp:
             mock_instance = MagicMock()
@@ -55,7 +56,8 @@ class TestNotificationServiceCoverage:
         "admin@test.org",
         "notification@cardio.ai"
     ])
-    def test_email_variations(self, email):
+    @pytest.mark.asyncio
+    async def test_email_variations(self, email):
         """Testa variações de email"""
         service = MagicMock()
         service.send_email.return_value = {'status': 'sent'}
@@ -67,7 +69,8 @@ class TestNotificationServiceCoverage:
         "ecg_complete",
         "emergency_alert"
     ])
-    def test_template_variations(self, template):
+    @pytest.mark.asyncio
+    async def test_template_variations(self, template):
         """Testa templates"""
         service = MagicMock()
         service.send_template.return_value = {'sent': True}

@@ -10,12 +10,10 @@ class TestHybridECGServiceSimple:
     """Simple tests targeting Hybrid ECG Service for maximum coverage"""
     
     @pytest.fixture
-    @pytest.fixture
     def mock_db(self):
         """Mock database session"""
         return Mock()
     
-    @pytest.fixture
     @pytest.fixture
     def hybrid_service(self, mock_db):
         """Hybrid ECG Service instance with mocked dependencies"""
@@ -28,7 +26,6 @@ class TestHybridECGServiceSimple:
                     service.validation_service = Mock()
                     return service
     
-    @pytest.fixture
     @pytest.fixture
     def sample_ecg_data(self):
         """Sample ECG data"""

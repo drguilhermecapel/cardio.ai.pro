@@ -52,10 +52,6 @@ class TestECGServiceCoverage:
     @pytest.fixture
     @pytest.fixture
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def ecg_service(self):
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -117,10 +113,6 @@ class TestMLModelServiceCoverage:
     @pytest.fixture
     @pytest.fixture
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def ml_service(self):
         with patch('pathlib.Path.exists', return_value=False):
             return MLModelService()
@@ -177,10 +169,6 @@ class TestMLModelServiceCoverage:
 class TestValidationServiceCoverage:
     """Tests for validation_service.py (12% -> 35% coverage target)"""
     
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     @pytest.fixture
     @pytest.fixture
     @pytest.fixture

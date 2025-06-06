@@ -167,7 +167,8 @@ class TestAdvancedPreprocessorMedicalGrade:
         preprocessor = AdvancedPreprocessor()
         assert preprocessor is not None
     
-    def test_preprocess_signal_complete_pipeline(self):
+    @pytest.mark.asyncio
+    async def test_preprocess_signal_complete_pipeline(self):
         """Test complete preprocessing pipeline."""
         preprocessor = AdvancedPreprocessor(sampling_rate=500)
         signal = np.random.randn(1000, 1).astype(np.float64)
@@ -176,7 +177,8 @@ class TestAdvancedPreprocessorMedicalGrade:
         assert isinstance(result, np.ndarray)
         assert result.shape[0] > 0
     
-    def test_preprocess_signal_with_parameters(self):
+    @pytest.mark.asyncio
+    async def test_preprocess_signal_with_parameters(self):
         """Test preprocessing with custom parameters."""
         preprocessor = AdvancedPreprocessor()
         signal = np.random.randn(1000, 1).astype(np.float64)
@@ -201,7 +203,8 @@ class TestAdvancedPreprocessorMedicalGrade:
         result = preprocessor._wavelet_denoise(signal)
         assert isinstance(result, np.ndarray)
     
-    def test_edge_cases_and_exceptions(self):
+    @pytest.mark.asyncio
+    async def test_edge_cases_and_exceptions(self):
         """Test edge cases that could cause medical system failures."""
         preprocessor = AdvancedPreprocessor(sampling_rate=500)
         
@@ -341,7 +344,8 @@ class TestHybridECGAnalysisServiceMedicalGrade:
         assert hasattr(service, 'preprocessor')
         assert hasattr(service, 'feature_extractor')
     
-    def test_analyze_ecg_comprehensive_complete(self, ecg_service):
+    @pytest.mark.asyncio
+    async def test_analyze_ecg_comprehensive_complete(self, ecg_service):
         """Test complete ECG analysis pipeline."""
         import tempfile
         import pandas as pd
@@ -495,7 +499,8 @@ class TestHybridECGAnalysisServiceMedicalGrade:
         assert 'atrial_fibrillation' in pathologies
         assert 'long_qt_syndrome' in pathologies
     
-    def test_generate_clinical_assessment(self, ecg_service):
+    @pytest.mark.asyncio
+    async def test_generate_clinical_assessment(self, ecg_service):
         """Test clinical assessment generation."""
         ai_results = {
             'predictions': {'normal': 0.8, 'atrial_fibrillation': 0.2},
@@ -579,7 +584,8 @@ class TestECGRegulatoryComplianceBasic:
         assert hasattr(ecg_service, 'preprocessor')
         assert hasattr(ecg_service, 'feature_extractor')
     
-    def test_metadata_completeness(self, ecg_service):
+    @pytest.mark.asyncio
+    async def test_metadata_completeness(self, ecg_service):
         """Test that analysis results contain required metadata."""
         ecg_data = {
             'signal': np.random.randn(1000, 1).astype(np.float64),
@@ -608,7 +614,8 @@ class TestECGPerformanceRequirements:
     def ecg_service(self):
         return HybridECGAnalysisService(db=Mock(), validation_service=Mock())
     
-    def test_processing_time_tracking(self, ecg_service):
+    @pytest.mark.asyncio
+    async def test_processing_time_tracking(self, ecg_service):
         """Test that processing time is tracked for medical compliance."""
         import tempfile
         import pandas as pd

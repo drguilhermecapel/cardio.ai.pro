@@ -125,7 +125,8 @@ class TestHybridECGAnalysisServiceCorrected:
         assert result_empty['is_valid'] is False
         assert len(result_empty['issues']) > 0
     
-    def test_analyze_ecg_comprehensive_sync(self, service, sample_ecg_data):
+    @pytest.mark.asyncio
+    async def test_analyze_ecg_comprehensive_sync(self, service, sample_ecg_data):
         """Test comprehensive ECG analysis - covers lines 920-952"""
         ecg_data, fs = sample_ecg_data
         
@@ -173,7 +174,8 @@ class TestHybridECGAnalysisServiceCorrected:
         assert 'qtc_value' in long_qt_result
         assert 'confidence' in long_qt_result
     
-    def test_generate_clinical_assessment(self, service, sample_ecg_data):
+    @pytest.mark.asyncio
+    async def test_generate_clinical_assessment(self, service, sample_ecg_data):
         """Test clinical assessment generation - covers lines 1212-1251"""
         ecg_data, fs = sample_ecg_data
         
@@ -301,7 +303,8 @@ class TestAdvancedPreprocessorCorrected:
         """Test preprocessor initialization - covers lines 283-285"""
         assert preprocessor is not None
     
-    def test_preprocess_signal(self, preprocessor, valid_signal):
+    @pytest.mark.asyncio
+    async def test_preprocess_signal(self, preprocessor, valid_signal):
         """Test signal preprocessing - covers lines 287-342"""
         fs = 500
         

@@ -234,7 +234,8 @@ class TestHybridECGAdditionalCoverage:
         result = hybrid_service._detect_long_qt(normal_features)
         assert isinstance(result, dict)
 
-    def test_hybrid_service_generate_clinical_assessment_edge_cases(self, hybrid_service):
+    @pytest.mark.asyncio
+    async def test_hybrid_service_generate_clinical_assessment_edge_cases(self, hybrid_service):
         """Test _generate_clinical_assessment with edge cases"""
         abnormal_predictions = {"abnormal": 0.9, "normal": 0.1}
         pathology_results = {"atrial_fibrillation": {"detected": True, "probability": 0.8}}
@@ -277,7 +278,8 @@ class TestHybridECGAdditionalCoverage:
         except Exception:
             assert True
 
-    def test_hybrid_service_analyze_ecg_comprehensive_edge_cases(self, hybrid_service):
+    @pytest.mark.asyncio
+    async def test_hybrid_service_analyze_ecg_comprehensive_edge_cases(self, hybrid_service):
         """Test analyze_ecg_comprehensive with edge cases"""
         minimal_signal_data = {
             "leads": {
