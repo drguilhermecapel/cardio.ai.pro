@@ -12,7 +12,6 @@ class TestValidationServiceComprehensive:
     """Comprehensive tests for Validation Service - targeting 70%+ coverage"""
     
     @pytest.fixture
-    @pytest.fixture
     def validation_service(self):
         """Create validation service with mocked repositories"""
         mock_db = Mock()

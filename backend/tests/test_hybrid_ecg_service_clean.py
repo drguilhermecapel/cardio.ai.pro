@@ -269,12 +269,6 @@ class TestAdvancedPreprocessor:
         return AdvancedPreprocessor()
     
     @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
     
@@ -309,12 +303,6 @@ class TestFeatureExtractor:
     def extractor(self):
         return FeatureExtractor()
     
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
-    @pytest.fixture
     @pytest.fixture
     def valid_signal(self):
         return np.random.randn(1000).astype(np.float64)
