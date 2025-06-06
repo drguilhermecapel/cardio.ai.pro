@@ -133,8 +133,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 'Invalid sampling rate' in str(issues)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_comprehensive_sync(self, service, sample_ecg_data):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_comprehensive_sync(self, service, sample_ecg_data):
         """Test comprehensive ECG analysis - covers lines 920-952"""
         ecg_data, fs = sample_ecg_data
         
@@ -179,8 +180,9 @@ class TestHybridECGAnalysisServiceComprehensive:
         assert 0 <= long_qt_probability <= 1
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_generate_clinical_assessment(self, service):
+    @pytest.mark.timeout(30)
+
+    async def test_generate_clinical_assessment(self, service):
         """Test clinical assessment generation - covers lines 1212-1251"""
         predictions = {
             'normal': 0.3,
@@ -324,8 +326,9 @@ class TestAdvancedPreprocessor:
         assert preprocessor is not None
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_preprocess_signal(self, preprocessor, valid_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_preprocess_signal(self, preprocessor, valid_signal):
         """Test signal preprocessing - covers lines 287-342"""
         fs = 500
         

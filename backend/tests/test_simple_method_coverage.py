@@ -39,8 +39,9 @@ class TestSimpleMethodCoverage:
         assert result is None
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_advanced_preprocessor_methods(self):
+    @pytest.mark.timeout(30)
+
+    async def test_advanced_preprocessor_methods(self):
         """Test AdvancedPreprocessor methods with correct signatures"""
         preprocessor = AdvancedPreprocessor()
         signal = np.random.randn(1000)
@@ -93,8 +94,9 @@ class TestSimpleMethodCoverage:
         assert isinstance(wavelet, dict)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_service_basic_methods(self):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_service_basic_methods(self):
         """Test HybridECGAnalysisService basic methods"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -117,8 +119,9 @@ class TestSimpleMethodCoverage:
         assert len(predictions) > 0
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_service_async_basic(self):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_service_async_basic(self):
         """Test HybridECGAnalysisService async methods"""
         mock_db = Mock()
         mock_ml_service = Mock()

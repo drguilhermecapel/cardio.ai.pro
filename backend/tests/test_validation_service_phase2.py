@@ -27,8 +27,9 @@ class TestValidationServiceComprehensive:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_create_validation_all_types(self, validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_create_validation_all_types(self, validation_service):
         """Test validation creation - covers lines 39-87"""
         
         validation_service.repository.get_validation_by_analysis = AsyncMock(return_value=None)
@@ -47,8 +48,9 @@ class TestValidationServiceComprehensive:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_automated_validation_rules(self, validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_automated_validation_rules(self, validation_service):
         """Test automated validation - covers lines 96-149"""
         analysis_data = {
             'ecg_features': {
@@ -75,8 +77,9 @@ class TestValidationServiceComprehensive:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_validation_workflow_complete(self, validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_validation_workflow_complete(self, validation_service):
         """Test complete validation workflow - covers lines 153-189"""
         from app.core.constants import ValidationStatus
         
@@ -121,8 +124,9 @@ class TestValidationServiceComprehensive:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_quality_metrics_calculation(self, validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_quality_metrics_calculation(self, validation_service):
         """Test quality metrics - covers lines 195-224"""
         validation_data = {
             'agreement_score': 0.85,
@@ -148,8 +152,9 @@ class TestValidationServiceComprehensive:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_escalation_workflows(self, validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_escalation_workflows(self, validation_service):
         """Test escalation logic - covers lines 233-250"""
         critical_validation = {
             'findings': ['STEMI', 'Ventricular tachycardia'],
@@ -174,8 +179,9 @@ class TestValidationServiceComprehensive:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_multi_validator_consensus(self, validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_multi_validator_consensus(self, validation_service):
         """Test consensus mechanisms - covers lines 258-287"""
         validations = [
             {'diagnosis': 'AFib', 'confidence': 0.9},

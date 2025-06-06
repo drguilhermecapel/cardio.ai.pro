@@ -168,8 +168,9 @@ class TestCorrectedCriticalServices:
         assert preprocessor.fs == 250
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
+    @pytest.mark.timeout(30)
+
+    async def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
         """Test signal preprocessing with correct method name"""
         preprocessor = AdvancedPreprocessor()
         
@@ -299,23 +300,26 @@ class TestCorrectedCriticalServices:
                             pass  # Coverage is what matters
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_service_validate_signal(self, sample_ecg_data):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_service_validate_signal(self, sample_ecg_data):
         """Test signal validation"""
         service = HybridECGAnalysisService()
         result = await service.validate_signal(sample_ecg_data)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_service_get_supported_pathologies(self):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_service_get_supported_pathologies(self):
         """Test getting supported pathologies"""
         service = HybridECGAnalysisService()
         result = await service.get_supported_pathologies()
         assert isinstance(result, list)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_service_analyze_ecg_file(self, sample_ecg_data):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_service_analyze_ecg_file(self, sample_ecg_data):
         """Test ECG file analysis"""
         service = HybridECGAnalysisService()
         
@@ -332,8 +336,9 @@ class TestCorrectedCriticalServices:
                 assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_service_analyze_ecg_signal(self, sample_ecg_data):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_service_analyze_ecg_signal(self, sample_ecg_data):
         """Test ECG signal analysis"""
         service = HybridECGAnalysisService()
         
@@ -343,8 +348,9 @@ class TestCorrectedCriticalServices:
                 assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
         """Test comprehensive ECG analysis"""
         service = HybridECGAnalysisService()
         

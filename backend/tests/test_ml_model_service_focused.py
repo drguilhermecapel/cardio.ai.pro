@@ -21,8 +21,9 @@ def sample_ecg_data():
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_analyze_ecg(ml_model_service, sample_ecg_data):
+@pytest.mark.timeout(30)
+
+async def test_analyze_ecg(ml_model_service, sample_ecg_data):
     """Test ECG analysis with actual method."""
     sample_rate = 500
     leads_names = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
@@ -39,8 +40,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_get_model_info(ml_model_service):
+@pytest.mark.timeout(30)
+
+async def test_get_model_info(ml_model_service):
     """Test getting model information."""
     info = ml_model_service.get_model_info()
     
@@ -51,8 +53,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_un_load_model(ml_model_service):
+@pytest.mark.timeout(30)
+
+async def test_un_load_model(ml_model_service):
     """Test unloading a model."""
     ml_model_service.models["test_model"] = Mock()
     ml_model_service.model_metadata["test_model"] = {}
@@ -64,8 +67,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_unload_nonexistent_model(ml_model_service):
+@pytest.mark.timeout(30)
+
+async def test_unload_nonexistent_model(ml_model_service):
     """Test unloading a model that doesn't exist."""
     result = ml_model_service.unload_model("nonexistent_model")
     

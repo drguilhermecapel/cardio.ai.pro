@@ -21,8 +21,9 @@ class TestCriticalLowCoverage80Target:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_signal_quality_assessment_all_methods(self):
+    @pytest.mark.timeout(30)
+
+    async def test_signal_quality_assessment_all_methods(self):
         """Test SignalQualityAnalyzer comprehensive coverage"""
         sqa = SignalQualityAnalyzer()
         
@@ -40,8 +41,9 @@ class TestCriticalLowCoverage80Target:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_validation_service_comprehensive_coverage(self):
+    @pytest.mark.timeout(30)
+
+    async def test_validation_service_comprehensive_coverage(self):
         """Test ValidationService comprehensive coverage"""
         mock_db = AsyncMock()
         mock_notification_service = Mock()
@@ -66,8 +68,9 @@ class TestCriticalLowCoverage80Target:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_comprehensive_coverage(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_comprehensive_coverage(self):
         """Test ECGAnalysisService comprehensive coverage"""
         mock_db = AsyncMock()
         mock_ml_service = Mock()
@@ -99,8 +102,9 @@ class TestCriticalLowCoverage80Target:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_notification_service_comprehensive_coverage(self):
+    @pytest.mark.timeout(30)
+
+    async def test_notification_service_comprehensive_coverage(self):
         """Test NotificationService comprehensive coverage"""
         mock_db = AsyncMock()
         service = NotificationService(mock_db)
@@ -133,8 +137,9 @@ class TestCriticalLowCoverage80Target:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_additional_signal_quality_methods(self):
+    @pytest.mark.timeout(30)
+
+    async def test_additional_signal_quality_methods(self):
         """Test additional SignalQualityAnalyzer methods for coverage"""
         sqa = SignalQualityAnalyzer()
         signal_2d = np.random.randn(1000, 2).astype(np.float64)
@@ -152,8 +157,9 @@ class TestCriticalLowCoverage80Target:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_validation_service_advanced_methods(self):
+    @pytest.mark.timeout(30)
+
+    async def test_validation_service_advanced_methods(self):
         """Test advanced ValidationService methods for coverage"""
         mock_db = AsyncMock()
         mock_notification_service = Mock()
@@ -196,8 +202,9 @@ class TestCriticalLowCoverage80Target:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_advanced_methods(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_advanced_methods(self):
         """Test advanced ECGAnalysisService methods for coverage"""
         mock_db = AsyncMock()
         mock_ml_service = Mock()
@@ -230,8 +237,9 @@ class TestCriticalLowCoverage80Target:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_notification_service_advanced_methods(self):
+    @pytest.mark.timeout(30)
+
+    async def test_notification_service_advanced_methods(self):
         """Test advanced NotificationService methods for coverage"""
         mock_db = AsyncMock()
         service = NotificationService(mock_db)

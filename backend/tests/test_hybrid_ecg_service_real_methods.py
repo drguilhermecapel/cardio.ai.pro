@@ -72,8 +72,9 @@ class TestHybridECGAnalysisService:
             assert 'predictions' in result
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_file_invalid_file(self, service):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_file_invalid_file(self, service):
         """Test analyze_ecg_file with invalid file"""
         with patch.object(service.reader, 'read_ecg') as mock_read:
             mock_read.return_value = None
@@ -94,8 +95,9 @@ class TestHybridECGAnalysisService:
         assert 'predictions' in result
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_signal_invalid(self, service):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_signal_invalid(self, service):
         """Test analyze_ecg_signal with invalid signal"""
         try:
             result = await service.analyze_ecg_signal(None)
@@ -104,8 +106,9 @@ class TestHybridECGAnalysisService:
             pass
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_validate_signal_valid(self, service, sample_ecg_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_validate_signal_valid(self, service, sample_ecg_signal):
         """Test validate_signal with valid signal"""
         try:
             result = await service.validate_signal(sample_ecg_signal)
@@ -114,8 +117,9 @@ class TestHybridECGAnalysisService:
             pass
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_comprehensive(self, service, sample_ecg_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_comprehensive(self, service, sample_ecg_signal):
         """Test analyze_ecg_comprehensive"""
         try:
             result = await service.analyze_ecg_comprehensive(sample_ecg_signal, sampling_rate=500)
@@ -229,8 +233,9 @@ class TestAdvancedPreprocessor:
         assert preprocessor is not None
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_preprocess_signal(self, mock_dependencies, sample_ecg_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_preprocess_signal(self, mock_dependencies, sample_ecg_signal):
         """Test signal preprocessing"""
         preprocessor = AdvancedPreprocessor()
         result = await preprocessor.preprocess_signal(sample_ecg_signal)
@@ -310,8 +315,9 @@ class TestPrivateMethods:
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_run_simplified_analysis(self, service, sample_ecg_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_run_simplified_analysis(self, service, sample_ecg_signal):
         """Test _run_simplified_analysis"""
         mock_features = {'heart_rate': 75, 'rr_intervals': [0.8, 0.9, 0.85]}
         result = await service._run_simplified_analysis(sample_ecg_signal, mock_features)
@@ -319,8 +325,9 @@ class TestPrivateMethods:
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_detect_pathologies(self, service, sample_ecg_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_detect_pathologies(self, service, sample_ecg_signal):
         """Test _detect_pathologies"""
         ai_predictions = {'atrial_fibrillation': 0.8, 'normal': 0.2}
         features = {"heart_rate": 75, "qt_interval": 400}
@@ -346,8 +353,9 @@ class TestPrivateMethods:
         assert result is not None
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_generate_clinical_assessment(self, service):
+    @pytest.mark.timeout(30)
+
+    async def test_generate_clinical_assessment(self, service):
         """Test _generate_clinical_assessment"""
         ai_predictions = {'atrial_fibrillation': 0.8, 'normal': 0.2}
         pathology_results = {'atrial_fibrillation': {'detected': True, 'confidence': 0.8}}
@@ -405,8 +413,9 @@ class TestPrivateMethods:
         assert result is not None
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_assess_signal_quality(self, service, sample_ecg_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_assess_signal_quality(self, service, sample_ecg_signal):
         """Test _assess_signal_quality"""
         result = await service._assess_signal_quality(sample_ecg_signal)
         assert result is not None
@@ -457,8 +466,9 @@ class TestErrorHandling:
     """Test error handling scenarios"""
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_file_exception(self, service):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_file_exception(self, service):
         """Test analyze_ecg_file with exception"""
         with patch.object(service.reader, 'read_ecg', side_effect=Exception("Test error")):
             try:
@@ -481,8 +491,9 @@ class TestErrorHandling:
                 pass
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_comprehensive_exception(self, service, sample_ecg_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_comprehensive_exception(self, service, sample_ecg_signal):
         """Test analyze_ecg_comprehensive with exception"""
         with patch.object(service, '_run_simplified_analysis', side_effect=Exception("Test error")):
             try:

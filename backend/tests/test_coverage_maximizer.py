@@ -83,8 +83,9 @@ class TestHybridECGServiceMaxCoverage:
     
     @pytest.mark.skipif(not HYBRID_ECG_AVAILABLE, reason="HybridECGAnalysisService not available")
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_all_methods_minimal(self):
+    @pytest.mark.timeout(30)
+
+    async def test_all_methods_minimal(self):
         """Call every method with minimal args"""
         with patch.multiple(
             'app.services.hybrid_ecg_service',
@@ -157,8 +158,9 @@ class TestValidationServiceMaxCoverage:
     
     @pytest.mark.skipif(not VALIDATION_SERVICE_AVAILABLE, reason="ValidationService not available")
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_all_validation_paths(self):
+    @pytest.mark.timeout(30)
+
+    async def test_all_validation_paths(self):
         """Test all validation service paths"""
         with patch.object(ValidationService, '__init__', return_value=None):
             try:

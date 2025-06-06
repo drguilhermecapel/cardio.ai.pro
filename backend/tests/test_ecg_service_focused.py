@@ -38,8 +38,9 @@ def sample_ecg_data():
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_create_ecg_analysis(ecg_service, sample_ecg_data):
+@pytest.mark.timeout(30)
+
+async def test_create_ecg_analysis(ecg_service, sample_ecg_data):
     """Test ECG analysis creation."""
     mock_analysis = ECGAnalysis()
     mock_analysis.id = 1
@@ -65,8 +66,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_get_analysis_by_id(ecg_service):
+@pytest.mark.timeout(30)
+
+async def test_get_analysis_by_id(ecg_service):
     """Test getting ECG analysis by ID."""
     mock_analysis = ECGAnalysis()
     mock_analysis.id = 1
@@ -82,8 +84,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_get_analyses_for_patient(ecg_service):
+@pytest.mark.timeout(30)
+
+async def test_get_analyses_for_patient(ecg_service):
     """Test getting ECG analyses for a patient."""
     mock_analyses = [ECGAnalysis(), ECGAnalysis()]
     ecg_service.repository.get_analyses_by_patient = AsyncMock(return_value=mock_analyses)
@@ -98,8 +101,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_delete_analysis(ecg_service):
+@pytest.mark.timeout(30)
+
+async def test_delete_analysis(ecg_service):
     """Test deleting ECG analysis."""
     ecg_service.repository.delete_analysis = AsyncMock(return_value=True)
     
@@ -110,8 +114,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_search_analyses_with_correct_params(ecg_service):
+@pytest.mark.timeout(30)
+
+async def test_search_analyses_with_correct_params(ecg_service):
     """Test searching analyses with correct parameters."""
     mock_analyses = [ECGAnalysis(), ECGAnalysis()]
     ecg_service.repository.search_analyses = AsyncMock(return_value=(mock_analyses, 2))

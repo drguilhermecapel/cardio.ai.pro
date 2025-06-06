@@ -18,8 +18,9 @@ def validation_service(test_db):
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_create_validation(validation_service):
+@pytest.mark.timeout(30)
+
+async def test_create_validation(validation_service):
     """Test creating validation."""
     mock_analysis = Mock()
     mock_analysis.id = 1
@@ -50,8 +51,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_submit_validation(validation_service):
+@pytest.mark.timeout(30)
+
+async def test_submit_validation(validation_service):
     """Test submitting validation."""
     from app.core.constants import ValidationStatus
     
@@ -87,8 +89,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_create_urgent_validation(validation_service):
+@pytest.mark.timeout(30)
+
+async def test_create_urgent_validation(validation_service):
     """Test creating urgent validation."""
     mock_validator = Mock()
     mock_validator.id = 1
@@ -118,8 +121,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_run_automated_validation_rules(validation_service):
+@pytest.mark.timeout(30)
+
+async def test_run_automated_validation_rules(validation_service):
     """Test running automated validation rules."""
     mock_analysis = Mock()
     mock_analysis.id = 1
@@ -133,8 +137,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_can_validate_permission(validation_service):
+@pytest.mark.timeout(30)
+
+async def test_can_validate_permission(validation_service):
     """Test validation permission check."""
     result = validation_service._can_validate(
         validator_role=UserRoles.PHYSICIAN,
@@ -146,8 +151,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_calculate_quality_metrics(validation_service):
+@pytest.mark.timeout(30)
+
+async def test_calculate_quality_metrics(validation_service):
     """Test quality metrics calculation."""
     ecg_data = {
         "signal_quality": 0.95,

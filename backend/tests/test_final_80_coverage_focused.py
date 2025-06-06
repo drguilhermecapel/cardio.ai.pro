@@ -14,8 +14,9 @@ class TestFinal80CoverageFocused:
     """Final focused test suite targeting 80% coverage"""
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_service_comprehensive_coverage(self):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_service_comprehensive_coverage(self):
         """Test HybridECGAnalysisService - 828 lines at 13% coverage = massive impact"""
         from app.services.hybrid_ecg_service import HybridECGAnalysisService
         
@@ -90,8 +91,9 @@ class TestFinal80CoverageFocused:
         service.restore_configuration({'backup': 'data'})
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_hybrid_processor_comprehensive_coverage(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_hybrid_processor_comprehensive_coverage(self):
         """Test ECGHybridProcessor - 380 lines at 12% coverage = high impact"""
         from app.utils.ecg_hybrid_processor import ECGHybridProcessor
         
@@ -170,8 +172,9 @@ class TestFinal80CoverageFocused:
         processor.load_state({'state': 'data'})
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_processor_additional_coverage(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_processor_additional_coverage(self):
         """Test ECGProcessor - 271 lines at 12% coverage = good impact"""
         from app.utils.ecg_processor import ECGProcessor
         

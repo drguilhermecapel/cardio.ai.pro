@@ -47,8 +47,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ml_model_service_analyze_ecg(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ml_model_service_analyze_ecg(self):
         """Test analyze_ecg method"""
         with patch('pathlib.Path.exists', return_value=False):
             service = MLModelService()
@@ -73,8 +74,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_notification_service_send_notification(self):
+    @pytest.mark.timeout(30)
+
+    async def test_notification_service_send_notification(self):
         """Test send notification method"""
         mock_db = Mock()
         service = NotificationService(mock_db)
@@ -98,8 +100,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_patient_service_create_patient(self):
+    @pytest.mark.timeout(30)
+
+    async def test_patient_service_create_patient(self):
         """Test create patient method"""
         mock_db = Mock()
         service = PatientService(mock_db)
@@ -127,8 +130,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_user_service_get_user_by_email(self):
+    @pytest.mark.timeout(30)
+
+    async def test_user_service_get_user_by_email(self):
         """Test get user by email method"""
         mock_db = Mock()
         service = UserService(mock_db)
@@ -154,8 +158,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_validation_service_create_validation(self):
+    @pytest.mark.timeout(30)
+
+    async def test_validation_service_create_validation(self):
         """Test create validation method"""
         mock_db = Mock()
         mock_notification_service = Mock()
@@ -177,8 +182,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_repository_create_analysis(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_repository_create_analysis(self):
         """Test ECGRepository create analysis"""
         mock_db = Mock()
         repo = ECGRepository(mock_db)
@@ -196,8 +202,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_patient_repository_create_patient(self):
+    @pytest.mark.timeout(30)
+
+    async def test_patient_repository_create_patient(self):
         """Test PatientRepository create patient"""
         mock_db = Mock()
         repo = PatientRepository(mock_db)
@@ -215,8 +222,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_user_repository_create_user(self):
+    @pytest.mark.timeout(30)
+
+    async def test_user_repository_create_user(self):
         """Test UserRepository create user"""
         mock_db = Mock()
         repo = UserRepository(mock_db)
@@ -234,8 +242,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_notification_repository_create_notification(self):
+    @pytest.mark.timeout(30)
+
+    async def test_notification_repository_create_notification(self):
         """Test NotificationRepository create notification"""
         mock_db = Mock()
         repo = NotificationRepository(mock_db)
@@ -253,8 +262,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_validation_repository_create_validation(self):
+    @pytest.mark.timeout(30)
+
+    async def test_validation_repository_create_validation(self):
         """Test ValidationRepository create validation"""
         mock_db = Mock()
         repo = ValidationRepository(mock_db)
@@ -280,8 +290,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_processor_preprocess_signal(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_processor_preprocess_signal(self):
         """Test ECGProcessor preprocess signal"""
         processor = ECGProcessor()
         signal = np.random.randn(1000, 12).astype(np.float64)
@@ -293,8 +304,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_processor_load_ecg_file(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_processor_load_ecg_file(self):
         """Test ECGProcessor load ECG file"""
         processor = ECGProcessor()
         
@@ -306,8 +318,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_processor_extract_metadata(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_processor_extract_metadata(self):
         """Test ECGProcessor extract metadata"""
         processor = ECGProcessor()
         
@@ -320,8 +333,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_signal_quality_analyzer_initialization(self):
+    @pytest.mark.timeout(30)
+
+    async def test_signal_quality_analyzer_initialization(self):
         """Test SignalQualityAnalyzer initialization"""
         sqa = SignalQualityAnalyzer()
         assert sqa is not None
@@ -330,8 +344,9 @@ class TestTargetedHighCoverage:
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_signal_quality_analyzer_analyze_quality(self):
+    @pytest.mark.timeout(30)
+
+    async def test_signal_quality_analyzer_analyze_quality(self):
         """Test SignalQualityAnalyzer analyze quality"""
         sqa = SignalQualityAnalyzer()
         signal = np.random.randn(1000, 12).astype(np.float64)

@@ -15,8 +15,9 @@ class Test80CoverageFinalStrategic:
     """Strategic test suite targeting 80% coverage with maximum impact"""
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_service_zero_coverage_828_lines(self):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_service_zero_coverage_828_lines(self):
         """Test HybridECGAnalysisService - 828 lines at 0% coverage = massive impact"""
         try:
             from app.services.hybrid_ecg_service import HybridECGAnalysisService
@@ -109,8 +110,9 @@ class Test80CoverageFinalStrategic:
             pytest.skip("ECGHybridProcessor not available")
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_processor_low_coverage_271_lines(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_processor_low_coverage_271_lines(self):
         """Test ECGProcessor - 271 lines at 12% coverage = good impact"""
         try:
             from app.utils.ecg_processor import ECGProcessor

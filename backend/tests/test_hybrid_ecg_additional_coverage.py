@@ -286,8 +286,9 @@ class TestHybridECGAdditionalCoverage:
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_service_generate_clinical_assessment_edge_cases(self, hybrid_service):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_service_generate_clinical_assessment_edge_cases(self, hybrid_service):
         """Test _generate_clinical_assessment with edge cases"""
         abnormal_predictions = {"abnormal": 0.9, "normal": 0.1}
         pathology_results = {"atrial_fibrillation": {"detected": True, "probability": 0.8}}
@@ -313,8 +314,9 @@ class TestHybridECGAdditionalCoverage:
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_service_analyze_ecg_comprehensive_async_edge_cases(self, hybrid_service):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_service_analyze_ecg_comprehensive_async_edge_cases(self, hybrid_service):
         """Test analyze_ecg_comprehensive_async with edge cases"""
         try:
             ecg_data = np.ones(1000).astype(np.float64)
@@ -328,8 +330,9 @@ class TestHybridECGAdditionalCoverage:
             assert True
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_service_analyze_ecg_comprehensive_edge_cases(self, hybrid_service):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_service_analyze_ecg_comprehensive_edge_cases(self, hybrid_service):
         """Test analyze_ecg_comprehensive with edge cases"""
         minimal_signal_data = {
             "leads": {
@@ -379,8 +382,9 @@ class TestHybridECGAdditionalCoverage:
         assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_service_assess_signal_quality_edge_cases(self, hybrid_service):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_service_assess_signal_quality_edge_cases(self, hybrid_service):
         """Test _assess_signal_quality with edge cases"""
         constant_signal = np.ones(1000)
         result = await hybrid_service._assess_signal_quality(constant_signal)

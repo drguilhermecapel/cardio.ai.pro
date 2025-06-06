@@ -124,8 +124,9 @@ class TestHybridECGDirectImport:
         assert "probability" in result
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_generate_clinical_assessment(self, hybrid_service):
+    @pytest.mark.timeout(30)
+
+    async def test_generate_clinical_assessment(self, hybrid_service):
         """Test _generate_clinical_assessment method"""
         ai_predictions = {"normal": 0.8}
         pathology_results = {"atrial_fibrillation": {"detected": False}}
@@ -207,8 +208,9 @@ class TestHybridECGDirectImport:
 
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
         """Test _assess_signal_quality method"""
         signal_1d = sample_ecg_signal[:, 0]
         result = await hybrid_service._assess_signal_quality(signal_1d)
@@ -290,8 +292,9 @@ class TestHybridECGDirectImport:
 
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_comprehensive_async(self, hybrid_service):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_comprehensive_async(self, hybrid_service):
         """Test analyze_ecg_comprehensive_async method"""
         with patch.object(hybrid_service.reader, 'read_ecg') as mock_read:
             mock_read.return_value = np.random.randn(1000).astype(np.float64)
@@ -304,8 +307,9 @@ class TestHybridECGDirectImport:
             assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_comprehensive(self, hybrid_service, sample_ecg_signal):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_comprehensive(self, hybrid_service, sample_ecg_signal):
         """Test analyze_ecg_comprehensive method"""
         signal_data = {
             "leads": {
@@ -319,8 +323,9 @@ class TestHybridECGDirectImport:
 
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_run_simplified_analysis(self, hybrid_service):
+    @pytest.mark.timeout(30)
+
+    async def test_run_simplified_analysis(self, hybrid_service):
         """Test _run_simplified_analysis method"""
         signal_data = {"test": "data"}
         features = {"heart_rate": 75}
@@ -331,8 +336,9 @@ class TestHybridECGDirectImport:
 
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_detect_pathologies(self, hybrid_service):
+    @pytest.mark.timeout(30)
+
+    async def test_detect_pathologies(self, hybrid_service):
         """Test _detect_pathologies method"""
         signal_data = {"test": "data"}
         features = {"heart_rate": 105, "qt_interval": 460}

@@ -90,8 +90,9 @@ class TestHybridECGServiceSimple:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
+    @pytest.mark.timeout(30)
+
+    async def test_advanced_preprocessor_preprocess_signal(self, sample_ecg_data):
         """Test preprocessing ECG data"""
         preprocessor = AdvancedPreprocessor(sampling_rate=500)
         result = await preprocessor.preprocess_signal(sample_ecg_data)
@@ -168,8 +169,9 @@ class TestHybridECGServiceSimple:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_service_init(self, hybrid_service):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_service_init(self, hybrid_service):
         """Test HybridECGAnalysisService initialization"""
         assert hybrid_service is not None
         assert hasattr(hybrid_service, 'analyze_ecg_comprehensive')
@@ -179,8 +181,9 @@ class TestHybridECGServiceSimple:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_service_analyze_ecg_comprehensive_simple(self, hybrid_service, sample_ecg_data):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_service_analyze_ecg_comprehensive_simple(self, hybrid_service, sample_ecg_data):
         """Test comprehensive ECG analysis - simplified"""
         with patch.object(hybrid_service.ecg_reader, 'read_ecg', return_value={'signal': sample_ecg_data, 'sampling_rate': 500}):
             with patch.object(hybrid_service.preprocessor, 'preprocess_signal', return_value=sample_ecg_data):

@@ -15,8 +15,9 @@ def user_service(test_db):
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_create_user_success(user_service):
+@pytest.mark.timeout(30)
+
+async def test_create_user_success(user_service):
     """Test successful user creation."""
     user_data = UserCreate(
         username="testuser",
@@ -49,8 +50,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_authenticate_user_success(user_service):
+@pytest.mark.timeout(30)
+
+async def test_authenticate_user_success(user_service):
     """Test successful user authentication."""
     mock_user = User(
         id=1,
@@ -70,8 +72,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_authenticate_user_invalid_password(user_service):
+@pytest.mark.timeout(30)
+
+async def test_authenticate_user_invalid_password(user_service):
     """Test authentication with invalid password."""
     mock_user = User(
         id=1,
@@ -90,8 +93,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_get_user_by_email(user_service):
+@pytest.mark.timeout(30)
+
+async def test_get_user_by_email(user_service):
     """Test getting user by email."""
     mock_user = User(
         id=1,
@@ -108,8 +112,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_get_user_by_username(user_service):
+@pytest.mark.timeout(30)
+
+async def test_get_user_by_username(user_service):
     """Test getting user by username."""
     mock_user = User(
         id=1,
@@ -126,8 +131,9 @@ async @pytest.mark.timeout(30)
 
 
 @pytest.mark.asyncio
-async @pytest.mark.timeout(30)
- def test_update_last_login(user_service):
+@pytest.mark.timeout(30)
+
+async def test_update_last_login(user_service):
     """Test updating user's last login."""
     user_service.repository.update_user = AsyncMock()
     

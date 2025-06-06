@@ -175,8 +175,9 @@ class TestECGHybridProcessorCoverage:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_get_system_status(self):
+    @pytest.mark.timeout(30)
+
+    async def test_get_system_status(self):
         """Test get system status"""
         processor = ECGHybridProcessor()
         status = await processor.get_model_info()

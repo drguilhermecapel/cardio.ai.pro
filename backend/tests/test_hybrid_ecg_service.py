@@ -102,8 +102,9 @@ class TestAdvancedPreprocessor:
         assert preprocessor.fs == 250  # Default sampling rate
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_preprocess_signal_basic(self):
+    @pytest.mark.timeout(30)
+
+    async def test_preprocess_signal_basic(self):
         """Test basic signal preprocessing."""
         preprocessor = AdvancedPreprocessor()
         signal = np.array([[1.0, 2.0, 3.0]], dtype=np.float64)
@@ -184,8 +185,9 @@ class TestHybridECGAnalysisService:
         assert hasattr(service, 'feature_extractor')
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_validate_signal_valid(self, mock_db, mock_validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_validate_signal_valid(self, mock_db, mock_validation_service):
         """Test signal validation with valid signal."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.array([1.0, 2.0, 3.0], dtype=np.float64)
@@ -194,8 +196,9 @@ class TestHybridECGAnalysisService:
         assert result is True
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_validate_signal_invalid_empty(self, mock_db, mock_validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_validate_signal_invalid_empty(self, mock_db, mock_validation_service):
         """Test signal validation with empty signal."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.array([], dtype=np.float64)
@@ -204,8 +207,9 @@ class TestHybridECGAnalysisService:
         assert result is False
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_get_supported_pathologies(self, mock_db, mock_validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_get_supported_pathologies(self, mock_db, mock_validation_service):
         """Test getting supported pathologies."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         
@@ -216,8 +220,9 @@ class TestHybridECGAnalysisService:
         assert 'Atrial Fibrillation' in result
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_simulate_predictions(self, mock_db, mock_validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_simulate_predictions(self, mock_db, mock_validation_service):
         """Test prediction simulation."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         features = {'heart_rate': 75.0}
@@ -230,8 +235,9 @@ class TestHybridECGAnalysisService:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_comprehensive_with_data(self, mock_db, mock_validation_service, ecg_sample_data):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_comprehensive_with_data(self, mock_db, mock_validation_service, ecg_sample_data):
         """Test comprehensive ECG analysis with direct data."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         
@@ -248,8 +254,9 @@ class TestHybridECGAnalysisService:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_analyze_ecg_comprehensive_no_input(self, mock_db, mock_validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_analyze_ecg_comprehensive_no_input(self, mock_db, mock_validation_service):
         """Test comprehensive ECG analysis with no input."""
         from app.core.exceptions import ECGProcessingException
         
@@ -260,8 +267,9 @@ class TestHybridECGAnalysisService:
     
     @pytest.mark.asyncio
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_assess_signal_quality(self, mock_db, mock_validation_service):
+    @pytest.mark.timeout(30)
+
+    async def test_assess_signal_quality(self, mock_db, mock_validation_service):
         """Test signal quality assessment."""
         service = HybridECGAnalysisService(mock_db, mock_validation_service)
         signal = np.random.randn(1000).astype(np.float64)

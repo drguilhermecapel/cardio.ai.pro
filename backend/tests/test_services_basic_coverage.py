@@ -63,8 +63,9 @@ class TestServicesBasicCoverage:
         assert service.notification_service is not None
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_get_analysis_by_id(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_get_analysis_by_id(self):
         """Test ECGAnalysisService get_analysis_by_id"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -77,8 +78,9 @@ class TestServicesBasicCoverage:
             assert result is None
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_get_analyses_by_patient(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_get_analyses_by_patient(self):
         """Test ECGAnalysisService get_analyses_by_patient"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -91,8 +93,9 @@ class TestServicesBasicCoverage:
             assert isinstance(result, list)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_search_analyses(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_search_analyses(self):
         """Test ECGAnalysisService search_analyses"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -105,8 +108,9 @@ class TestServicesBasicCoverage:
             assert isinstance(result, tuple)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_delete_analysis(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_delete_analysis(self):
         """Test ECGAnalysisService delete_analysis"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -119,8 +123,9 @@ class TestServicesBasicCoverage:
             assert result is True
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_calculate_file_info(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_calculate_file_info(self):
         """Test ECGAnalysisService _calculate_file_info"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -136,8 +141,9 @@ class TestServicesBasicCoverage:
             assert len(result) == 2
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_extract_measurements(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_extract_measurements(self):
         """Test ECGAnalysisService _extract_measurements"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -151,8 +157,9 @@ class TestServicesBasicCoverage:
             assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_generate_annotations(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_generate_annotations(self):
         """Test ECGAnalysisService _generate_annotations"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -167,8 +174,9 @@ class TestServicesBasicCoverage:
             assert isinstance(result, list)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_ecg_service_assess_clinical_urgency(self):
+    @pytest.mark.timeout(30)
+
+    async def test_ecg_service_assess_clinical_urgency(self):
         """Test ECGAnalysisService _assess_clinical_urgency"""
         mock_db = Mock()
         mock_ml_service = Mock()

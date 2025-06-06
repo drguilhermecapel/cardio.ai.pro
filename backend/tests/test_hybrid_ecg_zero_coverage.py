@@ -145,8 +145,9 @@ class TestHybridECGZeroCoverage:
         assert preprocessor.sample_rate == 250
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_advanced_preprocessor_preprocess_signal(self):
+    @pytest.mark.timeout(30)
+
+    async def test_advanced_preprocessor_preprocess_signal(self):
         """Test signal preprocessing"""
         preprocessor = AdvancedPreprocessor(250)
         signal = np.random.randn(1000).astype(np.float64)
@@ -335,8 +336,9 @@ class TestHybridECGZeroCoverage:
         assert hasattr(service, 'validation_service')
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_analysis_service_analyze_ecg_file(self):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_analysis_service_analyze_ecg_file(self):
         """Test ECG file analysis"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -356,8 +358,9 @@ class TestHybridECGZeroCoverage:
             assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_analysis_service_analyze_ecg_signal(self):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_analysis_service_analyze_ecg_signal(self):
         """Test ECG signal analysis"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -370,8 +373,9 @@ class TestHybridECGZeroCoverage:
         assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_analysis_service_simulate_predictions(self):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_analysis_service_simulate_predictions(self):
         """Test prediction simulation"""
         mock_db = Mock()
         mock_ml_service = Mock()
@@ -384,8 +388,9 @@ class TestHybridECGZeroCoverage:
         assert isinstance(result, dict)
     
     @pytest.mark.asyncio
-    async @pytest.mark.timeout(30)
- def test_hybrid_ecg_analysis_service_get_supported_pathologies(self):
+    @pytest.mark.timeout(30)
+
+    async def test_hybrid_ecg_analysis_service_get_supported_pathologies(self):
         """Test getting supported pathologies"""
         mock_db = Mock()
         mock_ml_service = Mock()
