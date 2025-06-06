@@ -130,11 +130,11 @@ class MLModelService:
                 "stemi",
                 "nstemi",
             ]
-            
+
             predictions_dict = {}
             for condition in condition_names:
                 predictions_dict[condition] = float(np.random.random())
-            
+
             return {
                 "predictions": predictions_dict,
                 "confidence": 0.85,
@@ -143,11 +143,11 @@ class MLModelService:
         except Exception as e:
             logger.error(f"Classification failed: {str(e)}")
             return {"predictions": {}, "confidence": 0.0}
-            
+
     def analyze_ecg_sync(
-        self, 
-        data: "np.ndarray[Any, np.dtype[np.float32]]", 
-        sample_rate: int, 
+        self,
+        data: "np.ndarray[Any, np.dtype[np.float32]]",
+        sample_rate: int,
         leads: list[str]
     ) -> dict[str, Any]:
         """Analyze ECG data (synchronous for tests)."""
@@ -155,11 +155,11 @@ class MLModelService:
             classification_results = self.classify_ecg(data)
             rhythm_results = self.detect_rhythm(data)
             quality_results = self.assess_quality(data)
-            
+
             predictions = {}
             if "predictions" in classification_results:
                 predictions = classification_results["predictions"]
-            
+
             return {
                 "classification": classification_results,
                 "rhythm": rhythm_results,
@@ -181,7 +181,7 @@ class MLModelService:
     ) -> dict[str, Any]:
         """Analyze ECG data using ML models (synchronous for tests)."""
         return self.analyze_ecg_sync(ecg_data, sample_rate, leads_names)
-        
+
     async def analyze_ecg_async(
         self,
         ecg_data: "np.ndarray[Any, np.dtype[np.float32]]",
@@ -295,7 +295,7 @@ class MLModelService:
         """Run ECG classification model."""
         try:
             model = self.models["ecg_classifier"]
-            
+
             if model is None:
                 condition_names = [
                     "normal",
@@ -314,11 +314,11 @@ class MLModelService:
                     "stemi",
                     "nstemi",
                 ]
-                
+
                 predictions_dict = {}
                 for condition in condition_names:
                     predictions_dict[condition] = float(np.random.random())
-                
+
                 return {
                     "predictions": predictions_dict,
                     "confidence": 0.85,
@@ -484,7 +484,7 @@ class MLModelService:
             # Mock rhythm detection for tests
             rhythm_types = ["sinus_rhythm", "atrial_fibrillation", "ventricular_tachycardia"]
             detected_rhythm = np.random.choice(rhythm_types)
-            
+
             return {
                 "rhythm_type": detected_rhythm,
                 "confidence": float(np.random.random()),
@@ -520,15 +520,15 @@ class MLModelService:
         try:
             arrhythmia_types = [
                 "normal",
-                "atrial_fibrillation", 
+                "atrial_fibrillation",
                 "ventricular_tachycardia",
                 "bradycardia",
                 "tachycardia"
             ]
-            
+
             predicted_arrhythmia = np.random.choice(arrhythmia_types)
             confidence = float(np.random.random())
-            
+
             return {
                 "arrhythmia_type": predicted_arrhythmia,
                 "confidence": confidence,
@@ -572,23 +572,23 @@ class MLModelService:
         """Postprocess raw model predictions"""
         if len(raw_predictions.shape) == 2 and raw_predictions.shape[0] > 0:
             predictions = raw_predictions[0] if raw_predictions.shape[0] == 1 else raw_predictions
-            
+
             return {
                 "predictions": predictions.tolist(),
                 "confidence": float(np.max(predictions)),
                 "predicted_class": int(np.argmax(predictions))
             }
-        
+
         return {
             "predictions": [],
             "confidence": 0.0,
             "predicted_class": -1
         }
-    
+
     def is_model_loaded(self, model_name: str) -> bool:
         """Check if a model is currently loaded"""
         return model_name in self.models
-    
+
     def get_loaded_models(self) -> list[str]:
         """Get list of currently loaded model names"""
         return list(self.models.keys())

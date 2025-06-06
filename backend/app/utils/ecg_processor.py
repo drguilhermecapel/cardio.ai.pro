@@ -159,9 +159,9 @@ class ECGProcessor:
         """Preprocess ECG signal for analysis"""
         try:
             processed = signal.copy()
-            
+
             processed = (processed - np.mean(processed)) / (np.std(processed) + 1e-8)
-            
+
             if len(processed) > 10:
                 try:
                     from scipy import signal as scipy_signal
@@ -169,7 +169,7 @@ class ECGProcessor:
                     processed = scipy_signal.filtfilt(b, a, processed)
                 except ImportError:
                     logger.warning("scipy not available, skipping filtering")
-            
+
             return processed.astype(np.float64)
         except Exception as e:
             logger.error("Failed to preprocess signal: %s", str(e))
@@ -179,10 +179,10 @@ class ECGProcessor:
         """Complete preprocessing pipeline for ECG signal (synchronous for tests)"""
         try:
             processed = self.preprocess_signal(signal)
-            
+
             if len(processed) < 100:
                 logger.warning("Signal too short for reliable analysis")
-            
+
             return processed
         except Exception as e:
             logger.error("Failed to run preprocessing pipeline: %s", str(e))
@@ -268,12 +268,12 @@ class ECGProcessor:
         """Extract features from ECG signal."""
         try:
             features = {}
-            
+
             features["mean"] = float(np.mean(signal))
             features["std"] = float(np.std(signal))
             features["min"] = float(np.min(signal))
             features["max"] = float(np.max(signal))
-            
+
             r_peaks = self.detect_r_peaks(signal)
             if len(r_peaks) > 1:
                 features["heart_rate"] = self.calculate_heart_rate(r_peaks, 500)
@@ -284,12 +284,12 @@ class ECGProcessor:
                 features["rr_mean"] = 0.0
                 features["rr_std"] = 0.0
                 features["rr_rmssd"] = 0.0
-            
+
             features["signal_length"] = len(signal)
             features["zero_crossings"] = len(np.where(np.diff(np.signbit(signal)))[0])
-            
+
             return features
-            
+
         except Exception as e:
             logger.error(f"Failed to extract features: {str(e)}")
             return {
@@ -306,13 +306,13 @@ class ECGProcessor:
         """Detect R-peaks in ECG signal."""
         try:
             from scipy.signal import find_peaks
-            
+
             normalized = (signal - np.mean(signal)) / (np.std(signal) + 1e-8)
-            
+
             peaks, _ = find_peaks(normalized, height=0.5, distance=int(0.6 * self.sampling_rate))
-            
+
             return peaks.astype(np.int64)
-            
+
         except ImportError:
             peaks = []
             for i in range(1, len(signal) - 1):
@@ -328,14 +328,14 @@ class ECGProcessor:
         try:
             if len(r_peaks) < 2:
                 return 0.0
-            
+
             rr_intervals = np.diff(r_peaks) / sampling_rate
-            
+
             mean_rr = np.mean(rr_intervals)
             heart_rate = 60.0 / mean_rr if mean_rr > 0 else 0.0
-            
+
             return float(heart_rate)
-            
+
         except Exception as e:
             logger.error(f"Failed to calculate heart rate: {str(e)}")
             return 0.0
@@ -349,24 +349,24 @@ class ECGProcessor:
                     "rr_std": 0.0,
                     "rr_rmssd": 0.0
                 }
-            
+
             rr_intervals = np.diff(r_peaks) / sampling_rate * 1000
-            
+
             rr_mean = float(np.mean(rr_intervals))
             rr_std = float(np.std(rr_intervals))
-            
+
             if len(rr_intervals) > 1:
                 rr_diff = np.diff(rr_intervals)
                 rr_rmssd = float(np.sqrt(np.mean(rr_diff ** 2)))
             else:
                 rr_rmssd = 0.0
-            
+
             return {
                 "rr_mean": rr_mean,
                 "rr_std": rr_std,
                 "rr_rmssd": rr_rmssd
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to calculate intervals: {str(e)}")
             return {
@@ -385,22 +385,22 @@ class ECGProcessor:
                     "issues": ["Empty or null signal"],
                     "recommendations": ["Provide valid ECG signal data"]
                 }
-            
+
             issues = []
             recommendations = []
-            
+
             if len(signal) < 100:
                 issues.append("Signal too short for reliable analysis")
                 recommendations.append("Use longer recording duration")
-            
+
             if np.std(signal) < 0.001:
                 issues.append("Signal appears flat or constant")
                 recommendations.append("Check electrode connections")
-            
+
             if np.max(np.abs(signal)) > 10.0:
                 issues.append("Signal contains extreme values")
                 recommendations.append("Check for artifacts or noise")
-            
+
             quality_score = 1.0
             if len(signal) < 100:
                 quality_score -= 0.3
@@ -408,9 +408,9 @@ class ECGProcessor:
                 quality_score -= 0.5
             if np.max(np.abs(signal)) > 10.0:
                 quality_score -= 0.2
-            
+
             quality_score = max(0.0, quality_score)
-            
+
             return {
                 "is_valid": quality_score > 0.5,
                 "quality_score": float(quality_score),
@@ -420,7 +420,7 @@ class ECGProcessor:
                 "signal_std": float(np.std(signal)),
                 "signal_range": float(np.max(signal) - np.min(signal))
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to validate signal: {str(e)}")
             return {
@@ -433,27 +433,27 @@ class ECGProcessor:
     def get_supported_formats(self) -> list[str]:
         """Get list of supported file formats"""
         return [".csv", ".txt", ".xml", ".json", ".edf", ".dat"]
-    
+
     def detect_artifacts(self, signal: np.ndarray) -> list[dict]:
         """Detect artifacts in ECG signal"""
         artifacts = []
-        
+
         if len(signal) > 0:
             mean_val = np.mean(signal)
             std_val = np.std(signal)
             threshold = mean_val + 3 * std_val
-            
+
             artifact_indices = np.where(np.abs(signal) > threshold)[0]
-            
+
             for idx in artifact_indices:
                 artifacts.append({
                     "type": "amplitude_artifact",
                     "position": int(idx),
                     "severity": "high" if np.abs(signal[idx]) > threshold * 1.5 else "medium"
                 })
-        
+
         return artifacts
-    
+
     async def validate_file_format(self, file_path: str) -> bool:
         """Validate if file format is supported"""
         supported_formats = self.get_supported_formats()

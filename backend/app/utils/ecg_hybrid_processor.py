@@ -196,7 +196,7 @@ class ECGHybridProcessor:
                 signal_1d = signal[:, 0] if signal.shape[1] > 0 else signal.flatten()
             else:
                 signal_1d = signal
-                
+
             fallback_peaks: list[int] = []
             threshold = np.max(signal_1d) * 0.6
             min_distance = int(0.6 * self.fs)
@@ -444,7 +444,7 @@ class ECGHybridProcessor:
         """
         if r_peaks is None:
             r_peaks = self._detect_r_peaks(signal)
-            
+
         analysis = {}
 
         if len(r_peaks) > 1:
@@ -594,7 +594,7 @@ class ECGHybridProcessor:
         """Get supported regulatory standards"""
         return {
             'FDA': 'US Food and Drug Administration',
-            'ANVISA': 'Brazilian Health Regulatory Agency', 
+            'ANVISA': 'Brazilian Health Regulatory Agency',
             'NMSA': 'China National Medical Products Administration',
             'EU': 'European Union Medical Device Regulation'
         }
@@ -631,22 +631,22 @@ class ECGHybridProcessor:
         hr_analysis = self._analyze_heart_rate(signal, r_peaks)
         if 'heart_rate' not in hr_analysis:
             hr_analysis['heart_rate'] = hr_analysis.get('mean_hr', 0)
-        
+
         if len(r_peaks) > 1:
             rr_intervals = np.diff(r_peaks) / self.fs * 1000  # in ms
             hr_analysis['rr_intervals'] = rr_intervals.tolist()
         else:
             hr_analysis['rr_intervals'] = []
-            
+
         return hr_analysis
 
     def analyze_rhythm(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] = None) -> dict[str, Any]:
         """Public interface for rhythm analysis"""
         if r_peaks is None:
             r_peaks = self._detect_r_peaks(signal)
-        
+
         afib_detected, afib_confidence = self._detect_afib(signal, r_peaks)
-        
+
         if afib_detected:
             return {
                 "rhythm_type": "atrial_fibrillation",
@@ -654,7 +654,7 @@ class ECGHybridProcessor:
                 "heart_rate": self._analyze_heart_rate(signal, r_peaks).get("mean_hr", 75),
                 "irregularity": "irregular"
             }
-        
+
         return self._analyze_rhythm(signal, r_peaks)
 
     def extract_features(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] = None) -> dict[str, Any]:
@@ -662,16 +662,16 @@ class ECGHybridProcessor:
         if r_peaks is None:
             r_peaks = self._detect_r_peaks(signal)
         features = self._extract_comprehensive_features(signal, r_peaks)
-        
+
         if "qrs_duration" not in features:
             features["qrs_duration"] = 90.0  # Default QRS duration in ms
-        
+
         features.update({
             "pr_interval": 160.0,  # Default PR interval in ms
             "qt_interval": 400.0,  # Default QT interval in ms
             "rr_interval": 800.0   # Default RR interval in ms
         })
-            
+
         return features
 
     def _detect_afib(self, signal: npt.NDArray[np.float64], r_peaks: npt.NDArray[np.int64] = None) -> tuple[bool, float]:
@@ -679,16 +679,16 @@ class ECGHybridProcessor:
         try:
             if r_peaks is None:
                 r_peaks = self._detect_r_peaks(signal)
-                
+
             if len(r_peaks) < 5:
                 return False, 0.0
-            
+
             rr_intervals = np.diff(r_peaks)
             rr_variability = np.std(rr_intervals) / np.mean(rr_intervals)
-            
+
             afib_detected = rr_variability > 0.15
             confidence = min(rr_variability * 2, 1.0)
-            
+
             return afib_detected, confidence
         except Exception as e:
             logger.error(f"AFib detection failed: {str(e)}")

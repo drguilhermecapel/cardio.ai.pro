@@ -54,7 +54,7 @@ class ECGAnalysisService:
         """Create a new ECG analysis."""
         try:
             analysis_id = f"ECG_{uuid.uuid4().hex[:12].upper()}"
-            
+
             file_path = analysis_data.get('file_path', '/tmp/default.csv')
             original_filename = analysis_data.get('original_filename', 'default.csv')
 
@@ -278,7 +278,7 @@ class ECGAnalysisService:
         except Exception as e:
             logger.error(f"Failed to extract measurements: {str(e)}")
             return {
-                "heart_rate": None, 
+                "heart_rate": None,
                 "detailed_measurements": [],
                 "pr_interval": None,
                 "qrs_duration": None,
@@ -406,11 +406,11 @@ class ECGAnalysisService:
         """Analyze ECG data and return results."""
         try:
             ml_results = self.ml_service.analyze_ecg(ecg_data, sampling_rate, leads)
-            
+
             processed_signal = self.processor.preprocess_signal(ecg_data)
-            
+
             quality_score = self.quality_analyzer.analyze_quality(processed_signal)
-            
+
             return {
                 'ml_predictions': ml_results,
                 'signal_quality': quality_score,
@@ -429,7 +429,7 @@ class ECGAnalysisService:
     async def get_analysis_by_id(self, analysis_id: int) -> ECGAnalysis | None:
         """Get analysis by ID."""
         return await self.repository.get_analysis_by_id(analysis_id)
-    
+
     def get_analysis(self, analysis_id: int) -> ECGAnalysis | None:
         """Get analysis by ID (synchronous version for tests)"""
         return self.repository.get_analysis(analysis_id)
@@ -504,7 +504,7 @@ class ECGAnalysisService:
                 },
                 "morphology_analysis": {
                     "p_wave": "normal",
-                    "qrs": "normal", 
+                    "qrs": "normal",
                     "t_wave": "normal"
                 },
                 "intervals": {
@@ -538,7 +538,7 @@ class ECGAnalysisService:
                     "confidence_score": 0.85
                 }
             }
-            
+
             return analysis
         except Exception as e:
             logger.error("Internal comprehensive analysis failed: %s", str(e))
@@ -607,7 +607,7 @@ class ECGAnalysisService:
                     "qrs_duration": 90
                 }
             }
-            
+
             return processed_data
         except Exception as e:
             logger.error("Synchronous analysis processing failed: %s", str(e))
@@ -616,7 +616,7 @@ class ECGAnalysisService:
     async def update_analysis_status(self, analysis_id: int, status: AnalysisStatus) -> bool:
         """Update analysis status"""
         return await self.repository.update_analysis_status(analysis_id, status)
-    
+
     async def get_analysis_statistics(self) -> dict[str, int]:
         """Get analysis statistics"""
         return await self.repository.get_analysis_statistics()

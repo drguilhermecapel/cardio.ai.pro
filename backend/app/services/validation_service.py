@@ -4,7 +4,7 @@ Validation Service - Medical validation and quality control.
 
 import logging
 from datetime import datetime
-from typing import Any, Optional, List
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,7 +13,6 @@ from app.core.constants import ClinicalUrgency, UserRoles, ValidationStatus
 from app.core.exceptions import PermissionDeniedException, ValidationException
 from app.models.ecg_analysis import ECGAnalysis
 from app.models.validation import (
-    QualityMetric,
     Validation,
     ValidationResult,
     ValidationRule,
@@ -202,16 +201,16 @@ class ValidationService:
                 "warnings": ["Signal quality could be improved"],
                 "recommendations": ["Consider longer recording duration"]
             }
-            
+
             if not analysis_data.get("signal_data"):
                 validation_results["critical_issues"].append("Missing signal data")
                 validation_results["overall_score"] = 0.0
-            
+
             if analysis_data.get("quality_score", 0) < 0.5:
                 validation_results["warnings"].append("Low signal quality detected")
-            
+
             return validation_results
-            
+
         except Exception as e:
             logger.error(f"Automated validation failed: {str(e)}")
             return {"error": "Validation failed", "overall_score": 0.0}
@@ -286,13 +285,13 @@ class ValidationService:
         try:
             if not validations:
                 return {"error": "No validations provided"}
-            
+
             total_validations = len(validations)
             approved_count = sum(1 for v in validations if getattr(v, 'status', '') == 'approved')
-            
+
             avg_confidence = sum(getattr(v, 'confidence_score', 0.5) for v in validations) / total_validations
             avg_quality = validation_data.get("signal_quality_rating", 3.5) if validation_data else 3.5
-            
+
             metrics = {
                 "total_validations": total_validations,
                 "approved_count": approved_count,
@@ -305,7 +304,7 @@ class ValidationService:
                     "overall_score": validation_data.get("overall_quality_score", 0.8) if validation_data else 0.8
                 }
             }
-            
+
             return metrics
 
         except Exception as e:
@@ -438,7 +437,7 @@ class ValidationService:
                 f"Failed to send validation notifications: error={str(e)}, validation_id={validation.id}"
             )
 
-    def get_validation_by_id(self, validation_id: int) -> Optional[Validation]:
+    def get_validation_by_id(self, validation_id: int) -> Validation | None:
         """Get validation by ID"""
         try:
             return self.repository.get_by_id(validation_id)
@@ -446,7 +445,7 @@ class ValidationService:
             logger.error("Failed to get validation %d: %s", validation_id, str(e))
             return None
 
-    def update_validation_status(self, validation_id: int, status: str) -> Optional[Validation]:
+    def update_validation_status(self, validation_id: int, status: str) -> Validation | None:
         """Update validation status"""
         try:
             validation = self.repository.get_by_id(validation_id)
@@ -459,7 +458,7 @@ class ValidationService:
             logger.error("Failed to update validation status %d: %s", validation_id, str(e))
             return None
 
-    def get_validations_by_status(self, status: str) -> List[Validation]:
+    def get_validations_by_status(self, status: str) -> list[Validation]:
         """Get validations by status"""
         try:
             return self.repository.get_by_status(status)
@@ -467,33 +466,33 @@ class ValidationService:
             logger.error("Failed to get validations by status %s: %s", status, str(e))
             return []
 
-    async def get_validations_by_validator(self, validator_id: int) -> List[Validation]:
+    async def get_validations_by_validator(self, validator_id: int) -> list[Validation]:
         """Get validations assigned to a specific validator."""
         try:
             return await self.repository.get_validations_by_validator(validator_id)
         except Exception as e:
             logger.error("Failed to get validations by validator %d: %s", validator_id, str(e))
             return []
-            
-    def update_validation(self, validation_id: int, update_data: dict[str, Any], user_id: int = None) -> Optional[Validation]:
+
+    def update_validation(self, validation_id: int, update_data: dict[str, Any], user_id: int = None) -> Validation | None:
         """Update validation (synchronous for tests)."""
         try:
             validation = self.repository.get_by_id(validation_id)
             if validation:
                 for key, value in update_data.items():
                     setattr(validation, key, value)
-                
+
                 if user_id is not None:
                     validation.updated_by = user_id
-                    
+
                 self.repository.update(validation)
                 return validation
             return None
         except Exception as e:
             logger.error(f"Failed to update validation {validation_id}: {str(e)}")
             return None
-            
-    def get_validations_by_analysis(self, analysis_id: int) -> List[Validation]:
+
+    def get_validations_by_analysis(self, analysis_id: int) -> list[Validation]:
         """Get validations by analysis ID (synchronous for tests)."""
         try:
             return self.repository.get_validations_by_analysis(analysis_id)
@@ -501,22 +500,22 @@ class ValidationService:
             logger.error(f"Failed to get validations for analysis {analysis_id}: {str(e)}")
             return []
 
-    def _calculate_consensus(self, validations: List[Any]) -> dict[str, Any]:
+    def _calculate_consensus(self, validations: list[Any]) -> dict[str, Any]:
         """Calculate consensus from multiple validations"""
         try:
             if not validations:
                 return {"final_status": "pending", "confidence": 0.0}
-            
+
             approved_count = sum(1 for v in validations if getattr(v, 'status', '') == 'approved')
             total_count = len(validations)
-            
+
             if approved_count / total_count >= 0.6:
                 final_status = "approved"
             else:
                 final_status = "rejected"
-            
+
             avg_confidence = sum(getattr(v, 'confidence_score', 0.5) for v in validations) / total_count
-            
+
             return {
                 "final_status": final_status,
                 "confidence": avg_confidence,
@@ -526,7 +525,7 @@ class ValidationService:
         except Exception as e:
             logger.error("Failed to calculate consensus: %s", str(e))
             return {"final_status": "error", "confidence": 0.0}
-    
+
     def validate_analysis(self, analysis_id: int, validator_id: int) -> dict:
         """Validate an analysis (synchronous version for tests)"""
         try:

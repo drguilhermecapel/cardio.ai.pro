@@ -13,7 +13,6 @@ from sqlalchemy.orm import selectinload
 from app.core.constants import AnalysisStatus
 from app.models.ecg_analysis import ECGAnalysis, ECGAnnotation, ECGMeasurement
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -323,7 +322,7 @@ class ECGRepository:
             select(func.count(ECGAnalysis.id))
         )
         return result.scalar()
-    
+
     async def get_recent_analyses(self, limit: int = 10) -> list[ECGAnalysis]:
         """Get recent analyses"""
         result = await self.db.execute(
@@ -347,7 +346,7 @@ class ECGRepository:
         except Exception as e:
             logger.error(f"Failed to get analyses by status {status}: {str(e)}")
             return []
-    
+
     def get_analysis(self, analysis_id: int) -> ECGAnalysis | None:
         """Get analysis by ID (synchronous version for tests)"""
         try:
