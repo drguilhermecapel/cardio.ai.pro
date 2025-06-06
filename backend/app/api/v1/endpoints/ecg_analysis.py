@@ -68,6 +68,7 @@ async def upload_ecg(
     analysis = await ecg_service.create_analysis(
         patient_id=patient_id,
         created_by=current_user.id,
+        analysis_data={}
     )
 
     return ECGUploadResponse(
