@@ -532,7 +532,7 @@ class ECGHybridProcessor:
         try:
             if self.hybrid_service is None:
                 raise ValueError("Hybrid service not initialized")
-
+            
             result = self.hybrid_service.analyze_ecg_comprehensive(file_path)
 
             if require_regulatory_compliance:
@@ -592,7 +592,7 @@ class ECGHybridProcessor:
             self.hybrid_service.ecg_reader is not None and
             hasattr(self.hybrid_service.ecg_reader, 'supported_formats')):
             return list(self.hybrid_service.ecg_reader.supported_formats.keys())
-
+        
         return ['WFDB', 'EDF', 'DICOM']
 
     def get_regulatory_standards(self) -> dict[str, str]:
