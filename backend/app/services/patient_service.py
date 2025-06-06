@@ -4,7 +4,7 @@ Patient Service - Patient management functionality.
 
 import logging
 from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
