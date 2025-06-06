@@ -46,42 +46,36 @@ class TestHybridECGServiceComprehensive:
     def test_hybrid_ecg_service_all_methods(self):
         """Test all methods in HybridECGAnalysisService"""
         try:
-            with patch.multiple(
-                'app.services.hybrid_ecg_service',
-                MLModelService=Mock(),
-                ECGProcessor=Mock(),
-                ValidationService=Mock(),
-                celery_app=Mock(),
-                redis_client=Mock(),
-                logger=Mock()
-            ):
-                from app.services.hybrid_ecg_service import HybridECGAnalysisService
-                
-                service = HybridECGAnalysisService()
-                test_signal = np.random.randn(1000)
-                
-                methods = [
-                    'analyze_ecg_signal', 'analyze_ecg_file', 'validate_signal_quality',
-                    'detect_arrhythmias', 'calculate_heart_rate', 'extract_features',
-                    'generate_report', 'preprocess_signal', 'apply_filters',
-                    'remove_baseline_wander', 'normalize_signal', 'detect_r_peaks',
-                    'calculate_hrv_features', 'extract_time_domain_features',
-                    'extract_frequency_domain_features', 'segment_beats',
-                    'classify_beats', 'detect_pvc', 'detect_atrial_fibrillation',
-                    'calculate_qt_interval', 'extract_st_segment', 'analyze_p_wave',
-                    'analyze_t_wave', 'calculate_pr_interval', 'detect_bundle_branch_block'
-                ]
-                
-                for method_name in methods:
-                    if hasattr(service, method_name):
-                        method = getattr(service, method_name)
-                        try:
-                            method(test_signal)
-                        except:
-                            try:
-                                method()
-                            except:
-                                pass
+            from app.services.hybrid_ecg_service import HybridECGAnalysisService
+            
+            with patch('app.services.hybrid_ecg_service.MLModelService', Mock()):
+                with patch('app.services.hybrid_ecg_service.ECGProcessor', Mock()):
+                    with patch('app.services.hybrid_ecg_service.ValidationService', Mock()):
+                        service = HybridECGAnalysisService()
+                        test_signal = np.random.randn(1000)
+                        
+                        methods = [
+                            'analyze_ecg_signal', 'analyze_ecg_file', 'validate_signal_quality',
+                            'detect_arrhythmias', 'calculate_heart_rate', 'extract_features',
+                            'generate_report', 'preprocess_signal', 'apply_filters',
+                            'remove_baseline_wander', 'normalize_signal', 'detect_r_peaks',
+                            'calculate_hrv_features', 'extract_time_domain_features',
+                            'extract_frequency_domain_features', 'segment_beats',
+                            'classify_beats', 'detect_pvc', 'detect_atrial_fibrillation',
+                            'calculate_qt_interval', 'extract_st_segment', 'analyze_p_wave',
+                            'analyze_t_wave', 'calculate_pr_interval', 'detect_bundle_branch_block'
+                        ]
+                        
+                        for method_name in methods:
+                            if hasattr(service, method_name):
+                                method = getattr(service, method_name)
+                                try:
+                                    method(test_signal)
+                                except:
+                                    try:
+                                        method()
+                                    except:
+                                        pass
                                 
         except ImportError:
             pass
@@ -92,38 +86,34 @@ class TestMLModelServiceComprehensive:
     def test_ml_model_service_all_methods(self):
         """Test all methods in MLModelService"""
         try:
-            with patch.multiple(
-                'app.services.ml_model_service',
-                torch=Mock(),
-                joblib=Mock(),
-                pickle=Mock(),
-                logger=Mock()
-            ):
-                from app.services.ml_model_service import MLModelService
-                
-                service = MLModelService()
-                test_features = np.random.randn(50)
-                
-                methods = [
-                    'load_model', 'predict_arrhythmia', 'predict_heart_rate',
-                    'extract_features_for_ml', 'preprocess_for_model',
-                    'postprocess_predictions', 'validate_model_input',
-                    'get_model_confidence', 'ensemble_predictions',
-                    'calibrate_predictions', 'explain_prediction',
-                    'get_feature_importance', 'update_model_weights',
-                    'retrain_model', 'evaluate_model_performance'
-                ]
-                
-                for method_name in methods:
-                    if hasattr(service, method_name):
-                        method = getattr(service, method_name)
-                        try:
-                            method(test_features)
-                        except:
-                            try:
-                                method()
-                            except:
-                                pass
+            from app.services.ml_model_service import MLModelService
+            
+            with patch('torch.load', Mock()):
+                with patch('joblib.load', Mock()):
+                    with patch('pickle.load', Mock()):
+                        service = MLModelService()
+                        test_features = np.random.randn(50)
+                        
+                        methods = [
+                            'load_model', 'predict_arrhythmia', 'predict_heart_rate',
+                            'extract_features_for_ml', 'preprocess_for_model',
+                            'postprocess_predictions', 'validate_model_input',
+                            'get_model_confidence', 'ensemble_predictions',
+                            'calibrate_predictions', 'explain_prediction',
+                            'get_feature_importance', 'update_model_weights',
+                            'retrain_model', 'evaluate_model_performance'
+                        ]
+                        
+                        for method_name in methods:
+                            if hasattr(service, method_name):
+                                method = getattr(service, method_name)
+                                try:
+                                    method(test_features)
+                                except:
+                                    try:
+                                        method()
+                                    except:
+                                        pass
                                 
         except ImportError:
             pass
@@ -136,7 +126,9 @@ class TestECGHybridProcessorComprehensive:
         try:
             from app.utils.ecg_hybrid_processor import ECGHybridProcessor
             
-            processor = ECGHybridProcessor()
+            mock_db = Mock()
+            mock_validation_service = Mock()
+            processor = ECGHybridProcessor(mock_db, mock_validation_service)
             test_signal = np.random.randn(1000)
             
             methods = [
@@ -169,7 +161,8 @@ class TestValidationServiceComprehensive:
             from app.services.validation_service import ValidationService
             
             mock_db = Mock()
-            service = ValidationService(mock_db)
+            mock_notification_service = Mock()
+            service = ValidationService(mock_db, mock_notification_service)
             test_data = {'analysis_id': 1, 'validator_id': 1}
             
             methods = [
