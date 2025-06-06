@@ -31,7 +31,7 @@ import {
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginPage from './pages/LoginPage';
 
-const SPEIApp = () => {
+const SPEIApp = (): JSX.Element => {
   const [activeModule, setActiveModule] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [theme, setTheme] = useState('dark');
@@ -60,7 +60,7 @@ const SPEIApp = () => {
     { id: 'telemedicine', name: 'Telemedicina', icon: Video, color: 'from-indigo-500 to-purple-500' }
   ];
 
-  const NotificationPanel = () => (
+  const NotificationPanel = (): JSX.Element => (
     <div className="absolute top-12 right-0 w-80 bg-gray-900/95 backdrop-blur-xl rounded-xl border border-gray-700 shadow-2xl z-50">
       <div className="p-4 border-b border-gray-700">
         <h3 className="text-lg font-semibold text-white">Notificações</h3>
@@ -85,7 +85,7 @@ const SPEIApp = () => {
     </div>
   );
 
-  const AIAssistant = () => {
+  const AIAssistant = (): JSX.Element | null => {
     const [messages] = useState([
       { id: 1, type: 'ai', content: 'Olá! Como posso ajudá-lo hoje?' }
     ]);
@@ -125,7 +125,7 @@ const SPEIApp = () => {
     );
   };
 
-  const Header = () => {
+  const Header = (): JSX.Element => {
     return (
       <header className="fixed top-0 left-0 right-0 h-16 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 z-40">
         <div className="flex items-center justify-between h-full px-6">
@@ -243,7 +243,7 @@ const SPEIApp = () => {
     );
   };
 
-  const Sidebar = () => (
+  const Sidebar = (): JSX.Element => (
     <aside className={`fixed left-0 top-16 h-full bg-gray-900/90 backdrop-blur-xl text-white transition-all duration-300 z-30 border-r border-gray-800 ${
       sidebarOpen ? 'w-64' : 'w-20'
     }`}>
@@ -295,7 +295,7 @@ const SPEIApp = () => {
     </aside>
   );
 
-  const DashboardModule = () => {
+  const DashboardModule = (): JSX.Element => {
     const stats = [
       { 
         title: 'Pacientes Hoje', 
@@ -368,7 +368,7 @@ const SPEIApp = () => {
       }
     ];
 
-    const ActivityChart = () => {
+    const ActivityChart = (): JSX.Element => {
       const [data, setData] = useState(Array.from({ length: 20 }, () => Math.random() * 100));
       
       useEffect(() => {
@@ -667,7 +667,7 @@ const SPEIApp = () => {
     );
   };
 
-  const renderModule = () => {
+  const renderModule = (): JSX.Element => {
     switch (activeModule) {
       case 'dashboard':
         return <DashboardModule />;
@@ -717,7 +717,7 @@ const SPEIApp = () => {
   );
 };
 
-function App() {
+function App(): JSX.Element {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
