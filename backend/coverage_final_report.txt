@@ -1,0 +1,2488 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.8, pytest-8.4.0, pluggy-1.6.0 -- /home/ubuntu/.pyenv/versions/3.12.8/bin/python3.12
+cachedir: .pytest_cache
+rootdir: /home/ubuntu/cardio.ai.pro/backend
+configfile: pyproject.toml
+testpaths: tests
+plugins: mock-3.14.1, timeout-2.4.0, cov-6.1.1, anyio-4.9.0, asyncio-1.0.0
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 1013 items / 87 errors
+
+ERROR: Coverage failure: total of 35 is less than fail-under=80
+
+==================================== ERRORS ====================================
+____________ ERROR collecting tests/test_achievable_80_coverage.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_achievable_80_coverage.py", line 86
+E       async def test_ml_model_service_postprocess_predictions(self):
+E   IndentationError: unexpected unindent
+__________ ERROR collecting tests/test_actual_methods_80_coverage.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_actual_methods_80_coverage.py", line 204
+E       async def test_ecg_repository_create_analysis(self, mock_db):
+E   IndentationError: unexpected unindent
+______ ERROR collecting tests/test_actual_service_methods_80_coverage.py _______
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_actual_service_methods_80_coverage.py", line 336
+E       async def test_ecg_repository_get_analysis_count(self, mock_db):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_additional_80_coverage.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_additional_80_coverage.py", line 136
+E       result = await service.get_model_info("test_model")
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+___________ ERROR collecting tests/test_additional_coverage_boost.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_additional_coverage_boost.py", line 31
+E       result = await service._analyze_ecg_comprehensive(sample_signal, 500, ['I', 'II'])
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+_____________ ERROR collecting tests/test_atomic_coverage_boost.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_atomic_coverage_boost.py", line 19
+E       async def test_patient_service_get_patient_by_patient_id(self):
+E   IndentationError: unexpected unindent
+__________ ERROR collecting tests/test_celery_tasks_comprehensive.py ___________
+ImportError while importing test module '/home/ubuntu/cardio.ai.pro/backend/tests/test_celery_tasks_comprehensive.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_celery_tasks_comprehensive.py:9: in <module>
+    from app.tasks.ecg_tasks import process_ecg_async, send_notification_async
+E   ImportError: cannot import name 'process_ecg_async' from 'app.tasks.ecg_tasks' (/home/ubuntu/cardio.ai.pro/backend/app/tasks/ecg_tasks.py)
+___________ ERROR collecting tests/test_comprehensive_80_coverage.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_comprehensive_80_coverage.py", line 21
+E       async def test_ml_model_service_comprehensive(self):
+E   IndentationError: unexpected unindent
+________ ERROR collecting tests/test_comprehensive_80_coverage_final.py ________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_comprehensive_80_coverage_final.py", line 214
+E       result = await service.classify_ecg(signal)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+_________ ERROR collecting tests/test_comprehensive_coverage_final.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_comprehensive_coverage_final.py", line 27
+E       async def test_ecg_service_file_operations(self):
+E   IndentationError: unexpected unindent
+_____ ERROR collecting tests/test_comprehensive_regulatory_80_coverage.py ______
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_comprehensive_regulatory_80_coverage.py", line 58
+E       async def test_hybrid_ecg_service_async_methods(self, sample_ecg_data):
+E   IndentationError: unexpected unindent
+_______ ERROR collecting tests/test_comprehensive_regulatory_80_final.py _______
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_comprehensive_regulatory_80_final.py", line 69
+E       result = await service.analyze_ecg(sample_ecg_signal, 500, ['I', 'II', 'III'])
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+________ ERROR collecting tests/test_comprehensive_regulatory_final.py _________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_comprehensive_regulatory_final.py", line 69
+E       async def test_ecg_repository_comprehensive_coverage(self):
+E   IndentationError: unexpected unindent
+___________ ERROR collecting tests/test_core_services_80_coverage.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_core_services_80_coverage.py", line 100
+E       async def test_analyze_ecg_no_models(self):
+E   IndentationError: unexpected unindent
+_____ ERROR collecting tests/test_correct_method_signatures_80_coverage.py _____
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_correct_method_signatures_80_coverage.py", line 70
+E       async def test_ml_model_service_analyze_ecg(self, sample_ecg_data):
+E   IndentationError: unexpected unindent
+__________ ERROR collecting tests/test_corrected_critical_services.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_corrected_critical_services.py", line 224
+E       async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
+E   IndentationError: unexpected unindent
+_______ ERROR collecting tests/test_corrected_regulatory_80_coverage.py ________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_corrected_regulatory_80_coverage.py", line 62
+E       async def test_hybrid_ecg_service_async_methods(self, sample_ecg_data):
+E   IndentationError: unexpected unindent
+__________ ERROR collecting tests/test_corrected_regulatory_final.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_corrected_regulatory_final.py", line 134
+E       result = await processor.preprocess_signal(signal)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+________________ ERROR collecting tests/test_coverage_boost.py _________________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_coverage_boost.py", line 210
+E       async def test_ecg_service_analyze_file_error_handling(self, ecg_service):
+E   IndentationError: unexpected unindent
+______________ ERROR collecting tests/test_coverage_boost_mega.py ______________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_coverage_boost_mega.py", line 207
+E       async def test_all_model_methods(self):
+E   IndentationError: unexpected unindent
+__________ ERROR collecting tests/test_critical_80_coverage_final.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_critical_80_coverage_final.py", line 242
+E       async def test_ecg_service_analyze_ecg_comprehensive(self, mock_db_session, sample_ecg_data):
+E   IndentationError: unexpected unindent
+________ ERROR collecting tests/test_critical_low_coverage_80_target.py ________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_critical_low_coverage_80_target.py", line 22
+E       async def test_signal_quality_assessment_all_methods(self):
+E   IndentationError: unexpected unindent
+_________ ERROR collecting tests/test_critical_modules_80_coverage.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_critical_modules_80_coverage.py", line 89
+E       async def test_hybrid_ecg_service_basic(self):
+E   IndentationError: unexpected unindent
+_________ ERROR collecting tests/test_critical_services_80_coverage.py _________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_critical_services_80_coverage.py", line 66
+E       result = await service.create_analysis(analysis_data, 1, 1)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+______ ERROR collecting tests/test_critical_services_80_coverage_final.py ______
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_critical_services_80_coverage_final.py", line 54
+E       async def test_validation_service_create_validation(self, mock_db):
+E   IndentationError: unexpected unindent
+________ ERROR collecting tests/test_critical_zero_coverage_services.py ________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_critical_zero_coverage_services.py", line 35
+E       async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_ecg_data):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_ecg_analysis_generated.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_ecg_analysis_generated.py", line 11
+E       from app.endpoints.ecg_analysis import 
+E                                              ^
+E   SyntaxError: invalid syntax
+_________ ERROR collecting tests/test_ecg_hybrid_processor_coverage.py _________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_ecg_hybrid_processor_coverage.py", line 158
+E       async def test_get_system_status(self):
+E   IndentationError: unexpected unindent
+_________ ERROR collecting tests/test_ecg_hybrid_processor_critical.py _________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_ecg_hybrid_processor_critical.py", line 44
+E       async def test_process_ecg_with_validation_critical(self, processor):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_ecg_processor_turbo_70.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_ecg_processor_turbo_70.py", line 259
+E       async def test_extract_metadata_async_xml(self, mock_extract_xml, mock_load_file, processor):
+E   IndentationError: unexpected unindent
+_____________ ERROR collecting tests/test_ecg_service_turbo_70.py ______________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_ecg_service_turbo_70.py", line 69
+E       async def test_create_analysis_success(self, service, sample_analysis_data):
+E   IndentationError: unexpected unindent
+__________ ERROR collecting tests/test_efficient_80_coverage_final.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_efficient_80_coverage_final.py", line 40
+E       async def test_signal_quality_analyzer_async_methods(self):
+E   IndentationError: unexpected unindent
+__________ ERROR collecting tests/test_final_80_coverage_efficient.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_80_coverage_efficient.py", line 59
+E       async def test_ml_model_service_predict_arrhythmia(self, mock_db):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_final_80_coverage_push.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_80_coverage_push.py", line 42
+E       result = await service._load_model('/fake/model.onnx', 'test_model')
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+_________ ERROR collecting tests/test_final_80_coverage_regulatory.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_80_coverage_regulatory.py", line 64
+E       result = await service.analyze_ecg_file("/tmp/test.ecg")
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+___________ ERROR collecting tests/test_final_80_coverage_target.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_80_coverage_target.py", line 21
+E       async def test_validation_service_correct_signatures(self):
+E   IndentationError: unexpected unindent
+_______ ERROR collecting tests/test_final_80_percent_regulatory_push.py ________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_80_percent_regulatory_push.py", line 33
+E       result = await service._calculate_quality_metrics(validations)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+_____ ERROR collecting tests/test_final_correct_signatures_80_coverage.py ______
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_correct_signatures_80_coverage.py", line 93
+E       async def test_hybrid_ecg_service_analyze_ecg_comprehensive(self, sample_data):
+E   IndentationError: unexpected unindent
+______________ ERROR collecting tests/test_final_coverage_push.py ______________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_coverage_push.py", line 96
+E       async def test_hybrid_ecg_service_signal_analysis(self):
+E   IndentationError: unexpected unindent
+_________ ERROR collecting tests/test_final_regulatory_80_coverage.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_regulatory_80_coverage.py", line 28
+E       async def test_ecg_processor_load_ecg_file_error_handling(self):
+E   IndentationError: unexpected unindent
+______ ERROR collecting tests/test_final_regulatory_80_coverage_simple.py ______
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_regulatory_80_coverage_simple.py", line 41
+E       async def test_signal_quality_analyzer_async(self):
+E   IndentationError: unexpected unindent
+_______ ERROR collecting tests/test_final_regulatory_80_percent_push.py ________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_regulatory_80_percent_push.py", line 384
+E       async def test_comprehensive_async_methods_maximum(self, setup_all_mocks):
+E   IndentationError: unexpected unindent
+___________ ERROR collecting tests/test_final_regulatory_80_push.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_regulatory_80_push.py", line 35
+E       result = await service._analyze_ecg_comprehensive(sample_signal, 500, ['I', 'II'])
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+__________ ERROR collecting tests/test_final_regulatory_compliance.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_final_regulatory_compliance.py", line 119
+E       async def test_hybrid_ecg_service_comprehensive_analysis(self, mock_ecg_data):
+E   IndentationError: unexpected unindent
+________________ ERROR collecting tests/test_fix_ecg_simple.py _________________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_fix_ecg_simple.py", line 33
+E       result = await service.analyze(ecg_data)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+____________ ERROR collecting tests/test_fix_notification_simple.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_fix_notification_simple.py", line 28
+E       result = await service.send_email('test@test.com', 'Test', 'Body')
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+____________ ERROR collecting tests/test_focused_coverage_boost.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_focused_coverage_boost.py", line 144
+E       async def test_hybrid_ecg_service_async_methods(self):
+E   IndentationError: unexpected unindent
+________ ERROR collecting tests/test_hybrid_ecg_additional_coverage.py _________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_additional_coverage.py", line 242
+E       async def test_hybrid_service_analyze_ecg_comprehensive_async_edge_cases(self, hybrid_service):
+E   IndentationError: unexpected unindent
+_______ ERROR collecting tests/test_hybrid_ecg_comprehensive_coverage.py _______
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_comprehensive_coverage.py", line 257
+E       async def test_analyze_ecg_comprehensive_with_file_path(self, service):
+E   IndentationError: unexpected unindent
+___________ ERROR collecting tests/test_hybrid_ecg_direct_import.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_direct_import.py", line 164
+E       async def test_assess_signal_quality(self, hybrid_service, sample_ecg_signal):
+E   IndentationError: unexpected unindent
+_________ ERROR collecting tests/test_hybrid_ecg_final_80_coverage.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_final_80_coverage.py", line 267
+E       async def test_hybrid_service_assess_signal_quality_comprehensive(self, hybrid_service):
+E   IndentationError: unexpected unindent
+______________ ERROR collecting tests/test_hybrid_ecg_service.py _______________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service.py", line 194
+E       async def test_analyze_ecg_comprehensive_with_data(self, mock_db, mock_validation_service, ecg_sample_data):
+E   IndentationError: unexpected unindent
+________ ERROR collecting tests/test_hybrid_ecg_service_80_coverage.py _________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service_80_coverage.py", line 256
+E       async def test_hybrid_ecg_analysis_service_analyze_ecg_comprehensive_async(self):
+E   IndentationError: unexpected unindent
+________ ERROR collecting tests/test_hybrid_ecg_service_95_coverage.py _________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service_95_coverage.py", line 106
+E       async def test_stemi_detection_emergency_timing(self, ecg_service, stemi_signal):
+E   IndentationError: unexpected unindent
+_______ ERROR collecting tests/test_hybrid_ecg_service_comprehensive.py ________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service_comprehensive.py", line 762
+E       async def test_analyze_ecg_comprehensive_full_workflow(self, ecg_service, sample_signal_data, tmp_path):
+E   IndentationError: unexpected unindent
+__________ ERROR collecting tests/test_hybrid_ecg_service_critical.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service_critical.py", line 106
+E       async def test_stemi_detection_emergency_timing(self, ecg_service, stemi_signal):
+E   IndentationError: unexpected unindent
+________ ERROR collecting tests/test_hybrid_ecg_service_critical_new.py ________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service_critical_new.py", line 55
+E       async def test_comprehensive_analysis_emergency_timing(self, ecg_service):
+E   IndentationError: unexpected unindent
+___________ ERROR collecting tests/test_hybrid_ecg_service_simple.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service_simple.py", line 138
+E       async def test_hybrid_service_init(self, hybrid_service):
+E   IndentationError: unexpected unindent
+____ ERROR collecting tests/test_hybrid_ecg_service_targeted_80_coverage.py ____
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service_targeted_80_coverage.py", line 352
+E       async def test_run_simplified_analysis(self, mock_db, mock_validation_service, sample_1d_signal):
+E   IndentationError: unexpected unindent
+___________ ERROR collecting tests/test_hybrid_ecg_service_turbo.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service_turbo.py", line 61
+E       result = await service.detect_arrhythmias(sample_ecg_data['signal'])
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+__________ ERROR collecting tests/test_hybrid_ecg_service_turbo_70.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_service_turbo_70.py", line 537
+E       async def test_analyze_ecg_comprehensive_async_success(self, service, sample_signal):
+E   IndentationError: unexpected unindent
+___________ ERROR collecting tests/test_hybrid_ecg_zero_coverage.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_hybrid_ecg_zero_coverage.py", line 267
+E       result = await service.analyze_ecg_file("/fake/test.csv")
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+________ ERROR collecting tests/test_low_coverage_services_targeted.py _________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_low_coverage_services_targeted.py", line 22
+E       async def test_notification_service_coverage(self, mock_db):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_major_services_coverage.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_major_services_coverage.py", line 78
+E       async def test_create_analysis_async(self, ecg_service):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_ml_model_service_turbo.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_ml_model_service_turbo.py", line 27
+E       async def test_all_ml_service_methods_massive_coverage(self, mock_all_deps, sample_features):
+E   IndentationError: unexpected unindent
+___________ ERROR collecting tests/test_ml_model_service_turbo_70.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_ml_model_service_turbo_70.py", line 139
+E       async def test_analyze_ecg_async_success(self, mock_onnx_session, mock_memory_monitor):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_regulatory_80_coverage.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_regulatory_80_coverage.py", line 28
+E       async def test_ecg_service_complete_workflow(self):
+E   IndentationError: unexpected unindent
+_________ ERROR collecting tests/test_regulatory_80_coverage_final.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_regulatory_80_coverage_final.py", line 297
+E       async def test_async():
+E   IndentationError: unexpected unindent
+________ ERROR collecting tests/test_regulatory_80_coverage_targeted.py ________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_regulatory_80_coverage_targeted.py", line 33
+E       result = await service.delete_analysis_sync(1)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+_________ ERROR collecting tests/test_regulatory_80_final_targeted.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_regulatory_80_final_targeted.py", line 65
+E       result = await service.create_analysis(analysis_data)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+__________ ERROR collecting tests/test_regulatory_80_percent_final.py __________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_regulatory_80_percent_final.py", line 151
+E       async def test_hybrid_ecg_service_run_simplified_analysis(self, sample_ecg_data):
+E   IndentationError: unexpected unindent
+_______ ERROR collecting tests/test_regulatory_compliance_80_coverage.py _______
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_regulatory_compliance_80_coverage.py", line 66
+E       processed = await processor.preprocess_signal(sample_ecg_data)
+E                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+___________ ERROR collecting tests/test_repositories_80_coverage.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_repositories_80_coverage.py", line 19
+E       async def test_ecg_repository_comprehensive(self):
+E   IndentationError: unexpected unindent
+______ ERROR collecting tests/test_repositories_comprehensive_coverage.py ______
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_repositories_comprehensive_coverage.py", line 31
+E       async def test_ecg_repository_comprehensive_coverage(self, mock_session):
+E   IndentationError: unexpected unindent
+__________ ERROR collecting tests/test_services_80_coverage_boost.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_services_80_coverage_boost.py", line 55
+E       async def test_ml_model_service_inference_methods(self):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_services_basic_coverage.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_services_basic_coverage.py", line 55
+E       async def test_ecg_service_get_analysis_by_id(self):
+E   IndentationError: unexpected unindent
+______________ ERROR collecting tests/test_simple_80_coverage.py _______________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_simple_80_coverage.py", line 141
+E       async def test_ecg_processor_basic(self):
+E   IndentationError: unexpected unindent
+_____________ ERROR collecting tests/test_simple_coverage_boost.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_simple_coverage_boost.py", line 60
+E       result = await service.get_model_info()
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+____________ ERROR collecting tests/test_simple_method_coverage.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_simple_method_coverage.py", line 112
+E       async def test_hybrid_ecg_service_async_basic(self):
+E   IndentationError: unexpected unindent
+_________ ERROR collecting tests/test_simple_regulatory_80_coverage.py _________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_simple_regulatory_80_coverage.py", line 20
+E       async def test_ecg_service_core_methods(self):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_simple_regulatory_final.py ____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:359: in _rewrite_test
+    co = compile(tree, strfn, "exec", dont_inherit=True)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_simple_regulatory_final.py", line 64
+E       result = await service.analyze_ecg(sample_ecg_data)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   SyntaxError: 'await' outside async function
+__________ ERROR collecting tests/test_simple_working_80_coverage.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_simple_working_80_coverage.py", line 30
+E       async def test_ml_model_service_analyze_ecg(self, sample_ecg_data):
+E   IndentationError: unexpected unindent
+_____________ ERROR collecting tests/test_strategic_80_coverage.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_strategic_80_coverage.py", line 22
+E       async def test_ecg_service_create_analysis_full(self):
+E   IndentationError: unexpected unindent
+_____________ ERROR collecting tests/test_targeted_80_coverage.py ______________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_targeted_80_coverage.py", line 23
+E       async def test_ecg_service_file_hash_calculation(self):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_targeted_high_coverage.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_targeted_high_coverage.py", line 42
+E       async def test_ml_model_service_analyze_ecg(self):
+E   IndentationError: unexpected unindent
+___________ ERROR collecting tests/test_working_80_coverage_final.py ___________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_working_80_coverage_final.py", line 82
+E       async def test_notification_service_working_methods(self):
+E   IndentationError: unexpected unindent
+____________ ERROR collecting tests/test_working_coverage_boost.py _____________
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/python.py:497: in importtestmodule
+    mod = import_path(
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path
+    importlib.import_module(module_name)
+../../.pyenv/versions/3.12.8/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.pyenv/versions/3.12.8/lib/python3.12/ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "/home/ubuntu/cardio.ai.pro/backend/tests/test_working_coverage_boost.py", line 110
+E       async def test_hybrid_ecg_service_async_complete(self):
+E   IndentationError: unexpected unindent
+=============================== warnings summary ===============================
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /home/ubuntu/.pyenv/versions/3.12.8/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/pydantic/_internal/_config.py:323: 12 warnings
+  /home/ubuntu/.pyenv/versions/3.12.8/lib/python3.12/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+../../.pyenv/versions/3.12.8/lib/python3.12/site-packages/neurokit2/signal/signal_findpeaks.py:3
+  /home/ubuntu/.pyenv/versions/3.12.8/lib/python3.12/site-packages/neurokit2/signal/signal_findpeaks.py:3: DeprecationWarning: scipy.misc is deprecated and will be removed in 2.0.0
+    import scipy.misc
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.8-final-0 ________________
+
+Name                                          Stmts   Miss  Cover   Missing
+---------------------------------------------------------------------------
+app/api/v1/api.py                                10      0   100%
+app/api/v1/endpoints/auth.py                     50     29    42%   29-59, 73-90, 99-113, 126
+app/api/v1/endpoints/ecg_analysis.py            134    103    23%   40-75, 90-107, 120-136, 153-181, 196-214, 224-242, 252-276, 286-297
+app/api/v1/endpoints/medical_validation.py       78     41    47%   45-50, 62-66, 78-101, 113-131, 143-147, 158-162
+app/api/v1/endpoints/notifications.py            32     15    53%   28-35, 50-62, 71-75, 84-88
+app/api/v1/endpoints/patients.py                 45     26    42%   32-42, 52-61, 72-84, 95-100, 117-124
+app/api/v1/endpoints/users.py                    47     27    43%   25, 35-46, 56-71, 82-92, 107-122
+app/api/v1/endpoints/validations.py              59     38    36%   33-49, 60-68, 84-93, 103-123, 133-158
+app/core/celery.py                                4      0   100%
+app/core/config.py                              116     17    85%   8, 43-49, 56, 78-82, 94, 97, 138, 148
+app/core/constants.py                           112      0   100%
+app/core/exceptions.py                           64     28    56%   22-28, 41-42, 61, 79, 97, 115, 134, 154-155, 169, 180, 191, 202, 218, 237-238, 257, 276-277, 297-298
+app/core/logging.py                              25      9    64%   18-40, 70, 89, 106
+app/core/security.py                             66     43    35%   25-41, 46-54, 59-70, 75, 80, 85-95, 100-112, 117, 122, 127, 132-133, 140-142, 147, 152
+app/db/init_db.py                                40     29    28%   21-23, 28-58
+app/db/session.py                                33     23    30%   33-65, 77-86, 96-106
+app/main.py                                      62     28    55%   31-56, 90, 103, 116, 128, 140, 149
+app/models/base.py                                7      0   100%
+app/models/ecg_analysis.py                       95      7    93%   15-17, 110, 118-120
+app/models/notification.py                       52      0   100%
+app/models/patient.py                            59      8    86%   14, 70, 75-76, 83-86
+app/models/user.py                               67      5    93%   15-16, 67, 72, 77
+app/models/validation.py                         69      3    96%   15-16, 68
+app/repositories/ecg_repository.py              164    133    19%   24, 28-31, 35-46, 50-61, 67-79, 88-141, 145-149, 155-167, 173-182, 186, 192-195, 201-207, 211-214, 220-226, 230-248, 252-265, 271-310, 322-325, 329-334, 338-349, 353-364
+app/repositories/notification_repository.py      69     52    25%   19, 23-26, 32-44, 48-66, 70-91, 95-106, 110-120, 126-136, 140-150, 154-164
+app/repositories/patient_repository.py           56     43    23%   18, 22-25, 29-31, 35-37, 41-53, 57-71, 77-105
+app/repositories/user_repository.py              41     29    29%   17, 21-24, 28-30, 34-36, 40-42, 46-58, 64-70
+app/repositories/validation_repository.py       160    124    22%   30, 34-37, 41-50, 54-63, 67-76, 82-93, 99-111, 119-146, 150-152, 158-167, 171-177, 183-186, 190-193, 199-213, 217-226, 230-239, 243-252, 256-261, 265, 269-273, 277-286, 290-294, 298, 302-313
+app/schemas/ecg_analysis.py                     142      5    96%   35-39
+app/schemas/notification.py                      49      0   100%
+app/schemas/patient.py                          102      6    94%   29-34
+app/schemas/user.py                             110     22    80%   35-45, 96-106
+app/schemas/validation.py                        65      0   100%
+app/services/ecg_service.py                     261    217    17%   40-45, 55-105, 109-213, 217-229, 235-280, 295-333, 339-398, 407-423, 431, 435, 439, 445, 451-455, 464, 473-477, 481, 485-489, 493-545, 549-590, 594-614, 618, 622
+app/services/hybrid_ecg_service.py              829    747    10%   40, 64-80, 84-102, 111-134, 138-156, 160-181, 185-204, 217-258, 262-266, 284-285, 301-342, 346-355, 359, 363-373, 377, 381-392, 396-401, 405-413, 422-423, 436-448, 452-459, 463-483, 487-498, 502-517, 521-546, 550-572, 576-591, 595-635, 639-673, 677-683, 687-721, 725-732, 741-762, 778-801, 814-838, 844-860, 869, 882-913, 922-952, 956-968, 972-984, 988-1123, 1127, 1144-1163, 1167-1181, 1191-1204, 1216-1245, 1254-1277, 1288-1291, 1314-1320, 1323-1373, 1398-1438, 1442-1482, 1491-1555, 1569, 1579-1586, 1590-1598, 1602-1615, 1619-1628, 1632-1633, 1637
+app/services/i18n_service.py                     93     40    57%   29-30, 38-41, 64, 69-70, 73-84, 87-91, 95-97, 118, 122-123, 127, 131, 135-136, 158-159, 163, 168, 174, 178
+app/services/medical_translation_service.py     141     87    38%   33-35, 44-46, 191, 211-232, 237-256, 260-277, 281-292, 296-307, 311-318, 322-329, 333-376
+app/services/ml_model_service.py                270    235    13%   25-29, 33-54, 58-106, 110-140, 149-169, 178, 187-248, 257-287, 291-359, 363-400, 404-424, 430-460, 466, 470-474, 478-490, 494-501, 505-507, 515-534, 542-554, 558-564, 568-577, 585, 589
+app/services/notification_service.py            207    175    15%   26-27, 33-50, 56-76, 82-97, 101-123, 127-149, 155-176, 182-200, 206-222, 226-256, 260, 264, 270, 276, 282, 288, 294-300, 306-318, 322-332, 338, 344, 348, 352, 356
+app/services/patient_service.py                  75     60    20%   22-23, 27-84, 88, 92-102, 106, 112
+app/services/user_service.py                     75     51    32%   29-30, 34-49, 53-60, 64, 68, 72, 76-92, 100-123
+app/services/validation_service.py              258    223    14%   35-37, 47-87, 96-149, 153-189, 195-217, 226-243, 251-261, 265-280, 286-313, 319-350, 356-385, 401, 411, 419-437, 443-447, 451-460, 464-468, 472-476, 480-494, 498-502, 506-528, 532-541
+app/tasks/ecg_tasks.py                           31     19    39%   20-53
+app/types/ecg_types.py                            4      0   100%
+app/utils/ecg_hybrid_processor.py               379    341    10%   24-32, 48-90, 102-125, 137-162, 174-212, 224-237, 241-255, 259-289, 293-311, 315-343, 347-355, 359-370, 374-377, 381-392, 404-432, 445-475, 488-518, 522, 532-571, 575, 589-591, 595, 604, 615, 619, 623-626, 630-641, 645-658, 662-675, 679-695
+app/utils/ecg_processor.py                      271    239    12%   23-24, 28-32, 36-40, 44-60, 64-70, 74-80, 84-103, 107-126, 130-156, 160-176, 180-189, 193, 210-248, 252-265, 269-295, 307-324, 328-341, 345-372, 380-426, 435, 439-455, 459-461
+app/utils/memory_monitor.py                      29     21    28%   18-34, 44-51, 55-64
+app/utils/signal_quality.py                     154    140     9%   19-44, 56-116, 127-179, 183-196, 200-213, 217-231, 235-250, 254
+---------------------------------------------------------------------------
+TOTAL                                          5361   3488    35%
+Coverage HTML written to dir htmlcov
+FAIL Required test coverage of 80% not reached. Total coverage: 34.94%
+=========================== short test summary info ============================
+ERROR tests/test_achievable_80_coverage.py
+ERROR tests/test_actual_methods_80_coverage.py
+ERROR tests/test_actual_service_methods_80_coverage.py
+ERROR tests/test_additional_80_coverage.py
+ERROR tests/test_additional_coverage_boost.py
+ERROR tests/test_atomic_coverage_boost.py
+ERROR tests/test_celery_tasks_comprehensive.py
+ERROR tests/test_comprehensive_80_coverage.py
+ERROR tests/test_comprehensive_80_coverage_final.py
+ERROR tests/test_comprehensive_coverage_final.py
+ERROR tests/test_comprehensive_regulatory_80_coverage.py
+ERROR tests/test_comprehensive_regulatory_80_final.py
+ERROR tests/test_comprehensive_regulatory_final.py
+ERROR tests/test_core_services_80_coverage.py
+ERROR tests/test_correct_method_signatures_80_coverage.py
+ERROR tests/test_corrected_critical_services.py
+ERROR tests/test_corrected_regulatory_80_coverage.py
+ERROR tests/test_corrected_regulatory_final.py
+ERROR tests/test_coverage_boost.py
+ERROR tests/test_coverage_boost_mega.py
+ERROR tests/test_critical_80_coverage_final.py
+ERROR tests/test_critical_low_coverage_80_target.py
+ERROR tests/test_critical_modules_80_coverage.py
+ERROR tests/test_critical_services_80_coverage.py
+ERROR tests/test_critical_services_80_coverage_final.py
+ERROR tests/test_critical_zero_coverage_services.py
+ERROR tests/test_ecg_analysis_generated.py
+ERROR tests/test_ecg_hybrid_processor_coverage.py
+ERROR tests/test_ecg_hybrid_processor_critical.py
+ERROR tests/test_ecg_processor_turbo_70.py
+ERROR tests/test_ecg_service_turbo_70.py
+ERROR tests/test_efficient_80_coverage_final.py
+ERROR tests/test_final_80_coverage_efficient.py
+ERROR tests/test_final_80_coverage_push.py
+ERROR tests/test_final_80_coverage_regulatory.py
+ERROR tests/test_final_80_coverage_target.py
+ERROR tests/test_final_80_percent_regulatory_push.py
+ERROR tests/test_final_correct_signatures_80_coverage.py
+ERROR tests/test_final_coverage_push.py
+ERROR tests/test_final_regulatory_80_coverage.py
+ERROR tests/test_final_regulatory_80_coverage_simple.py
+ERROR tests/test_final_regulatory_80_percent_push.py
+ERROR tests/test_final_regulatory_80_push.py
+ERROR tests/test_final_regulatory_compliance.py
+ERROR tests/test_fix_ecg_simple.py
+ERROR tests/test_fix_notification_simple.py
+ERROR tests/test_focused_coverage_boost.py
+ERROR tests/test_hybrid_ecg_additional_coverage.py
+ERROR tests/test_hybrid_ecg_comprehensive_coverage.py
+ERROR tests/test_hybrid_ecg_direct_import.py
+ERROR tests/test_hybrid_ecg_final_80_coverage.py
+ERROR tests/test_hybrid_ecg_service.py
+ERROR tests/test_hybrid_ecg_service_80_coverage.py
+ERROR tests/test_hybrid_ecg_service_95_coverage.py
+ERROR tests/test_hybrid_ecg_service_comprehensive.py
+ERROR tests/test_hybrid_ecg_service_critical.py
+ERROR tests/test_hybrid_ecg_service_critical_new.py
+ERROR tests/test_hybrid_ecg_service_simple.py
+ERROR tests/test_hybrid_ecg_service_targeted_80_coverage.py
+ERROR tests/test_hybrid_ecg_service_turbo.py
+ERROR tests/test_hybrid_ecg_service_turbo_70.py
+ERROR tests/test_hybrid_ecg_zero_coverage.py
+ERROR tests/test_low_coverage_services_targeted.py
+ERROR tests/test_major_services_coverage.py
+ERROR tests/test_ml_model_service_turbo.py
+ERROR tests/test_ml_model_service_turbo_70.py
+ERROR tests/test_regulatory_80_coverage.py
+ERROR tests/test_regulatory_80_coverage_final.py
+ERROR tests/test_regulatory_80_coverage_targeted.py
+ERROR tests/test_regulatory_80_final_targeted.py
+ERROR tests/test_regulatory_80_percent_final.py
+ERROR tests/test_regulatory_compliance_80_coverage.py
+ERROR tests/test_repositories_80_coverage.py
+ERROR tests/test_repositories_comprehensive_coverage.py
+ERROR tests/test_services_80_coverage_boost.py
+ERROR tests/test_services_basic_coverage.py
+ERROR tests/test_simple_80_coverage.py
+ERROR tests/test_simple_coverage_boost.py
+ERROR tests/test_simple_method_coverage.py
+ERROR tests/test_simple_regulatory_80_coverage.py
+ERROR tests/test_simple_regulatory_final.py
+ERROR tests/test_simple_working_80_coverage.py
+ERROR tests/test_strategic_80_coverage.py
+ERROR tests/test_targeted_80_coverage.py
+ERROR tests/test_targeted_high_coverage.py
+ERROR tests/test_working_80_coverage_final.py
+ERROR tests/test_working_coverage_boost.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 87 errors during collection !!!!!!!!!!!!!!!!!!!
+======================= 14 warnings, 87 errors in 30.30s =======================

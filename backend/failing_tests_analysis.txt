@@ -1,0 +1,63 @@
+## Analysis of 28 Failing Tests in hybrid_ecg_service.py
+
+### Coverage Impact
+- Current: 38% (314/829 lines covered)
+- Target: 70%+ (580+ lines covered)
+- Missing: 515 lines still need coverage
+
+### Failure Categories
+
+#### 1. TypeError: unexpected keyword argument 'sampling_rate' (18 tests)
+- test_preprocess_signal
+- test_filter_signal  
+- test_extract_all_features
+- test_extract_time_domain_features
+- test_extract_frequency_domain_features
+- test_extract_morphological_features
+- test_run_simplified_analysis
+- test_detect_pathologies
+- test_detect_atrial_fibrillation
+- test_detect_long_qt
+- test_analyze_emergency_patterns
+- test_preprocess_signal_private
+- test_analyze_with_ai
+- test_validate_ecg_signal
+- test_validate_signal_quality
+- test_assess_signal_quality
+- test_analyze_leads
+- test_analyze_rhythm_patterns
+
+**Fix**: Remove `sampling_rate=500` parameter from all method calls
+
+#### 2. AssertionError: missing 'confidence' key (2 tests)
+- test_analyze_ecg_signal_valid
+- test_analyze_ecg_comprehensive (expects 'analysis' key)
+
+**Fix**: Remove assertions for non-existent keys, check actual return structure
+
+#### 3. ECGProcessingException handling (5 tests)
+- test_analyze_ecg_file_success (missing 'metadata' key)
+- test_analyze_ecg_file_invalid_file
+- test_analyze_ecg_signal_invalid
+- test_analyze_ecg_comprehensive_async
+- test_analyze_ecg_file_exception
+
+**Fix**: Add proper try/catch blocks for ECGProcessingException
+
+#### 4. AttributeError: 'numpy.ndarray' object has no attribute 'get' (1 test)
+- test_simulate_predictions
+
+**Fix**: Pass features dict instead of numpy array
+
+#### 5. Missing required positional arguments (2 tests)
+- test_generate_clinical_assessment (needs pathology_results, features)
+- test_read_ecg_csv (returns None)
+
+**Fix**: Add missing required parameters
+
+### Test Status Summary
+- Total Tests: 45
+- Passed: 17
+- Failed: 28
+- Current Coverage: 38% (improvement from 13%)
+- Target Coverage: 70%+
