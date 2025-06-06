@@ -124,15 +124,15 @@ class ECGAnalysisService:
                 analysis.leads_names,
             )
 
-            measurements = await self._extract_measurements(
+            measurements = self._extract_measurements(
                 preprocessed_data, analysis.sample_rate
             )
 
-            annotations = await self._generate_annotations(
+            annotations = self._generate_annotations(
                 preprocessed_data, ai_results, analysis.sample_rate
             )
 
-            clinical_assessment = await self._assess_clinical_urgency(ai_results)
+            clinical_assessment = self._assess_clinical_urgency(ai_results)
 
             end_time = datetime.utcnow()
             processing_duration_ms = int((end_time - start_time).total_seconds() * 1000)
@@ -221,7 +221,7 @@ class ECGAnalysisService:
 
         return file_hash, file_size
 
-    async def _extract_measurements(
+    def _extract_measurements(
         self, ecg_data: np.ndarray[Any, np.dtype[np.float64]], sample_rate: int
     ) -> dict[str, Any]:
         """Extract clinical measurements from ECG data."""
@@ -272,7 +272,7 @@ class ECGAnalysisService:
             logger.error(f"Failed to extract measurements: {str(e)}")
             return {"heart_rate": None, "detailed_measurements": []}
 
-    async def _generate_annotations(
+    def _generate_annotations(
         self,
         ecg_data: np.ndarray[Any, np.dtype[np.float64]],
         ai_results: dict[str, Any],
@@ -316,7 +316,7 @@ class ECGAnalysisService:
             logger.error(f"Failed to generate annotations: {str(e)}")
             return []
 
-    async def _assess_clinical_urgency(
+    def _assess_clinical_urgency(
         self, ai_results: dict[str, Any]
     ) -> dict[str, Any]:
         """Assess clinical urgency based on AI results."""

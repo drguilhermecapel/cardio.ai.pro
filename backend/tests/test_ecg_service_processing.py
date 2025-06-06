@@ -47,7 +47,7 @@ async def test_process_analysis_async_success(ecg_service):
         "interpretability": {},
         "rhythm": "sinus"
     })
-    ecg_service._extract_measurements = AsyncMock(return_value={
+    ecg_service._extract_measurements = Mock(return_value={
         "heart_rate": 75,
         "pr_interval": 160,
         "qrs_duration": 100,
@@ -55,8 +55,8 @@ async def test_process_analysis_async_success(ecg_service):
         "qtc_interval": 420,
         "detailed_measurements": []
     })
-    ecg_service._generate_annotations = AsyncMock(return_value=[])
-    ecg_service._assess_clinical_urgency = AsyncMock(return_value={
+    ecg_service._generate_annotations = Mock(return_value=[])
+    ecg_service._assess_clinical_urgency = Mock(return_value={
         "urgency": ClinicalUrgency.LOW,
         "critical": False,
         "primary_diagnosis": "Normal ECG",
@@ -114,9 +114,9 @@ async def test_process_analysis_async_critical_validation(ecg_service):
     ecg_service.processor.preprocess_signal = AsyncMock(return_value=np.array([[1, 2], [3, 4]]))
     ecg_service.quality_analyzer.analyze_quality = AsyncMock(return_value={"overall_score": 0.9})
     ecg_service.ml_service.analyze_ecg = AsyncMock(return_value={"confidence": 0.85, "predictions": {}})
-    ecg_service._extract_measurements = AsyncMock(return_value={"heart_rate": 75, "detailed_measurements": []})
-    ecg_service._generate_annotations = AsyncMock(return_value=[])
-    ecg_service._assess_clinical_urgency = AsyncMock(return_value={
+    ecg_service._extract_measurements = Mock(return_value={"heart_rate": 75, "detailed_measurements": []})
+    ecg_service._generate_annotations = Mock(return_value=[])
+    ecg_service._assess_clinical_urgency = Mock(return_value={
         "urgency": ClinicalUrgency.CRITICAL,
         "critical": True
     })
@@ -181,7 +181,7 @@ async def test_extract_measurements_success(ecg_service):
         }
         mock_process.return_value = (mock_signals, mock_info)
         
-        measurements = await ecg_service._extract_measurements(ecg_data, sample_rate)
+        measurements = ecg_service._extract_measurements(ecg_data, sample_rate)
         
         assert "heart_rate" in measurements
         assert "detailed_measurements" in measurements
@@ -195,7 +195,7 @@ async def test_extract_measurements_error_handling(ecg_service):
     sample_rate = 500
     
     with patch('neurokit2.ecg_process', side_effect=Exception("Processing error")):
-        measurements = await ecg_service._extract_measurements(ecg_data, sample_rate)
+        measurements = ecg_service._extract_measurements(ecg_data, sample_rate)
         
         assert measurements["heart_rate"] is None
         assert measurements["detailed_measurements"] == []
@@ -217,7 +217,7 @@ async def test_generate_annotations_success(ecg_service):
         mock_info = {"ECG_R_Peaks": np.array([100, 600, 1100])}
         mock_process.return_value = (mock_signals, mock_info)
         
-        annotations = await ecg_service._generate_annotations(ecg_data, ai_results, sample_rate)
+        annotations = ecg_service._generate_annotations(ecg_data, ai_results, sample_rate)
         
         assert len(annotations) > 0
         assert any(ann["annotation_type"] == "beat" for ann in annotations)
@@ -232,7 +232,7 @@ async def test_generate_annotations_error_handling(ecg_service):
     sample_rate = 500
     
     with patch('neurokit2.ecg_process', side_effect=Exception("Processing error")):
-        annotations = await ecg_service._generate_annotations(ecg_data, ai_results, sample_rate)
+        annotations = ecg_service._generate_annotations(ecg_data, ai_results, sample_rate)
         
         assert annotations == []
 
@@ -248,7 +248,7 @@ async def test_assess_clinical_urgency_critical(ecg_service):
         "confidence": 0.9
     }
     
-    assessment = await ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service._assess_clinical_urgency(ai_results)
     
     assert assessment["urgency"] == ClinicalUrgency.CRITICAL
     assert assessment["critical"] is True
@@ -266,7 +266,7 @@ async def test_assess_clinical_urgency_high_priority(ecg_service):
         "confidence": 0.8
     }
     
-    assessment = await ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service._assess_clinical_urgency(ai_results)
     
     assert assessment["urgency"] == ClinicalUrgency.HIGH
     assert assessment["critical"] is False
@@ -281,7 +281,7 @@ async def test_assess_clinical_urgency_low_confidence(ecg_service):
         "confidence": 0.5
     }
     
-    assessment = await ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service._assess_clinical_urgency(ai_results)
     
     assert "Manual review recommended due to low AI confidence" in assessment["recommendations"]
 
@@ -291,7 +291,7 @@ async def test_assess_clinical_urgency_error_handling(ecg_service):
     """Test clinical urgency assessment error handling - covers lines 379-381."""
     ai_results = None
     
-    assessment = await ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service._assess_clinical_urgency(ai_results)
     
     assert assessment["urgency"] == ClinicalUrgency.LOW
     assert assessment["critical"] is False
