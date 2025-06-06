@@ -1120,45 +1120,7 @@ class HybridECGAnalysisService:
             logger.error(f"Comprehensive ECG analysis failed: {e}")
             raise ECGProcessingException(f"ECG analysis failed: {str(e)}") from e
 
-    async def _run_simplified_analysis(self, signal_data: dict[str, Any], features: dict[str, float]) -> dict[str, Any]:
-        """Run simplified analysis for testing"""
-        return {
-            "simplified": True,
-            "features": features,
-            "signal_quality": "good",
-            "confidence": 0.85,
-            "model_version": "1.0.0",
-            "predictions": {
-                "normal": 0.3,
-                "abnormal": 0.2,
-                "atrial_fibrillation": 0.2,
-                "tachycardia": 0.15,
-                "bradycardia": 0.15
-            }
-        }
 
-    async def _detect_pathologies(self, signal_data: dict[str, Any], features: dict[str, float]) -> dict[str, Any]:
-        """Detect pathologies from features"""
-        pathologies = {}
-
-        heart_rate = features.get('heart_rate', 70)
-        qt_interval = features.get('qt_interval', 400)
-
-        if heart_rate > 100:
-            pathologies['tachycardia'] = {'detected': True, 'confidence': 0.8, 'criteria': 'HR > 100 bpm'}
-            pathologies['atrial_fibrillation'] = {'detected': False, 'confidence': 0.1, 'criteria': 'Regular rhythm'}
-        elif heart_rate < 60:
-            pathologies['bradycardia'] = {'detected': True, 'confidence': 0.7, 'criteria': 'HR < 60 bpm'}
-            pathologies['atrial_fibrillation'] = {'detected': False, 'confidence': 0.05, 'criteria': 'Regular rhythm'}
-        else:
-            pathologies['atrial_fibrillation'] = {'detected': False, 'confidence': 0.02, 'criteria': 'Normal HR range'}
-
-        if qt_interval > 450:
-            pathologies['long_qt_syndrome'] = {'detected': True, 'confidence': 0.8, 'criteria': 'QTc > 450ms'}
-        else:
-            pathologies['long_qt_syndrome'] = {'detected': False, 'confidence': 0.1, 'criteria': 'Normal QTc'}
-
-        return pathologies
 
     def _detect_atrial_fibrillation(self, features: dict[str, float]) -> dict[str, Any]:
         """Detect atrial fibrillation from features"""

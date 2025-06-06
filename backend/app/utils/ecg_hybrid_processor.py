@@ -530,6 +530,8 @@ class ECGHybridProcessor:
                                         analysis_id: str, require_regulatory_compliance: bool = True) -> dict[str, Any]:
         """Process ECG with validation for medical use"""
         try:
+            if self.hybrid_service is None:
+                raise ValueError("Hybrid service not initialized")
             analysis_result = self.hybrid_service.analyze_ecg_comprehensive(file_path)
 
             result = analysis_result.copy()
