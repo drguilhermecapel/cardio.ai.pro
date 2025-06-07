@@ -24,7 +24,7 @@ const MedicalCard: React.FC<MedicalCardProps> = ({
   className = '',
   children
 }) => {
-  const getSeverityColors = () => {
+  const getSeverityColors = (): { bg: string; border: string; glow: string; icon: string; accent: string } => {
     switch (severity) {
       case 'warning':
         return {
@@ -53,13 +53,13 @@ const MedicalCard: React.FC<MedicalCardProps> = ({
     }
   }
 
-  const getTrendIcon = () => {
+  const getTrendIcon = (): string => {
     if (trend === 'up') return '↗'
     if (trend === 'down') return '↘'
     return '→'
   }
 
-  const getTrendColor = () => {
+  const getTrendColor = (): string => {
     if (trend === 'up') return 'text-green-400'
     if (trend === 'down') return 'text-red-400'
     return 'text-gray-400'

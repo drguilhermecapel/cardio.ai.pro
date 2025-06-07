@@ -72,7 +72,7 @@ const AIInsightPanel: React.FC<AIInsightPanelProps> = ({
 
   const displayInsights = insights || defaultInsights
 
-  const getInsightIcon = (type: string) => {
+  const getInsightIcon = (type: string): React.ComponentType<{ className?: string }> => {
     switch (type) {
       case 'diagnosis': return BrainCircuit
       case 'recommendation': return Sparkles
@@ -81,7 +81,7 @@ const AIInsightPanel: React.FC<AIInsightPanelProps> = ({
     }
   }
 
-  const getSeverityColors = (severity: string) => {
+  const getSeverityColors = (severity: string): { bg: string; border: string; text: string; glow: string } => {
     switch (severity) {
       case 'critical':
         return {
@@ -114,7 +114,7 @@ const AIInsightPanel: React.FC<AIInsightPanelProps> = ({
     }
   }
 
-  const getConfidenceColor = (confidence: number) => {
+  const getConfidenceColor = (confidence: number): string => {
     if (confidence >= 90) return 'text-green-400'
     if (confidence >= 70) return 'text-yellow-400'
     return 'text-red-400'

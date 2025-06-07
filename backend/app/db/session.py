@@ -54,11 +54,11 @@ def get_engine() -> AsyncEngine:
             }
             import os
             from pathlib import Path
-            
+
             db_path = str(settings.DATABASE_URL).replace("sqlite+aiosqlite:///", "")
             if not db_path.startswith("/"):
                 db_path = os.path.abspath(db_path)
-            
+
             db_dir = os.path.dirname(db_path)
             if db_dir:
                 try:
@@ -70,7 +70,7 @@ def get_engine() -> AsyncEngine:
                     raise RuntimeError(
                         f"Cannot create or write to database directory {db_dir}: {e}. "
                         "Check permissions and disk space."
-                    )
+                    ) from e
 
         _engine = create_async_engine(
             str(settings.DATABASE_URL),

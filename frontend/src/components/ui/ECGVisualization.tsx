@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Activity, Heart, Zap, TrendingUp } from 'lucide-react'
 
 interface ECGDataPoint {
@@ -66,7 +66,7 @@ const ECGVisualization: React.FC<ECGVisualizationProps> = ({
 
   const ecgData = data || generateSampleECGData()
 
-  const drawECG = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+  const drawECG = useCallback((ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void => {
     const { width, height } = canvas
     
     ctx.fillStyle = 'rgba(17, 24, 39, 0.95)'
@@ -122,7 +122,7 @@ const ECGVisualization: React.FC<ECGVisualizationProps> = ({
       ctx.fill()
       ctx.shadowBlur = 0
     }
-  }
+  }, [ecgData, isRealTime, isActive])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -135,7 +135,7 @@ const ECGVisualization: React.FC<ECGVisualizationProps> = ({
     canvas.height = height * window.devicePixelRatio
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
 
-    const animate = () => {
+    const animate = (): void => {
       drawECG(ctx, canvas)
       if (isRealTime) {
         animationRef.current = requestAnimationFrame(animate)
@@ -149,15 +149,15 @@ const ECGVisualization: React.FC<ECGVisualizationProps> = ({
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [ecgData, isRealTime, isActive, height])
+  }, [ecgData, isRealTime, isActive, height, drawECG])
 
-  const getRhythmColor = () => {
+  const getRhythmColor = (): string => {
     if (rhythm.toLowerCase().includes('normal')) return 'text-green-400'
     if (rhythm.toLowerCase().includes('arritmia')) return 'text-red-400'
     return 'text-yellow-400'
   }
 
-  const getHeartRateColor = () => {
+  const getHeartRateColor = (): string => {
     if (heartRate < 60) return 'text-blue-400'
     if (heartRate > 100) return 'text-red-400'
     return 'text-green-400'
