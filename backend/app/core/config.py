@@ -42,10 +42,9 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         values = info.data
-        
+
         if values.get("STANDALONE_MODE", True):
             return "sqlite+aiosqlite:///./cardioai.db"
-            
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
         host = values.get("POSTGRES_SERVER")
@@ -60,10 +59,9 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         values = info.data
-        
+
         if values.get("STANDALONE_MODE", True):
             return "sqlite+aiosqlite:///./cardioai_test.db"
-            
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
         host = values.get("POSTGRES_SERVER")
@@ -85,7 +83,7 @@ class Settings(BaseSettings):
             return v
 
         values = info.data
-        
+
         if values.get("STANDALONE_MODE", True):
             return ""
 
@@ -150,10 +148,9 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         values = info.data
-        
+
         if values.get("STANDALONE_MODE", True):
             return ""
-            
         redis_url = values.get("REDIS_URL")
         return str(redis_url) if redis_url else "redis://localhost:6379/0"
 
@@ -164,16 +161,15 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         values = info.data
-        
+
         if values.get("STANDALONE_MODE", True):
             return ""
-            
         redis_url = values.get("REDIS_URL")
         return str(redis_url) if redis_url else "redis://localhost:6379/0"
 
     AUDIT_LOG_RETENTION_DAYS: int = 2555  # 7 years
     ENABLE_DIGITAL_SIGNATURES: bool = True
-    
+
     MODELS_DIR: str = "models"
     REQUIRE_AUDIT_TRAIL: bool = True
 

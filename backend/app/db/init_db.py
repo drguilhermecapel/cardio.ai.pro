@@ -22,19 +22,19 @@ async def init_db() -> None:
     """Initialize database with tables and default data."""
     try:
         logger.info("Initializing CardioAI Pro database...")
-        
+
         engine = get_engine()
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-        
+
         logger.info("Database tables created successfully")
-        
+
         session_factory = get_session_factory()
         async with session_factory() as session:
             await create_admin_user(session)
-            
+
         logger.info("Database initialization completed successfully")
-        
+
     except Exception as e:
         logger.error(f"Database initialization failed: {str(e)}")
         raise
@@ -44,7 +44,7 @@ async def create_admin_user(session: AsyncSession) -> User | None:
     """Create default admin user if it doesn't exist."""
     try:
         from sqlalchemy.future import select
-        
+
         admin_email = "admin@cardioai.pro"
         stmt = select(User).where(User.email == admin_email)
         result = await session.execute(stmt)
@@ -63,7 +63,6 @@ async def create_admin_user(session: AsyncSession) -> User | None:
         admin_user.role = UserRoles.ADMIN
         admin_user.is_active = True
         admin_user.is_superuser = True
-        admin_user.is_physician = True
 
         session.add(admin_user)
         await session.commit()
@@ -88,11 +87,11 @@ async def check_database_exists() -> bool:
                 db_path = Path.cwd() / db_path
             else:
                 db_path = Path(db_path)
-            
+
             return db_path.exists() and db_path.is_file()
-        
+
         return True
-        
+
     except Exception as e:
         logger.error(f"Error checking database existence: {str(e)}")
         return False
@@ -102,7 +101,7 @@ async def ensure_database_ready() -> None:
     """Ensure database is ready for use, initialize if needed."""
     try:
         db_exists = await check_database_exists()
-        
+
         if not db_exists:
             logger.info("Database not found, initializing...")
             await init_db()
@@ -111,13 +110,13 @@ async def ensure_database_ready() -> None:
             engine = get_engine()
             async with engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
-            
+
             session_factory = get_session_factory()
             async with session_factory() as session:
                 await create_admin_user(session)
-            
+
         logger.info("Database is ready for use")
-        
+
     except Exception as e:
         logger.error(f"Database preparation failed: {str(e)}")
         raise

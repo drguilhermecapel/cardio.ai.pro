@@ -3,7 +3,6 @@ CardioAI Pro - Standalone FastAPI Application
 Simplified ECG Analysis System for Desktop
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -15,7 +14,6 @@ if getattr(sys, 'frozen', False):
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
 
 # Simplified startup for standalone version

@@ -169,19 +169,19 @@ class ECGProcessor:
                 lead_data = processed_data[:, i]
 
                 from scipy.signal import butter, filtfilt
-                
+
                 cleaned_signal = lead_data - np.mean(lead_data)
-                
+
                 nyquist = 500 / 2
                 low = 0.5 / nyquist
                 high = 40.0 / nyquist
-                
+
                 try:
                     b, a = butter(4, [low, high], btype='band')
                     cleaned_signal = filtfilt(b, a, cleaned_signal)
                 except Exception:
                     pass
-                
+
                 processed_data[:, i] = cleaned_signal
 
             return processed_data
