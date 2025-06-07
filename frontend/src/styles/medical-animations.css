@@ -2,12 +2,24 @@
 
 /* Heartbeat Animation */
 @keyframes heartbeat {
-  0% { transform: scale(1); }
-  15% { transform: scale(1.15); }
-  30% { transform: scale(1); }
-  45% { transform: scale(1.15); }
-  60% { transform: scale(1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.15);
+  }
+  30% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.15);
+  }
+  60% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .heartbeat {
@@ -16,7 +28,7 @@
 
 /* ECG Line Animation */
 @keyframes ecg-line {
-  0% { 
+  0% {
     transform: translateX(-100%);
     opacity: 0;
   }
@@ -26,7 +38,7 @@
   90% {
     opacity: 1;
   }
-  100% { 
+  100% {
     transform: translateX(100%);
     opacity: 0;
   }
@@ -45,13 +57,13 @@
   right: 0;
   bottom: 0;
   background: linear-gradient(
-    90deg, 
-    transparent 0%, 
-    transparent 40%, 
-    #22d3ee 45%, 
-    #06b6d4 50%, 
-    #22d3ee 55%, 
-    transparent 60%, 
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    #22d3ee 45%,
+    #06b6d4 50%,
+    #22d3ee 55%,
+    transparent 60%,
     transparent 100%
   );
   animation: ecg-line 3s linear infinite;
@@ -59,15 +71,15 @@
 
 /* Pulse Effect */
 @keyframes pulse {
-  0% { 
+  0% {
     box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.7);
     transform: scale(1);
   }
-  70% { 
+  70% {
     box-shadow: 0 0 0 10px rgba(34, 211, 238, 0);
     transform: scale(1.05);
   }
-  100% { 
+  100% {
     box-shadow: 0 0 0 0 rgba(34, 211, 238, 0);
     transform: scale(1);
   }
@@ -79,15 +91,15 @@
 
 /* Medical Pulse for Critical Alerts */
 @keyframes medical-pulse {
-  0% { 
+  0% {
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
     background-color: rgba(239, 68, 68, 0.1);
   }
-  70% { 
+  70% {
     box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
     background-color: rgba(239, 68, 68, 0.2);
   }
-  100% { 
+  100% {
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
     background-color: rgba(239, 68, 68, 0.1);
   }
@@ -103,7 +115,7 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
@@ -113,20 +125,20 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 
+  box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 /* Holographic Effect */
 @keyframes holographic {
-  0% { 
+  0% {
     background-position: 0% 50%;
   }
-  50% { 
+  50% {
     background-position: 100% 50%;
   }
-  100% { 
+  100% {
     background-position: 0% 50%;
   }
 }
@@ -145,7 +157,8 @@
 
 /* Gradient Animation */
 @keyframes gradient-x {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0%);
   }
   50% {
@@ -160,10 +173,11 @@
 
 /* Floating Animation */
 @keyframes float {
-  0%, 100% { 
+  0%,
+  100% {
     transform: translateY(0px);
   }
-  50% { 
+  50% {
     transform: translateY(-10px);
   }
 }
@@ -194,11 +208,12 @@
 
 /* Breathing Animation for Medical Indicators */
 @keyframes breathe {
-  0%, 100% { 
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.8;
   }
-  50% { 
+  50% {
     transform: scale(1.1);
     opacity: 1;
   }
@@ -235,12 +250,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #22d3ee,
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, #22d3ee, transparent);
   animation: scan-line 3s linear infinite;
   z-index: 1;
 }
@@ -337,7 +347,7 @@
   .shimmer {
     animation: none;
   }
-  
+
   .ecg-line::before,
   .scan-line::after {
     animation: none;

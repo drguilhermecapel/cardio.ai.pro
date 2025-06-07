@@ -24,7 +24,7 @@ function createWindow() {
     frame: true,
     titleBarStyle: 'default',
     vibrancy: 'dark',
-    visualEffectState: 'active'
+    visualEffectState: 'active',
   })
 
   const isDev = process.env.NODE_ENV === 'development'
@@ -38,11 +38,11 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
-    
+
     if (process.env.NODE_ENV === 'development') {
       mainWindow.webContents.openDevTools()
     }
-    
+
     setTimeout(() => {
       checkBackendHealth()
     }, 3000)
@@ -60,9 +60,9 @@ function createWindow() {
 
 function startBackend() {
   let backendPath
-  
+
   const possiblePaths = []
-  
+
   if (process.platform === 'win32') {
     possiblePaths.push(
       path.join(__dirname, '../../backend/dist/cardioai-pro-backend.exe'),
@@ -80,7 +80,7 @@ function startBackend() {
       path.join(__dirname, 'cardioai-pro-backend')
     )
   }
-  
+
   backendPath = possiblePaths.find(p => {
     try {
       return require('fs').existsSync(p)
@@ -89,25 +89,27 @@ function startBackend() {
       return false
     }
   })
-  
+
   if (!backendPath) {
     console.error('Backend executable not found in any of these locations:')
     possiblePaths.forEach(p => console.error('  -', p))
     console.warn('Application will run in frontend-only mode')
-    
-    dialog.showMessageBox({
-      type: 'warning',
-      title: 'CardioAI Pro - Backend Warning',
-      message: 'Backend server not found',
-      detail: 'The application will run in frontend-only mode. Some features may be limited.',
-      buttons: ['Continue', 'Exit'],
-      defaultId: 0,
-      cancelId: 1
-    }).then(result => {
-      if (result.response === 1) {
-        app.quit()
-      }
-    })
+
+    dialog
+      .showMessageBox({
+        type: 'warning',
+        title: 'CardioAI Pro - Backend Warning',
+        message: 'Backend server not found',
+        detail: 'The application will run in frontend-only mode. Some features may be limited.',
+        buttons: ['Continue', 'Exit'],
+        defaultId: 0,
+        cancelId: 1,
+      })
+      .then(result => {
+        if (result.response === 1) {
+          app.quit()
+        }
+      })
     return
   }
 
@@ -119,8 +121,8 @@ function startBackend() {
     env: {
       ...process.env,
       STANDALONE_MODE: 'true',
-      ENVIRONMENT: 'production'
-    }
+      ENVIRONMENT: 'production',
+    },
   })
 
   backendProcess.stdout.on('data', data => {
@@ -131,7 +133,7 @@ function startBackend() {
     console.error(`Backend Error: ${data}`)
   })
 
-  backendProcess.on('error', (err) => {
+  backendProcess.on('error', err => {
     console.error('Failed to start backend process:', err)
     dialog.showErrorBox(
       'CardioAI Pro - Backend Error',
@@ -193,18 +195,20 @@ async function checkBackendHealth() {
     return true
   } catch (error) {
     console.error('Backend health check failed:', error)
-    dialog.showMessageBox(mainWindow, {
-      type: 'warning',
-      title: 'CardioAI Pro - Connection Warning',
-      message: 'Backend server connection failed',
-      detail: 'Unable to connect to the backend server. Some features may not work properly.',
-      buttons: ['Retry', 'Continue'],
-      defaultId: 0
-    }).then(result => {
-      if (result.response === 0) {
-        setTimeout(() => checkBackendHealth(), 5000)
-      }
-    })
+    dialog
+      .showMessageBox(mainWindow, {
+        type: 'warning',
+        title: 'CardioAI Pro - Connection Warning',
+        message: 'Backend server connection failed',
+        detail: 'Unable to connect to the backend server. Some features may not work properly.',
+        buttons: ['Retry', 'Continue'],
+        defaultId: 0,
+      })
+      .then(result => {
+        if (result.response === 0) {
+          setTimeout(() => checkBackendHealth(), 5000)
+        }
+      })
     return false
   }
 }
@@ -222,7 +226,8 @@ ipcMain.handle('show-about', () => {
     type: 'info',
     title: 'About CardioAI Pro',
     message: 'CardioAI Pro v1.0.0',
-    detail: 'AI-powered Electronic Medical Record System\nSpecialized in cardiovascular analysis and diagnostics\n\n© 2024 CardioAI Pro. All rights reserved.',
-    buttons: ['OK']
+    detail:
+      'AI-powered Electronic Medical Record System\nSpecialized in cardiovascular analysis and diagnostics\n\n© 2024 CardioAI Pro. All rights reserved.',
+    buttons: ['OK'],
   })
 })

@@ -417,7 +417,7 @@ class ECGAnalysisService:
                 "generated_at": datetime.utcnow().isoformat(),
                 "analysis_id": analysis.analysis_id,
                 "patient_id": analysis.patient_id,
-                
+
                 "patient_info": {
                     "analysis_date": analysis.acquisition_date.isoformat() if analysis.acquisition_date else None,
                     "device_info": {
@@ -426,7 +426,7 @@ class ECGAnalysisService:
                         "serial": analysis.device_serial
                     }
                 },
-                
+
                 "technical_parameters": {
                     "sample_rate_hz": analysis.sample_rate,
                     "duration_seconds": analysis.duration_seconds,
@@ -436,7 +436,7 @@ class ECGAnalysisService:
                     "noise_level": analysis.noise_level,
                     "baseline_wander": analysis.baseline_wander
                 },
-                
+
                 # Clinical Measurements
                 "clinical_measurements": {
                     "heart_rate_bpm": analysis.heart_rate_bpm,
@@ -448,13 +448,13 @@ class ECGAnalysisService:
                         "qtc_interval_ms": analysis.qtc_interval_ms
                     }
                 },
-                
+
                 "ai_analysis": {
                     "confidence": analysis.ai_confidence,
                     "predictions": analysis.ai_predictions or {},
                     "interpretability": analysis.ai_interpretability or {}
                 },
-                
+
                 "clinical_assessment": {
                     "primary_diagnosis": analysis.primary_diagnosis,
                     "secondary_diagnoses": analysis.secondary_diagnoses or [],
@@ -464,7 +464,7 @@ class ECGAnalysisService:
                     "requires_immediate_attention": analysis.requires_immediate_attention,
                     "recommendations": analysis.recommendations or []
                 },
-                
+
                 # Detailed Measurements
                 "detailed_measurements": [
                     {
@@ -478,7 +478,7 @@ class ECGAnalysisService:
                     }
                     for m in measurements
                 ],
-                
+
                 "annotations": [
                     {
                         "type": a.annotation_type,
@@ -490,16 +490,16 @@ class ECGAnalysisService:
                     }
                     for a in annotations
                 ],
-                
+
                 "quality_assessment": {
-                    "overall_quality": "excellent" if analysis.signal_quality_score > 0.9 
+                    "overall_quality": "excellent" if analysis.signal_quality_score > 0.9
                                      else "good" if analysis.signal_quality_score > 0.7
                                      else "fair" if analysis.signal_quality_score > 0.5
                                      else "poor",
                     "quality_score": analysis.signal_quality_score,
                     "quality_issues": self._assess_quality_issues(analysis)
                 },
-                
+
                 "processing_info": {
                     "processing_started_at": analysis.processing_started_at.isoformat() if analysis.processing_started_at else None,
                     "processing_completed_at": analysis.processing_completed_at.isoformat() if analysis.processing_completed_at else None,
@@ -507,7 +507,7 @@ class ECGAnalysisService:
                     "ai_model_version": "1.0.0",
                     "analysis_version": "2.0.0"
                 },
-                
+
                 "compliance": {
                     "validated": analysis.is_validated,
                     "validation_required": analysis.validation_required,
@@ -517,11 +517,11 @@ class ECGAnalysisService:
             }
 
             report["clinical_interpretation"] = self._generate_clinical_interpretation(analysis)
-            
+
             report["medical_recommendations"] = self._generate_medical_recommendations(analysis)
 
             logger.info(f"Medical report generated successfully: analysis_id={analysis.analysis_id}, report_id={report['report_id']}")
-            
+
             return report
 
         except Exception as e:
@@ -541,7 +541,7 @@ class ECGAnalysisService:
             "qrs_duration": {"min": 80, "max": 120, "unit": "ms"},
             "qt_interval": {"min": 350, "max": 450, "unit": "ms"}
         }
-        
+
         if measurement_type in normal_ranges:
             if isinstance(normal_ranges[measurement_type], dict) and lead_name in normal_ranges[measurement_type]:
                 return normal_ranges[measurement_type][lead_name]
@@ -549,28 +549,28 @@ class ECGAnalysisService:
                 return normal_ranges[measurement_type]["default"]
             else:
                 return normal_ranges[measurement_type]
-        
+
         return {"min": 0, "max": 0, "unit": "unknown"}
 
     def _assess_quality_issues(self, analysis: ECGAnalysis) -> list[str]:
         """Assess signal quality issues."""
         issues = []
-        
+
         if analysis.signal_quality_score < 0.7:
             issues.append("Low overall signal quality")
-        
+
         if analysis.noise_level and analysis.noise_level > 0.3:
             issues.append("High noise level detected")
-        
+
         if analysis.baseline_wander and analysis.baseline_wander > 0.2:
             issues.append("Significant baseline wander")
-        
+
         return issues
 
     def _generate_clinical_interpretation(self, analysis: ECGAnalysis) -> str:
         """Generate clinical interpretation text."""
         interpretation_parts = []
-        
+
         # Heart rate assessment
         if analysis.heart_rate_bpm:
             if analysis.heart_rate_bpm < 60:
@@ -579,55 +579,55 @@ class ECGAnalysisService:
                 interpretation_parts.append(f"Tachycardia present with heart rate of {analysis.heart_rate_bpm} bpm.")
             else:
                 interpretation_parts.append(f"Normal heart rate of {analysis.heart_rate_bpm} bpm.")
-        
+
         # Rhythm assessment
         if analysis.rhythm:
             if analysis.rhythm.lower() == "sinus":
                 interpretation_parts.append("Normal sinus rhythm.")
             else:
                 interpretation_parts.append(f"Rhythm: {analysis.rhythm}.")
-        
+
         # Interval assessment
         if analysis.pr_interval_ms and analysis.pr_interval_ms > 200:
             interpretation_parts.append("Prolonged PR interval suggesting first-degree AV block.")
-        
+
         if analysis.qtc_interval_ms and analysis.qtc_interval_ms > 450:
             interpretation_parts.append("Prolonged QTc interval - consider medication review and electrolyte assessment.")
-        
+
         if analysis.primary_diagnosis and analysis.primary_diagnosis != "Normal ECG":
             interpretation_parts.append(f"Primary finding: {analysis.primary_diagnosis}.")
-        
+
         if analysis.clinical_urgency == ClinicalUrgency.CRITICAL:
             interpretation_parts.append("CRITICAL: Immediate medical attention required.")
         elif analysis.clinical_urgency == ClinicalUrgency.HIGH:
             interpretation_parts.append("HIGH PRIORITY: Prompt medical evaluation recommended.")
-        
+
         return " ".join(interpretation_parts) if interpretation_parts else "Normal ECG within normal limits."
 
     def _generate_medical_recommendations(self, analysis: ECGAnalysis) -> list[str]:
         """Generate medical recommendations based on findings."""
         recommendations = []
-        
+
         if analysis.recommendations:
             recommendations.extend(analysis.recommendations)
-        
+
         if analysis.heart_rate_bpm:
             if analysis.heart_rate_bpm < 50:
                 recommendations.append("Consider pacemaker evaluation for severe bradycardia")
             elif analysis.heart_rate_bpm > 150:
                 recommendations.append("Evaluate for underlying causes of tachycardia")
-        
+
         if analysis.qtc_interval_ms and analysis.qtc_interval_ms > 500:
             recommendations.append("Monitor for torsades de pointes risk")
             recommendations.append("Review medications that may prolong QT interval")
-        
+
         if analysis.signal_quality_score and analysis.signal_quality_score < 0.6:
             recommendations.append("Consider repeat ECG due to poor signal quality")
-        
+
         if analysis.clinical_urgency == ClinicalUrgency.CRITICAL:
             recommendations.append("Activate emergency response protocol")
             recommendations.append("Continuous cardiac monitoring required")
         elif analysis.clinical_urgency == ClinicalUrgency.HIGH:
             recommendations.append("Cardiology consultation within 24 hours")
-        
+
         return list(set(recommendations))  # Remove duplicates

@@ -143,22 +143,22 @@ export const medicalAnimations = {
   bounce: 'animate-bounce',
   spin: 'animate-spin',
   ping: 'animate-ping',
-  
+
   heartbeat: 'animate-[heartbeat_1.5s_ease-in-out_infinite]',
   ecgLine: 'animate-[ecgLine_2s_linear_infinite]',
   breathe: 'animate-[breathe_2s_ease-in-out_infinite]',
   medicalPulse: 'animate-[medicalPulse_1.5s_ease-in-out_infinite]',
-  
+
   fadeIn: 'animate-[fadeIn_0.5s_ease-in-out]',
   slideIn: 'animate-[slideIn_0.3s_ease-in-out]',
   slideUp: 'animate-[slideUp_0.4s_ease-out]',
   scaleIn: 'animate-[scaleIn_0.2s_ease-out]',
-  
+
   holographicScan: 'animate-[holographicScan_3s_linear_infinite]',
   dataFlow: 'animate-[dataFlow_4s_linear_infinite]',
   shimmer: 'animate-[shimmer_1.5s_infinite]',
   float: 'animate-[float_3s_ease-in-out_infinite]',
-  
+
   gradientX: 'animate-[gradientX_15s_ease_infinite]',
   gradientY: 'animate-[gradientY_15s_ease_infinite]',
   gradientXY: 'animate-[gradientXY_15s_ease_infinite]',
@@ -195,10 +195,13 @@ export const medicalVariants = {
   },
   button: {
     primary: 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700',
-    secondary: 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
-    warning: 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600',
+    secondary:
+      'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
+    warning:
+      'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600',
     critical: 'bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700',
-    success: 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600',
+    success:
+      'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600',
     ghost: 'bg-transparent border border-gray-600 hover:bg-gray-800/50',
   },
   input: {
@@ -233,10 +236,10 @@ export const medicalTypography = {
 
 export const medicalSpacing = {
   xs: '0.25rem', // 4px
-  sm: '0.5rem',  // 8px
-  md: '1rem',    // 16px
-  lg: '1.5rem',  // 24px
-  xl: '2rem',    // 32px
+  sm: '0.5rem', // 8px
+  md: '1rem', // 16px
+  lg: '1.5rem', // 24px
+  xl: '2rem', // 32px
   '2xl': '3rem', // 48px
   '3xl': '4rem', // 64px
   '4xl': '6rem', // 96px
@@ -244,13 +247,13 @@ export const medicalSpacing = {
 
 export const medicalBorderRadius = {
   none: '0',
-  sm: '0.125rem',   // 2px
+  sm: '0.125rem', // 2px
   DEFAULT: '0.25rem', // 4px
-  md: '0.375rem',   // 6px
-  lg: '0.5rem',     // 8px
-  xl: '0.75rem',    // 12px
-  '2xl': '1rem',    // 16px
-  '3xl': '1.5rem',  // 24px
+  md: '0.375rem', // 6px
+  lg: '0.5rem', // 8px
+  xl: '0.75rem', // 12px
+  '2xl': '1rem', // 16px
+  '3xl': '1.5rem', // 24px
   full: '9999px',
 }
 

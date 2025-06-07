@@ -23,13 +23,12 @@ import {
   TrendingUp,
   TrendingDown,
   Activity,
-
   Pill,
   ScanLine,
   Sparkles,
   Heart,
   Zap,
-  Stethoscope
+  Stethoscope,
 } from 'lucide-react'
 import { AuthProvider } from './contexts/AuthContext'
 import { useAuth } from './hooks/useAuth'
@@ -613,12 +612,7 @@ const SPEIApp = (): JSX.Element => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <AIInsightPanel />
-          <ECGVisualization 
-            heartRate={72}
-            rhythm="Sinusal Normal"
-            isRealTime={true}
-            height={300}
-          />
+          <ECGVisualization heartRate={72} rhythm="Sinusal Normal" isRealTime={true} height={300} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

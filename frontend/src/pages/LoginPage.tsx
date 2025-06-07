@@ -48,7 +48,7 @@ const LoginPage: React.FC = () => {
           <BrainCircuit className="w-10 h-10" />
         </div>
       </div>
-      
+
       <div className="max-w-md w-full space-y-8 relative z-10">
         <div className="text-center">
           <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-3xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-2xl shadow-cyan-500/25 mb-8 relative">
@@ -61,19 +61,17 @@ const LoginPage: React.FC = () => {
               CardioAI Pro
             </span>
           </h2>
-          <p className="text-xl text-gray-300 mb-2">
-            Sistema de Análise Cardíaca com IA
-          </p>
+          <p className="text-xl text-gray-300 mb-2">Sistema de Análise Cardíaca com IA</p>
           <div className="flex items-center justify-center space-x-2 text-sm text-gray-400">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <span>Sistema Online</span>
           </div>
         </div>
-        
+
         <div className="bg-gray-900/40 backdrop-blur-xl rounded-3xl border border-gray-700/50 shadow-2xl p-8 relative overflow-hidden">
           {/* Glassmorphism overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-3xl"></div>
-          
+
           <form className="space-y-6 relative z-10" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl backdrop-blur-sm flex items-center space-x-2">
@@ -81,7 +79,7 @@ const LoginPage: React.FC = () => {
                 <span>{error}</span>
               </div>
             )}
-            
+
             <div className="space-y-4">
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-cyan-400 transition-colors" />
@@ -98,7 +96,7 @@ const LoginPage: React.FC = () => {
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/5 to-cyan-500/0 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
               </div>
-              
+
               <div className="relative group">
                 <Shield className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-cyan-400 transition-colors" />
                 <input

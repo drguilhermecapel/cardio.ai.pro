@@ -51,7 +51,7 @@ Object.defineProperty(HTMLCanvasElement.prototype, 'offsetHeight', {
   value: 200,
 })
 
-global.requestAnimationFrame = vi.fn((cb) => {
+global.requestAnimationFrame = vi.fn(cb => {
   setTimeout(cb, 16)
   return 1
 })

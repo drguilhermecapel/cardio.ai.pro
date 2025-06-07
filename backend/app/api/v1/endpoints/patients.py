@@ -142,9 +142,9 @@ async def get_patient_ecg_analyses(
     from app.services.ml_model_service import MLModelService
     from app.services.notification_service import NotificationService
     from app.services.validation_service import ValidationService
-    
+
     patient_service = PatientService(db)
-    
+
     patient = await patient_service.get_patient_by_patient_id(patient_id)
     if not patient:
         raise HTTPException(
