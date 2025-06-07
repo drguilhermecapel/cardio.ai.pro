@@ -17,10 +17,8 @@ from celery.exceptions import Retry
 
 from app.core.config import settings
 
-pytestmark = pytest.mark.skipif(
-    settings.STANDALONE_MODE, 
-    reason="Celery task tests skipped in standalone mode"
-)
+if settings.STANDALONE_MODE:
+    pytest.skip("Celery task tests skipped in standalone mode", allow_module_level=True)
 
 from app.tasks.ecg_tasks import process_ecg_analysis
 
