@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 if getattr(sys, 'frozen', False):
-    bundle_dir = Path(sys._MEIPASS)
+    bundle_dir = Path(getattr(sys, '_MEIPASS', ''))
     app_dir = bundle_dir / 'app'
     if app_dir.exists():
         sys.path.insert(0, str(app_dir))

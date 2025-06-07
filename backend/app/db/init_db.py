@@ -82,11 +82,11 @@ async def check_database_exists() -> bool:
     try:
         db_url = str(settings.DATABASE_URL)
         if "sqlite" in db_url:
-            db_path = db_url.replace("sqlite+aiosqlite:///", "")
-            if not db_path.startswith("/"):
-                db_path = Path.cwd() / db_path
+            db_path_str = db_url.replace("sqlite+aiosqlite:///", "")
+            if not db_path_str.startswith("/"):
+                db_path = Path.cwd() / db_path_str
             else:
-                db_path = Path(db_path)
+                db_path = Path(db_path_str)
 
             return db_path.exists() and db_path.is_file()
 
