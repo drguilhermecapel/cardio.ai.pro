@@ -6,7 +6,18 @@ ERROR: Node.js is not installed or not in PATH
 Please install Node.js from https://nodejs.org
 ```
 
-## ✅ Solução Simples
+## 🚀 Solução Automática (NOVA!)
+
+**O instalador agora baixa automaticamente o Node.js portátil!**
+
+Quando você executar o `build_installer.bat`, ele irá:
+1. ✅ Verificar se Node.js está instalado no sistema
+2. ✅ Se não encontrar, baixar automaticamente Node.js v18.19.0 portátil
+3. ✅ Extrair e configurar na pasta `portable_node/`
+4. ✅ Usar a versão portátil para build do frontend
+5. ✅ Não requer instalação manual ou modificação do PATH
+
+## ✅ Solução Manual (se automática falhar)
 
 ### Passo 1: Instalar Node.js
 1. **Acesse**: https://nodejs.org
@@ -30,9 +41,23 @@ v18.17.0
 ### Passo 3: Executar o Instalador
 Agora execute novamente o `build_installer.bat`
 
+## 📁 Estrutura do Node.js Portátil
+
+Após o download automático, a estrutura será:
+```
+windows_installer/
+├── portable_node/
+│   ├── node.exe          # Node.js executável
+│   ├── npm.cmd           # npm command
+│   ├── node_modules/     # Módulos Node.js
+│   └── ...
+├── build_installer.bat   # Script principal
+└── SOLUCAO_NODEJS.md    # Este arquivo
+```
+
 ## 🚀 Alternativa: Instalador Pré-Compilado
 
-Se preferir **não instalar Node.js**, você pode usar o instalador já compilado:
+Se preferir **não usar download automático**, você pode usar o instalador já compilado:
 
 ### Opção A: Baixar Executável Pronto
 - **Arquivo**: `CardioAI-Pro-1.0.0-portable.exe` (200MB)

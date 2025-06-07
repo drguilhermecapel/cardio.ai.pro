@@ -38,46 +38,81 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Check Node.js with version verification
+REM Check for Node.js - try portable version first, then system installation
+set PORTABLE_NODE_DIR=%~dp0portable_node
+set PORTABLE_NODE=%PORTABLE_NODE_DIR%\node.exe
+set PORTABLE_NPM=%PORTABLE_NODE_DIR%\npm.cmd
+
+if exist "%PORTABLE_NODE%" (
+    echo Found portable Node.js at: %PORTABLE_NODE%
+    set NODE_CMD=%PORTABLE_NODE%
+    set NPM_CMD=%PORTABLE_NPM%
+    goto :check_node_version
+)
+
+REM Check system Node.js installation
 node --version >nul 2>&1
 if errorlevel 1 (
     echo.
     echo ========================================
-    echo ERROR: Node.js is not installed or not in PATH
+    echo Node.js not found - downloading portable version...
     echo ========================================
     echo.
-    echo SOLUTION:
-    echo 1. Download Node.js LTS from: https://nodejs.org
-    echo 2. During installation, check "Add to PATH"
-    echo 3. Restart Command Prompt after installation
-    echo 4. Run this script again
-    echo.
-    echo For detailed instructions, see: SOLUCAO_NODEJS.md
-    echo.
-    pause
-    exit /b 1
+    call :download_portable_nodejs
+    if errorlevel 1 (
+        echo.
+        echo ========================================
+        echo ERROR: Failed to download portable Node.js
+        echo ========================================
+        echo.
+        echo MANUAL SOLUTION:
+        echo 1. Download Node.js LTS from: https://nodejs.org
+        echo 2. During installation, check "Add to PATH"
+        echo 3. Restart Command Prompt after installation
+        echo 4. Run this script again
+        echo.
+        echo For detailed instructions, see: SOLUCAO_NODEJS.md
+        echo.
+        pause
+        exit /b 1
+    )
+    set NODE_CMD=%PORTABLE_NODE%
+    set NPM_CMD=%PORTABLE_NPM%
+) else (
+    echo Found system Node.js installation
+    set NODE_CMD=node
+    set NPM_CMD=npm
 )
 
+:check_node_version
+
 REM Verify Node.js version is 16+
-for /f "tokens=1" %%i in ('node --version') do set NODE_VERSION=%%i
+for /f "tokens=1" %%i in ('"%NODE_CMD%" --version') do set NODE_VERSION=%%i
 echo Found Node.js version: %NODE_VERSION%
-node -e "process.exit(parseInt(process.version.slice(1)) >= 16 ? 0 : 1)" >nul 2>&1
+"%NODE_CMD%" -e "process.exit(parseInt(process.version.slice(1)) >= 16 ? 0 : 1)" >nul 2>&1
 if errorlevel 1 (
     echo.
     echo ========================================
     echo ERROR: Node.js version 16+ required, found %NODE_VERSION%
     echo ========================================
     echo.
-    echo SOLUTION:
-    echo 1. Download Node.js LTS (v18 or v20) from: https://nodejs.org
-    echo 2. Uninstall old version first if needed
-    echo 3. Install new version with "Add to PATH" checked
-    echo 4. Restart Command Prompt and run this script again
-    echo.
-    echo For detailed instructions, see: SOLUCAO_NODEJS.md
-    echo.
-    pause
-    exit /b 1
+    echo Attempting to download newer portable Node.js...
+    call :download_portable_nodejs
+    if errorlevel 1 (
+        echo.
+        echo MANUAL SOLUTION:
+        echo 1. Download Node.js LTS (v18 or v20) from: https://nodejs.org
+        echo 2. Uninstall old version first if needed
+        echo 3. Install new version with "Add to PATH" checked
+        echo 4. Run this script again
+        echo.
+        echo For detailed instructions, see: SOLUCAO_NODEJS.md
+        echo.
+        pause
+        exit /b 1
+    )
+    set NODE_CMD=%PORTABLE_NODE%
+    set NPM_CMD=%PORTABLE_NPM%
 )
 
 REM Check NSIS (optional - will provide instructions if missing)
@@ -153,8 +188,8 @@ if not exist "..\frontend" (
     exit /b 1
 )
 
-REM Check if npm/yarn is available
-npm --version >nul 2>&1
+REM Check if npm is available
+"%NPM_CMD%" --version >nul 2>&1
 if errorlevel 1 (
     echo.
     echo ========================================
@@ -301,3 +336,46 @@ if "%NSIS_AVAILABLE%"=="true" (
 
 echo.
 pause
+
+REM Function to download portable Node.js
+:download_portable_nodejs
+echo Downloading portable Node.js v18.19.0...
+set NODE_URL=https://nodejs.org/dist/v18.19.0/node-v18.19.0-win-x64.zip
+set NODE_ZIP=%TEMP%\node-portable.zip
+
+REM Create portable_node directory
+if not exist "%PORTABLE_NODE_DIR%" mkdir "%PORTABLE_NODE_DIR%"
+
+REM Download Node.js using PowerShell
+powershell -Command "try { Invoke-WebRequest -Uri '%NODE_URL%' -OutFile '%NODE_ZIP%' -UseBasicParsing; Write-Host 'Download completed' } catch { Write-Host 'Download failed:' $_.Exception.Message; exit 1 }"
+if errorlevel 1 (
+    echo Failed to download Node.js
+    exit /b 1
+)
+
+REM Extract Node.js using PowerShell
+echo Extracting portable Node.js...
+powershell -Command "try { Expand-Archive -Path '%NODE_ZIP%' -DestinationPath '%TEMP%\node-extract' -Force; Write-Host 'Extraction completed' } catch { Write-Host 'Extraction failed:' $_.Exception.Message; exit 1 }"
+if errorlevel 1 (
+    echo Failed to extract Node.js
+    del "%NODE_ZIP%" >nul 2>&1
+    exit /b 1
+)
+
+REM Move files to portable_node directory
+echo Setting up portable Node.js...
+xcopy "%TEMP%\node-extract\node-v18.19.0-win-x64\*" "%PORTABLE_NODE_DIR%\" /E /I /Y >nul
+if errorlevel 1 (
+    echo Failed to setup portable Node.js
+    del "%NODE_ZIP%" >nul 2>&1
+    rmdir /s /q "%TEMP%\node-extract" >nul 2>&1
+    exit /b 1
+)
+
+REM Cleanup
+del "%NODE_ZIP%" >nul 2>&1
+rmdir /s /q "%TEMP%\node-extract" >nul 2>&1
+
+echo ✅ Portable Node.js installed successfully!
+echo Location: %PORTABLE_NODE_DIR%
+exit /b 0
