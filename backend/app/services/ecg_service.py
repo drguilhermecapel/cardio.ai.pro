@@ -492,9 +492,9 @@ class ECGAnalysisService:
                 ],
 
                 "quality_assessment": {
-                    "overall_quality": "excellent" if analysis.signal_quality_score > 0.9
-                                     else "good" if analysis.signal_quality_score > 0.7
-                                     else "fair" if analysis.signal_quality_score > 0.5
+                    "overall_quality": "excellent" if analysis.signal_quality_score and analysis.signal_quality_score > 0.9
+                                     else "good" if analysis.signal_quality_score and analysis.signal_quality_score > 0.7
+                                     else "fair" if analysis.signal_quality_score and analysis.signal_quality_score > 0.5
                                      else "poor",
                     "quality_score": analysis.signal_quality_score,
                     "quality_issues": self._assess_quality_issues(analysis)
@@ -530,33 +530,41 @@ class ECGAnalysisService:
 
     def _get_normal_range(self, measurement_type: str, lead_name: str) -> dict[str, float]:
         """Get normal range for a measurement type and lead."""
-        normal_ranges = {
+        normal_ranges: dict[str, dict[str, dict[str, float]] | dict[str, float]] = {
             "amplitude": {
-                "default": {"min": -5.0, "max": 5.0, "unit": "mV"},
-                "V1": {"min": -1.0, "max": 3.0, "unit": "mV"},
-                "V5": {"min": 0.5, "max": 2.5, "unit": "mV"}
+                "default": {"min": -5.0, "max": 5.0, "unit": 0.0},
+                "V1": {"min": -1.0, "max": 3.0, "unit": 0.0},
+                "V5": {"min": 0.5, "max": 2.5, "unit": 0.0}
             },
-            "heart_rate": {"min": 60, "max": 100, "unit": "bpm"},
-            "pr_interval": {"min": 120, "max": 200, "unit": "ms"},
-            "qrs_duration": {"min": 80, "max": 120, "unit": "ms"},
-            "qt_interval": {"min": 350, "max": 450, "unit": "ms"}
+            "heart_rate": {"min": 60.0, "max": 100.0, "unit": 0.0},
+            "pr_interval": {"min": 120.0, "max": 200.0, "unit": 0.0},
+            "qrs_duration": {"min": 80.0, "max": 120.0, "unit": 0.0},
+            "qt_interval": {"min": 350.0, "max": 450.0, "unit": 0.0}
         }
 
         if measurement_type in normal_ranges:
-            if isinstance(normal_ranges[measurement_type], dict) and lead_name in normal_ranges[measurement_type]:
-                return normal_ranges[measurement_type][lead_name]
-            elif isinstance(normal_ranges[measurement_type], dict) and "default" in normal_ranges[measurement_type]:
-                return normal_ranges[measurement_type]["default"]
-            else:
-                return normal_ranges[measurement_type]
+            range_data = normal_ranges[measurement_type]
+            if isinstance(range_data, dict):
+                if lead_name in range_data:
+                    lead_data = range_data[lead_name]
+                    if isinstance(lead_data, dict):
+                        return lead_data
+                elif "default" in range_data:
+                    default_data = range_data["default"]
+                    if isinstance(default_data, dict):
+                        return default_data
+                else:
+                    if isinstance(range_data, dict) and all(isinstance(v, (int, float)) for v in range_data.values()):
+                        return {k: float(v) for k, v in range_data.items() if isinstance(v, (int, float))}
+                    return {"min": 0.0, "max": 0.0, "unit": 0.0}
 
-        return {"min": 0, "max": 0, "unit": "unknown"}
+        return {"min": 0.0, "max": 0.0, "unit": 0.0}
 
     def _assess_quality_issues(self, analysis: ECGAnalysis) -> list[str]:
         """Assess signal quality issues."""
         issues = []
 
-        if analysis.signal_quality_score < 0.7:
+        if analysis.signal_quality_score and analysis.signal_quality_score < 0.7:
             issues.append("Low overall signal quality")
 
         if analysis.noise_level and analysis.noise_level > 0.3:
