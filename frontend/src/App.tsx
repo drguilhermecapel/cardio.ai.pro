@@ -23,14 +23,20 @@ import {
   TrendingUp,
   TrendingDown,
   Activity,
-  AlertTriangle,
+
   Pill,
   ScanLine,
   Sparkles,
+  Heart,
+  Zap,
+  Stethoscope
 } from 'lucide-react'
 import { AuthProvider } from './contexts/AuthContext'
 import { useAuth } from './hooks/useAuth'
 import LoginPage from './pages/LoginPage'
+import MedicalCard from './components/ui/MedicalCard'
+import ECGVisualization from './components/ui/ECGVisualization'
+import AIInsightPanel from './components/ui/AIInsightPanel'
 
 const SPEIApp = (): JSX.Element => {
   const [activeModule, setActiveModule] = useState('dashboard')
@@ -150,8 +156,9 @@ const SPEIApp = (): JSX.Element => {
 
   const Header = (): JSX.Element => {
     return (
-      <header className="fixed top-0 left-0 right-0 h-16 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800 z-40">
-        <div className="flex items-center justify-between h-full px-6">
+      <header className="fixed top-0 left-0 right-0 h-16 bg-gray-900/80 backdrop-blur-xl border-b border-gray-800/50 z-40 shadow-lg">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/5 to-purple-500/10"></div>
+        <div className="relative flex items-center justify-between h-full px-6">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -272,11 +279,12 @@ const SPEIApp = (): JSX.Element => {
 
   const Sidebar = (): JSX.Element => (
     <aside
-      className={`fixed left-0 top-16 h-full bg-gray-900/90 backdrop-blur-xl text-white transition-all duration-300 z-30 border-r border-gray-800 ${
+      className={`fixed left-0 top-16 h-full bg-gray-900/80 backdrop-blur-xl text-white transition-all duration-300 z-30 border-r border-gray-800/50 ${
         sidebarOpen ? 'w-64' : 'w-20'
       }`}
     >
-      <nav className="mt-8 px-4">
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-purple-500/5"></div>
+      <nav className="relative mt-8 px-4">
         {modules.map(module => {
           const Icon = module.icon
           const isActive = activeModule === module.id
@@ -604,84 +612,71 @@ const SPEIApp = (): JSX.Element => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-            <div className="relative bg-gray-900/80 backdrop-blur-xl rounded-2xl p-6 border border-gray-700">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-purple-400" />
-                  AI Insights em Tempo Real
-                </h3>
-                <span className="text-xs text-gray-400">Atualizado há 2 min</span>
-              </div>
-              <div className="space-y-3">
-                <div className="p-4 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-xl border border-red-500/20">
-                  <div className="flex items-start space-x-3">
-                    <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-white">Alerta de Sepse</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        2 pacientes apresentam sinais precoces. Protocolo automático ativado.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-xl border border-yellow-500/20">
-                  <div className="flex items-start space-x-3">
-                    <Pill className="w-5 h-5 text-yellow-400 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-white">Interações Medicamentosas</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        3 prescrições requerem revisão por possíveis interações.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl border border-blue-500/20">
-                  <div className="flex items-start space-x-3">
-                    <TrendingUp className="w-5 h-5 text-blue-400 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-white">Otimização de Fluxo</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Sugestão: Reorganizar agenda pode reduzir tempo de espera em 23%.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button className="mt-4 w-full py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-pink-700 transition-all">
-                Ver Análise Completa
-              </button>
+          <AIInsightPanel />
+          <ECGVisualization 
+            heartRate={72}
+            rhythm="Sinusal Normal"
+            isRealTime={true}
+            height={300}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <MedicalCard
+            title="Frequência Cardíaca"
+            value={72}
+            unit="BPM"
+            icon={Heart}
+            trend="stable"
+            trendValue="Normal"
+            severity="normal"
+          />
+          <MedicalCard
+            title="Pressão Arterial"
+            value="120/80"
+            unit="mmHg"
+            icon={Activity}
+            trend="up"
+            trendValue="+2%"
+            severity="normal"
+          />
+          <MedicalCard
+            title="Saturação O2"
+            value={98}
+            unit="%"
+            icon={Stethoscope}
+            trend="stable"
+            trendValue="Estável"
+            severity="normal"
+          />
+        </div>
+
+        <div className="bg-gray-900/80 backdrop-blur-xl rounded-2xl p-6 border border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Zap className="w-5 h-5 text-cyan-400" />
+              Monitoramento em Tempo Real
+            </h3>
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-xs text-gray-400">Live</span>
             </div>
           </div>
 
-          <div className="bg-gray-900/80 backdrop-blur-xl rounded-2xl p-6 border border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Activity className="w-5 h-5 text-cyan-400" />
-                Monitoramento em Tempo Real
-              </h3>
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-xs text-gray-400">Live</span>
-              </div>
+          <ActivityChart />
+
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-cyan-400">98.2%</p>
+              <p className="text-xs text-gray-400">Uptime Sistema</p>
             </div>
-
-            <ActivityChart />
-
-            <div className="grid grid-cols-3 gap-4 mt-6">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-cyan-400">98.2%</p>
-                <p className="text-xs text-gray-400">Uptime Sistema</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-400">1.2s</p>
-                <p className="text-xs text-gray-400">Resp. Média IA</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-purple-400">847</p>
-                <p className="text-xs text-gray-400">Análises/hora</p>
-              </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-green-400">1.2s</p>
+              <p className="text-xs text-gray-400">Resp. Média IA</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-purple-400">847</p>
+              <p className="text-xs text-gray-400">Análises/hora</p>
             </div>
           </div>
         </div>
