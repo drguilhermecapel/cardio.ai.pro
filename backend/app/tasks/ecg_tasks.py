@@ -14,7 +14,7 @@ if not settings.STANDALONE_MODE:
     try:
         from celery import current_task
 
-        from app.core.celery import celery_app  # type: ignore
+        from app.core.celery import celery_app
 
         CELERY_AVAILABLE = True
     except ImportError:
@@ -48,8 +48,8 @@ def process_ecg_analysis_sync_wrapper(analysis_id: int) -> dict[str, Any]:
     """Synchronous wrapper for standalone mode"""
     return asyncio.run(process_ecg_analysis_sync(analysis_id))
 
-if CELERY_AVAILABLE:
-    @celery_app.task(bind=True)  # type: ignore
+if CELERY_AVAILABLE and celery_app is not None:
+    @celery_app.task(bind=True)  # type: ignore[misc]
     def process_ecg_analysis(self: Any, analysis_id: int) -> dict[str, Any]:
         """Process ECG analysis in background"""
         try:

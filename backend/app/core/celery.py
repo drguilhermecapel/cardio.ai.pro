@@ -1,4 +1,7 @@
+from typing import Any
 from app.core.config import settings
+
+celery_app: Any = None
 
 if not settings.STANDALONE_MODE:
     try:
@@ -29,5 +32,3 @@ if not settings.STANDALONE_MODE:
 
     except ImportError:
         celery_app = None
-else:
-    celery_app = None
