@@ -1,35 +1,94 @@
 # CardioAI Pro
 
-Sistema de prontuário eletrônico com análise de ECG baseada em inteligência artificial.
+Sistema de análise de ECG com IA para diagnóstico médico avançado.
 
-## Instalação para Windows
+## 🚀 Versão Standalone Disponível!
 
-### Instalação Simples (Recomendada)
+**Nova versão simplificada para Windows - Instalação com clique duplo!**
 
-1. **Baixe o instalador**: `CardioAI-Pro-Installer.exe`
-2. **Execute como administrador**: Clique com o botão direito no arquivo e selecione "Executar como administrador"
-3. **Siga o assistente de instalação**: Aceite a licença e escolha o diretório de instalação
-4. **Inicie o aplicativo**: Use o atalho criado na área de trabalho ou no menu Iniciar
+### Downloads Standalone
+- **[CardioAI-Pro-v1.0.0-Setup.exe](CardioAI-Pro-v1.0.0-Setup.exe)** (38.6 MB) - Instalador profissional
+- **[install-cardioai-pro-standalone.bat](install-cardioai-pro-standalone.bat)** - Instalação automática
+- **[CardioAI-Pro-v1.0.0-Portable.zip](CardioAI-Pro-v1.0.0-Portable.zip)** (40.4 MB) - Versão portátil
 
-O CardioAI Pro será instalado como um aplicativo desktop completo, sem necessidade de Docker, linha de comando ou configurações técnicas.
+### Instalação Simples
+```bash
+# 1. Baixe os arquivos (instalador + script)
+# 2. Coloque na mesma pasta
+# 3. Clique duas vezes em: install-cardioai-pro-standalone.bat
+# 4. Pronto! Sistema instalado e funcionando
+```
 
-### Características da Instalação
+**📖 [Guia Completo da Versão Standalone](README-STANDALONE.md)**
 
-- ✅ **Instalação com um clique**: Sem configurações complexas
-- ✅ **Sem dependências externas**: Não requer Docker, PostgreSQL ou Redis
-- ✅ **Banco de dados local**: Usa SQLite para armazenamento seguro
-- ✅ **Interface web integrada**: Abre automaticamente no navegador
-- ✅ **Atalhos convenientes**: Ícones na área de trabalho e menu Iniciar
-- ✅ **Desinstalação limpa**: Remove completamente o aplicativo quando necessário
+---
 
-### Requisitos do Sistema
+## Características
 
-- **Sistema Operacional**: Windows 10 ou superior
-- **Memória RAM**: Mínimo 4GB, recomendado 8GB
-- **Espaço em disco**: 2GB livres
-- **Navegador**: Chrome, Firefox, Edge ou Safari atualizado
+- 🔬 Análise automática de ECG com IA
+- 📊 Interface web responsiva
+- 🏥 Compliance médico (ANVISA/FDA)
+- 🔒 Segurança LGPD/HIPAA
+- 📱 API REST completa
+- 🚀 Deploy com Docker
+- 💻 **NOVO**: Versão standalone para Windows
 
-### Para Desenvolvedores
+## Versões Disponíveis
+
+### 🖥️ Standalone (Windows)
+- ✅ Instalação simples (clique duplo)
+- ✅ Sem Docker ou dependências
+- ✅ Processamento 100% local
+- ✅ Ideal para usuários finais
+- ❌ Apenas Windows
+- ❌ Funcionalidades limitadas
+
+### 🐳 Docker (Multiplataforma)
+- ✅ Funcionalidades completas
+- ✅ Multiplataforma (Linux/Mac/Windows)
+- ✅ Escalabilidade
+- ✅ Ideal para desenvolvimento
+- ❌ Requer conhecimento técnico
+- ❌ Configuração complexa
+
+## Instalação
+
+### 🎯 Versão Standalone (Recomendada para Usuários)
+
+**Requisitos**: Apenas Windows 7+ (64-bit)
+
+```bash
+# Método 1: Instalação Automática
+1. Baixe: install-cardioai-pro-standalone.bat + CardioAI-Pro-v1.0.0-Setup.exe
+2. Coloque na mesma pasta
+3. Clique duas vezes no arquivo .bat
+4. Aguarde a instalação
+5. Use o atalho da área de trabalho
+
+# Método 2: Versão Portátil
+1. Baixe: CardioAI-Pro-v1.0.0-Portable.zip
+2. Extraia para uma pasta
+3. Clique duas vezes em: CardioAI-Pro.bat
+4. Sistema inicia automaticamente
+```
+
+### 🐳 Versão Docker (Para Desenvolvedores)
+
+**Requisitos**: Docker, Docker Compose, Git, 8GB RAM
+
+```bash
+# Clone o repositório
+git clone https://github.com/drguilhermecapel/cardio.ai.pro.git
+cd cardio.ai.pro
+
+# Inicie os serviços
+docker-compose up -d
+
+# Acesse a aplicação
+open http://localhost:3000
+```
+
+### 🔧 Compilação do Instalador (Para Desenvolvedores)
 
 Se você deseja compilar o instalador a partir do código fonte:
 
@@ -51,6 +110,30 @@ Se você deseja compilar o instalador a partir do código fonte:
 
 Para instruções detalhadas de desenvolvimento, consulte `windows_installer/README.md`.
 
-### Instalação Manual (Avançada)
+## Uso
 
-Para instalação manual usando Docker, consulte o arquivo `INSTALACAO.md`.
+### Interface Web
+
+**Versão Standalone**
+- **URL**: http://localhost:8000 (abre automaticamente)
+- **Login**: admin / admin123
+
+**Versão Docker**
+- **URL**: http://localhost:3000
+- **Admin**: admin@cardioai.pro / admin123
+- **Docs API**: http://localhost:8000/docs
+
+## Suporte
+
+- 📧 Email: suporte@cardioai.pro
+- 💬 Discord: [CardioAI Community](https://discord.gg/cardioai)
+- 📖 Docs: [docs.cardioai.pro](https://docs.cardioai.pro)
+- 🐛 Issues: [GitHub Issues](https://github.com/drguilhermecapel/cardio.ai.pro/issues)
+
+### Documentação Adicional
+- **[README-STANDALONE.md](README-STANDALONE.md)** - Guia completo da versão standalone
+- **[INSTALACAO-STANDALONE.md](INSTALACAO-STANDALONE.md)** - Instruções detalhadas de instalação
+
+---
+
+**CardioAI Pro** - Revolucionando o diagnóstico de ECG com Inteligência Artificial 🚀

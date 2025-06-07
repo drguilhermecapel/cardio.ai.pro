@@ -25,6 +25,7 @@ from app.services.ml_model_service import MLModelService
 from app.services.notification_service import NotificationService
 from app.services.user_service import UserService
 from app.services.validation_service import ValidationService
+from app.tasks.ecg_tasks import process_ecg_analysis_sync
 
 router = APIRouter()
 
@@ -72,11 +73,17 @@ async def upload_ecg(
         created_by=current_user.id,
     )
 
+    try:
+        await process_ecg_analysis_sync(analysis.id)
+        message = "ECG uploaded and analyzed successfully."
+    except Exception as e:
+        message = f"ECG uploaded but analysis failed: {str(e)}"
+
     return ECGUploadResponse(
         analysis_id=analysis.analysis_id,
-        message="ECG uploaded successfully. Analysis started.",
+        message=message,
         status=analysis.status,
-        estimated_processing_time_seconds=30,
+        estimated_processing_time_seconds=0,
     )
 
 

@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import neurokit2 as nk
+# import neurokit2 as nk  # Removed for standalone version
 import numpy as np
 from numpy.typing import NDArray
 
@@ -168,7 +168,20 @@ class ECGProcessor:
             for i in range(processed_data.shape[1]):
                 lead_data = processed_data[:, i]
 
-                cleaned_signal = nk.ecg_clean(lead_data, sampling_rate=500)
+                from scipy.signal import butter, filtfilt
+                
+                cleaned_signal = lead_data - np.mean(lead_data)
+                
+                nyquist = 500 / 2
+                low = 0.5 / nyquist
+                high = 40.0 / nyquist
+                
+                try:
+                    b, a = butter(4, [low, high], btype='band')
+                    cleaned_signal = filtfilt(b, a, cleaned_signal)
+                except Exception:
+                    pass
+                
                 processed_data[:, i] = cleaned_signal
 
             return processed_data

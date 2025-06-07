@@ -31,8 +31,8 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "cardioai_dev_password"
     POSTGRES_DB: str = "cardioai_pro"
     POSTGRES_PORT: int = 5432
-    DATABASE_URL: str | None = None
-    TEST_DATABASE_URL: str | None = None
+    DATABASE_URL: str = "sqlite+aiosqlite:///./cardioai.db"
+    TEST_DATABASE_URL: str = "sqlite+aiosqlite:///./cardioai_test.db"
     STANDALONE_MODE: bool = True
 
     @field_validator("DATABASE_URL", mode="before")
@@ -60,6 +60,10 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         values = info.data
+        
+        if values.get("STANDALONE_MODE", True):
+            return "sqlite+aiosqlite:///./cardioai_test.db"
+            
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
         host = values.get("POSTGRES_SERVER")
@@ -169,6 +173,8 @@ class Settings(BaseSettings):
 
     AUDIT_LOG_RETENTION_DAYS: int = 2555  # 7 years
     ENABLE_DIGITAL_SIGNATURES: bool = True
+    
+    MODELS_DIR: str = "models"
     REQUIRE_AUDIT_TRAIL: bool = True
 
     FIRST_SUPERUSER: str = "admin@cardioai.pro"
