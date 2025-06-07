@@ -15,6 +15,13 @@ import asyncio
 from unittest.mock import Mock, patch, AsyncMock
 from celery.exceptions import Retry
 
+from app.core.config import settings
+
+pytestmark = pytest.mark.skipif(
+    settings.STANDALONE_MODE, 
+    reason="Celery task tests skipped in standalone mode"
+)
+
 from app.tasks.ecg_tasks import process_ecg_analysis
 
 

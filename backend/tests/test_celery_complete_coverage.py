@@ -14,6 +14,13 @@ import pytest
 from unittest.mock import Mock, patch
 from celery import Celery
 
+from app.core.config import settings
+
+pytestmark = pytest.mark.skipif(
+    settings.STANDALONE_MODE, 
+    reason="Celery tests skipped in standalone mode"
+)
+
 from app.core.celery import celery_app
 
 
