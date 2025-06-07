@@ -7,19 +7,19 @@ setlocal enabledelayedexpansion
 title CardioAI Pro v1.0.0 - Windows Installer
 
 echo.
-echo ╔══════════════════════════════════════════════════════════════════════════════╗
-echo ║                          CardioAI Pro v1.0.0                              ║
-echo ║                   Sistema de Análise de ECG com IA                       ║
-echo ║                                                                              ║
-echo ║  ✓ Análise automática de ECG com IA                                      ║
-echo ║  ✓ Compliance médico ANVISA/FDA                                          ║
-echo ║  ✓ Interface web responsiva                                              ║
-echo ║  ✓ API REST completa                                                     ║
-echo ║  ✓ Segurança LGPD/HIPAA                                                  ║
-echo ╚══════════════════════════════════════════════════════════════════════════════╝
+echo ================================================================================
+echo                          CardioAI Pro v1.0.0                              
+echo                   Sistema de Analise de ECG com IA                       
+echo                                                                              
+echo   * Analise automatica de ECG com IA                                      
+echo   * Compliance medico ANVISA/FDA                                          
+echo   * Interface web responsiva                                              
+echo   * API REST completa                                                     
+echo   * Seguranca LGPD/HIPAA                                                  
+echo ================================================================================
 echo.
 
-echo [INFO] Verificando privilégios de administrador...
+echo [INFO] Verificando privilegios de administrador...
 
 :: Check if running as administrator
 net session >nul 2>&1
@@ -34,17 +34,36 @@ if %errorLevel% neq 0 (
     exit /b 1
 )
 
-echo [OK] Privilégios de administrador confirmados
+echo [OK] Privilegios de administrador confirmados
 
 echo.
-echo [INFO] Iniciando instalação avançada via PowerShell...
-echo [INFO] O PowerShell irá gerenciar a instalação completa do sistema
+echo [INFO] Iniciando instalacao avancada via PowerShell...
+echo [INFO] O PowerShell ira gerenciar a instalacao completa do sistema
 
 :: Check if PowerShell is available
-powershell -Command "Get-Host" >nul 2>&1
+where powershell >nul 2>&1
 if %errorLevel% neq 0 (
-    echo [ERROR] PowerShell não está disponível neste sistema
-    echo [INFO] PowerShell 5.1+ é necessário para a instalação
+    echo [ERROR] PowerShell nao esta disponivel neste sistema
+    echo [INFO] PowerShell 5.1+ e necessario para a instalacao
+    echo.
+    echo Solucoes:
+    echo 1. Instale o PowerShell 5.1+ do site da Microsoft
+    echo 2. Ou use o Windows 10/11 que ja inclui PowerShell
+    echo 3. Verifique se PowerShell esta no PATH do sistema
+    echo.
+    pause
+    exit /b 1
+)
+
+:: Test PowerShell execution
+powershell -Command "Write-Host 'PowerShell OK'" >nul 2>&1
+if %errorLevel% neq 0 (
+    echo [ERROR] PowerShell encontrado mas nao pode executar comandos
+    echo [INFO] Verifique as politicas de execucao do PowerShell
+    echo.
+    echo Para corrigir, execute como Administrador:
+    echo Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    echo.
     pause
     exit /b 1
 )
@@ -55,14 +74,14 @@ powershell -ExecutionPolicy Bypass -File "%~dp0install-cardioai-pro.ps1"
 :: Check PowerShell script exit code
 if %errorLevel% neq 0 (
     echo.
-    echo [ERROR] A instalação encontrou problemas
+    echo [ERROR] A instalacao encontrou problemas
     echo [INFO] Verifique as mensagens acima para mais detalhes
     pause
     exit /b 1
 )
 
 echo.
-echo [SUCCESS] Instalação concluída com sucesso!
-echo [INFO] O CardioAI Pro está pronto para uso
+echo [SUCCESS] Instalacao concluida com sucesso!
+echo [INFO] O CardioAI Pro esta pronto para uso
 echo.
 pause
