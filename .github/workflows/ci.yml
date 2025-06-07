@@ -101,6 +101,12 @@ jobs:
       with:
         node-version: '18'
     
+    - name: Increase Node memory
+      run: echo "NODE_OPTIONS=--max-old-space-size=8192" >> $GITHUB_ENV
+
+    - name: Clear npm cache
+      run: npm cache clean --force
+    
     - name: Install dependencies
       working-directory: ./frontend
       run: npm install
