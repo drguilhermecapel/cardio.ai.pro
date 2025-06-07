@@ -554,8 +554,8 @@ class ECGAnalysisService:
                     if isinstance(default_data, dict):
                         return default_data
                 else:
-                    if isinstance(range_data, dict) and all(isinstance(v, (int, float)) for v in range_data.values()):
-                        return {k: float(v) for k, v in range_data.items() if isinstance(v, (int, float))}
+                    if isinstance(range_data, dict) and all(isinstance(v, int | float) for v in range_data.values()):
+                        return {k: float(v) for k, v in range_data.items() if isinstance(v, int | float)}
                     return {"min": 0.0, "max": 0.0, "unit": 0.0}
 
         return {"min": 0.0, "max": 0.0, "unit": 0.0}
