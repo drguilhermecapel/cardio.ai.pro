@@ -17,7 +17,7 @@ from app.api.v1.endpoints import (
 api_router = APIRouter()
 
 @api_router.get("/health")
-async def health_check():
+async def health_check() -> JSONResponse:
     """Health check endpoint for API v1."""
     return JSONResponse(
         content={
