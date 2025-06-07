@@ -3,14 +3,14 @@ from app.core.config import settings
 if not settings.STANDALONE_MODE:
     try:
         from celery import Celery
-        
+
         celery_app = Celery(
             "cardioai",
             broker=settings.REDIS_URL,
             backend=settings.REDIS_URL,
             include=["app.tasks"]
         )
-        
+
         celery_app.conf.update(
             task_serializer="json",
             accept_content=["json"],
@@ -23,10 +23,10 @@ if not settings.STANDALONE_MODE:
             worker_prefetch_multiplier=1,
             worker_max_tasks_per_child=1000,
         )
-        
+
         if __name__ == "__main__":
             celery_app.start()
-            
+
     except ImportError:
         celery_app = None
 else:
