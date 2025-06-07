@@ -15,6 +15,9 @@ from app.core.exceptions import AuthenticationException
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
 
 def create_access_token(
     subject: str | Any,
@@ -145,6 +148,14 @@ def verify_digital_signature(
 def generate_file_hash(file_content: bytes) -> str:
     """Generate file hash for integrity verification."""
     return hashlib.sha256(file_content).hexdigest()
+
+
+def decode_access_token(token: str) -> dict[str, Any] | None:
+    """Decode access token and return payload."""
+    try:
+        return verify_token(token, "access")
+    except AuthenticationException:
+        return None
 
 
 def constant_time_compare(val1: str, val2: str) -> bool:
