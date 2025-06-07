@@ -143,6 +143,8 @@ class ECGMeasurement(Base):
 
     normal_min: Mapped[float | None] = mapped_column(Float)
     normal_max: Mapped[float | None] = mapped_column(Float)
+    
+    source: Mapped[str] = mapped_column(String(20), nullable=False, default="algorithm")
 
     analysis: Mapped["ECGAnalysis"] = relationship("ECGAnalysis", back_populates="measurements")
 
