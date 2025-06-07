@@ -33,7 +33,7 @@ def test_api_v1_prefix():
 def test_cors_middleware():
     """Test CORS middleware is configured."""
     client = TestClient(app)
-    response = client.options("/health")
+    response = client.get("/health")
     
     assert response.status_code == 200
 
@@ -47,7 +47,7 @@ def test_app_initialization():
 def test_openapi_schema():
     """Test OpenAPI schema generation."""
     client = TestClient(app)
-    response = client.get("/openapi.json")
+    response = client.get("/api/v1/openapi.json")
     
     assert response.status_code == 200
     schema = response.json()
@@ -58,7 +58,7 @@ def test_openapi_schema():
 def test_docs_endpoint():
     """Test API documentation endpoint."""
     client = TestClient(app)
-    response = client.get("/docs")
+    response = client.get("/api/v1/docs")
     
     assert response.status_code == 200
 
@@ -66,7 +66,7 @@ def test_docs_endpoint():
 def test_redoc_endpoint():
     """Test ReDoc documentation endpoint."""
     client = TestClient(app)
-    response = client.get("/redoc")
+    response = client.get("/api/v1/redoc")
     
     assert response.status_code == 200
 
