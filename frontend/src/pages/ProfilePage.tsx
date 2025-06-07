@@ -55,7 +55,7 @@ const ProfilePage: React.FC = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000))
       setMessage({ type: 'success', text: 'Profile updated successfully!' })
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Failed to update profile. Please try again.' })
     } finally {
       setIsLoading(false)
@@ -85,7 +85,7 @@ const ProfilePage: React.FC = () => {
         newPassword: '',
         confirmPassword: '',
       }))
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Failed to change password. Please try again.' })
     } finally {
       setIsLoading(false)
