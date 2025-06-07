@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
     DATABASE_URL: str | None = None
     TEST_DATABASE_URL: str | None = None
+    STANDALONE_MODE: bool = True
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
@@ -41,6 +42,10 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         values = info.data
+        
+        if values.get("STANDALONE_MODE", True):
+            return "sqlite+aiosqlite:///./cardioai.db"
+            
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
         host = values.get("POSTGRES_SERVER")
@@ -76,6 +81,10 @@ class Settings(BaseSettings):
             return v
 
         values = info.data
+        
+        if values.get("STANDALONE_MODE", True):
+            return ""
+
         password = values.get("REDIS_PASSWORD")
         auth = f":{password}@" if password else ""
 
@@ -137,6 +146,10 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         values = info.data
+        
+        if values.get("STANDALONE_MODE", True):
+            return ""
+            
         redis_url = values.get("REDIS_URL")
         return str(redis_url) if redis_url else "redis://localhost:6379/0"
 
@@ -147,6 +160,10 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         values = info.data
+        
+        if values.get("STANDALONE_MODE", True):
+            return ""
+            
         redis_url = values.get("REDIS_URL")
         return str(redis_url) if redis_url else "redis://localhost:6379/0"
 

@@ -1,46 +1,56 @@
-# cardio.ai.pro
-Program to evaluate EKG
+# CardioAI Pro
 
-## Quick Installation
+Sistema de prontuário eletrônico com análise de ECG baseada em inteligência artificial.
 
-### Windows Installation (Recommended)
-**Double-click Installation (PowerShell):**
-1. Download the repository files
-2. Right-click `install-cardioai-pro.bat` and select "Run as administrator"
-3. Follow the automated installation process
+## Instalação para Windows
 
-**Alternative Manual Installation (No PowerShell):**
-1. Download the repository files
-2. Double-click `install-cardioai-pro-simple.bat`
-3. Follow the step-by-step manual instructions
+### Instalação Simples (Recomendada)
 
-**PowerShell Direct:**
-```powershell
-# Run as Administrator
-.\install-cardioai-pro.ps1
-```
+1. **Baixe o instalador**: `CardioAI-Pro-Installer.exe`
+2. **Execute como administrador**: Clique com o botão direito no arquivo e selecione "Executar como administrador"
+3. **Siga o assistente de instalação**: Aceite a licença e escolha o diretório de instalação
+4. **Inicie o aplicativo**: Use o atalho criado na área de trabalho ou no menu Iniciar
 
-### Linux Installation
-**GUI Installation:**
-Double-click the `cardio-ai-pro-installer.desktop` file to start the interactive installer.
+O CardioAI Pro será instalado como um aplicativo desktop completo, sem necessidade de Docker, linha de comando ou configurações técnicas.
 
-**Command Line Installation:**
-```bash
-./install-cardioai-pro.sh
-```
+### Características da Instalação
 
-## System Requirements
+- ✅ **Instalação com um clique**: Sem configurações complexas
+- ✅ **Sem dependências externas**: Não requer Docker, PostgreSQL ou Redis
+- ✅ **Banco de dados local**: Usa SQLite para armazenamento seguro
+- ✅ **Interface web integrada**: Abre automaticamente no navegador
+- ✅ **Atalhos convenientes**: Ícones na área de trabalho e menu Iniciar
+- ✅ **Desinstalação limpa**: Remove completamente o aplicativo quando necessário
 
-### Windows
-- Windows 10 or higher
-- Administrator privileges
-- 4GB RAM minimum
-- Internet connection for downloading dependencies
+### Requisitos do Sistema
 
-### Linux
-- Ubuntu 20.04+ or compatible distribution
-- Docker 20.10+
-- Docker Compose 2.0+
-- 4GB RAM minimum
+- **Sistema Operacional**: Windows 10 ou superior
+- **Memória RAM**: Mínimo 4GB, recomendado 8GB
+- **Espaço em disco**: 2GB livres
+- **Navegador**: Chrome, Firefox, Edge ou Safari atualizado
 
-For detailed installation instructions, see [INSTALACAO.md](INSTALACAO.md).
+### Para Desenvolvedores
+
+Se você deseja compilar o instalador a partir do código fonte:
+
+1. **Clone o repositório**:
+   ```bash
+   git clone https://github.com/drguilhermecapel/cardio.ai.pro.git
+   cd cardio.ai.pro
+   ```
+
+2. **Navegue para o diretório do instalador**:
+   ```bash
+   cd windows_installer
+   ```
+
+3. **Execute o script de compilação**:
+   ```bash
+   build_installer.bat
+   ```
+
+Para instruções detalhadas de desenvolvimento, consulte `windows_installer/README.md`.
+
+### Instalação Manual (Avançada)
+
+Para instalação manual usando Docker, consulte o arquivo `INSTALACAO.md`.
