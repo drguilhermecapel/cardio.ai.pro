@@ -15,6 +15,8 @@ if getattr(sys, 'frozen', False):
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.api import api_router
+
 
 # Simplified startup for standalone version
 def create_app() -> FastAPI:
@@ -35,6 +37,8 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    app.include_router(api_router, prefix="/api/v1")
 
     return app
 
