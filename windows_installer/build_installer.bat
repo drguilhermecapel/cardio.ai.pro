@@ -41,8 +41,19 @@ if errorlevel 1 (
 REM Check Node.js with version verification
 node --version >nul 2>&1
 if errorlevel 1 (
+    echo.
+    echo ========================================
     echo ERROR: Node.js is not installed or not in PATH
-    echo Please install Node.js 16+ from https://nodejs.org
+    echo ========================================
+    echo.
+    echo SOLUTION:
+    echo 1. Download Node.js LTS from: https://nodejs.org
+    echo 2. During installation, check "Add to PATH"
+    echo 3. Restart Command Prompt after installation
+    echo 4. Run this script again
+    echo.
+    echo For detailed instructions, see: SOLUCAO_NODEJS.md
+    echo.
     pause
     exit /b 1
 )
@@ -52,8 +63,19 @@ for /f "tokens=1" %%i in ('node --version') do set NODE_VERSION=%%i
 echo Found Node.js version: %NODE_VERSION%
 node -e "process.exit(parseInt(process.version.slice(1)) >= 16 ? 0 : 1)" >nul 2>&1
 if errorlevel 1 (
+    echo.
+    echo ========================================
     echo ERROR: Node.js version 16+ required, found %NODE_VERSION%
-    echo Please upgrade Node.js from https://nodejs.org
+    echo ========================================
+    echo.
+    echo SOLUTION:
+    echo 1. Download Node.js LTS (v18 or v20) from: https://nodejs.org
+    echo 2. Uninstall old version first if needed
+    echo 3. Install new version with "Add to PATH" checked
+    echo 4. Restart Command Prompt and run this script again
+    echo.
+    echo For detailed instructions, see: SOLUCAO_NODEJS.md
+    echo.
     pause
     exit /b 1
 )
@@ -134,8 +156,21 @@ if not exist "..\frontend" (
 REM Check if npm/yarn is available
 npm --version >nul 2>&1
 if errorlevel 1 (
+    echo.
+    echo ========================================
     echo ERROR: npm not found but Node.js was detected earlier
-    echo This might indicate a PATH issue or incomplete Node.js installation
+    echo ========================================
+    echo.
+    echo This indicates a PATH issue or incomplete Node.js installation
+    echo.
+    echo SOLUTION:
+    echo 1. Reinstall Node.js from https://nodejs.org
+    echo 2. Make sure to check "Add to PATH" during installation
+    echo 3. Restart your computer (not just Command Prompt)
+    echo 4. Run this script again
+    echo.
+    echo For detailed instructions, see: SOLUCAO_NODEJS.md
+    echo.
     pause
     exit /b 1
 )
