@@ -25,9 +25,9 @@ def create_app() -> FastAPI:
         title="CardioAI Pro API",
         description="Standalone ECG Analysis System",
         version="1.0.0",
-        docs_url="/docs",
-        redoc_url="/redoc",
-        openapi_url="/openapi.json",
+        docs_url="/api/v1/docs",
+        redoc_url="/api/v1/redoc",
+        openapi_url="/api/v1/openapi.json",
     )
 
     app.add_middleware(
