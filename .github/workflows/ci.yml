@@ -245,8 +245,76 @@ jobs:
       if: always()
       run: docker compose down -v
 
+  installer-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Validate Linux installer
+      run: |
+        echo "🔍 Validating Linux installer script..."
+        
+        # Check if installer exists and is executable
+        if [ ! -f "install-cardioai-pro.sh" ]; then
+          echo "❌ Linux installer script not found"
+          exit 1
+        fi
+        
+        # Check script syntax
+        bash -n install-cardioai-pro.sh
+        if [ $? -ne 0 ]; then
+          echo "❌ Linux installer has syntax errors"
+          exit 1
+        fi
+        
+        echo "✅ Linux installer validation passed"
+    
+    - name: Validate Windows installers
+      run: |
+        echo "🔍 Validating Windows installer scripts..."
+        
+        # Check if PowerShell script exists
+        if [ ! -f "install-cardioai-pro.ps1" ]; then
+          echo "❌ PowerShell installer script not found"
+          exit 1
+        fi
+        
+        # Check if batch script exists
+        if [ ! -f "install-cardioai-pro.bat" ]; then
+          echo "❌ Batch installer script not found"
+          exit 1
+        fi
+        
+        # Validate PowerShell script reference in batch file
+        if ! grep -q "install-cardioai-pro.ps1" install-cardioai-pro.bat; then
+          echo "❌ Batch script doesn't reference PowerShell script correctly"
+          exit 1
+        fi
+        
+        echo "✅ Windows installer validation passed"
+    
+    - name: Check for non-existent installer references
+      run: |
+        echo "🔍 Checking for references to non-existent installers..."
+        
+        # Check README for standalone installer references
+        if grep -q "CardioAI-Pro-v.*-Setup.exe\|CardioAI-Pro-v.*-Portable.zip\|install-cardioai-pro-standalone.bat" README.md; then
+          echo "❌ README contains references to non-existent standalone installers"
+          exit 1
+        fi
+        
+        # Check for orphaned standalone files
+        if [ -f "install-cardioai-pro-standalone.bat" ] || [ -f "README-STANDALONE.md" ] || [ -f "INSTALACAO-STANDALONE.md" ]; then
+          echo "❌ Orphaned standalone installer files found"
+          exit 1
+        fi
+        
+        echo "✅ No references to non-existent installers found"
+
   security-scan:
     runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests, installer-validation]
     permissions:
       contents: read
       security-events: write
