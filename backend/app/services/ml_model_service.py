@@ -54,20 +54,20 @@ class MLModelService:
     def _load_model(self, model_name: str, model_path: str) -> None:
         """Load a single ONNX model."""
         try:
-            providers = ['CPUExecutionProvider']
+            providers = ["CPUExecutionProvider"]
 
-            if ort.get_device() == 'GPU':
-                providers.insert(0, 'CUDAExecutionProvider')
+            if ort.get_device() == "GPU":
+                providers.insert(0, "CUDAExecutionProvider")
 
             session_options = ort.SessionOptions()
-            session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            session_options.graph_optimization_level = (
+                ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            )
             session_options.intra_op_num_threads = 4
             session_options.inter_op_num_threads = 2
 
             session = ort.InferenceSession(
-                model_path,
-                sess_options=session_options,
-                providers=providers
+                model_path, sess_options=session_options, providers=providers
             )
 
             self.models[model_name] = session
@@ -89,7 +89,9 @@ class MLModelService:
 
         except Exception as e:
             logger.error(f"Failed to load model {model_name}: {str(e)}")
-            raise MLModelException(f"Failed to load model {model_name}: {str(e)}") from e
+            raise MLModelException(
+                f"Failed to load model {model_name}: {str(e)}"
+            ) from e
 
     async def analyze_ecg(
         self,
@@ -165,7 +167,7 @@ class MLModelService:
         try:
             if ecg_data.shape[1] < 12:
                 padded_data = np.zeros((ecg_data.shape[0], 12), dtype=np.float32)
-                padded_data[:, :ecg_data.shape[1]] = ecg_data
+                padded_data[:, : ecg_data.shape[1]] = ecg_data
                 ecg_data = padded_data
             elif ecg_data.shape[1] > 12:
                 ecg_data = ecg_data[:, :12].astype(np.float32)
@@ -173,17 +175,20 @@ class MLModelService:
             target_sample_rate = 500
             if sample_rate != target_sample_rate:
                 from scipy import signal
+
                 num_samples = int(ecg_data.shape[0] * target_sample_rate / sample_rate)
                 ecg_data = signal.resample(ecg_data, num_samples, axis=0)
 
-            ecg_data = (ecg_data - np.mean(ecg_data, axis=0)) / (np.std(ecg_data, axis=0) + 1e-8)
+            ecg_data = (ecg_data - np.mean(ecg_data, axis=0)) / (
+                np.std(ecg_data, axis=0) + 1e-8
+            )
 
             target_length = 5000
             if ecg_data.shape[0] > target_length:
                 ecg_data = ecg_data[:target_length, :]
             elif ecg_data.shape[0] < target_length:
                 padded_data = np.zeros((target_length, 12), dtype=np.float32)
-                padded_data[:ecg_data.shape[0], :] = ecg_data
+                padded_data[: ecg_data.shape[0], :] = ecg_data
                 ecg_data = padded_data
 
             ecg_data = np.expand_dims(ecg_data.T, axis=0).astype(np.float32)
@@ -194,7 +199,9 @@ class MLModelService:
             logger.error(f"Preprocessing failed: {str(e)}")
             raise MLModelException(f"Preprocessing failed: {str(e)}") from e
 
-    async def _run_classification(self, data: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
+    async def _run_classification(
+        self, data: "np.ndarray[Any, np.dtype[np.float32]]"
+    ) -> dict[str, Any]:
         """Run ECG classification model."""
         try:
             model = self.models["ecg_classifier"]
@@ -237,7 +244,9 @@ class MLModelService:
             logger.error(f"Classification failed: {str(e)}")
             return {"predictions": {}, "confidence": 0.0}
 
-    async def _run_rhythm_detection(self, data: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
+    async def _run_rhythm_detection(
+        self, data: "np.ndarray[Any, np.dtype[np.float32]]"
+    ) -> dict[str, Any]:
         """Run rhythm detection model."""
         try:
             model = self.models["rhythm_detector"]
@@ -257,16 +266,22 @@ class MLModelService:
             ]
 
             rhythm_idx = np.argmax(rhythm_probs)
-            rhythm = rhythm_types[rhythm_idx] if rhythm_idx < len(rhythm_types) else "Unknown"
+            rhythm = (
+                rhythm_types[rhythm_idx]
+                if rhythm_idx < len(rhythm_types)
+                else "Unknown"
+            )
 
             events = []
             if rhythm != "Sinus Rhythm" and rhythm_probs[rhythm_idx] > 0.7:
-                events.append({
-                    "label": f"{rhythm}_detected",
-                    "time_ms": 0.0,
-                    "confidence": float(rhythm_probs[rhythm_idx]),
-                    "properties": {"rhythm_type": rhythm},
-                })
+                events.append(
+                    {
+                        "label": f"{rhythm}_detected",
+                        "time_ms": 0.0,
+                        "confidence": float(rhythm_probs[rhythm_idx]),
+                        "properties": {"rhythm_type": rhythm},
+                    }
+                )
 
             return {
                 "rhythm": rhythm,
@@ -278,7 +293,9 @@ class MLModelService:
             logger.error(f"Rhythm detection failed: {str(e)}")
             return {"rhythm": "Unknown", "events": []}
 
-    async def _run_quality_assessment(self, data: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
+    async def _run_quality_assessment(
+        self, data: "np.ndarray[Any, np.dtype[np.float32]]"
+    ) -> dict[str, Any]:
         """Run signal quality assessment model."""
         try:
             model = self.models["quality_assessor"]
@@ -303,7 +320,9 @@ class MLModelService:
             return {"score": 0.5, "issues": ["Quality assessment unavailable"]}
 
     async def _generate_interpretability(
-        self, data: "np.ndarray[Any, np.dtype[np.float32]]", classification_results: dict[str, Any]
+        self,
+        data: "np.ndarray[Any, np.dtype[np.float32]]",
+        classification_results: dict[str, Any],
     ) -> dict[str, Any]:
         """Generate interpretability maps using gradient-based methods."""
         try:
@@ -313,9 +332,25 @@ class MLModelService:
                 "explanation": "AI detected patterns consistent with the predicted condition",
             }
 
-            leads = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+            leads = [
+                "I",
+                "II",
+                "III",
+                "aVR",
+                "aVL",
+                "aVF",
+                "V1",
+                "V2",
+                "V3",
+                "V4",
+                "V5",
+                "V6",
+            ]
             for _i, lead in enumerate(leads):
-                attention = np.random.random(data.shape[2]) * classification_results["confidence"]
+                attention = (
+                    np.random.random(data.shape[2])
+                    * classification_results["confidence"]
+                )
                 attention_maps = interpretability["attention_maps"]
                 if isinstance(attention_maps, dict):
                     attention_maps[lead] = attention.tolist()

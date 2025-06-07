@@ -33,7 +33,7 @@ async def create_validation(
     if current_user.role not in [UserRoles.ADMIN, UserRoles.CARDIOLOGIST]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to assign validations"
+            detail="Insufficient permissions to assign validations",
         )
 
     notification_service = NotificationService(db)
@@ -106,18 +106,17 @@ async def get_validation(
     validation = await validation_service.repository.get_validation_by_id(validation_id)
     if not validation:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Validation not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Validation not found"
         )
 
     if (
-        not current_user.is_superuser and
-        validation.validator_id != current_user.id and
-        validation.analysis.created_by != current_user.id
+        not current_user.is_superuser
+        and validation.validator_id != current_user.id
+        and validation.analysis.created_by != current_user.id
     ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view this validation"
+            detail="Not authorized to view this validation",
         )
 
     return validation
@@ -132,8 +131,7 @@ async def get_pending_critical_validations(
     """Get pending critical validations."""
     if not current_user.is_physician:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
         )
 
     notification_service = NotificationService(db)
@@ -149,8 +147,8 @@ async def get_pending_critical_validations(
 
     validations = []
     for analysis in critical_analyses:
-        existing_validation = await validation_service.repository.get_validation_by_analysis(
-            analysis.id
+        existing_validation = (
+            await validation_service.repository.get_validation_by_analysis(analysis.id)
         )
         if existing_validation:
             validations.append(existing_validation)

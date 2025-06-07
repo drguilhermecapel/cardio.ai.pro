@@ -25,7 +25,10 @@ class MemoryMonitor:
                 "process_memory_mb": memory_info.rss / 1024 / 1024,
                 "process_memory_percent": process.memory_percent(),
                 "system_memory_total_gb": system_memory.total / 1024 / 1024 / 1024,
-                "system_memory_available_gb": system_memory.available / 1024 / 1024 / 1024,
+                "system_memory_available_gb": system_memory.available
+                / 1024
+                / 1024
+                / 1024,
                 "system_memory_percent": system_memory.percent,
             }
 

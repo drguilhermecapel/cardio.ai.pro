@@ -11,17 +11,20 @@ from app.core.constants import ValidationStatus
 
 class ValidationBase(BaseModel):
     """Base validation schema."""
+
     analysis_id: int
     validator_id: int
 
 
 class ValidationCreate(ValidationBase):
     """Validation creation schema."""
+
     pass
 
 
 class ValidationUpdate(BaseModel):
     """Validation update schema."""
+
     status: ValidationStatus | None = None
     agrees_with_ai: bool | None = None
     clinical_notes: str | None = None
@@ -39,6 +42,7 @@ class ValidationUpdate(BaseModel):
 
 class ValidationSubmit(BaseModel):
     """Validation submission schema."""
+
     approved: bool = True
     agrees_with_ai: bool | None = None
     clinical_notes: str | None = None
@@ -56,6 +60,7 @@ class ValidationSubmit(BaseModel):
 
 class ValidationInDB(ValidationBase):
     """Validation in database schema."""
+
     id: int
     status: ValidationStatus
     validation_date: datetime | None
@@ -82,11 +87,13 @@ class ValidationInDB(ValidationBase):
 
 class Validation(ValidationInDB):
     """Validation response schema."""
+
     pass
 
 
 class ValidationList(BaseModel):
     """Validation list response schema."""
+
     validations: list[Validation]
     total: int
     page: int

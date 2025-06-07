@@ -192,7 +192,7 @@ class NonECGImageException(CardioAIException):
         message: str,
         category: str,
         contextual_response: dict[str, Any],
-        confidence: float = 0.0
+        confidence: float = 0.0,
     ) -> None:
         super().__init__(
             message=message,
@@ -201,6 +201,6 @@ class NonECGImageException(CardioAIException):
             details={
                 "category": category,
                 "confidence": confidence,
-                "contextual_response": contextual_response
+                "contextual_response": contextual_response,
             },
         )

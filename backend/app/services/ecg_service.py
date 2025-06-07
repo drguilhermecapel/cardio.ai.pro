@@ -2,7 +2,6 @@
 ECG Analysis Service - Core ECG processing and analysis functionality.
 """
 
-import asyncio
 import hashlib
 import logging
 import uuid
@@ -67,8 +66,12 @@ class ECGAnalysisService:
             analysis.file_path = file_path
             analysis.file_hash = file_hash
             analysis.file_size = file_size
-            analysis.acquisition_date = ecg_metadata.get("acquisition_date", datetime.utcnow())
-            analysis.sample_rate = ecg_metadata.get("sample_rate", settings.ECG_SAMPLE_RATE)
+            analysis.acquisition_date = ecg_metadata.get(
+                "acquisition_date", datetime.utcnow()
+            )
+            analysis.sample_rate = ecg_metadata.get(
+                "sample_rate", settings.ECG_SAMPLE_RATE
+            )
             analysis.duration_seconds = ecg_metadata.get("duration_seconds", 10.0)
             analysis.leads_count = ecg_metadata.get("leads_count", 12)
             analysis.leads_names = ecg_metadata.get("leads_names", settings.ECG_LEADS)
@@ -150,11 +153,17 @@ class ECGAnalysisService:
                 "qt_interval_ms": measurements.get("qt_interval"),
                 "qtc_interval_ms": measurements.get("qtc_interval"),
                 "primary_diagnosis": clinical_assessment.get("primary_diagnosis"),
-                "secondary_diagnoses": clinical_assessment.get("secondary_diagnoses", []),
+                "secondary_diagnoses": clinical_assessment.get(
+                    "secondary_diagnoses", []
+                ),
                 "diagnosis_category": clinical_assessment.get("category"),
                 "icd10_codes": clinical_assessment.get("icd10_codes", []),
-                "clinical_urgency": clinical_assessment.get("urgency", ClinicalUrgency.LOW),
-                "requires_immediate_attention": clinical_assessment.get("critical", False),
+                "clinical_urgency": clinical_assessment.get(
+                    "urgency", ClinicalUrgency.LOW
+                ),
+                "requires_immediate_attention": clinical_assessment.get(
+                    "critical", False
+                ),
                 "recommendations": clinical_assessment.get("recommendations", []),
                 "signal_quality_score": quality_metrics.get("overall_score", 0.0),
                 "noise_level": quality_metrics.get("noise_level", 0.0),
@@ -195,11 +204,13 @@ class ECGAnalysisService:
                     "status": AnalysisStatus.FAILED,
                     "error_message": str(e),
                     "retry_count": analysis.retry_count + 1 if analysis else 1,
-                }
+                },
             )
 
             if analysis and analysis.retry_count < 3:
-                logger.info(f"Analysis {analysis_id} failed, retry would be handled by caller")
+                logger.info(
+                    f"Analysis {analysis_id} failed, retry would be handled by caller"
+                )
 
     async def _calculate_file_info(self, file_path: str) -> tuple[str, int]:
         """Calculate file hash and size."""
@@ -227,20 +238,27 @@ class ECGAnalysisService:
 
             if ecg_data.shape[0] > sample_rate:
                 lead_ii = ecg_data[:, 1] if ecg_data.shape[1] > 1 else ecg_data[:, 0]
-                
+
                 from scipy.signal import find_peaks
-                peaks, _ = find_peaks(lead_ii, height=np.std(lead_ii), distance=sample_rate//3)
-                
+
+                peaks, _ = find_peaks(
+                    lead_ii, height=np.std(lead_ii), distance=sample_rate // 3
+                )
+
                 if len(peaks) > 1:
                     rr_intervals = np.diff(peaks) / sample_rate * 1000  # ms
                     heart_rate = 60000 / np.mean(rr_intervals)  # bpm
-                    measurements["heart_rate"] = int(heart_rate) if not np.isnan(heart_rate) else 75
-                    
+                    measurements["heart_rate"] = (
+                        int(heart_rate) if not np.isnan(heart_rate) else 75
+                    )
+
                     avg_rr = np.mean(rr_intervals)
                     measurements["pr_interval"] = int(avg_rr * 0.16)
                     measurements["qrs_duration"] = 100
                     measurements["qt_interval"] = int(avg_rr * 0.4)
-                    measurements["qtc_interval"] = int(measurements["qt_interval"] / np.sqrt(avg_rr / 1000))
+                    measurements["qtc_interval"] = int(
+                        measurements["qt_interval"] / np.sqrt(avg_rr / 1000)
+                    )
                 else:
                     measurements["heart_rate"] = 75  # Default
                     measurements["pr_interval"] = 160
@@ -248,18 +266,35 @@ class ECGAnalysisService:
                     measurements["qt_interval"] = 400
                     measurements["qtc_interval"] = 420
 
-            for i, lead_name in enumerate(["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]):
+            for i, lead_name in enumerate(
+                [
+                    "I",
+                    "II",
+                    "III",
+                    "aVR",
+                    "aVL",
+                    "aVF",
+                    "V1",
+                    "V2",
+                    "V3",
+                    "V4",
+                    "V5",
+                    "V6",
+                ]
+            ):
                 if i < ecg_data.shape[1]:
                     lead_data = ecg_data[:, i]
 
-                    detailed_measurements.append({
-                        "measurement_type": "amplitude",
-                        "lead_name": lead_name,
-                        "value": float(np.max(lead_data) - np.min(lead_data)),
-                        "unit": "mV",
-                        "confidence": 0.9,
-                        "source": "algorithm",
-                    })
+                    detailed_measurements.append(
+                        {
+                            "measurement_type": "amplitude",
+                            "lead_name": lead_name,
+                            "value": float(np.max(lead_data) - np.min(lead_data)),
+                            "unit": "mV",
+                            "confidence": 0.9,
+                            "source": "algorithm",
+                        }
+                    )
 
             measurements["detailed_measurements"] = detailed_measurements
 
@@ -281,32 +316,39 @@ class ECGAnalysisService:
         try:
             if ecg_data.shape[0] > sample_rate:
                 lead_ii = ecg_data[:, 1] if ecg_data.shape[1] > 1 else ecg_data[:, 0]
-                
+
                 from scipy.signal import find_peaks
-                peaks, _ = find_peaks(lead_ii, height=np.std(lead_ii), distance=sample_rate//3)
-                
+
+                peaks, _ = find_peaks(
+                    lead_ii, height=np.std(lead_ii), distance=sample_rate // 3
+                )
+
                 for peak_idx in peaks:
                     time_ms = (peak_idx / sample_rate) * 1000
-                    
-                    annotations.append({
-                        "annotation_type": "beat",
-                        "label": "R_peak",
-                        "time_ms": float(time_ms),
-                        "confidence": 0.85,
-                        "source": "algorithm",
-                        "properties": {"peak_amplitude": float(lead_ii[peak_idx])},
-                    })
+
+                    annotations.append(
+                        {
+                            "annotation_type": "beat",
+                            "label": "R_peak",
+                            "time_ms": float(time_ms),
+                            "confidence": 0.85,
+                            "source": "algorithm",
+                            "properties": {"peak_amplitude": float(lead_ii[peak_idx])},
+                        }
+                    )
 
             if "events" in ai_results:
                 for event in ai_results["events"]:
-                    annotations.append({
-                        "annotation_type": "event",
-                        "label": event.get("label", "unknown"),
-                        "time_ms": float(event.get("time_ms", 0)),
-                        "confidence": float(event.get("confidence", 0.5)),
-                        "source": "ai",
-                        "properties": event.get("properties", {}),
-                    })
+                    annotations.append(
+                        {
+                            "annotation_type": "event",
+                            "label": event.get("label", "unknown"),
+                            "time_ms": float(event.get("time_ms", 0)),
+                            "confidence": float(event.get("confidence", 0.5)),
+                            "source": "ai",
+                            "properties": event.get("properties", {}),
+                        }
+                    )
 
             return annotations
 
@@ -314,9 +356,7 @@ class ECGAnalysisService:
             logger.error(f"Failed to generate annotations: {str(e)}")
             return []
 
-    def _assess_clinical_urgency(
-        self, ai_results: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _assess_clinical_urgency(self, ai_results: dict[str, Any]) -> dict[str, Any]:
         """Assess clinical urgency based on AI results."""
         assessment = {
             "urgency": ClinicalUrgency.LOW,
@@ -344,7 +384,9 @@ class ECGAnalysisService:
                 if predictions.get(condition, 0.0) > 0.7:
                     assessment["urgency"] = ClinicalUrgency.CRITICAL
                     assessment["critical"] = True
-                    assessment["primary_diagnosis"] = condition.replace("_", " ").title()
+                    assessment["primary_diagnosis"] = condition.replace(
+                        "_", " "
+                    ).title()
                     assessment["category"] = DiagnosisCategory.ARRHYTHMIA
                     recommendations = assessment["recommendations"]
                     if isinstance(recommendations, list):
@@ -361,17 +403,23 @@ class ECGAnalysisService:
                 for condition in high_priority_conditions:
                     if predictions.get(condition, 0.0) > 0.6:
                         assessment["urgency"] = ClinicalUrgency.HIGH
-                        assessment["primary_diagnosis"] = condition.replace("_", " ").title()
+                        assessment["primary_diagnosis"] = condition.replace(
+                            "_", " "
+                        ).title()
                         assessment["category"] = DiagnosisCategory.ARRHYTHMIA
                         recommendations = assessment["recommendations"]
                         if isinstance(recommendations, list):
-                            recommendations.append("Cardiology consultation recommended")
+                            recommendations.append(
+                                "Cardiology consultation recommended"
+                            )
                         break
 
             if confidence < 0.7:
                 recommendations = assessment["recommendations"]
                 if isinstance(recommendations, list):
-                    recommendations.append("Manual review recommended due to low AI confidence")
+                    recommendations.append(
+                        "Manual review recommended due to low AI confidence"
+                    )
 
             return assessment
 

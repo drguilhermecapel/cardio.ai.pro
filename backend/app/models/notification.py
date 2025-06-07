@@ -46,7 +46,9 @@ class Notification(Base):
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     delivery_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    last_delivery_attempt: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_delivery_attempt: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
     delivery_status: Mapped[str | None] = mapped_column(String(50))
 
     notification_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSON)
@@ -104,11 +106,15 @@ class NotificationPreference(Base):
     enabled_channels: Mapped[list[str]] = mapped_column(JSON, nullable=False)
 
     quiet_hours_start: Mapped[str | None] = mapped_column(String(5))  # HH:MM
-    quiet_hours_end: Mapped[str | None] = mapped_column(String(5))    # HH:MM
+    quiet_hours_end: Mapped[str | None] = mapped_column(String(5))  # HH:MM
     timezone: Mapped[str] = mapped_column(String(50), nullable=False, default="UTC")
 
-    escalation_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    escalation_delay_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)
+    escalation_enabled: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
+    escalation_delay_minutes: Mapped[int] = mapped_column(
+        Integer, default=30, nullable=False
+    )
     escalation_channels: Mapped[list[str] | None] = mapped_column(JSON)
 
     def __repr__(self) -> str:

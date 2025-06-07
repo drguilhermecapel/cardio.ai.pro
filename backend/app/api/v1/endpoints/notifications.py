@@ -55,8 +55,7 @@ async def mark_notification_read(
 
     if not success:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Notification not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found"
         )
 
     return {"message": "Notification marked as read"}

@@ -34,8 +34,7 @@ async def create_patient(
     existing = await patient_service.get_patient_by_patient_id(patient_data.patient_id)
     if existing:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Patient ID already exists"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Patient ID already exists"
         )
 
     patient = await patient_service.create_patient(patient_data, current_user.id)
@@ -54,8 +53,7 @@ async def get_patient(
     patient = await patient_service.get_patient_by_patient_id(patient_id)
     if not patient:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Patient not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
         )
 
     return patient
@@ -74,8 +72,7 @@ async def update_patient(
     patient = await patient_service.get_patient_by_patient_id(patient_id)
     if not patient:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Patient not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
         )
 
     update_data = patient_update.dict(exclude_unset=True)

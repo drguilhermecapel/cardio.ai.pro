@@ -22,15 +22,21 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    username: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    username: Mapped[str] = mapped_column(
+        String(50), unique=True, index=True, nullable=False
+    )
+    email: Mapped[str] = mapped_column(
+        String(255), unique=True, index=True, nullable=False
+    )
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
 
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
     phone: Mapped[str | None] = mapped_column(String(20))
 
-    role: Mapped[UserRoles] = mapped_column(String(20), nullable=False, default=UserRoles.VIEWER)
+    role: Mapped[UserRoles] = mapped_column(
+        String(20), nullable=False, default=UserRoles.VIEWER
+    )
     license_number: Mapped[str | None] = mapped_column(String(50))
     specialty: Mapped[str | None] = mapped_column(String(100))
     institution: Mapped[str | None] = mapped_column(String(200))
@@ -41,17 +47,23 @@ class User(Base):
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     last_login: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    failed_login_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    failed_login_attempts: Mapped[int] = mapped_column(
+        Integer, default=0, nullable=False
+    )
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     digital_signature_key: Mapped[str | None] = mapped_column(Text)
-    signature_created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    signature_created_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
 
     notification_preferences: Mapped[str | None] = mapped_column(Text)  # JSON
     ui_preferences: Mapped[str | None] = mapped_column(Text)  # JSON
 
     analyses: Mapped[list["ECGAnalysis"]] = relationship(
-        "ECGAnalysis", back_populates="created_by_user", foreign_keys="ECGAnalysis.created_by"
+        "ECGAnalysis",
+        back_populates="created_by_user",
+        foreign_keys="ECGAnalysis.created_by",
     )
     validations: Mapped[list["Validation"]] = relationship(
         "Validation", back_populates="validator", foreign_keys="Validation.validator_id"
@@ -74,9 +86,9 @@ class User(Base):
     def can_validate_critical(self) -> bool:
         """Check if user can validate critical findings."""
         return (
-            self.role in [UserRoles.CARDIOLOGIST, UserRoles.PHYSICIAN] and
-            self.experience_years is not None and
-            self.experience_years >= 5
+            self.role in [UserRoles.CARDIOLOGIST, UserRoles.PHYSICIAN]
+            and self.experience_years is not None
+            and self.experience_years >= 5
         )
 
 
@@ -97,7 +109,9 @@ class APIKey(Base):
     last_used: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     usage_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    rate_limit_per_minute: Mapped[int] = mapped_column(Integer, default=60, nullable=False)
+    rate_limit_per_minute: Mapped[int] = mapped_column(
+        Integer, default=60, nullable=False
+    )
 
     def __repr__(self) -> str:
         return f"<APIKey(id={self.id}, name='{self.name}', user_id={self.user_id})>"
@@ -116,11 +130,11 @@ class UserSession(Base):
     user_agent: Mapped[str] = mapped_column(Text, nullable=False)
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
     last_activity: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
     def __repr__(self) -> str:

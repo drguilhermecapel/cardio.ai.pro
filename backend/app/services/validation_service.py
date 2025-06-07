@@ -54,9 +54,7 @@ class ValidationService:
                 raise ValidationException("Analysis not found")
 
             if not self._can_validate(
-                validator_role,
-                validator_experience_years,
-                analysis.clinical_urgency
+                validator_role, validator_experience_years, analysis.clinical_urgency
             ):
                 raise PermissionDeniedException(
                     "Insufficient permissions to validate this analysis"
@@ -99,13 +97,17 @@ class ValidationService:
                 raise ValidationException("Validation not found")
 
             if validation.validator_id != validator_id:
-                raise PermissionDeniedException("Not authorized to submit this validation")
+                raise PermissionDeniedException(
+                    "Not authorized to submit this validation"
+                )
 
             if validation.status != ValidationStatus.PENDING:
                 raise ValidationException("Validation already completed")
 
             update_data = {
-                "status": ValidationStatus.APPROVED if validation_data.get("approved", True) else ValidationStatus.REJECTED,
+                "status": ValidationStatus.APPROVED
+                if validation_data.get("approved", True)
+                else ValidationStatus.REJECTED,
                 "validation_date": datetime.utcnow(),
                 "agrees_with_ai": validation_data.get("agrees_with_ai"),
                 "clinical_notes": validation_data.get("clinical_notes"),
@@ -117,20 +119,28 @@ class ValidationService:
                 "recommendations": validation_data.get("recommendations", []),
                 "follow_up_required": validation_data.get("follow_up_required", False),
                 "follow_up_notes": validation_data.get("follow_up_notes"),
-                "validation_duration_minutes": validation_data.get("validation_duration_minutes"),
+                "validation_duration_minutes": validation_data.get(
+                    "validation_duration_minutes"
+                ),
             }
 
             if validation_data.get("digital_signature"):
                 update_data["digital_signature"] = validation_data["digital_signature"]
                 update_data["signature_timestamp"] = datetime.utcnow()
 
-            updated_validation = await self.repository.update_validation(validation_id, update_data)
+            updated_validation = await self.repository.update_validation(
+                validation_id, update_data
+            )
             if not updated_validation:
                 raise ValidationException("Failed to update validation")
 
-            await self._update_analysis_validation_status(updated_validation.analysis_id)
+            await self._update_analysis_validation_status(
+                updated_validation.analysis_id
+            )
 
-            await self._calculate_quality_metrics(updated_validation.analysis_id, validation_data)
+            await self._calculate_quality_metrics(
+                updated_validation.analysis_id, validation_data
+            )
 
             await self._send_validation_notifications(updated_validation)
 
@@ -164,8 +174,7 @@ class ValidationService:
 
             if available_validators:
                 validator = max(
-                    available_validators,
-                    key=lambda v: v.experience_years or 0
+                    available_validators, key=lambda v: v.experience_years or 0
                 )
 
                 await self.create_validation(
@@ -190,7 +199,9 @@ class ValidationService:
                 f"Failed to create urgent validation: error={str(e)}, analysis_id={analysis_id}"
             )
 
-    async def run_automated_validation_rules(self, analysis_id: int) -> list[ValidationResult]:
+    async def run_automated_validation_rules(
+        self, analysis_id: int
+    ) -> list[ValidationResult]:
         """Run automated validation rules on analysis."""
         try:
             rules = await self.repository.get_active_validation_rules()
@@ -237,9 +248,9 @@ class ValidationService:
             if validator_role == UserRoles.CARDIOLOGIST:
                 return True
             if (
-                validator_role == UserRoles.PHYSICIAN and
-                validator_experience_years and
-                validator_experience_years >= settings.MIN_EXPERIENCE_YEARS_CRITICAL
+                validator_role == UserRoles.PHYSICIAN
+                and validator_experience_years
+                and validator_experience_years >= settings.MIN_EXPERIENCE_YEARS_CRITICAL
             ):
                 return True
             return False
@@ -262,7 +273,7 @@ class ValidationService:
             return True
         if analysis.requires_immediate_attention:
             return True
-        ai_confidence = getattr(analysis, 'ai_confidence', None)
+        ai_confidence = getattr(analysis, "ai_confidence", None)
         if ai_confidence is not None and ai_confidence < 0.7:
             return True
         return False
@@ -273,7 +284,8 @@ class ValidationService:
             validations = await self.repository.get_validations_by_analysis(analysis_id)
 
             completed_validations = [
-                v for v in validations
+                v
+                for v in validations
                 if v.status in [ValidationStatus.APPROVED, ValidationStatus.REJECTED]
             ]
 
@@ -327,7 +339,9 @@ class ValidationService:
                 metric.metric_unit = "score"
                 metric.normal_min = 0.7
                 metric.normal_max = 1.0
-                metric.is_within_normal = validation_data["overall_quality_score"] >= 0.7
+                metric.is_within_normal = (
+                    validation_data["overall_quality_score"] >= 0.7
+                )
                 metric.calculation_method = "manual_validation"
                 metrics.append(metric)
 
@@ -371,9 +385,7 @@ class ValidationService:
             return await self.repository.create_validation_result(validation_result)
 
         except Exception as e:
-            logger.error(
-                f"Rule execution failed: rule_id={rule.id}, error={str(e)}"
-            )
+            logger.error(f"Rule execution failed: rule_id={rule.id}, error={str(e)}")
             return None
 
     async def _execute_threshold_rule(
@@ -452,9 +464,9 @@ class ValidationService:
                 )
 
             if (
-                validation.status == ValidationStatus.REJECTED and
-                validation.analysis and
-                validation.analysis.clinical_urgency == ClinicalUrgency.CRITICAL
+                validation.status == ValidationStatus.REJECTED
+                and validation.analysis
+                and validation.analysis.clinical_urgency == ClinicalUrgency.CRITICAL
             ):
                 await self.notification_service.send_critical_rejection_alert(
                     validation.analysis_id

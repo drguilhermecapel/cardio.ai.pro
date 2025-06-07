@@ -12,6 +12,7 @@ from app.core.constants import NotificationPriority, NotificationType
 
 class NotificationBase(BaseModel):
     """Base notification schema."""
+
     title: str
     message: str
     notification_type: NotificationType
@@ -20,6 +21,7 @@ class NotificationBase(BaseModel):
 
 class NotificationCreate(NotificationBase):
     """Notification creation schema."""
+
     user_id: int
     channels: list[str] = []
     related_resource_type: str | None = None
@@ -30,6 +32,7 @@ class NotificationCreate(NotificationBase):
 
 class NotificationUpdate(BaseModel):
     """Notification update schema."""
+
     title: str | None = None
     message: str | None = None
     notification_type: NotificationType | None = None
@@ -40,6 +43,7 @@ class NotificationUpdate(BaseModel):
 
 class NotificationInDB(NotificationBase):
     """Notification in database schema."""
+
     id: int
     user_id: int
     channels: list[str]
@@ -63,11 +67,13 @@ class NotificationInDB(NotificationBase):
 
 class Notification(NotificationInDB):
     """Notification response schema."""
+
     pass
 
 
 class NotificationList(BaseModel):
     """Notification list response schema."""
+
     notifications: list[Notification]
     total: int
     page: int

@@ -17,6 +17,7 @@ from app.core.constants import (
 
 class ECGAnalysisBase(BaseModel):
     """Base ECG analysis schema."""
+
     patient_id: int
     original_filename: str = Field(..., min_length=1, max_length=255)
     acquisition_date: datetime
@@ -28,24 +29,26 @@ class ECGAnalysisBase(BaseModel):
     device_model: str | None = Field(None, max_length=100)
     device_serial: str | None = Field(None, max_length=50)
 
-    @field_validator('leads_names')
+    @field_validator("leads_names")
     @classmethod
     def validate_leads(cls, v: list[str]) -> list[str]:
         """Validate ECG leads."""
         valid_leads = [lead.value for lead in ECGLeads]
         for lead in v:
             if lead not in valid_leads:
-                raise ValueError(f'Invalid ECG lead: {lead}')
+                raise ValueError(f"Invalid ECG lead: {lead}")
         return v
 
 
 class ECGAnalysisCreate(ECGAnalysisBase):
     """ECG analysis creation schema."""
+
     pass
 
 
 class ECGAnalysisUpdate(BaseModel):
     """ECG analysis update schema."""
+
     clinical_notes: str | None = None
     recommendations: list[str] | None = None
     clinical_urgency: ClinicalUrgency | None = None
@@ -53,6 +56,7 @@ class ECGAnalysisUpdate(BaseModel):
 
 class ECGAnalysisInDB(ECGAnalysisBase):
     """ECG analysis in database schema."""
+
     id: int
     analysis_id: str
     created_by: int
@@ -96,6 +100,7 @@ class ECGAnalysisInDB(ECGAnalysisBase):
 
 class ECGAnalysis(ECGAnalysisInDB):
     """ECG analysis response schema."""
+
     is_critical: bool
     processing_time_seconds: float | None
 
@@ -105,6 +110,7 @@ class ECGAnalysis(ECGAnalysisInDB):
 
 class ECGAnalysisList(BaseModel):
     """ECG analysis list response schema."""
+
     analyses: list[ECGAnalysis]
     total: int
     page: int
@@ -113,6 +119,7 @@ class ECGAnalysisList(BaseModel):
 
 class ECGAnalysisSearch(BaseModel):
     """ECG analysis search schema."""
+
     patient_id: int | None = None
     status: AnalysisStatus | None = None
     clinical_urgency: ClinicalUrgency | None = None
@@ -125,6 +132,7 @@ class ECGAnalysisSearch(BaseModel):
 
 class ECGMeasurementBase(BaseModel):
     """Base ECG measurement schema."""
+
     measurement_type: str = Field(..., min_length=1, max_length=50)
     lead_name: str = Field(..., min_length=1, max_length=10)
     value: float
@@ -139,11 +147,13 @@ class ECGMeasurementBase(BaseModel):
 
 class ECGMeasurementCreate(ECGMeasurementBase):
     """ECG measurement creation schema."""
+
     pass
 
 
 class ECGMeasurement(ECGMeasurementBase):
     """ECG measurement response schema."""
+
     id: int
     analysis_id: int
     created_at: datetime
@@ -155,6 +165,7 @@ class ECGMeasurement(ECGMeasurementBase):
 
 class ECGAnnotationBase(BaseModel):
     """Base ECG annotation schema."""
+
     annotation_type: str = Field(..., min_length=1, max_length=50)
     label: str = Field(..., min_length=1, max_length=100)
     time_ms: float = Field(..., ge=0.0)
@@ -166,11 +177,13 @@ class ECGAnnotationBase(BaseModel):
 
 class ECGAnnotationCreate(ECGAnnotationBase):
     """ECG annotation creation schema."""
+
     pass
 
 
 class ECGAnnotation(ECGAnnotationBase):
     """ECG annotation response schema."""
+
     id: int
     analysis_id: int
     created_by: int | None
@@ -183,6 +196,7 @@ class ECGAnnotation(ECGAnnotationBase):
 
 class ECGProcessingResult(BaseModel):
     """ECG processing result schema."""
+
     analysis_id: str
     status: AnalysisStatus
     ai_confidence: float | None
@@ -198,6 +212,7 @@ class ECGProcessingResult(BaseModel):
 
 class ECGUploadResponse(BaseModel):
     """ECG upload response schema."""
+
     analysis_id: str
     message: str
     status: AnalysisStatus

@@ -116,20 +116,26 @@ class ValidationRepository:
         stmt = (
             select(User)
             .where(User.is_active.is_(True))
-            .where(User.role.in_([
-                UserRoles.TECHNICIAN,
-                UserRoles.PHYSICIAN,
-                UserRoles.CARDIOLOGIST,
-                UserRoles.ADMIN,
-            ]))
+            .where(
+                User.role.in_(
+                    [
+                        UserRoles.TECHNICIAN,
+                        UserRoles.PHYSICIAN,
+                        UserRoles.CARDIOLOGIST,
+                        UserRoles.ADMIN,
+                    ]
+                )
+            )
         )
 
         if min_role == UserRoles.CARDIOLOGIST:
             stmt = stmt.where(User.role.in_([UserRoles.CARDIOLOGIST, UserRoles.ADMIN]))
         elif min_role == UserRoles.PHYSICIAN:
-            stmt = stmt.where(User.role.in_([
-                UserRoles.PHYSICIAN, UserRoles.CARDIOLOGIST, UserRoles.ADMIN
-            ]))
+            stmt = stmt.where(
+                User.role.in_(
+                    [UserRoles.PHYSICIAN, UserRoles.CARDIOLOGIST, UserRoles.ADMIN]
+                )
+            )
 
         if min_experience_years:
             stmt = stmt.where(
@@ -182,7 +188,9 @@ class ValidationRepository:
         await self.db.refresh(validation_result)
         return validation_result
 
-    async def create_quality_metric(self, quality_metric: QualityMetric) -> QualityMetric:
+    async def create_quality_metric(
+        self, quality_metric: QualityMetric
+    ) -> QualityMetric:
         """Create quality metric."""
         self.db.add(quality_metric)
         await self.db.commit()
@@ -209,9 +217,8 @@ class ValidationRepository:
         total_result = await self.db.execute(total_stmt)
         total_validations = total_result.scalar()
 
-        status_stmt = (
-            select(Validation.status, func.count(Validation.id))
-            .group_by(Validation.status)
+        status_stmt = select(Validation.status, func.count(Validation.id)).group_by(
+            Validation.status
         )
         if date_from:
             status_stmt = status_stmt.where(Validation.created_at >= date_from)
@@ -219,7 +226,9 @@ class ValidationRepository:
             status_stmt = status_stmt.where(Validation.created_at <= date_to)
 
         status_result = await self.db.execute(status_stmt)
-        status_counts: dict[str, int] = {str(status): count for status, count in status_result.all()}
+        status_counts: dict[str, int] = {
+            str(status): count for status, count in status_result.all()
+        }
 
         avg_time_stmt = select(func.avg(Validation.validation_duration_minutes)).where(
             Validation.validation_duration_minutes.isnot(None)
@@ -235,9 +244,12 @@ class ValidationRepository:
         return {
             "total_validations": total_validations,
             "status_distribution": status_counts,
-            "average_validation_time_minutes": float(avg_validation_time) if avg_validation_time else None,
+            "average_validation_time_minutes": float(avg_validation_time)
+            if avg_validation_time
+            else None,
             "approval_rate": (
-                status_counts.get(str(ValidationStatus.APPROVED), 0) /
-                max(total_validations or 1, 1) * 100
+                status_counts.get(str(ValidationStatus.APPROVED), 0)
+                / max(total_validations or 1, 1)
+                * 100
             ),
         }

@@ -38,8 +38,7 @@ async def login(
 
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
         )
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -51,7 +50,7 @@ async def login(
     refresh_token = create_access_token(
         subject=user.username,
         expires_delta=refresh_token_expires,
-        additional_claims={"type": "refresh"}
+        additional_claims={"type": "refresh"},
     )
 
     await user_service.update_last_login(user.id)
@@ -75,15 +74,13 @@ async def register(
     existing_user = await user_service.get_user_by_email(user_data.email)
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
         )
 
     existing_username = await user_service.get_user_by_username(user_data.username)
     if existing_username:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already taken"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Username already taken"
         )
 
     user = await user_service.create_user(user_data)
@@ -101,8 +98,7 @@ async def refresh_token(
     user = await user_service.verify_refresh_token(refresh_token)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
         )
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)

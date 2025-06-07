@@ -1,20 +1,22 @@
 """
-Medical-Grade Tests for Celery Configuration Module
+Medical-Grade Tests for Celery Configuration Module (DISABLED - Standalone Version)
 Target: 70%+ Coverage for Auxiliary Module
 
+NOTE: This test file is disabled in the standalone version as Celery has been removed.
+The standalone version uses synchronous processing instead of background tasks.
+
 Focus Areas:
-- Celery app configuration and initialization
-- Task routing and serialization settings
-- Medical safety in background task management
-- Performance and reliability configurations
-- Error handling and monitoring setup
+- Celery app configuration and initialization (REMOVED)
+- Task routing and serialization settings (REMOVED)
+- Medical safety in background task management (CONVERTED TO SYNC)
+- Performance and reliability configurations (SIMPLIFIED)
+- Error handling and monitoring setup (MAINTAINED)
 """
 
 import pytest
 from unittest.mock import Mock, patch
-from celery import Celery
 
-from app.core.celery import celery_app
+pytestmark = pytest.mark.skip(reason="Celery removed in standalone version")
 
 
 class TestCeleryBasicConfiguration:

@@ -45,16 +45,24 @@ class Validation(Base):
     overall_quality_score: Mapped[float | None] = mapped_column(Float)
 
     recommendations: Mapped[list[str] | None] = mapped_column(JSON)
-    follow_up_required: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    follow_up_required: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
     follow_up_notes: Mapped[str | None] = mapped_column(Text)
 
     digital_signature: Mapped[str | None] = mapped_column(String(255))
-    signature_timestamp: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    signature_timestamp: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
 
     validation_duration_minutes: Mapped[int | None] = mapped_column(Integer)
-    requires_second_opinion: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    requires_second_opinion: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
 
-    analysis: Mapped["ECGAnalysis"] = relationship("ECGAnalysis", back_populates="validations")
+    analysis: Mapped["ECGAnalysis"] = relationship(
+        "ECGAnalysis", back_populates="validations"
+    )
     validator: Mapped["User"] = relationship(
         "User", back_populates="validations", foreign_keys=[validator_id]
     )
@@ -77,15 +85,21 @@ class ValidationRule(Base):
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    rule_type: Mapped[str] = mapped_column(String(50), nullable=False)  # threshold, pattern, ml
+    rule_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # threshold, pattern, ml
 
     parameters: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
-    severity: Mapped[str] = mapped_column(String(20), nullable=False)  # info, warning, error, critical
+    severity: Mapped[str] = mapped_column(
+        String(20), nullable=False
+    )  # info, warning, error, critical
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     applies_to_conditions: Mapped[list[str] | None] = mapped_column(JSON)
 
-    created_by: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
+    created_by: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=False
+    )
     version: Mapped[str] = mapped_column(String(20), nullable=False, default="1.0")
 
     def __repr__(self) -> str:

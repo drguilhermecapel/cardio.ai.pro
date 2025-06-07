@@ -123,6 +123,8 @@ class UserService:
 
         return user
 
-    async def update_user(self, user_id: int, update_data: dict[str, Any]) -> User | None:
+    async def update_user(
+        self, user_id: int, update_data: dict[str, Any]
+    ) -> User | None:
         """Update user with provided data."""
         return await self.repository.update_user(user_id, update_data)

@@ -36,7 +36,9 @@ class PatientRepository:
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def update_patient(self, patient_id: int, update_data: dict[str, Any]) -> Patient | None:
+    async def update_patient(
+        self, patient_id: int, update_data: dict[str, Any]
+    ) -> Patient | None:
         """Update patient."""
         stmt = select(Patient).where(Patient.id == patient_id)
         result = await self.db.execute(stmt)
@@ -52,7 +54,9 @@ class PatientRepository:
 
         return patient
 
-    async def get_patients(self, limit: int = 50, offset: int = 0) -> tuple[list[Patient], int]:
+    async def get_patients(
+        self, limit: int = 50, offset: int = 0
+    ) -> tuple[list[Patient], int]:
         """Get patients with pagination."""
         count_stmt = select(func.count(Patient.id)).where(Patient.is_active.is_(True))
         count_result = await self.db.execute(count_stmt)
@@ -85,9 +89,8 @@ class PatientRepository:
         if not conditions:
             return [], 0
 
-        count_stmt = (
-            select(func.count(Patient.id))
-            .where(and_(Patient.is_active.is_(True), or_(*conditions)))
+        count_stmt = select(func.count(Patient.id)).where(
+            and_(Patient.is_active.is_(True), or_(*conditions))
         )
         count_result = await self.db.execute(count_stmt)
         total = count_result.scalar()

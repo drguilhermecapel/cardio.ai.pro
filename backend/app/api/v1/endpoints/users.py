@@ -36,11 +36,13 @@ async def update_current_user(
 
     update_data = user_update.dict(exclude_unset=True)
 
-    updated_user = await user_service.repository.update_user(current_user.id, update_data)
+    updated_user = await user_service.repository.update_user(
+        current_user.id, update_data
+    )
     if not updated_user:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update user"
+            detail="Failed to update user",
         )
 
     return updated_user
@@ -56,16 +58,17 @@ async def change_password(
     user_service = UserService(db)
 
     from app.core.security import get_password_hash, verify_password
-    if not verify_password(password_data.current_password, current_user.hashed_password):
+
+    if not verify_password(
+        password_data.current_password, current_user.hashed_password
+    ):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect current password"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect current password"
         )
 
     new_hashed_password = get_password_hash(password_data.new_password)
     await user_service.repository.update_user(
-        current_user.id,
-        {"hashed_password": new_hashed_password}
+        current_user.id, {"hashed_password": new_hashed_password}
     )
 
     return {"message": "Password changed successfully"}
@@ -81,8 +84,7 @@ async def list_users(
     """List users (admin only)."""
     if current_user.role != UserRoles.ADMIN:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
         )
 
     user_service = UserService(db)
@@ -106,8 +108,7 @@ async def get_user(
     """Get user by ID (admin only or own profile)."""
     if current_user.role != UserRoles.ADMIN and current_user.id != user_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
         )
 
     user_service = UserService(db)
@@ -115,8 +116,7 @@ async def get_user(
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
     return user

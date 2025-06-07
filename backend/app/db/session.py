@@ -44,7 +44,7 @@ def get_engine() -> AsyncEngine:
             connect_args = {
                 "server_settings": {
                     "application_name": "CardioAI_Pro_v1",
-                    "jit": "off"
+                    "jit": "off",
                 },
                 "command_timeout": 60,
             }
@@ -53,6 +53,7 @@ def get_engine() -> AsyncEngine:
                 "check_same_thread": False,
             }
             import os
+
             db_path = str(settings.DATABASE_URL).replace("sqlite+aiosqlite:///", "")
             if not db_path.startswith("/"):
                 db_path = os.path.abspath(db_path)
@@ -66,7 +67,7 @@ def get_engine() -> AsyncEngine:
             poolclass=NullPool if settings.ENVIRONMENT == "test" else None,
             pool_pre_ping=True,
             pool_recycle=300,
-            connect_args=connect_args
+            connect_args=connect_args,
         )
 
     return _engine

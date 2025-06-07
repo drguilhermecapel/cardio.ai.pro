@@ -41,7 +41,9 @@ class UserRepository:
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def update_user(self, user_id: int, update_data: dict[str, Any]) -> User | None:
+    async def update_user(
+        self, user_id: int, update_data: dict[str, Any]
+    ) -> User | None:
         """Update user."""
         stmt = select(User).where(User.id == user_id)
         result = await self.db.execute(stmt)

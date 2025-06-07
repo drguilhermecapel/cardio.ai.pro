@@ -36,10 +36,15 @@ class NotificationService:
             notification = Notification()
             notification.user_id = validator_id
             notification.title = "New ECG Validation Assignment"
-            notification.message = f"You have been assigned to validate ECG analysis #{analysis_id}"
+            notification.message = (
+                f"You have been assigned to validate ECG analysis #{analysis_id}"
+            )
             notification.notification_type = NotificationType.VALIDATION_REMINDER
             notification.priority = priority
-            notification.channels = [NotificationChannel.IN_APP, NotificationChannel.EMAIL]
+            notification.channels = [
+                NotificationChannel.IN_APP,
+                NotificationChannel.EMAIL,
+            ]
             notification.related_resource_type = "ecg_analysis"
             notification.related_resource_id = analysis_id
 
@@ -57,7 +62,9 @@ class NotificationService:
             notification = Notification()
             notification.user_id = validator_id
             notification.title = "URGENT: Critical ECG Requires Immediate Validation"
-            notification.message = f"Critical ECG analysis #{analysis_id} requires immediate validation"
+            notification.message = (
+                f"Critical ECG analysis #{analysis_id} requires immediate validation"
+            )
             notification.notification_type = NotificationType.CRITICAL_FINDING
             notification.priority = NotificationPriority.CRITICAL
             notification.channels = [
@@ -86,7 +93,10 @@ class NotificationService:
             notification.message = f"ECG analysis #{analysis_id} validation completed with status: {status}"
             notification.notification_type = NotificationType.ANALYSIS_COMPLETE
             notification.priority = NotificationPriority.NORMAL
-            notification.channels = [NotificationChannel.IN_APP, NotificationChannel.EMAIL]
+            notification.channels = [
+                NotificationChannel.IN_APP,
+                NotificationChannel.EMAIL,
+            ]
             notification.related_resource_type = "ecg_analysis"
             notification.related_resource_id = analysis_id
 
@@ -131,7 +141,9 @@ class NotificationService:
                 notification = Notification()
                 notification.user_id = admin.id
                 notification.title = "ALERT: No Validators Available"
-                notification.message = f"No validators available for critical ECG analysis #{analysis_id}"
+                notification.message = (
+                    f"No validators available for critical ECG analysis #{analysis_id}"
+                )
                 notification.notification_type = NotificationType.SYSTEM_ALERT
                 notification.priority = NotificationPriority.CRITICAL
                 notification.channels = [
@@ -153,7 +165,11 @@ class NotificationService:
     ) -> None:
         """Send analysis completion notification."""
         try:
-            priority = NotificationPriority.HIGH if has_critical_findings else NotificationPriority.NORMAL
+            priority = (
+                NotificationPriority.HIGH
+                if has_critical_findings
+                else NotificationPriority.NORMAL
+            )
             channels = [NotificationChannel.IN_APP, NotificationChannel.EMAIL]
 
             if has_critical_findings:
@@ -185,10 +201,15 @@ class NotificationService:
             notification = Notification()
             notification.user_id = user_id
             notification.title = "ECG Quality Alert"
-            notification.message = f"Quality issues detected in ECG analysis #{analysis_id}: {issues_text}"
+            notification.message = (
+                f"Quality issues detected in ECG analysis #{analysis_id}: {issues_text}"
+            )
             notification.notification_type = NotificationType.QUALITY_ALERT
             notification.priority = NotificationPriority.MEDIUM
-            notification.channels = [NotificationChannel.IN_APP, NotificationChannel.EMAIL]
+            notification.channels = [
+                NotificationChannel.IN_APP,
+                NotificationChannel.EMAIL,
+            ]
             notification.related_resource_type = "ecg_analysis"
             notification.related_resource_id = analysis_id
             notification.notification_metadata = {"quality_issues": quality_issues}
@@ -200,7 +221,10 @@ class NotificationService:
             logger.error(f"Failed to send quality alert: {str(e)}")
 
     async def send_system_alert(
-        self, title: str, message: str, priority: NotificationPriority = NotificationPriority.NORMAL
+        self,
+        title: str,
+        message: str,
+        priority: NotificationPriority = NotificationPriority.NORMAL,
     ) -> None:
         """Send system-wide alert to administrators."""
         try:
@@ -213,7 +237,10 @@ class NotificationService:
                 notification.message = message
                 notification.notification_type = NotificationType.SYSTEM_ALERT
                 notification.priority = priority
-                notification.channels = [NotificationChannel.IN_APP, NotificationChannel.EMAIL]
+                notification.channels = [
+                    NotificationChannel.IN_APP,
+                    NotificationChannel.EMAIL,
+                ]
 
                 await self.repository.create_notification(notification)
                 await self._send_notification(notification)
@@ -289,7 +316,9 @@ class NotificationService:
             f"PHONE: {notification.title} to user {notification.user_id}: {notification.message}"
         )
 
-    def _map_urgency_to_priority(self, urgency: ClinicalUrgency) -> NotificationPriority:
+    def _map_urgency_to_priority(
+        self, urgency: ClinicalUrgency
+    ) -> NotificationPriority:
         """Map clinical urgency to notification priority."""
         mapping = {
             ClinicalUrgency.LOW: NotificationPriority.LOW,
@@ -309,7 +338,8 @@ class NotificationService:
         if self._is_quiet_hours(preferences):
             if NotificationPriority.CRITICAL in channels:
                 return [
-                    ch for ch in channels
+                    ch
+                    for ch in channels
                     if ch in [NotificationChannel.PHONE_CALL, NotificationChannel.SMS]
                 ]
             else:

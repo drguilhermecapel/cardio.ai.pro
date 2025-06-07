@@ -3,19 +3,19 @@ CardioAI Pro - Standalone FastAPI Application
 Simplified ECG Analysis System for Desktop
 """
 
-import os
 import sys
 from pathlib import Path
 
-if getattr(sys, 'frozen', False):
+if getattr(sys, "frozen", False):
     bundle_dir = Path(sys._MEIPASS)
-    app_dir = bundle_dir / 'app'
+    app_dir = bundle_dir / "app"
     if app_dir.exists():
         sys.path.insert(0, str(app_dir))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+
+from app.api.v1.api import api_router
 
 
 # Simplified startup for standalone version
@@ -38,6 +38,8 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    app.include_router(api_router, prefix="/api/v1")
+
     return app
 
 
@@ -57,7 +59,7 @@ async def root() -> dict[str, str]:
         "message": "CardioAI Pro Standalone API",
         "version": "1.0.0",
         "docs": "/docs",
-        "status": "running"
+        "status": "running",
     }
 
 

@@ -2,12 +2,12 @@
 Application configuration settings.
 """
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     pass
 
-from pydantic import ValidationInfo, field_validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -28,8 +28,6 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./cardioai.db"
     TEST_DATABASE_URL: str = "sqlite+aiosqlite:///./cardioai_test.db"
-
-
 
     ALLOWED_HOSTS: list[str] = ["*"]
 
@@ -60,7 +58,20 @@ class Settings(BaseSettings):
 
     ECG_SAMPLE_RATE: int = 500
     ECG_DURATION_SECONDS: int = 10
-    ECG_LEADS: list[str] = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+    ECG_LEADS: list[str] = [
+        "I",
+        "II",
+        "III",
+        "aVR",
+        "aVL",
+        "aVF",
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+    ]
 
     MIN_VALIDATION_SCORE: float = 0.8
     REQUIRE_DOUBLE_VALIDATION_CRITICAL: bool = True
@@ -74,11 +85,9 @@ class Settings(BaseSettings):
     ENABLE_METRICS: bool = True
     SENTRY_DSN: str | None = None
 
-
-
     AUDIT_LOG_RETENTION_DAYS: int = 2555  # 7 years
     ENABLE_DIGITAL_SIGNATURES: bool = True
-    
+
     MODELS_DIR: str = "models"
     REQUIRE_AUDIT_TRAIL: bool = True
 
@@ -93,7 +102,7 @@ class Settings(BaseSettings):
         "case_sensitive": True,
         "env_file": ".env",
         "env_file_encoding": "utf-8",
-        "extra": "ignore"
+        "extra": "ignore",
     }
 
 

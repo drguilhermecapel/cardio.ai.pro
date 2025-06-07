@@ -7,6 +7,7 @@ from enum import Enum
 
 class UserRoles(str, Enum):
     """User roles."""
+
     ADMIN = "admin"
     PHYSICIAN = "physician"
     CARDIOLOGIST = "cardiologist"
@@ -17,6 +18,7 @@ class UserRoles(str, Enum):
 
 class AnalysisStatus(str, Enum):
     """Analysis status."""
+
     PENDING = "pending"
     PROCESSING = "processing"
     COMPLETED = "completed"
@@ -26,6 +28,7 @@ class AnalysisStatus(str, Enum):
 
 class ValidationStatus(str, Enum):
     """Validation status."""
+
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
@@ -34,6 +37,7 @@ class ValidationStatus(str, Enum):
 
 class ECGLeads(str, Enum):
     """ECG leads."""
+
     LEAD_I = "I"
     II = "II"
     III = "III"
@@ -50,6 +54,7 @@ class ECGLeads(str, Enum):
 
 class DiagnosisCategory(str, Enum):
     """Diagnosis categories."""
+
     NORMAL = "normal"
     ARRHYTHMIA = "arrhythmia"
     CONDUCTION_DISORDER = "conduction_disorder"
@@ -60,6 +65,7 @@ class DiagnosisCategory(str, Enum):
 
 class ClinicalUrgency(str, Enum):
     """Clinical urgency levels."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -68,6 +74,7 @@ class ClinicalUrgency(str, Enum):
 
 class FileType(str, Enum):
     """Supported file types."""
+
     PDF = "application/pdf"
     JPEG = "image/jpeg"
     PNG = "image/png"
@@ -78,6 +85,7 @@ class FileType(str, Enum):
 
 class NotificationChannel(str, Enum):
     """Notification channels."""
+
     EMAIL = "email"
     SMS = "sms"
     PUSH = "push"
@@ -88,6 +96,7 @@ class NotificationChannel(str, Enum):
 
 class NotificationPriority(str, Enum):
     """Notification priority levels."""
+
     LOW = "low"
     NORMAL = "normal"
     MEDIUM = "medium"
@@ -97,6 +106,7 @@ class NotificationPriority(str, Enum):
 
 class NotificationType(str, Enum):
     """Notification types."""
+
     CRITICAL_FINDING = "critical_finding"
     ANALYSIS_COMPLETE = "analysis_complete"
     VALIDATION_REMINDER = "validation_reminder"
@@ -108,6 +118,7 @@ class NotificationType(str, Enum):
 
 class AuditEventType(str, Enum):
     """Audit event types."""
+
     USER_LOGIN = "user_login"
     USER_LOGOUT = "user_logout"
     DATA_ACCESS = "data_access"
@@ -120,6 +131,7 @@ class AuditEventType(str, Enum):
 
 class ModelType(str, Enum):
     """ML model types."""
+
     CLASSIFICATION = "classification"
     SEGMENTATION = "segmentation"
     DETECTION = "detection"
@@ -128,6 +140,7 @@ class ModelType(str, Enum):
 
 class ModelStatus(str, Enum):
     """ML model status."""
+
     ACTIVE = "active"
     INACTIVE = "inactive"
     TRAINING = "training"
@@ -136,7 +149,7 @@ class ModelStatus(str, Enum):
 
 ECG_SAMPLE_RATES = [250, 500, 1000]
 ECG_STANDARD_DURATION = 10  # seconds
-ECG_MINIMUM_DURATION = 5   # seconds
+ECG_MINIMUM_DURATION = 5  # seconds
 ECG_MAXIMUM_DURATION = 60  # seconds
 
 HEART_RATE_NORMAL_RANGE = (60, 100)  # bpm
