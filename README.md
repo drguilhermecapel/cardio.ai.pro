@@ -88,6 +88,28 @@ docker-compose up -d
 open http://localhost:3000
 ```
 
+### 🔧 Compilação do Instalador (Para Desenvolvedores)
+
+Se você deseja compilar o instalador a partir do código fonte:
+
+1. **Clone o repositório**:
+   ```bash
+   git clone https://github.com/drguilhermecapel/cardio.ai.pro.git
+   cd cardio.ai.pro
+   ```
+
+2. **Navegue para o diretório do instalador**:
+   ```bash
+   cd windows_installer
+   ```
+
+3. **Execute o script de compilação**:
+   ```bash
+   build_installer.bat
+   ```
+
+Para instruções detalhadas de desenvolvimento, consulte `windows_installer/README.md`.
+
 ## Uso
 
 ### Interface Web

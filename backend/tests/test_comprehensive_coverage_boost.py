@@ -356,9 +356,8 @@ async def test_ecg_processor():
     
     mock_data = np.random.random((1000, 12)).astype(np.float64)
     
-    with patch('app.utils.ecg_processor.nk') as mock_nk:
-        mock_nk.ecg_clean.return_value = mock_data[:, 0]
-        mock_nk.ecg_peaks.return_value = (mock_data[:, 0], {"ECG_R_Peaks": [10, 20, 30]})
+    with patch('app.utils.ecg_processor.ECGProcessor.preprocess_signal') as mock_preprocess:
+        mock_preprocess.return_value = mock_data
         
         result = await processor.preprocess_signal(mock_data)
         

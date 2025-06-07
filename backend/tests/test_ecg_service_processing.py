@@ -194,7 +194,7 @@ async def test_extract_measurements_error_handling(ecg_service):
     ecg_data = np.random.rand(5000, 12)
     sample_rate = 500
     
-    with patch('neurokit2.ecg_process', side_effect=Exception("Processing error")):
+    with patch('scipy.signal.find_peaks', side_effect=Exception("Processing error")):
         measurements = ecg_service._extract_measurements(ecg_data, sample_rate)
         
         assert measurements["heart_rate"] is None
@@ -231,7 +231,7 @@ async def test_generate_annotations_error_handling(ecg_service):
     ai_results = {}
     sample_rate = 500
     
-    with patch('neurokit2.ecg_process', side_effect=Exception("Processing error")):
+    with patch('scipy.signal.find_peaks', side_effect=Exception("Processing error")):
         annotations = ecg_service._generate_annotations(ecg_data, ai_results, sample_rate)
         
         assert annotations == []

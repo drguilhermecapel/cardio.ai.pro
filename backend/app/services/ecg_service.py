@@ -2,7 +2,7 @@
 ECG Analysis Service - Core ECG processing and analysis functionality.
 """
 
-import asyncio
+
 import hashlib
 import logging
 import uuid
@@ -227,15 +227,15 @@ class ECGAnalysisService:
 
             if ecg_data.shape[0] > sample_rate:
                 lead_ii = ecg_data[:, 1] if ecg_data.shape[1] > 1 else ecg_data[:, 0]
-                
+
                 from scipy.signal import find_peaks
                 peaks, _ = find_peaks(lead_ii, height=np.std(lead_ii), distance=sample_rate//3)
-                
+
                 if len(peaks) > 1:
                     rr_intervals = np.diff(peaks) / sample_rate * 1000  # ms
                     heart_rate = 60000 / np.mean(rr_intervals)  # bpm
                     measurements["heart_rate"] = int(heart_rate) if not np.isnan(heart_rate) else 75
-                    
+
                     avg_rr = np.mean(rr_intervals)
                     measurements["pr_interval"] = int(avg_rr * 0.16)
                     measurements["qrs_duration"] = 100
@@ -281,13 +281,13 @@ class ECGAnalysisService:
         try:
             if ecg_data.shape[0] > sample_rate:
                 lead_ii = ecg_data[:, 1] if ecg_data.shape[1] > 1 else ecg_data[:, 0]
-                
+
                 from scipy.signal import find_peaks
                 peaks, _ = find_peaks(lead_ii, height=np.std(lead_ii), distance=sample_rate//3)
-                
+
                 for peak_idx in peaks:
                     time_ms = (peak_idx / sample_rate) * 1000
-                    
+
                     annotations.append({
                         "annotation_type": "beat",
                         "label": "R_peak",

@@ -26,10 +26,74 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALGORITHM: str = "HS256"
 
+    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_USER: str = "cardioai"
+    POSTGRES_PASSWORD: str = "cardioai_dev_password"
+    POSTGRES_DB: str = "cardioai_pro"
+    POSTGRES_PORT: int = 5432
     DATABASE_URL: str = "sqlite+aiosqlite:///./cardioai.db"
     TEST_DATABASE_URL: str = "sqlite+aiosqlite:///./cardioai_test.db"
+    STANDALONE_MODE: bool = True
 
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def assemble_db_connection(cls: "type[Settings]", v: str | None, info: ValidationInfo) -> Any:
+        """Assemble database URL."""
+        if isinstance(v, str):
+            return v
+        values = info.data
 
+        if values.get("STANDALONE_MODE", True):
+            return "sqlite+aiosqlite:///./cardioai.db"
+        user = values.get("POSTGRES_USER")
+        password = values.get("POSTGRES_PASSWORD")
+        host = values.get("POSTGRES_SERVER")
+        port = values.get("POSTGRES_PORT")
+        db = values.get("POSTGRES_DB")
+        return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"
+
+    @field_validator("TEST_DATABASE_URL", mode="before")
+    @classmethod
+    def assemble_test_db_connection(cls: "type[Settings]", v: str | None, info: ValidationInfo) -> Any:
+        """Assemble test database URL."""
+        if isinstance(v, str):
+            return v
+        values = info.data
+
+        if values.get("STANDALONE_MODE", True):
+            return "sqlite+aiosqlite:///./cardioai_test.db"
+        user = values.get("POSTGRES_USER")
+        password = values.get("POSTGRES_PASSWORD")
+        host = values.get("POSTGRES_SERVER")
+        port = values.get("POSTGRES_PORT")
+        db = values.get("POSTGRES_DB")
+        return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}_test"
+
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_PASSWORD: str | None = None
+    REDIS_DB: int = 0
+    REDIS_URL: str | None = None
+
+    @field_validator("REDIS_URL", mode="before")
+    @classmethod
+    def assemble_redis_connection(cls: "type[Settings]", v: str | None, info: ValidationInfo) -> str:
+        """Assemble Redis URL."""
+        if isinstance(v, str):
+            return v
+
+        values = info.data
+
+        if values.get("STANDALONE_MODE", True):
+            return ""
+
+        password = values.get("REDIS_PASSWORD")
+        auth = f":{password}@" if password else ""
+
+        return (
+            f"redis://{auth}{values.get('REDIS_HOST')}:"
+            f"{values.get('REDIS_PORT')}/{values.get('REDIS_DB')}"
+        )
 
     ALLOWED_HOSTS: list[str] = ["*"]
 
@@ -74,12 +138,37 @@ class Settings(BaseSettings):
     ENABLE_METRICS: bool = True
     SENTRY_DSN: str | None = None
 
+    CELERY_BROKER_URL: str | None = None
+    CELERY_RESULT_BACKEND: str | None = None
 
+    @field_validator("CELERY_BROKER_URL", mode="before")
+    @classmethod
+    def assemble_celery_broker(cls: "type[Settings]", v: str | None, info: ValidationInfo) -> str:
+        """Assemble Celery broker URL."""
+        if isinstance(v, str):
+            return v
+        values = info.data
+
+        if values.get("STANDALONE_MODE", True):
+            return ""
+        redis_url = values.get("REDIS_URL")
+        return str(redis_url) if redis_url else "redis://localhost:6379/0"
+
+    @field_validator("CELERY_RESULT_BACKEND", mode="before")
+    @classmethod
+    def assemble_celery_backend(cls: "type[Settings]", v: str | None, info: ValidationInfo) -> str:
+        """Assemble Celery result backend URL."""
+        if isinstance(v, str):
+            return v
+        values = info.data
+
+        if values.get("STANDALONE_MODE", True):
+            return ""
+        redis_url = values.get("REDIS_URL")
+        return str(redis_url) if redis_url else "redis://localhost:6379/0"
 
     AUDIT_LOG_RETENTION_DAYS: int = 2555  # 7 years
     ENABLE_DIGITAL_SIGNATURES: bool = True
-    
-    MODELS_DIR: str = "models"
     REQUIRE_AUDIT_TRAIL: bool = True
 
     FIRST_SUPERUSER: str = "admin@cardioai.pro"

@@ -1,1 +1,35 @@
+from typing import Any
 
+from app.core.config import settings
+
+celery_app: Any = None
+
+if not settings.STANDALONE_MODE:
+    try:
+        from celery import Celery
+
+        celery_app = Celery(
+            "cardioai",
+            broker=settings.REDIS_URL,
+            backend=settings.REDIS_URL,
+            include=["app.tasks"]
+        )
+
+        celery_app.conf.update(
+            task_serializer="json",
+            accept_content=["json"],
+            result_serializer="json",
+            timezone="UTC",
+            enable_utc=True,
+            task_track_started=True,
+            task_time_limit=30 * 60,
+            task_soft_time_limit=60,
+            worker_prefetch_multiplier=1,
+            worker_max_tasks_per_child=1000,
+        )
+
+        if __name__ == "__main__":
+            celery_app.start()
+
+    except ImportError:
+        celery_app = None
