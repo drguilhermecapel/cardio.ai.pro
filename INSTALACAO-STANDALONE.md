@@ -68,7 +68,7 @@ Esta versão standalone do CardioAI Pro foi projetada para usuários que desejam
 
 1. **Login inicial:**
    - Usuário: `admin`
-   - Senha: `admin123`
+   - Senha: (gerada automaticamente - veja logs do sistema)
 
 2. **Altere a senha:**
    - Acesse as configurações do usuário

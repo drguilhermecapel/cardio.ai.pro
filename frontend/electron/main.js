@@ -46,40 +46,61 @@ function createWindow() {
 
 function startBackend() {
   let backendPath
-
+  
+  const possiblePaths = []
+  
   if (process.platform === 'win32') {
-    backendPath = path.join(__dirname, '../../backend/dist/cardioai-pro-backend.exe')
+    possiblePaths.push(
+      path.join(__dirname, '../../backend/dist/cardioai-pro-backend.exe'),
+      path.join(__dirname, '../../backend/dist/cardioai-pro-backend'),
+      path.join(process.resourcesPath || '', 'backend', 'cardioai-pro-backend.exe'),
+      path.join(process.resourcesPath || '', 'cardioai-pro-backend.exe'),
+      path.join(__dirname, 'cardioai-pro-backend.exe')
+    )
   } else {
-    backendPath = path.join(__dirname, '../../backend/dist/cardioai-pro-backend')
+    possiblePaths.push(
+      path.join(__dirname, '../../backend/dist/cardioai-pro-backend'),
+      path.join(__dirname, '../../backend/dist/cardioai-pro-backend.exe'),
+      path.join(process.resourcesPath || '', 'backend', 'cardioai-pro-backend'),
+      path.join(process.resourcesPath || '', 'cardioai-pro-backend'),
+      path.join(__dirname, 'cardioai-pro-backend')
+    )
   }
-
-  if (process.resourcesPath) {
-    backendPath = path.join(process.resourcesPath, 'backend', 'cardioai-pro-backend.exe')
-  }
-
-  if (require('fs').existsSync(backendPath)) {
-    console.log('Starting backend server...')
-    backendProcess = spawn(backendPath, [], {
-      stdio: 'pipe',
-      detached: false,
-      windowsHide: true, // Hide console window on Windows
-    })
-
-    backendProcess.stdout.on('data', data => {
-      console.log(`Backend: ${data}`)
-    })
-
-    backendProcess.stderr.on('data', data => {
-      console.error(`Backend Error: ${data}`)
-    })
-
-    backendProcess.on('close', code => {
-      console.log(`Backend process exited with code ${code}`)
-    })
-  } else {
-    console.warn('Backend executable not found at:', backendPath)
+  
+  backendPath = possiblePaths.find(p => {
+    try {
+      return require('fs').existsSync(p)
+    } catch (error) {
+      console.warn('Error checking path:', p, error)
+      return false
+    }
+  })
+  
+  if (!backendPath) {
+    console.error('Backend executable not found in any of these locations:')
+    possiblePaths.forEach(p => console.error('  -', p))
     console.warn('Application will run in frontend-only mode')
+    return
   }
+
+  console.log('Starting backend server from:', backendPath)
+  backendProcess = spawn(backendPath, [], {
+    stdio: 'pipe',
+    detached: false,
+    windowsHide: true, // Hide console window on Windows
+  })
+
+  backendProcess.stdout.on('data', data => {
+    console.log(`Backend: ${data}`)
+  })
+
+  backendProcess.stderr.on('data', data => {
+    console.error(`Backend Error: ${data}`)
+  })
+
+  backendProcess.on('close', code => {
+    console.log(`Backend process exited with code ${code}`)
+  })
 }
 
 function stopBackend() {

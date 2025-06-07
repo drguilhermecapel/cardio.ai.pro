@@ -116,11 +116,11 @@ Para instruções detalhadas de desenvolvimento, consulte `windows_installer/REA
 
 **Versão Standalone**
 - **URL**: http://localhost:8000 (abre automaticamente)
-- **Login**: admin / admin123
+- **Login**: admin / (senha gerada automaticamente no primeiro uso - veja logs do sistema)
 
 **Versão Docker**
 - **URL**: http://localhost:3000
-- **Admin**: admin@cardioai.pro / admin123
+- **Admin**: admin@cardioai.pro / (senha gerada automaticamente no primeiro uso - veja logs do sistema)
 - **Docs API**: http://localhost:8000/docs
 
 ## Suporte

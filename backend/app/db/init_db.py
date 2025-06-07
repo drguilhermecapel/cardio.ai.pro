@@ -57,7 +57,16 @@ async def create_admin_user(session: AsyncSession) -> User | None:
         admin_user = User()
         admin_user.username = "admin"
         admin_user.email = admin_email
-        admin_user.hashed_password = get_password_hash("admin123")
+        default_password = settings.FIRST_SUPERUSER_PASSWORD
+        if default_password == "changeme123":
+            import secrets
+            import string
+            alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+            default_password = ''.join(secrets.choice(alphabet) for _ in range(16))
+            logger.warning(f"Generated secure admin password: {default_password}")
+            logger.warning("IMPORTANT: Save this password and change it after first login!")
+        
+        admin_user.hashed_password = get_password_hash(default_password)
         admin_user.first_name = "CardioAI"
         admin_user.last_name = "Administrator"
         admin_user.role = UserRoles.ADMIN

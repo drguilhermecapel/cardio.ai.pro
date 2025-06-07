@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     API_V1_STR: str = "/api/v1"
 
-    SECRET_KEY: str = "dev-secret-key-change-in-production"
+    SECRET_KEY: str = "CHANGE_ME_IN_PRODUCTION_USE_STRONG_SECRET_KEY"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALGORITHM: str = "HS256"
@@ -94,6 +94,18 @@ class Settings(BaseSettings):
             f"redis://{auth}{values.get('REDIS_HOST')}:"
             f"{values.get('REDIS_PORT')}/{values.get('REDIS_DB')}"
         )
+
+    @field_validator("REDIS_URL", mode="after")
+    @classmethod
+    def validate_standalone_consistency(cls, v: str, info: ValidationInfo) -> str:
+        """Validate standalone mode consistency."""
+        values = info.data
+        if values.get("STANDALONE_MODE", True) and v:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning("STANDALONE_MODE=True but REDIS_URL is set. Ignoring Redis configuration.")
+            return ""
+        return v
 
     ALLOWED_HOSTS: list[str] = ["*"]
 
@@ -173,7 +185,7 @@ class Settings(BaseSettings):
 
     FIRST_SUPERUSER: str = "admin@cardioai.pro"
     FIRST_SUPERUSER_EMAIL: str = "admin@cardioai.pro"
-    FIRST_SUPERUSER_PASSWORD: str = "changeme123"
+    FIRST_SUPERUSER_PASSWORD: str = "CHANGE_ME_SECURE_PASSWORD_REQUIRED"
 
     MAX_ECG_FILE_SIZE: int = 50 * 1024 * 1024  # 50MB
     ECG_UPLOAD_DIR: str = "uploads/ecg"

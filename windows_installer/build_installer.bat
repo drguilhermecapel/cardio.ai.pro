@@ -18,7 +18,7 @@ if not exist "build_backend.py" (
 REM Check for required tools
 echo Checking for required tools...
 
-REM Check Python
+REM Check Python with version verification
 python --version >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Python is not installed or not in PATH
@@ -27,11 +27,33 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Check Node.js
+REM Verify Python version is 3.8+
+for /f "tokens=2" %%i in ('python --version 2^>^&1') do set PYTHON_VERSION=%%i
+echo Found Python version: %PYTHON_VERSION%
+python -c "import sys; exit(0 if sys.version_info >= (3, 8) else 1)" >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Python version 3.8+ required, found %PYTHON_VERSION%
+    echo Please upgrade Python from https://python.org
+    pause
+    exit /b 1
+)
+
+REM Check Node.js with version verification
 node --version >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Node.js is not installed or not in PATH
-    echo Please install Node.js from https://nodejs.org
+    echo Please install Node.js 16+ from https://nodejs.org
+    pause
+    exit /b 1
+)
+
+REM Verify Node.js version is 16+
+for /f "tokens=1" %%i in ('node --version') do set NODE_VERSION=%%i
+echo Found Node.js version: %NODE_VERSION%
+node -e "process.exit(parseInt(process.version.slice(1)) >= 16 ? 0 : 1)" >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Node.js version 16+ required, found %NODE_VERSION%
+    echo Please upgrade Node.js from https://nodejs.org
     pause
     exit /b 1
 )
@@ -44,7 +66,9 @@ if errorlevel 1 (
     echo The installer script will be created but you'll need to compile it manually
     set NSIS_AVAILABLE=false
 ) else (
-    echo NSIS found - installer will be compiled automatically
+    for /f "tokens=*" %%i in ('makensis /VERSION 2^>^&1') do set NSIS_VERSION=%%i
+    echo NSIS found - version: %NSIS_VERSION%
+    echo Installer will be compiled automatically
     set NSIS_AVAILABLE=true
 )
 
@@ -58,9 +82,32 @@ echo Step 1: Building Backend Executable
 echo ========================================
 echo.
 
+REM Verify backend directory exists
+if not exist "..\backend" (
+    echo ERROR: Backend directory not found
+    echo Please ensure you're running this from the windows_installer directory
+    echo and that the backend directory exists at ../backend
+    pause
+    exit /b 1
+)
+
+REM Check if Poetry is available before building
+poetry --version >nul 2>&1
+if errorlevel 1 (
+    echo WARNING: Poetry not found, attempting to install...
+    python -m pip install poetry
+    if errorlevel 1 (
+        echo ERROR: Failed to install Poetry
+        echo Please install Poetry manually: https://python-poetry.org/docs/#installation
+        pause
+        exit /b 1
+    )
+)
+
 python build_backend.py
 if errorlevel 1 (
     echo ERROR: Backend build failed
+    echo Check the error messages above for details
     pause
     exit /b 1
 )
@@ -75,9 +122,32 @@ echo Step 2: Building Frontend Application
 echo ========================================
 echo.
 
+REM Verify frontend directory exists
+if not exist "..\frontend" (
+    echo ERROR: Frontend directory not found
+    echo Please ensure you're running this from the windows_installer directory
+    echo and that the frontend directory exists at ../frontend
+    pause
+    exit /b 1
+)
+
+REM Check if npm/yarn is available
+npm --version >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: npm not found but Node.js was detected earlier
+    echo This might indicate a PATH issue or incomplete Node.js installation
+    pause
+    exit /b 1
+)
+
 python build_frontend.py
 if errorlevel 1 (
     echo ERROR: Frontend build failed
+    echo Check the error messages above for details
+    echo Common issues:
+    echo - Missing dependencies: run 'npm install' in frontend directory
+    echo - TypeScript errors: check frontend code for syntax issues
+    echo - Memory issues: try 'npm run build' manually with --max-old-space-size=4096
     pause
     exit /b 1
 )
@@ -92,11 +162,12 @@ echo Step 3: Preparing Installer Files
 echo ========================================
 echo.
 
-REM Create a simple icon file (placeholder)
+REM Create a proper minimal ICO file instead of empty placeholder
 if not exist "cardioai.ico" (
-    echo Creating placeholder icon file...
-    copy nul cardioai.ico >nul
-    echo Placeholder icon created. Replace cardioai.ico with actual icon file.
+    echo Creating minimal valid icon file...
+    REM Create a minimal 16x16 ICO file with proper header
+    powershell -Command "Add-Type -AssemblyName System.Drawing; $bmp = New-Object System.Drawing.Bitmap(16,16); $bmp.Save('cardioai.ico', [System.Drawing.Imaging.ImageFormat]::Icon); $bmp.Dispose()"
+    echo Valid icon file created. Replace with custom icon if desired.
 )
 
 REM Create LICENSE.txt if it doesn't exist

@@ -325,7 +325,7 @@ verify_installation() {
         echo -e "${CYAN}   • Frontend: ${WHITE}http://localhost:${web_port}${NC}"
         echo -e "${CYAN}   • API: ${WHITE}http://localhost:${api_port}${NC}"
         echo -e "${CYAN}   • Documentação: ${WHITE}http://localhost:${api_port}/docs${NC}"
-        echo -e "${CYAN}   • Admin: ${WHITE}admin@cardioai.pro / admin123${NC}"
+        echo -e "${CYAN}   • Admin: ${WHITE}admin@cardioai.pro / (senha gerada automaticamente - veja logs)${NC}"
         
         echo -e "\n${WHITE}🔧 Comandos Úteis:${NC}"
         echo -e "${YELLOW}   • Ver logs: ${WHITE}docker-compose logs -f${NC}"
@@ -495,8 +495,8 @@ show_help() {
     
     echo -e "${WHITE}🔐 Credenciais Padrão:${NC}"
     echo -e "• Usuário: admin@cardioai.pro"
-    echo -e "• Senha: admin123"
-    echo -e "• (Altere após primeiro login)"
+    echo -e "• Senha: (gerada automaticamente no primeiro uso)"
+    echo -e "• (Verifique os logs do sistema para obter a senha inicial)"
     echo
     
     echo -e "${WHITE}📞 Suporte:${NC}"

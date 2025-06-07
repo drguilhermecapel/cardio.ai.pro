@@ -135,7 +135,7 @@ cd C:\caminho\para\cardio.ai.pro
 
 **Credenciais Padrão:**
 - Usuário: admin@cardioai.pro
-- Senha: admin123
+- Senha: (gerada automaticamente no primeiro uso - veja logs do sistema)
 
 **Comandos Úteis (PowerShell):**
 ```powershell
@@ -381,9 +381,9 @@ docker-compose exec postgres pg_isready -U postgres
 ### Credenciais Padrão
 ```
 Usuário: admin@cardioai.pro
-Senha: admin123
+Senha: (gerada automaticamente no primeiro uso)
 ```
-⚠️ **IMPORTANTE**: Altere a senha após o primeiro login!
+⚠️ **IMPORTANTE**: Verifique os logs do sistema para obter a senha inicial e altere-a após o primeiro login!
 
 ### Criação de Usuários
 ```bash
