@@ -155,6 +155,22 @@ if errorlevel 1 (
 echo.
 echo All required tools are available. Starting build process...
 echo.
+echo ========================================
+echo IMPORTANT: Build Process Information
+echo ========================================
+echo This script will now build the CardioAI Pro installer.
+echo The process includes several steps that may take time:
+echo.
+echo 1. Backend build (PyInstaller) - may take 5-10 minutes
+echo 2. Frontend build (npm/Vite) - may take 2-5 minutes  
+echo 3. Installer compilation - may take 1-2 minutes
+echo.
+echo Please be patient and do NOT close this window.
+echo The script is working even if it appears inactive.
+echo.
+echo Press any key to continue...
+pause >nul
+echo.
 
 REM Step 1: Build Backend
 echo ========================================
@@ -184,6 +200,9 @@ if errorlevel 1 (
     )
 )
 
+echo Starting backend build process...
+echo This may take several minutes - please wait...
+echo.
 python build_backend.py
 if errorlevel 1 (
     echo ERROR: Backend build failed
@@ -233,6 +252,9 @@ if errorlevel 1 (
     exit /b 1
 )
 
+echo Starting frontend build process...
+echo This may take several minutes - please wait...
+echo.
 python build_frontend.py
 if errorlevel 1 (
     echo ERROR: Frontend build failed
