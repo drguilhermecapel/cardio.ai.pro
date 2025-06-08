@@ -196,7 +196,10 @@ https://github.com/drguilhermecapel/cardio.ai.pro
         f.write(license_content)
     
     icon_file = installer_dir / "cardioai.ico"
-    
+    if not icon_file.exists():
+        print("Icon file not found, creating placeholder cardioai.ico")
+        icon_file.touch()
+
     nsis_script = installer_dir / "installer.nsi"
     with open(nsis_script, 'w', encoding='utf-8') as f:
         f.write(create_nsis_script())

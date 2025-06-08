@@ -175,7 +175,8 @@ The installer uses these default settings:
 To customize the installer:
 
 1. **Change application details**: Edit variables at the top of `cardioai_installer.nsi`
-2. **Add custom icon**: Replace `cardioai.ico` with your icon file
+2. **Add custom icon**: Replace `cardioai.ico` with your icon file. If the file
+   is missing, the build script will create a blank placeholder automatically.
 3. **Modify license**: Edit `LICENSE.txt`
 4. **Change default settings**: Modify `.env.example`
 
