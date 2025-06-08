@@ -11,13 +11,31 @@ REM Check if we're in the correct directory and auto-navigate if needed
 if not exist "build_backend.py" (
     if exist "windows_installer\build_backend.py" (
         echo Auto-navigating to windows_installer directory...
-        cd windows_installer
+        set PUSHED_DIR=1
+        pushd windows_installer
+        if errorlevel 1 (
+            echo ERROR: Failed to navigate to windows_installer directory
+            echo Current directory: %CD%
+            pause
+            exit /b 1
+        )
+        echo Successfully navigated to windows_installer directory
     ) else (
         echo ERROR: Please run this script from the project root or windows_installer directory
         echo Current directory should contain windows_installer\ folder or build_backend.py
+        echo Current directory: %CD%
         pause
         exit /b 1
     )
+)
+
+REM Verify we're now in the correct directory
+if not exist "build_backend.py" (
+    echo ERROR: Directory navigation failed - build_backend.py not found
+    echo Current directory: %CD%
+    echo Expected files: build_backend.py, build_frontend.py, cardioai_installer.nsi
+    pause
+    exit /b 1
 )
 
 REM Check for required tools
@@ -340,6 +358,10 @@ if "%NSIS_AVAILABLE%"=="true" (
 )
 
 echo.
+
+REM Restore original directory if we navigated
+if defined PUSHED_DIR popd
+
 pause
 
 REM Function to download portable Node.js
