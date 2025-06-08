@@ -248,6 +248,9 @@ Thumbs.db
 *.bin
 *.model
 
+# Windows installer executables - too large for git
+windows_installer/*.exe
+
 # Data files
 data/
 *.csv
