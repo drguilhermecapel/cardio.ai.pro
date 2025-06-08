@@ -9,8 +9,28 @@ echo.
 
 REM Check if we're in the correct directory
 if not exist "build_backend.py" (
-    echo ERROR: Please run this script from the windows_installer directory
-    echo Current directory should contain build_backend.py, build_frontend.py, etc.
+    echo.
+    echo ========================================
+    echo ERROR: Incorrect Directory
+    echo ========================================
+    echo.
+    echo This script must be run from the windows_installer directory.
+    echo.
+    echo CURRENT DIRECTORY: %CD%
+    echo.
+    echo SOLUTION:
+    echo 1. Navigate to the CardioAI Pro project folder
+    echo 2. Enter the windows_installer directory:
+    echo    cd windows_installer
+    echo 3. Run this script again:
+    echo    build_installer.bat
+    echo.
+    echo The windows_installer directory should contain:
+    echo   - build_backend.py
+    echo   - build_frontend.py  
+    echo   - build_installer.bat (this script)
+    echo   - cardioai_installer.nsi
+    echo.
     pause
     exit /b 1
 )
