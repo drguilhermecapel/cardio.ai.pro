@@ -7,12 +7,17 @@ echo CardioAI Pro Windows Installer Builder
 echo ========================================
 echo.
 
-REM Check if we're in the correct directory
+REM Check if we're in the correct directory and auto-navigate if needed
 if not exist "build_backend.py" (
-    echo ERROR: Please run this script from the windows_installer directory
-    echo Current directory should contain build_backend.py, build_frontend.py, etc.
-    pause
-    exit /b 1
+    if exist "windows_installer\build_backend.py" (
+        echo Auto-navigating to windows_installer directory...
+        cd windows_installer
+    ) else (
+        echo ERROR: Please run this script from the project root or windows_installer directory
+        echo Current directory should contain windows_installer\ folder or build_backend.py
+        pause
+        exit /b 1
+    )
 )
 
 REM Check for required tools
