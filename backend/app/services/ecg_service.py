@@ -548,14 +548,14 @@ class ECGAnalysisService:
                 if lead_name in range_data:
                     lead_data = range_data[lead_name]
                     if isinstance(lead_data, dict):
-                        return {k: v for k, v in lead_data.items() if isinstance(v, (int, float, str))}
+                        return {k: v for k, v in lead_data.items() if isinstance(v, int | float | str)}
                 elif "default" in range_data:
                     default_data = range_data["default"]
                     if isinstance(default_data, dict):
-                        return {k: v for k, v in default_data.items() if isinstance(v, (int, float, str))}
+                        return {k: v for k, v in default_data.items() if isinstance(v, int | float | str)}
                 else:
-                    if isinstance(range_data, dict) and all(isinstance(v, (int, float, str)) for v in range_data.values()):
-                        return {k: v for k, v in range_data.items() if isinstance(v, (int, float, str))}
+                    if isinstance(range_data, dict) and all(isinstance(v, int | float | str) for v in range_data.values()):
+                        return {k: v for k, v in range_data.items() if isinstance(v, int | float | str)}
                     return {"min": 0.0, "max": 0.0, "unit": "unknown"}
 
         return {"min": 0.0, "max": 0.0, "unit": "unknown"}
