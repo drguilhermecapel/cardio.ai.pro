@@ -164,7 +164,7 @@ class ECGDocumentScanner:
                 signal = np.interp(np.linspace(0, len(signal_points)-1, target_length),
                                  np.arange(len(signal_points)), signal_points)
 
-                confidence = float(min(1.0, np.std(signal) * 10))  # Heuristic confidence
+                confidence = min(1.0, float(np.std(signal)) * 10)  # Heuristic confidence
 
                 return signal, confidence
             else:
