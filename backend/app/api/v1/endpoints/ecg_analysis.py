@@ -57,7 +57,7 @@ async def upload_ecg(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Invalid image file: {str(e)}"
-            )
+            ) from e
 
     if file.size and file.size > settings.MAX_ECG_FILE_SIZE:
         raise HTTPException(

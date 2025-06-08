@@ -69,7 +69,7 @@ class UniversalECGReader:
                         result = loop.run_until_complete(result)
                 except RuntimeError:
                     result = asyncio.run(result)
-            
+
             if isinstance(result, dict):
                 return result
             elif result is not None:
@@ -157,15 +157,15 @@ class UniversalECGReader:
         """Digitize ECG from images using advanced document scanner"""
         try:
             from app.services.ecg_document_scanner import ECGDocumentScanner
-            
+
             scanner = ECGDocumentScanner()
             result = await scanner.digitize_ecg(filepath, sampling_rate)
-            
+
             logger.info(f"Successfully digitized ECG image: {filepath}")
             logger.info(f"Scanner confidence: {result['metadata']['scanner_confidence']}")
-            
+
             return result
-            
+
         except ImportError as e:
             logger.error(f"ECGDocumentScanner not available: {e}")
             signal_matrix = np.random.randn(5000, 12) * 0.1
