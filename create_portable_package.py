@@ -47,7 +47,7 @@ def create_portable_package():
     
     print(f"Creating package in: {package_dir}")
     
-    backend_exe = base_dir / "backend" / "dist" / "cardioai-pro-backend"
+    backend_exe = base_dir / "backend" / "dist" / "cardioai-pro-backend.exe"
     if backend_exe.exists():
         print("✓ Copying backend executable...")
         shutil.copy2(backend_exe, package_dir / "cardioai-pro-backend.exe")
