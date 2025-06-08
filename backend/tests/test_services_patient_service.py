@@ -40,7 +40,7 @@ async def test_create_patient():
         mock_patient.id = 1
         mock_patient.first_name = "John"
         mock_patient.last_name = "Doe"
-        mock_repo.create_patient.return_value = mock_patient
+        mock_repo.create_patient = AsyncMock(return_value=mock_patient)
         
         result = await service.create_patient(patient_data, created_by=1)
         
@@ -59,7 +59,7 @@ async def test_get_patient_by_patient_id():
         mock_patient = MagicMock()
         mock_patient.patient_id = "P123"
         mock_patient.first_name = "John"
-        mock_repo.get_patient_by_patient_id.return_value = mock_patient
+        mock_repo.get_patient_by_patient_id = AsyncMock(return_value=mock_patient)
         
         result = await service.get_patient_by_patient_id("P123")
         
@@ -79,7 +79,7 @@ async def test_update_patient():
         mock_patient = MagicMock()
         mock_patient.id = 1
         mock_patient.first_name = "Jane"
-        mock_repo.update_patient.return_value = mock_patient
+        mock_repo.update_patient = AsyncMock(return_value=mock_patient)
         
         result = await service.update_patient(1, update_data)
         
@@ -95,7 +95,7 @@ async def test_get_patients():
     
     with patch.object(service, 'repository') as mock_repo:
         mock_patients = [MagicMock(), MagicMock()]
-        mock_repo.get_patients.return_value = (mock_patients, 2)
+        mock_repo.get_patients = AsyncMock(return_value=(mock_patients, 2))
         
         result, count = await service.get_patients(limit=10, offset=0)
         
@@ -112,7 +112,7 @@ async def test_search_patients():
     
     with patch.object(service, 'repository') as mock_repo:
         mock_patients = [MagicMock()]
-        mock_repo.search_patients.return_value = (mock_patients, 1)
+        mock_repo.search_patients = AsyncMock(return_value=(mock_patients, 1))
         
         result, count = await service.search_patients("John", ["first_name"], limit=10, offset=0)
         

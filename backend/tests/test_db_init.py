@@ -25,19 +25,25 @@ async def test_init_db():
 async def test_create_admin_user_new_user():
     """Test creating admin user when user doesn't exist."""
     mock_session = AsyncMock()
-    mock_user_repo = MagicMock()
-    mock_user_repo.get_by_email.return_value = None
     
-    with patch('app.db.init_db.UserRepository') as mock_repo_class:
-        mock_repo_class.return_value = mock_user_repo
-        
-        with patch('app.db.init_db.get_password_hash') as mock_hash:
-            mock_hash.return_value = "hashed_password"
+    with patch('sqlalchemy.future.select') as mock_select:
+        with patch.object(mock_session, 'execute') as mock_execute:
+            mock_result = MagicMock()
+            mock_result.scalar_one_or_none.return_value = None  # No existing user
+            mock_execute.return_value = mock_result
             
-            await create_admin_user(mock_session)
-            
-            assert mock_session.add.called
-            assert mock_session.commit.called
+            with patch('app.db.init_db.get_password_hash') as mock_hash:
+                mock_hash.return_value = "hashed_password"
+                
+                with patch('app.db.init_db.User') as mock_user_class:
+                    mock_user = MagicMock()
+                    mock_user_class.return_value = mock_user
+                    
+                    result = await create_admin_user(mock_session)
+                    
+                    assert mock_session.add.called
+                    assert mock_session.commit.called
+                    assert result == mock_user
 
 
 @pytest.mark.asyncio
@@ -62,14 +68,18 @@ async def test_init_db_with_tables():
     """Test database initialization with table creation."""
     mock_session = AsyncMock()
     mock_engine = MagicMock()
+    mock_conn = AsyncMock()
     
     with patch('app.db.init_db.get_session_factory') as mock_factory:
         mock_factory.return_value.return_value.__aenter__.return_value = mock_session
         
-        with patch('app.db.init_db.engine', mock_engine):
-            with patch('app.models.base.Base.metadata') as mock_metadata:
+        with patch('app.db.init_db.get_engine') as mock_get_engine:
+            mock_get_engine.return_value = mock_engine
+            mock_engine.begin.return_value.__aenter__.return_value = mock_conn
+            
+            with patch('app.db.init_db.create_admin_user') as mock_create_user:
                 await init_db()
-                mock_metadata.create_all.assert_called_once_with(bind=mock_engine)
+                mock_conn.run_sync.assert_called_once()
 
 
 @pytest.mark.asyncio

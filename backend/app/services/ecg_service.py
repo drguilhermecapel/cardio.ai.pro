@@ -528,18 +528,18 @@ class ECGAnalysisService:
             logger.error(f"Failed to generate medical report: analysis_id={analysis_id}, error={str(e)}")
             raise ECGProcessingException(f"Failed to generate report: {str(e)}") from e
 
-    def _get_normal_range(self, measurement_type: str, lead_name: str) -> dict[str, float]:
+    def _get_normal_range(self, measurement_type: str, lead_name: str) -> dict[str, float | str]:
         """Get normal range for a measurement type and lead."""
-        normal_ranges: dict[str, dict[str, dict[str, float]] | dict[str, float]] = {
+        normal_ranges: dict[str, dict[str, object]] = {
             "amplitude": {
-                "default": {"min": -5.0, "max": 5.0, "unit": 0.0},
-                "V1": {"min": -1.0, "max": 3.0, "unit": 0.0},
-                "V5": {"min": 0.5, "max": 2.5, "unit": 0.0}
+                "default": {"min": -5.0, "max": 5.0, "unit": "mV"},
+                "V1": {"min": -1.0, "max": 3.0, "unit": "mV"},
+                "V5": {"min": 0.5, "max": 2.5, "unit": "mV"}
             },
-            "heart_rate": {"min": 60.0, "max": 100.0, "unit": 0.0},
-            "pr_interval": {"min": 120.0, "max": 200.0, "unit": 0.0},
-            "qrs_duration": {"min": 80.0, "max": 120.0, "unit": 0.0},
-            "qt_interval": {"min": 350.0, "max": 450.0, "unit": 0.0}
+            "heart_rate": {"min": 60.0, "max": 100.0, "unit": "bpm"},
+            "pr_interval": {"min": 120.0, "max": 200.0, "unit": "ms"},
+            "qrs_duration": {"min": 80.0, "max": 120.0, "unit": "ms"},
+            "qt_interval": {"min": 350.0, "max": 450.0, "unit": "ms"}
         }
 
         if measurement_type in normal_ranges:
@@ -548,17 +548,17 @@ class ECGAnalysisService:
                 if lead_name in range_data:
                     lead_data = range_data[lead_name]
                     if isinstance(lead_data, dict):
-                        return lead_data
+                        return {k: v for k, v in lead_data.items() if isinstance(v, (int, float, str))}
                 elif "default" in range_data:
                     default_data = range_data["default"]
                     if isinstance(default_data, dict):
-                        return default_data
+                        return {k: v for k, v in default_data.items() if isinstance(v, (int, float, str))}
                 else:
-                    if isinstance(range_data, dict) and all(isinstance(v, int | float) for v in range_data.values()):
-                        return {k: float(v) for k, v in range_data.items() if isinstance(v, int | float)}
-                    return {"min": 0.0, "max": 0.0, "unit": 0.0}
+                    if isinstance(range_data, dict) and all(isinstance(v, (int, float, str)) for v in range_data.values()):
+                        return {k: v for k, v in range_data.items() if isinstance(v, (int, float, str))}
+                    return {"min": 0.0, "max": 0.0, "unit": "unknown"}
 
-        return {"min": 0.0, "max": 0.0, "unit": 0.0}
+        return {"min": 0.0, "max": 0.0, "unit": "unknown"}
 
     def _assess_quality_issues(self, analysis: ECGAnalysis) -> list[str]:
         """Assess signal quality issues."""

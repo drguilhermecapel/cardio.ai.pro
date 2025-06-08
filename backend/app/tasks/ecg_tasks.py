@@ -40,8 +40,7 @@ async def process_ecg_analysis_sync(analysis_id: int) -> dict[str, Any]:
             logger.info(f"ECG analysis {analysis_id} completed successfully")
             return {"status": "completed", "analysis_id": analysis_id}
 
-    except Exception as exc:
-        logger.error("ECG analysis failed: %s", exc)
+    except Exception:
         raise
 
 def process_ecg_analysis_sync_wrapper(analysis_id: int) -> dict[str, Any]:
