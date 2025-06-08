@@ -6,37 +6,43 @@ echo ========================================
 echo CardioAI Pro Windows Installer Builder
 echo ========================================
 echo.
+echo NOTE: This script can be run from anywhere - it will automatically
+echo navigate to the correct directory. You can double-click it or run
+echo it from Command Prompt.
+echo.
 
-REM Check if we're in the correct directory and auto-navigate if needed
-if not exist "build_backend.py" (
-    if exist "windows_installer\build_backend.py" (
-        echo Auto-navigating to windows_installer directory...
-        set PUSHED_DIR=1
-        pushd windows_installer
-        if errorlevel 1 (
-            echo ERROR: Failed to navigate to windows_installer directory
-            echo Current directory: %CD%
-            pause
-            exit /b 1
-        )
-        echo Successfully navigated to windows_installer directory
-    ) else (
-        echo ERROR: Please run this script from the project root or windows_installer directory
-        echo Current directory should contain windows_installer\ folder or build_backend.py
-        echo Current directory: %CD%
-        pause
-        exit /b 1
-    )
-)
+REM Get the directory where this script is located
+set SCRIPT_DIR=%~dp0
 
-REM Verify we're now in the correct directory
-if not exist "build_backend.py" (
-    echo ERROR: Directory navigation failed - build_backend.py not found
+REM Navigate to the script's directory first
+echo Navigating to installer directory: %SCRIPT_DIR%
+pushd "%SCRIPT_DIR%"
+if errorlevel 1 (
+    echo ERROR: Failed to navigate to script directory: %SCRIPT_DIR%
     echo Current directory: %CD%
-    echo Expected files: build_backend.py, build_frontend.py, cardioai_installer.nsi
     pause
     exit /b 1
 )
+set PUSHED_DIR=1
+
+REM Now verify we're in the correct directory (should have build_backend.py)
+if not exist "build_backend.py" (
+    echo ERROR: Script directory validation failed - build_backend.py not found
+    echo Script directory: %SCRIPT_DIR%
+    echo Current directory: %CD%
+    echo.
+    echo This script must be located in the windows_installer directory of the CardioAI Pro project.
+    echo Expected files: build_backend.py, build_frontend.py, cardioai_installer.nsi
+    echo.
+    echo SOLUTION:
+    echo 1. Make sure you downloaded the complete CardioAI Pro project
+    echo 2. Ensure this script is in the windows_installer folder
+    echo 3. Do not move this script to other locations
+    pause
+    exit /b 1
+)
+
+echo ✅ Successfully located in installer directory
 
 REM Check for required tools
 echo Checking for required tools...
@@ -62,7 +68,7 @@ if errorlevel 1 (
 )
 
 REM Check for Node.js - try portable version first, then system installation
-set PORTABLE_NODE_DIR=%~dp0portable_node
+set PORTABLE_NODE_DIR=portable_node
 set PORTABLE_NODE=%PORTABLE_NODE_DIR%\node.exe
 set PORTABLE_NPM=%PORTABLE_NODE_DIR%\npm.cmd
 
