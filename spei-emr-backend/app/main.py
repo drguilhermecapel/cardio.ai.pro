@@ -1,9 +1,22 @@
-from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+"""FastAPI application entry point for the SPEI EMR backend."""
+
+from __future__ import annotations
+
+from pathlib import Path
 from typing import List
+
 import jwt
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import (HTTPAuthorizationCredentials, HTTPBearer)
+from sqlalchemy.orm import Session
+
+if __name__ == "__main__" and __package__ is None:
+    # Allow running with `python app/main.py` by adjusting sys.path
+    import sys
+
+    sys.path.append(str(Path(__file__).resolve().parent.parent))
+    __package__ = "app"
 from datetime import datetime, timedelta
 import bcrypt
 import os
@@ -165,3 +178,14 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow()}
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        log_level="info",
+    )
