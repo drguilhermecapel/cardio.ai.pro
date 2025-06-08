@@ -76,6 +76,9 @@ class FileType(str, Enum):
     TXT = "text/plain"
 
 
+ECG_FILE_EXTENSIONS = {'.csv', '.txt', '.xml', '.dat', '.png', '.jpg', '.jpeg'}
+
+
 class NotificationChannel(str, Enum):
     """Notification channels."""
     EMAIL = "email"
