@@ -66,9 +66,9 @@ class UniversalECGReader:
                     if loop.is_running():
                         return {"data": result}
                     else:
-                        result = loop.run_until_complete(result)
+                        result = loop.run_until_complete(result)  # type: ignore
                 except RuntimeError:
-                    result = asyncio.run(result)
+                    result = asyncio.run(result)  # type: ignore
 
             if isinstance(result, dict):
                 return result

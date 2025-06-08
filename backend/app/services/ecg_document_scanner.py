@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class ECGDocumentScanner:
     """Advanced ECG document scanner for digitizing ECG images."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.sampling_rate = 500  # Default sampling rate
         self.leads = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
 
@@ -80,14 +80,14 @@ class ECGDocumentScanner:
                 }
             }
 
-    def _load_image(self, filepath: str) -> np.ndarray:
+    def _load_image(self, filepath: str) -> np.ndarray[Any, Any]:
         """Load image using OpenCV."""
         image = cv2.imread(filepath)
         if image is None:
             raise ValueError(f"Could not load image from {filepath}")
         return image
 
-    def _preprocess_image(self, image: np.ndarray) -> np.ndarray:
+    def _preprocess_image(self, image: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
         """Preprocess image for ECG detection."""
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -95,7 +95,7 @@ class ECGDocumentScanner:
                                      cv2.THRESH_BINARY_INV, 11, 2)
         return thresh
 
-    def _detect_grid(self, image: np.ndarray) -> dict[str, Any]:
+    def _detect_grid(self, image: np.ndarray[Any, Any]) -> dict[str, Any]:
         """Detect ECG grid pattern."""
         horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 1))
         vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 25))
@@ -111,7 +111,7 @@ class ECGDocumentScanner:
             'vertical_lines': vertical_lines
         }
 
-    def _detect_lead_regions(self, image: np.ndarray, grid_info: dict[str, Any]) -> list[np.ndarray]:
+    def _detect_lead_regions(self, image: np.ndarray[Any, Any], grid_info: dict[str, Any]) -> list[np.ndarray[Any, Any]]:
         """Detect regions containing individual ECG leads."""
         height, width = image.shape
 
@@ -130,7 +130,7 @@ class ECGDocumentScanner:
 
         return regions
 
-    def _extract_signal_from_region(self, region: np.ndarray, sampling_rate: int) -> tuple[np.ndarray, float]:
+    def _extract_signal_from_region(self, region: np.ndarray[Any, Any], sampling_rate: int) -> tuple[np.ndarray[Any, Any], float]:
         """Extract ECG signal from a region using line detection."""
         try:
             contours, _ = cv2.findContours(region, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -164,7 +164,7 @@ class ECGDocumentScanner:
                 signal = np.interp(np.linspace(0, len(signal_points)-1, target_length),
                                  np.arange(len(signal_points)), signal_points)
 
-                confidence = min(1.0, np.std(signal) * 10)  # Heuristic confidence
+                confidence = float(min(1.0, np.std(signal) * 10))  # Heuristic confidence
 
                 return signal, confidence
             else:
