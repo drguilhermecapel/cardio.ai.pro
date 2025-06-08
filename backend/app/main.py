@@ -15,7 +15,12 @@ if getattr(sys, 'frozen', False):
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.api import api_router
+try:
+    from app.api.v1.api import api_router
+except ModuleNotFoundError:  # allow running without PYTHONPATH configured
+    current_dir = Path(__file__).resolve().parent
+    sys.path.insert(0, str(current_dir.parent))
+    from app.api.v1.api import api_router
 
 
 # Simplified startup for standalone version
