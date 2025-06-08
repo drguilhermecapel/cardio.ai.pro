@@ -38,7 +38,7 @@ async def upload_ecg(
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """Upload ECG file for analysis."""
-    allowed_extensions = {'.csv', '.txt', '.xml', '.dat'}
+    allowed_extensions = {'.csv', '.txt', '.xml', '.dat', '.png', '.jpg', '.jpeg'}
     file_extension = os.path.splitext(file.filename or "")[1].lower()
 
     if file_extension not in allowed_extensions:
@@ -46,6 +46,18 @@ async def upload_ecg(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unsupported file type. Allowed: {', '.join(allowed_extensions)}"
         )
+
+    if file_extension in {'.png', '.jpg', '.jpeg'}:
+        try:
+            from PIL import Image
+            with Image.open(file.file) as img:
+                img.verify()
+            await file.seek(0)
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid image file: {str(e)}"
+            ) from e
 
     if file.size and file.size > settings.MAX_ECG_FILE_SIZE:
         raise HTTPException(

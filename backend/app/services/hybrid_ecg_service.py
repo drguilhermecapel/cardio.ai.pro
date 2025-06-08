@@ -59,6 +59,17 @@ class UniversalECGReader:
 
         if ext in self.supported_formats:
             result = self.supported_formats[ext](filepath, sampling_rate or 500)
+            if hasattr(result, '__await__'):
+                import asyncio
+                try:
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        return {"data": result}
+                    else:
+                        result = loop.run_until_complete(result)  # type: ignore
+                except RuntimeError:
+                    result = asyncio.run(result)  # type: ignore
+
             if isinstance(result, dict):
                 return result
             elif result is not None:
@@ -145,23 +156,32 @@ class UniversalECGReader:
     async def _read_image(self, filepath: str, sampling_rate: int = 500) -> dict[str, Any]:
         """Digitize ECG from images using advanced document scanner"""
         try:
-            # from app.services.ecg_document_scanner import ECGDocumentScanner  # Disabled for core component
-            raise NotImplementedError("Image processing not available in core component")
-        except NotImplementedError:
-            signal_matrix = np.random.randn(5000, 12) * 0.1
+            from app.services.ecg_document_scanner import ECGDocumentScanner
 
+            scanner = ECGDocumentScanner()
+            result = await scanner.digitize_ecg(filepath, sampling_rate)
+
+            logger.info(f"Successfully digitized ECG image: {filepath}")
+            logger.info(f"Scanner confidence: {result['metadata']['scanner_confidence']}")
+
+            return result
+
+        except ImportError as e:
+            logger.error(f"ECGDocumentScanner not available: {e}")
+            signal_matrix = np.random.randn(5000, 12) * 0.1
             return {
                 'signal': signal_matrix,
                 'sampling_rate': sampling_rate,
                 'labels': ['I', 'II', 'III', 'aVR', 'aVL', 'aVF',
                           'V1', 'V2', 'V3', 'V4', 'V5', 'V6'],
                 'metadata': {
-                    'source': 'digitized_image',
-                    'scanner_confidence': 0.0,  # Placeholder for PR-008
-                    'document_detected': False,  # Placeholder for PR-008
-                    'processing_method': 'not_implemented',  # Placeholder for PR-008
-                    'grid_detected': False,  # Placeholder for PR-008
-                    'leads_detected': 0  # Placeholder for PR-008
+                    'source': 'digitized_image_fallback',
+                    'scanner_confidence': 0.0,
+                    'document_detected': False,
+                    'processing_method': 'import_error_fallback',
+                    'grid_detected': False,
+                    'leads_detected': 0,
+                    'error': str(e)
                 }
             }
         except Exception as e:
@@ -175,7 +195,8 @@ class UniversalECGReader:
                 'metadata': {
                     'source': 'digitized_image_fallback',
                     'error': str(e),
-                    'scanner_confidence': 0.0
+                    'scanner_confidence': 0.0,
+                    'processing_method': 'exception_fallback'
                 }
             }
 
