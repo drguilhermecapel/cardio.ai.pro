@@ -26,7 +26,7 @@ def setup_environment():
         ], check=True)
     
     print("Installing backend dependencies...")
-    subprocess.run(["poetry", "install", "--no-dev"], check=True)
+    subprocess.run(["poetry", "install", "--without=dev"], check=True)
     
     print("Installing PyInstaller...")
     subprocess.run(["poetry", "run", "pip", "install", "pyinstaller"], check=True)
