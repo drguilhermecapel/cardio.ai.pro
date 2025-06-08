@@ -53,12 +53,24 @@ def get_engine() -> AsyncEngine:
                 "check_same_thread": False,
             }
             import os
+            from pathlib import Path
+
             db_path = str(settings.DATABASE_URL).replace("sqlite+aiosqlite:///", "")
             if not db_path.startswith("/"):
                 db_path = os.path.abspath(db_path)
+
             db_dir = os.path.dirname(db_path)
             if db_dir:
-                os.makedirs(db_dir, exist_ok=True)
+                try:
+                    os.makedirs(db_dir, mode=0o755, exist_ok=True)
+                    test_file = Path(db_dir) / ".write_test"
+                    test_file.touch()
+                    test_file.unlink()
+                except (OSError, PermissionError) as e:
+                    raise RuntimeError(
+                        f"Cannot create or write to database directory {db_dir}: {e}. "
+                        "Check permissions and disk space."
+                    ) from e
 
         _engine = create_async_engine(
             str(settings.DATABASE_URL),

@@ -85,13 +85,14 @@ def test_get_password_hash():
 def test_decode_access_token():
     """Test JWT access token decoding."""
     token = "valid_jwt_token"
-    
-    with patch('app.core.security.jwt.decode') as mock_decode:
-        mock_decode.return_value = {"sub": "test@example.com", "exp": 1234567890}
-        
+
+    with patch('app.core.security.verify_token') as mock_verify:
+        mock_verify.return_value = {"sub": "test@example.com", "exp": 1234567890, "type": "access"}
+
         payload = decode_access_token(token)
-        
-        mock_decode.assert_called_once()
+
+        mock_verify.assert_called_once_with(token, "access")
+        assert payload is not None
         assert payload["sub"] == "test@example.com"
 
 
@@ -99,12 +100,13 @@ def test_decode_access_token_invalid():
     """Test JWT access token decoding with invalid token."""
     token = "invalid_jwt_token"
     
-    with patch('app.core.security.jwt.decode') as mock_decode:
-        mock_decode.side_effect = Exception("Invalid token")
+    with patch('app.core.security.verify_token') as mock_verify:
+        from app.core.exceptions import AuthenticationException
+        mock_verify.side_effect = AuthenticationException("Invalid token")
         
         payload = decode_access_token(token)
         
-        mock_decode.assert_called_once()
+        mock_verify.assert_called_once_with(token, "access")
         assert payload is None
 
 

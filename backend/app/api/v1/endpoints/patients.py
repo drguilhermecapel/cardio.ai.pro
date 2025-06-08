@@ -127,3 +127,46 @@ async def search_patients(
         page=offset // limit + 1,
         size=limit,
     )
+
+
+@router.get("/{patient_id}/ecg-analyses")
+async def get_patient_ecg_analyses(
+    patient_id: str,
+    limit: int = 50,
+    offset: int = 0,
+    current_user: User = Depends(UserService.get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """Get ECG analyses for a specific patient."""
+    from app.services.ecg_service import ECGAnalysisService
+    from app.services.ml_model_service import MLModelService
+    from app.services.notification_service import NotificationService
+    from app.services.validation_service import ValidationService
+
+    patient_service = PatientService(db)
+
+    patient = await patient_service.get_patient_by_patient_id(patient_id)
+    if not patient:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Patient not found"
+        )
+
+    ml_service = MLModelService()
+    validation_service = ValidationService(db, NotificationService(db))
+    ecg_service = ECGAnalysisService(db, ml_service, validation_service)
+
+    filters = {"patient_id": patient.id}
+    if not current_user.is_superuser:
+        filters["created_by"] = current_user.id
+
+    analyses, total = await ecg_service.search_analyses(filters, limit, offset)
+
+    from app.schemas.ecg_analysis import ECGAnalysis, ECGAnalysisList
+    analyses_schemas = [ECGAnalysis.from_orm(a) for a in analyses]
+    return ECGAnalysisList(
+        analyses=analyses_schemas,
+        total=total,
+        page=offset // limit + 1,
+        size=limit,
+    )

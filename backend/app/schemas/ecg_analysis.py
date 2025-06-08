@@ -21,7 +21,7 @@ class ECGAnalysisBase(BaseModel):
     original_filename: str = Field(..., min_length=1, max_length=255)
     acquisition_date: datetime
     sample_rate: int = Field(..., ge=100, le=2000)
-    duration_seconds: float = Field(..., ge=1.0, le=300.0)
+    duration_seconds: float = Field(..., ge=0.001, le=300.0)
     leads_count: int = Field(..., ge=1, le=15)
     leads_names: list[str] = Field(..., min_length=1, max_length=15)
     device_manufacturer: str | None = Field(None, max_length=100)

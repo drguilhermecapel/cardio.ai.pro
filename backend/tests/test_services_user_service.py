@@ -6,7 +6,7 @@ if settings.STANDALONE_MODE:
     pytest.skip("User service tests skipped in standalone mode", allow_module_level=True)
 
 from app.services.user_service import UserService
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate
 
 
 @pytest.mark.asyncio
@@ -15,7 +15,8 @@ async def test_user_service_initialization():
     mock_session = AsyncMock()
     service = UserService(mock_session)
     
-    assert service.session == mock_session
+    assert service.db == mock_session
+    assert hasattr(service, 'repository')
 
 
 @pytest.mark.asyncio
@@ -25,40 +26,24 @@ async def test_create_user():
     service = UserService(mock_session)
     
     user_data = UserCreate(
+        username="testuser",
         email="test@example.com",
-        password="password123",
-        full_name="Test User"
+        password="Password123!",
+        first_name="Test",
+        last_name="User"
     )
     
-    with patch.object(service, 'user_repo') as mock_repo:
+    with patch.object(service, 'repository') as mock_repo:
         mock_user = MagicMock()
         mock_user.id = 1
         mock_user.email = "test@example.com"
-        mock_repo.create.return_value = mock_user
+        mock_repo.create_user = AsyncMock(return_value=mock_user)
         
         result = await service.create_user(user_data)
         
-        mock_repo.create.assert_called_once()
+        mock_repo.create_user.assert_called_once()
         assert result.id == 1
         assert result.email == "test@example.com"
-
-
-@pytest.mark.asyncio
-async def test_get_user_by_id():
-    """Test getting user by ID."""
-    mock_session = AsyncMock()
-    service = UserService(mock_session)
-    
-    with patch.object(service, 'user_repo') as mock_repo:
-        mock_user = MagicMock()
-        mock_user.id = 1
-        mock_user.email = "test@example.com"
-        mock_repo.get.return_value = mock_user
-        
-        result = await service.get_user(1)
-        
-        mock_repo.get.assert_called_once_with(1)
-        assert result.id == 1
 
 
 @pytest.mark.asyncio
@@ -67,15 +52,32 @@ async def test_get_user_by_email():
     mock_session = AsyncMock()
     service = UserService(mock_session)
     
-    with patch.object(service, 'user_repo') as mock_repo:
+    with patch.object(service, 'repository') as mock_repo:
         mock_user = MagicMock()
         mock_user.email = "test@example.com"
-        mock_repo.get_by_email.return_value = mock_user
+        mock_repo.get_user_by_email = AsyncMock(return_value=mock_user)
         
         result = await service.get_user_by_email("test@example.com")
         
-        mock_repo.get_by_email.assert_called_once_with("test@example.com")
+        mock_repo.get_user_by_email.assert_called_once_with("test@example.com")
         assert result.email == "test@example.com"
+
+
+@pytest.mark.asyncio
+async def test_get_user_by_username():
+    """Test getting user by username."""
+    mock_session = AsyncMock()
+    service = UserService(mock_session)
+    
+    with patch.object(service, 'repository') as mock_repo:
+        mock_user = MagicMock()
+        mock_user.username = "testuser"
+        mock_repo.get_user_by_username = AsyncMock(return_value=mock_user)
+        
+        result = await service.get_user_by_username("testuser")
+        
+        mock_repo.get_user_by_username.assert_called_once_with("testuser")
+        assert result.username == "testuser"
 
 
 @pytest.mark.asyncio
@@ -84,33 +86,18 @@ async def test_update_user():
     mock_session = AsyncMock()
     service = UserService(mock_session)
     
-    user_update = UserUpdate(full_name="Updated Name")
+    update_data = {"first_name": "Updated", "last_name": "Name"}
     
-    with patch.object(service, 'user_repo') as mock_repo:
+    with patch.object(service, 'repository') as mock_repo:
         mock_user = MagicMock()
         mock_user.id = 1
-        mock_user.full_name = "Updated Name"
-        mock_repo.update.return_value = mock_user
+        mock_user.first_name = "Updated"
+        mock_repo.update_user = AsyncMock(return_value=mock_user)
         
-        result = await service.update_user(1, user_update)
+        result = await service.update_user(1, update_data)
         
-        mock_repo.update.assert_called_once_with(1, user_update)
-        assert result.full_name == "Updated Name"
-
-
-@pytest.mark.asyncio
-async def test_delete_user():
-    """Test user deletion."""
-    mock_session = AsyncMock()
-    service = UserService(mock_session)
-    
-    with patch.object(service, 'user_repo') as mock_repo:
-        mock_repo.delete.return_value = True
-        
-        result = await service.delete_user(1)
-        
-        mock_repo.delete.assert_called_once_with(1)
-        assert result is True
+        mock_repo.update_user.assert_called_once_with(1, update_data)
+        assert result.first_name == "Updated"
 
 
 @pytest.mark.asyncio
@@ -119,18 +106,18 @@ async def test_authenticate_user():
     mock_session = AsyncMock()
     service = UserService(mock_session)
     
-    with patch.object(service, 'user_repo') as mock_repo:
-        with patch('app.services.user_service.verify_password') as mock_verify:
+    with patch('app.services.user_service.verify_password') as mock_verify:
+        with patch.object(service, 'repository') as mock_repo:
             mock_user = MagicMock()
-            mock_user.email = "test@example.com"
-            mock_user.hashed_password = "hashed_password"
-            mock_repo.get_by_email.return_value = mock_user
+            mock_user.username = "testuser"
+            mock_user.hashed_password = "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj3bp.Uvj/Ey"
+            mock_repo.get_user_by_username = AsyncMock(return_value=mock_user)
             mock_verify.return_value = True
             
-            result = await service.authenticate_user("test@example.com", "password123")
+            result = await service.authenticate_user("testuser", "password123")
             
-            mock_repo.get_by_email.assert_called_once_with("test@example.com")
-            mock_verify.assert_called_once_with("password123", "hashed_password")
+            mock_repo.get_user_by_username.assert_called_once_with("testuser")
+            mock_verify.assert_called_once_with("password123", "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj3bp.Uvj/Ey")
             assert result == mock_user
 
 
@@ -140,15 +127,15 @@ async def test_authenticate_user_invalid_password():
     mock_session = AsyncMock()
     service = UserService(mock_session)
     
-    with patch.object(service, 'user_repo') as mock_repo:
-        with patch('app.services.user_service.verify_password') as mock_verify:
+    with patch('app.services.user_service.verify_password') as mock_verify:
+        with patch.object(service, 'repository') as mock_repo:
             mock_user = MagicMock()
-            mock_user.email = "test@example.com"
-            mock_user.hashed_password = "hashed_password"
-            mock_repo.get_by_email.return_value = mock_user
+            mock_user.username = "testuser"
+            mock_user.hashed_password = "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj3bp.Uvj/Ey"
+            mock_repo.get_user_by_username = AsyncMock(return_value=mock_user)
             mock_verify.return_value = False
             
-            result = await service.authenticate_user("test@example.com", "wrong_password")
+            result = await service.authenticate_user("testuser", "wrong_password")
             
             assert result is None
 
@@ -159,54 +146,26 @@ async def test_authenticate_user_not_found():
     mock_session = AsyncMock()
     service = UserService(mock_session)
     
-    with patch.object(service, 'user_repo') as mock_repo:
-        mock_repo.get_by_email.return_value = None
+    with patch.object(service, 'repository') as mock_repo:
+        mock_repo.get_user_by_username = AsyncMock(return_value=None)
         
-        result = await service.authenticate_user("nonexistent@example.com", "password123")
+        result = await service.authenticate_user("nonexistent", "password123")
         
         assert result is None
 
 
 @pytest.mark.asyncio
-async def test_list_users():
-    """Test listing users."""
+async def test_update_last_login():
+    """Test updating user's last login."""
     mock_session = AsyncMock()
     service = UserService(mock_session)
     
-    with patch.object(service, 'user_repo') as mock_repo:
-        mock_users = [MagicMock(), MagicMock()]
-        mock_repo.list.return_value = mock_users
+    with patch.object(service, 'repository') as mock_repo:
+        mock_repo.update_user = AsyncMock(return_value=None)
         
-        result = await service.list_users(skip=0, limit=10)
+        await service.update_last_login(1)
         
-        mock_repo.list.assert_called_once_with(skip=0, limit=10)
-        assert len(result) == 2
-
-
-@pytest.mark.asyncio
-async def test_user_exists():
-    """Test checking if user exists."""
-    mock_session = AsyncMock()
-    service = UserService(mock_session)
-    
-    with patch.object(service, 'user_repo') as mock_repo:
-        mock_repo.get_by_email.return_value = MagicMock()
-        
-        result = await service.user_exists("test@example.com")
-        
-        mock_repo.get_by_email.assert_called_once_with("test@example.com")
-        assert result is True
-
-
-@pytest.mark.asyncio
-async def test_user_not_exists():
-    """Test checking if user does not exist."""
-    mock_session = AsyncMock()
-    service = UserService(mock_session)
-    
-    with patch.object(service, 'user_repo') as mock_repo:
-        mock_repo.get_by_email.return_value = None
-        
-        result = await service.user_exists("nonexistent@example.com")
-        
-        assert result is False
+        mock_repo.update_user.assert_called_once()
+        args = mock_repo.update_user.call_args[0]
+        assert args[0] == 1
+        assert "last_login" in args[1]

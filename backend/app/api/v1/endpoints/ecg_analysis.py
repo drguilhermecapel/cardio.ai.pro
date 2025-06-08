@@ -283,6 +283,45 @@ async def delete_analysis(
     return {"message": "Analysis deleted successfully"}
 
 
+@router.post("/{analysis_id}/generate-report")
+async def generate_report(
+    analysis_id: str,
+    current_user: User = Depends(UserService.get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """Generate medical report for ECG analysis."""
+    ml_service = MLModelService()
+    validation_service = ValidationService(db, NotificationService(db))
+    ecg_service = ECGAnalysisService(db, ml_service, validation_service)
+
+    analysis = await ecg_service.repository.get_analysis_by_analysis_id(analysis_id)
+    if not analysis:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Analysis not found"
+        )
+
+    if not current_user.is_superuser and analysis.created_by != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to generate report for this analysis"
+        )
+
+    try:
+        report = await ecg_service.generate_report(analysis.id)
+        return {
+            "message": "Report generated successfully",
+            "report_id": report.get("report_id"),
+            "analysis_id": analysis_id,
+            "status": "completed"
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate report: {str(e)}"
+        ) from e
+
+
 @router.get("/critical/pending", response_model=list[ECGAnalysis])
 async def get_critical_pending(
     limit: int = 20,

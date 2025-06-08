@@ -102,7 +102,7 @@ Clique duplo em: CardioAI-Pro.bat
 ### Acesso
 
 - **URL local**: http://localhost:8000
-- **Login inicial**: admin / admin123
+- **Login inicial**: admin / (senha gerada automaticamente - veja logs do sistema)
 - **Alterar senha**: Recomendado na primeira utilização
 
 ### Parar o Sistema

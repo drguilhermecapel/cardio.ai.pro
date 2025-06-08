@@ -26,7 +26,7 @@ def setup_environment():
         ], check=True)
     
     print("Installing backend dependencies...")
-    subprocess.run(["poetry", "install", "--no-dev"], check=True)
+    subprocess.run(["poetry", "install", "--without=dev"], check=True)
     
     print("Installing PyInstaller...")
     subprocess.run(["poetry", "run", "pip", "install", "pyinstaller"], check=True)
@@ -185,14 +185,19 @@ def build_executable():
     ], cwd=backend_dir, check=True)
     
     dist_dir = backend_dir / "dist"
-    exe_file = dist_dir / "cardioai-backend.exe"
+    exe_file = dist_dir / "cardioai-backend"
+    exe_file_windows = dist_dir / "cardioai-backend.exe"
     
     if exe_file.exists():
         installer_dir = Path(__file__).parent
         shutil.copy2(exe_file, installer_dir / "cardioai-backend.exe")
         print(f"Executable copied to: {installer_dir / 'cardioai-backend.exe'}")
+    elif exe_file_windows.exists():
+        installer_dir = Path(__file__).parent
+        shutil.copy2(exe_file_windows, installer_dir / "cardioai-backend.exe")
+        print(f"Executable copied to: {installer_dir / 'cardioai-backend.exe'}")
     else:
-        raise FileNotFoundError("Built executable not found!")
+        raise FileNotFoundError(f"Built executable not found! Checked: {exe_file} and {exe_file_windows}")
 
 def create_startup_script():
     """Create a startup script for the backend service."""

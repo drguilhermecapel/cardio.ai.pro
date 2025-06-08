@@ -10,18 +10,37 @@ import shutil
 import subprocess
 from pathlib import Path
 
+NODE_CMD = "node"
+NPM_CMD = "npm"
+
 def check_node_npm():
     """Check if Node.js and npm are available."""
     print("Checking Node.js and npm availability...")
     
+    portable_node_dir = Path(__file__).parent / "portable_node"
+    portable_node = portable_node_dir / "node.exe"
+    portable_npm = portable_node_dir / "npm.cmd"
+    
+    node_cmd = "node"
+    npm_cmd = "npm"
+    
+    if portable_node.exists() and portable_npm.exists():
+        print(f"Using portable Node.js: {portable_node}")
+        node_cmd = str(portable_node)
+        npm_cmd = str(portable_npm)
+    
     try:
-        result = subprocess.run(["node", "--version"], capture_output=True, text=True, check=True)
+        result = subprocess.run([node_cmd, "--version"], capture_output=True, text=True, check=True)
         node_version = result.stdout.strip()
         print(f"Node.js version: {node_version}")
         
-        result = subprocess.run(["npm", "--version"], capture_output=True, text=True, check=True)
+        result = subprocess.run([npm_cmd, "--version"], capture_output=True, text=True, check=True)
         npm_version = result.stdout.strip()
         print(f"npm version: {npm_version}")
+        
+        global NODE_CMD, NPM_CMD
+        NODE_CMD = node_cmd
+        NPM_CMD = npm_cmd
         
         return True
         
@@ -38,21 +57,21 @@ def install_dependencies():
     os.chdir(frontend_dir)
     
     if (frontend_dir / "package-lock.json").exists():
-        subprocess.run(["npm", "install"], check=True)
+        subprocess.run([NPM_CMD, "install"], check=True)
     elif (frontend_dir / "yarn.lock").exists():
         try:
             subprocess.run(["yarn", "install"], check=True)
         except FileNotFoundError:
             print("Yarn not found, falling back to npm...")
-            subprocess.run(["npm", "install"], check=True)
+            subprocess.run([NPM_CMD, "install"], check=True)
     elif (frontend_dir / "pnpm-lock.yaml").exists():
         try:
             subprocess.run(["pnpm", "install"], check=True)
         except FileNotFoundError:
             print("pnpm not found, falling back to npm...")
-            subprocess.run(["npm", "install"], check=True)
+            subprocess.run([NPM_CMD, "install"], check=True)
     else:
-        subprocess.run(["npm", "install"], check=True)
+        subprocess.run([NPM_CMD, "install"], check=True)
 
 def create_production_env():
     """Create production environment configuration."""
@@ -81,19 +100,19 @@ def build_frontend():
     os.chdir(frontend_dir)
     
     if (frontend_dir / "package-lock.json").exists():
-        subprocess.run(["npm", "run", "build"], check=True)
+        subprocess.run([NPM_CMD, "run", "build"], check=True)
     elif (frontend_dir / "yarn.lock").exists():
         try:
             subprocess.run(["yarn", "build"], check=True)
         except FileNotFoundError:
-            subprocess.run(["npm", "run", "build"], check=True)
+            subprocess.run([NPM_CMD, "run", "build"], check=True)
     elif (frontend_dir / "pnpm-lock.yaml").exists():
         try:
             subprocess.run(["pnpm", "run", "build"], check=True)
         except FileNotFoundError:
-            subprocess.run(["npm", "run", "build"], check=True)
+            subprocess.run([NPM_CMD, "run", "build"], check=True)
     else:
-        subprocess.run(["npm", "run", "build"], check=True)
+        subprocess.run([NPM_CMD, "run", "build"], check=True)
 
 def copy_build_files():
     """Copy built frontend files to installer directory."""

@@ -24,9 +24,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JS
       const response = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ username, password }),
+        body: new URLSearchParams({ username, password }),
       })
 
       if (response.ok) {

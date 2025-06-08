@@ -102,7 +102,8 @@ class ECGProcessor:
             metadata["leads_count"] = data.shape[1]
             sample_rate = metadata.get("sample_rate", 500)
             if isinstance(sample_rate, int | float):
-                metadata["duration_seconds"] = float(data.shape[0]) / float(sample_rate)
+                calculated_duration = float(data.shape[0]) / float(sample_rate)
+                metadata["duration_seconds"] = max(calculated_duration, 0.1)
             else:
                 metadata["duration_seconds"] = 10.0
 

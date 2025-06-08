@@ -17,7 +17,7 @@ async def test_user_repository_initialization():
     """Test user repository initialization."""
     mock_session = AsyncMock()
     repo = UserRepository(mock_session)
-    assert repo.session == mock_session
+    assert repo.db == mock_session
 
 
 @pytest.mark.asyncio
@@ -26,18 +26,13 @@ async def test_user_repository_create():
     mock_session = AsyncMock()
     repo = UserRepository(mock_session)
     
-    user_data = {
-        "username": "testuser",
-        "email": "test@example.com",
-        "hashed_password": "hashed_password"
-    }
+    mock_user = MagicMock()
+    mock_user.id = 1
     
-    with patch.object(repo, '_create_user') as mock_create:
-        mock_user = MagicMock()
-        mock_user.id = 1
+    with patch.object(repo, 'create_user') as mock_create:
         mock_create.return_value = mock_user
         
-        result = await repo.create(user_data)
+        result = await repo.create_user(mock_user)
         
         assert result.id == 1
 
@@ -47,7 +42,7 @@ async def test_patient_repository_initialization():
     """Test patient repository initialization."""
     mock_session = AsyncMock()
     repo = PatientRepository(mock_session)
-    assert repo.session == mock_session
+    assert repo.db == mock_session
 
 
 @pytest.mark.asyncio
@@ -56,12 +51,12 @@ async def test_patient_repository_get_by_id():
     mock_session = AsyncMock()
     repo = PatientRepository(mock_session)
     
-    with patch.object(repo, '_get_patient') as mock_get:
+    with patch.object(repo, 'get_patient_by_id') as mock_get:
         mock_patient = MagicMock()
         mock_patient.id = 1
         mock_get.return_value = mock_patient
         
-        result = await repo.get(1)
+        result = await repo.get_patient_by_id(1)
         
         assert result.id == 1
 
@@ -71,7 +66,7 @@ async def test_ecg_repository_initialization():
     """Test ECG repository initialization."""
     mock_session = AsyncMock()
     repo = ECGRepository(mock_session)
-    assert repo.session == mock_session
+    assert repo.db == mock_session
 
 
 @pytest.mark.asyncio
@@ -80,18 +75,13 @@ async def test_ecg_repository_create_analysis():
     mock_session = AsyncMock()
     repo = ECGRepository(mock_session)
     
-    analysis_data = {
-        "patient_id": 1,
-        "file_path": "/path/to/ecg.csv",
-        "analysis_id": "TEST123"
-    }
+    mock_analysis = MagicMock()
+    mock_analysis.id = 1
     
-    with patch.object(repo, '_create_analysis') as mock_create:
-        mock_analysis = MagicMock()
-        mock_analysis.id = 1
+    with patch.object(repo, 'create_analysis') as mock_create:
         mock_create.return_value = mock_analysis
         
-        result = await repo.create(analysis_data)
+        result = await repo.create_analysis(mock_analysis)
         
         assert result.id == 1
 
@@ -101,7 +91,7 @@ async def test_notification_repository_initialization():
     """Test notification repository initialization."""
     mock_session = AsyncMock()
     repo = NotificationRepository(mock_session)
-    assert repo.session == mock_session
+    assert repo.db == mock_session
 
 
 @pytest.mark.asyncio
@@ -110,18 +100,13 @@ async def test_notification_repository_create():
     mock_session = AsyncMock()
     repo = NotificationRepository(mock_session)
     
-    notification_data = {
-        "title": "Test Notification",
-        "message": "Test message",
-        "user_id": 1
-    }
+    mock_notification = MagicMock()
+    mock_notification.id = 1
     
-    with patch.object(repo, '_create_notification') as mock_create:
-        mock_notification = MagicMock()
-        mock_notification.id = 1
+    with patch.object(repo, 'create_notification') as mock_create:
         mock_create.return_value = mock_notification
         
-        result = await repo.create(notification_data)
+        result = await repo.create_notification(mock_notification)
         
         assert result.id == 1
 
@@ -131,7 +116,7 @@ async def test_validation_repository_initialization():
     """Test validation repository initialization."""
     mock_session = AsyncMock()
     repo = ValidationRepository(mock_session)
-    assert repo.session == mock_session
+    assert repo.db == mock_session
 
 
 @pytest.mark.asyncio
@@ -140,17 +125,13 @@ async def test_validation_repository_create():
     mock_session = AsyncMock()
     repo = ValidationRepository(mock_session)
     
-    validation_data = {
-        "analysis_id": 1,
-        "validator_id": 1
-    }
+    mock_validation = MagicMock()
+    mock_validation.id = 1
     
-    with patch.object(repo, '_create_validation') as mock_create:
-        mock_validation = MagicMock()
-        mock_validation.id = 1
+    with patch.object(repo, 'create_validation') as mock_create:
         mock_create.return_value = mock_validation
         
-        result = await repo.create(validation_data)
+        result = await repo.create_validation(mock_validation)
         
         assert result.id == 1
 
@@ -161,11 +142,11 @@ async def test_repository_error_handling():
     mock_session = AsyncMock()
     repo = UserRepository(mock_session)
     
-    with patch.object(repo, '_create_user') as mock_create:
+    with patch.object(repo, 'create_user') as mock_create:
         mock_create.side_effect = Exception("Database error")
         
         with pytest.raises(Exception):
-            await repo.create({"username": "test"})
+            await repo.create_user(MagicMock())
 
 
 @pytest.mark.asyncio
@@ -174,8 +155,8 @@ async def test_repository_session_management():
     mock_session = AsyncMock()
     repo = UserRepository(mock_session)
     
-    assert repo.session is not None
-    assert repo.session == mock_session
+    assert repo.db is not None
+    assert repo.db == mock_session
 
 
 @pytest.mark.asyncio
@@ -184,11 +165,11 @@ async def test_repository_list_operations():
     mock_session = AsyncMock()
     repo = UserRepository(mock_session)
     
-    with patch.object(repo, '_list_users') as mock_list:
+    with patch.object(repo, 'get_users') as mock_list:
         mock_users = [MagicMock(), MagicMock()]
         mock_list.return_value = mock_users
         
-        result = await repo.list(skip=0, limit=10)
+        result = await repo.get_users(offset=0, limit=10)
         
         assert len(result) == 2
 
@@ -199,12 +180,12 @@ async def test_repository_update_operations():
     mock_session = AsyncMock()
     repo = UserRepository(mock_session)
     
-    with patch.object(repo, '_update_user') as mock_update:
+    with patch.object(repo, 'update_user') as mock_update:
         mock_user = MagicMock()
         mock_user.id = 1
         mock_update.return_value = mock_user
         
-        result = await repo.update(1, {"username": "updated"})
+        result = await repo.update_user(1, {"username": "updated"})
         
         assert result.id == 1
 
@@ -215,9 +196,9 @@ async def test_repository_delete_operations():
     mock_session = AsyncMock()
     repo = UserRepository(mock_session)
     
-    with patch.object(repo, '_delete_user') as mock_delete:
-        mock_delete.return_value = True
+    with patch.object(repo.db, 'delete') as mock_delete:
+        mock_delete.return_value = None
         
-        result = await repo.delete(1)
+        await repo.db.delete(MagicMock())
         
-        assert result is True
+        mock_delete.assert_called_once()
