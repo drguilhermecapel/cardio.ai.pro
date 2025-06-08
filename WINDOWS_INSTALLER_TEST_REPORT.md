@@ -3,16 +3,17 @@
 ## 📋 Test Summary
 **Date**: June 8, 2025  
 **Version**: CardioAI Pro v1.0.0  
-**Test Status**: ✅ PASSED - Portable executable successfully built
+**Test Status**: ✅ PASSED - Unified installer successfully built
 
 ## 🎯 Executable Details
 
-### Generated File
-- **Filename**: `CardioAI-Pro-1.0.0-portable.exe`
-- **Location**: `frontend/dist-electron/CardioAI-Pro-1.0.0-portable.exe`
-- **Size**: 209,286,624 bytes (209 MB)
+### Generated Files
+- **Unified Installer**: `CardioAI-Pro-1.0.0-installer.exe`
+- **Location**: `frontend/dist-electron/CardioAI-Pro-1.0.0-installer.exe`
+- **Size**: 240,090,895 bytes (229 MB)
 - **Architecture**: Windows x64
-- **Type**: Portable executable (no installation required)
+- **Type**: NSIS installer with unified backend and frontend
+
 
 ### Build Configuration
 - **Electron Builder**: v24.13.3
@@ -42,15 +43,18 @@
 ## 🚀 Installation Instructions for Users
 
 ### For End Users
-1. Download `CardioAI-Pro-1.0.0-portable.exe`
-2. Run the executable directly (no installation needed)
-3. The application will start automatically
-4. Backend server starts automatically on localhost:8000
-5. Frontend interface opens in Electron window
+1. Download `CardioAI-Pro-1.0.0-installer.exe` (229 MB)
+2. Run the installer with administrator privileges
+3. Follow the installation wizard (allows custom directory selection)
+4. Launch CardioAI Pro from desktop shortcut or start menu
+5. Backend server starts automatically on localhost:8000
+6. Frontend interface opens in Electron window
 
 ### Technical Features
-- **Self-contained**: All dependencies bundled
-- **No installation required**: Portable execution
+- **Self-contained**: All dependencies bundled (frontend + backend)
+- **NSIS installer**: Professional installation wizard
+- **Desktop shortcuts**: Automatic shortcut creation
+- **Unified executable**: Backend and frontend in single installer
 - **Automatic backend startup**: Integrated server management
 - **Medical AI analysis**: ECG processing with image upload support
 - **Cross-platform compatibility**: Windows 10/11 (64-bit)

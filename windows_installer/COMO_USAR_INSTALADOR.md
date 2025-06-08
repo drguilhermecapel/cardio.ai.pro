@@ -73,10 +73,10 @@ Após a execução bem-sucedida, você terá:
 ### Se NSIS não estiver disponível:
 - `cardioai-backend.exe` - Executável do backend
 
-### Executável Portátil (Recomendado):
-- `CardioAI-Pro-1.0.0-portable.exe` - **Executável portátil gerado pelo Electron** (209 MB)
-- Localização: `frontend/dist-electron/CardioAI-Pro-1.0.0-portable.exe`
-- Uso: Clique duplo para executar diretamente
+### Instalador Unificado (Recomendado):
+- `CardioAI-Pro-1.0.0-installer.exe` - **Instalador NSIS com backend e frontend** (229 MB)
+- Localização: `frontend/dist-electron/CardioAI-Pro-1.0.0-installer.exe`
+- Uso: Execute como administrador e siga o assistente de instalação
 - `frontend_build/` - Arquivos do frontend
 - `serve_frontend.py` - Servidor do frontend
 - `cardioai_installer.nsi` - Script NSIS (para compilação manual)
@@ -134,11 +134,12 @@ Se encontrar problemas:
 
 ### Opções de Distribuição:
 
-**Opção 1: Executável Portátil (Recomendado)**
-O arquivo `CardioAI-Pro-1.0.0-portable.exe` pode ser distribuído diretamente. Usuários só precisam:
-1. Baixar o arquivo executável
-2. Clique duplo para executar
-3. Sistema inicia automaticamente
+**Opção 1: Instalador Unificado (Recomendado)**
+O arquivo `CardioAI-Pro-1.0.0-installer.exe` pode ser distribuído diretamente. Usuários só precisam:
+1. Baixar o arquivo instalador
+2. Executar como administrador
+3. Seguir o assistente de instalação
+4. Lançar pelo atalho da área de trabalho
 
 **Opção 2: Instalador NSIS**
 O arquivo `CardioAI-Pro-Installer.exe` pode ser distribuído para usuários finais. Eles só precisam:

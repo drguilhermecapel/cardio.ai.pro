@@ -2,22 +2,22 @@
 
 ## 📦 Distribution Options
 
-### Option 1: Portable Executable (Recommended)
+### Option 1: Unified Installer (Recommended)
 
-**File**: `CardioAI-Pro-1.0.0-portable.exe` (209 MB)  
-**Location**: `frontend/dist-electron/CardioAI-Pro-1.0.0-portable.exe`
+**File**: `CardioAI-Pro-1.0.0-installer.exe` (229 MB)  
+**Location**: `frontend/dist-electron/CardioAI-Pro-1.0.0-installer.exe`
 
 #### For End Users
-1. **Download**: Get the portable executable file
-2. **Run**: Double-click the file to launch
-3. **Access**: Application opens automatically at http://localhost:8000
-4. **No Installation Required**: Self-contained executable
+1. **Download**: Get the unified installer file
+2. **Install**: Run installer with administrator privileges
+3. **Launch**: Use desktop shortcut or start menu
+4. **Access**: Application opens automatically at http://localhost:8000
 
 #### Technical Details
 - **Platform**: Windows 10/11 (64-bit)
 - **Dependencies**: All bundled (Electron, Node.js, Python backend)
-- **Size**: 209 MB
-- **Type**: Portable (no registry changes)
+- **Size**: 229 MB
+- **Type**: NSIS installer with desktop shortcuts
 - **Backend**: Automatically starts on localhost:8000
 - **Frontend**: Electron-based desktop application
 
@@ -43,17 +43,17 @@
    ```
 
 3. **Generated Files**:
-   - `frontend/dist-electron/CardioAI-Pro-1.0.0-portable.exe` - Portable executable
-   - `CardioAI-Pro-Installer.exe` - NSIS installer (if NSIS available)
+   - `frontend/dist-electron/CardioAI-Pro-1.0.0-installer.exe` - Unified NSIS installer
+   - Backend and frontend components included in single installer
 
 ## 🚀 User Instructions
 
-### Quick Start (Portable)
+### Quick Start (Installer)
 ```
-1. Download CardioAI-Pro-1.0.0-portable.exe
-2. Double-click to run
-3. Wait for application to start
-4. Access via browser or Electron window
+1. Download CardioAI-Pro-1.0.0-installer.exe
+2. Run as administrator
+3. Follow installation wizard
+4. Launch from desktop shortcut
 5. Login with generated credentials (see console)
 ```
 
@@ -75,7 +75,8 @@
 
 ### Architecture
 ```
-CardioAI-Pro-1.0.0-portable.exe
+CardioAI-Pro-1.0.0-installer.exe
+├── NSIS Installer Wrapper
 ├── Electron Frontend (React/TypeScript)
 ├── Python Backend (FastAPI)
 ├── AI Models (ECG Analysis)
