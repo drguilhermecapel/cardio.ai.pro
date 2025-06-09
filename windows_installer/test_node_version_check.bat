@@ -10,7 +10,11 @@ if errorlevel 1 (
     goto :end
 )
 
-echo Testing new PowerShell-based version check...
+echo Testing PowerShell-based version capture...
+for /f "tokens=*" %%i in ('powershell -Command "& '%NODE_CMD%' --version"') do set TEST_NODE_VERSION=%%i
+echo Captured version: %TEST_NODE_VERSION%
+
+echo Testing PowerShell-based version check...
 powershell -Command "try { $version = & '%NODE_CMD%' --version; $major = [int]($version -replace 'v', '' -split '\.')[0]; exit ($major -ge 16 ? 0 : 1) } catch { exit 1 }" >nul 2>&1
 if errorlevel 1 (
     echo FAIL: Node.js version check failed

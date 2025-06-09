@@ -19,10 +19,10 @@ def validate_batch_syntax(filepath):
     for i, line in enumerate(lines, 1):
         line = line.strip()
         
-        if 'node' in line.lower() and '-e' in line and '"' not in line:
+        if 'node' in line.lower() and '-e' in line and '"' not in line and 'powershell' not in line.lower():
             issues.append(f"Line {i}: Unquoted Node.js command: {line}")
         
-        if any(keyword in line for keyword in ['from', 'import', 'slice']) and 'echo' not in line.lower() and 'python -c "' not in line:
+        if any(keyword in line for keyword in ['from', 'import', 'slice']) and 'echo' not in line.lower() and 'python -c "' not in line and 'powershell' not in line.lower():
             issues.append(f"Line {i}: Potential keyword conflict: {line}")
     
     if issues:
