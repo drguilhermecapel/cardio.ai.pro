@@ -56,6 +56,6 @@ describe('Layout', () => {
   it('displays navigation elements', () => {
     renderWithProviders(<Layout />)
     expect(screen.getByText('Dashboard')).toBeDefined()
-    expect(screen.getByText('SPEI - Sistema EMR')).toBeDefined()
+    expect(screen.getByText('CardioAI Pro')).toBeDefined()
   })
 })

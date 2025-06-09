@@ -37,7 +37,7 @@ import MedicalCard from './components/ui/MedicalCard'
 import ECGVisualization from './components/ui/ECGVisualization'
 import AIInsightPanel from './components/ui/AIInsightPanel'
 
-const SPEIApp = (): JSX.Element => {
+const CardioAIApp = (): JSX.Element => {
   const [activeModule, setActiveModule] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [theme, setTheme] = useState('dark')
@@ -174,8 +174,8 @@ const SPEIApp = (): JSX.Element => {
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">SPEI</h1>
-                <p className="text-xs text-gray-400">Sistema Inteligente</p>
+                <h1 className="text-xl font-bold text-white">CardioAI</h1>
+                <p className="text-xs text-gray-400">ECG Analysis</p>
               </div>
             </div>
           </div>
@@ -760,7 +760,7 @@ function App(): JSX.Element {
     return <LoginPage />
   }
 
-  return <SPEIApp />
+  return <CardioAIApp />
 }
 
 function AppWithAuth(): JSX.Element {

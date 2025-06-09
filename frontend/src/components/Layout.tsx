@@ -30,7 +30,7 @@ const Layout: React.FC = (): JSX.Element | null => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold">SPEI - Sistema EMR</h1>
+              <h1 className="text-xl font-bold">CardioAI Pro</h1>
             </div>
             <div className="flex items-center space-x-4">
               <span>Bem-vindo, {user?.username}</span>
