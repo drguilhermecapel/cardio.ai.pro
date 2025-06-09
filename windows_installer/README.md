@@ -189,7 +189,7 @@ To customize the installer:
 ## Security Considerations
 
 - The installer requires Administrator privileges to install system-wide
-- The application stores medical data locally in SQLite
+- The application stores cardiac data locally in SQLite
 - No network services are exposed by default
 - All data remains on the local machine
 
