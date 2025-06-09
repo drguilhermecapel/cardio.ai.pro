@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.v1.endpoints import (
     auth,
+    avatar,
     ecg_analysis,
     notifications,
     patients,
@@ -28,6 +29,7 @@ async def health_check() -> JSONResponse:
     )
 
 api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
+api_router.include_router(avatar.router, prefix="/avatar", tags=["avatar"])
 api_router.include_router(ecg_analysis.router, prefix="/ecg", tags=["ecg-analysis"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])
 api_router.include_router(patients.router, prefix="/patients", tags=["patients"])

@@ -261,3 +261,10 @@ secrets/
 *.key
 *.pem
 *.crt
+
+# Media files - ignore all except .gitkeep
+media/*
+!media/.gitkeep
+!media/*/
+media/*/*
+!media/*/.gitkeep

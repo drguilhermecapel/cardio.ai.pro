@@ -190,6 +190,9 @@ class Settings(BaseSettings):
     MAX_ECG_FILE_SIZE: int = 50 * 1024 * 1024  # 50MB
     ECG_UPLOAD_DIR: str = "uploads/ecg"
 
+    AVATAR_UPLOAD_DIR: str = "media/avatars"
+    AVATAR_MODEL_CACHE_DIR: str = "models/avatar"
+
     model_config = {
         "case_sensitive": True,
         "env_file": ".env",

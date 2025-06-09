@@ -18,6 +18,13 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender-dev \
     libgomp1 \
+    # Additional dependencies for Stable Diffusion and CUDA support
+    libffi-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libwebp-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
