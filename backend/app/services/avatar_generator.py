@@ -5,10 +5,10 @@ Avatar generation service using Stable Diffusion.
 import logging
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import torch
 from diffusers import StableDiffusionPipeline
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
