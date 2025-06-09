@@ -1,6 +1,6 @@
 # CardioAI Pro Windows Installer
 
-This directory contains all the necessary files and scripts to build a standalone Windows installer for CardioAI Pro, an AI-powered electronic medical record system with ECG analysis capabilities.
+This directory contains all the necessary files and scripts to build a standalone Windows installer for CardioAI Pro, an AI-powered ECG analysis and cardiac monitoring system.
 
 ## Overview
 
