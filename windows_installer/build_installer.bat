@@ -119,7 +119,8 @@ if errorlevel 1 (
 :check_node_version
 
 REM Verify Node.js version is 16+
-for /f "tokens=1" %%i in ('"%NODE_CMD%" --version') do set NODE_VERSION=%%i
+REM Use PowerShell to capture Node.js version to avoid batch parsing issues
+for /f "tokens=*" %%i in ('powershell -Command "& '%NODE_CMD%' --version"') do set NODE_VERSION=%%i
 echo Found Node.js version: %NODE_VERSION%
 powershell -Command "try { $version = & '%NODE_CMD%' --version; $major = [int]($version -replace 'v', '' -split '\.')[0]; exit ($major -ge 16 ? 0 : 1) } catch { exit 1 }" >nul 2>&1
 if errorlevel 1 (

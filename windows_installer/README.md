@@ -204,6 +204,12 @@ The installer includes validation scripts to help diagnose issues:
 
 ### Recent Fixes
 
+**Windows Batch Parser Error Fix (January 2025)**
+- Resolved persistent "from: foi inesperado neste momento" error that occurred during Node.js version capture
+- Root cause: The `for /f "tokens=1" %%i in ('"%NODE_CMD%" --version')` command was causing batch parsing conflicts
+- Solution: Replaced with PowerShell-wrapped version capture: `for /f "tokens=*" %%i in ('powershell -Command "& '%NODE_CMD%' --version"')`
+- This ensures both version capture and version checking use PowerShell, eliminating all batch parsing conflicts
+
 **Windows Batch Parser Error Fix (December 2024)**
 - Resolved "from: foi inesperado neste momento" error that occurred during Node.js version checking
 - Root cause: Windows batch parser was misinterpreting JavaScript syntax `process.version.slice(1)` as batch commands
