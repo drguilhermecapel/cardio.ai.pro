@@ -57,14 +57,14 @@ class AvatarGeneratorService:
                 self.pipeline = pipeline
                 logger.info("Enabled CUDA optimizations: fp16, attention slicing, memory efficient attention")
             else:
-                pipeline: Any = StableDiffusionPipeline.from_pretrained(  # type: ignore[no-untyped-call]
+                cpu_pipeline: Any = StableDiffusionPipeline.from_pretrained(  # type: ignore[no-untyped-call]
                     model_name,
                     torch_dtype=torch.float32,
                     safety_checker=None,
                     requires_safety_checker=False,
                 )
-                pipeline = pipeline.to(self.device)
-                self.pipeline = pipeline
+                cpu_pipeline = cpu_pipeline.to(self.device)
+                self.pipeline = cpu_pipeline
                 logger.info("Using CPU mode with fp32")
 
         except Exception as e:
@@ -123,7 +123,7 @@ class AvatarGeneratorService:
             generator = torch.Generator(device=self.device).manual_seed(seed)
 
             with torch.inference_mode():
-                result = pipeline(  # type: ignore[operator]
+                result = pipeline(
                     prompt=prompt,
                     negative_prompt=negative_prompt,
                     height=height,
