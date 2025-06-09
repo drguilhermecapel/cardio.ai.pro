@@ -7,16 +7,22 @@ Sistema de análise de ECG com IA para diagnóstico médico avançado.
 **Nova versão simplificada para Windows - Instalação com clique duplo!**
 
 ### Downloads Standalone
-- **[CardioAI-Pro-v1.0.0-Setup.exe](CardioAI-Pro-v1.0.0-Setup.exe)** (38.6 MB) - Instalador profissional
-- **[install-cardioai-pro-standalone.bat](install-cardioai-pro-standalone.bat)** - Instalação automática
-- **[CardioAI-Pro-v1.0.0-Portable.zip](CardioAI-Pro-v1.0.0-Portable.zip)** (40.4 MB) - Versão portátil
+- **[CardioAI-Pro-1.0.0-installer.exe](frontend/dist-electron/CardioAI-Pro-1.0.0-installer.exe)** (229 MB) - Instalador unificado
+- **[build_installer.bat](windows_installer/build_installer.bat)** - Script de compilação do instalador
 
 ### Instalação Simples
 ```bash
-# 1. Baixe os arquivos (instalador + script)
-# 2. Coloque na mesma pasta
-# 3. Clique duas vezes em: install-cardioai-pro-standalone.bat
-# 4. Pronto! Sistema instalado e funcionando
+# Opção 1: Usar instalador unificado (Recomendado)
+# 1. Baixe: CardioAI-Pro-1.0.0-installer.exe
+# 2. Execute como administrador
+# 3. Siga o assistente de instalação
+# 4. Lance pelo atalho da área de trabalho
+
+# Opção 2: Compilar do código fonte
+# 1. Clone o repositório
+# 2. Navegue para windows_installer/
+# 3. Clique duas vezes em: build_installer.bat
+# 4. Use o instalador gerado
 ```
 
 **📖 [Guia Completo da Versão Standalone](README-STANDALONE.md)**
@@ -36,12 +42,12 @@ Sistema de análise de ECG com IA para diagnóstico médico avançado.
 ## Versões Disponíveis
 
 ### 🖥️ Standalone (Windows)
-- ✅ Instalação simples (clique duplo)
+- ✅ Instalação profissional (assistente NSIS)
 - ✅ Sem Docker ou dependências
 - ✅ Processamento 100% local
 - ✅ Ideal para usuários finais
+- ✅ Backend e frontend unificados
 - ❌ Apenas Windows
-- ❌ Funcionalidades limitadas
 
 ### 🐳 Docker (Multiplataforma)
 - ✅ Funcionalidades completas
@@ -58,18 +64,18 @@ Sistema de análise de ECG com IA para diagnóstico médico avançado.
 **Requisitos**: Apenas Windows 7+ (64-bit)
 
 ```bash
-# Método 1: Instalação Automática
-1. Baixe: install-cardioai-pro-standalone.bat + CardioAI-Pro-v1.0.0-Setup.exe
-2. Coloque na mesma pasta
-3. Clique duas vezes no arquivo .bat
-4. Aguarde a instalação
-5. Use o atalho da área de trabalho
+# Método 1: Instalador Unificado (Recomendado)
+1. Baixe: CardioAI-Pro-1.0.0-installer.exe
+2. Execute como administrador
+3. Siga o assistente de instalação
+4. Lance pelo atalho da área de trabalho
+5. Acesse via http://localhost:8000
 
-# Método 2: Versão Portátil
-1. Baixe: CardioAI-Pro-v1.0.0-Portable.zip
-2. Extraia para uma pasta
-3. Clique duas vezes em: CardioAI-Pro.bat
-4. Sistema inicia automaticamente
+# Método 2: Compilar do Código Fonte
+1. Clone o repositório
+2. Navegue para windows_installer/
+3. Clique duas vezes em: build_installer.bat
+4. Use o instalador gerado em frontend/dist-electron/
 ```
 
 ### 🐳 Versão Docker (Para Desenvolvedores)
@@ -131,8 +137,9 @@ Para instruções detalhadas de desenvolvimento, consulte `windows_installer/REA
 - 🐛 Issues: [GitHub Issues](https://github.com/drguilhermecapel/cardio.ai.pro/issues)
 
 ### Documentação Adicional
-- **[README-STANDALONE.md](README-STANDALONE.md)** - Guia completo da versão standalone
-- **[INSTALACAO-STANDALONE.md](INSTALACAO-STANDALONE.md)** - Instruções detalhadas de instalação
+- **[DISTRIBUTION_GUIDE.md](DISTRIBUTION_GUIDE.md)** - Guia completo de distribuição
+- **[WINDOWS_INSTALLER_TEST_REPORT.md](WINDOWS_INSTALLER_TEST_REPORT.md)** - Relatório de testes do instalador
+- **[windows_installer/COMO_USAR_INSTALADOR.md](windows_installer/COMO_USAR_INSTALADOR.md)** - Instruções detalhadas de compilação
 
 ---
 

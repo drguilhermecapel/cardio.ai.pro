@@ -18,8 +18,9 @@ def check_dependencies():
     
     for package in required_packages:
         try:
+            import_name = 'PyInstaller' if package == 'pyinstaller' else package
             result = subprocess.run([
-                "poetry", "run", "python", "-c", f"import {package}"
+                "poetry", "run", "python", "-c", f"import {import_name}"
             ], capture_output=True, text=True)
             if result.returncode != 0:
                 missing_packages.append(package)
@@ -68,7 +69,7 @@ def build_executable():
             "poetry", "run", "pyinstaller",
             "--clean",
             "--noconfirm",
-            "cardioai-pro.spec"
+            "cardioai-backend.spec"
         ]
         
         print(f"Running: {' '.join(cmd)}")
@@ -76,10 +77,14 @@ def build_executable():
         
         print("✓ Build completed successfully!")
         
-        exe_path = Path("dist/cardioai-pro-backend.exe")
+        exe_path = Path("dist/cardioai-backend")
         if exe_path.exists():
             size_mb = exe_path.stat().st_size / (1024 * 1024)
             print(f"✓ Executable created: {exe_path} ({size_mb:.1f} MB)")
+            
+            windows_exe_path = Path("dist/cardioai-pro-backend.exe")
+            exe_path.rename(windows_exe_path)
+            print(f"✓ Renamed to: {windows_exe_path}")
             return True
         else:
             print("✗ Executable not found in dist/")
