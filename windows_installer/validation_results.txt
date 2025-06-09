@@ -1,0 +1,2 @@
+✅ build_installer.bat syntax validation: PASSED
+⚠️ cardioai_installer.nsi syntax validation: SKIPPED (NSIS not installed)

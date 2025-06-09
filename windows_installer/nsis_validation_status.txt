@@ -1,0 +1,1 @@
+NSIS syntax validation skipped - makensis not available on system
