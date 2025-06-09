@@ -127,6 +127,13 @@ The installed application will:
 - Install Node.js from nodejs.org
 - Restart Command Prompt after installation
 
+**"from: foi inesperado neste momento" error during Node.js version check**
+- This error was caused by Windows batch parser misinterpreting JavaScript syntax in the Node.js version check
+- Fixed in recent versions by replacing the problematic JavaScript command with a PowerShell-based approach
+- The old command: `node -e "process.exit(parseInt(process.version.slice(1)) >= 16 ? 0 : 1)"`
+- The new command: `powershell -Command "try { $version = & '%NODE_CMD%' --version; $major = [int]($version -replace 'v', '' -split '\.')[0]; exit ($major -ge 16 ? 0 : 1) } catch { exit 1 }"`
+- This PowerShell approach avoids inline JavaScript that could cause batch parsing conflicts
+
 **"Poetry not found"**
 - The build script will attempt to install Poetry automatically
 - If it fails, install manually: `pip install poetry`
@@ -186,13 +193,31 @@ To customize the installer:
 - No network services are exposed by default
 - All data remains on the local machine
 
+## Testing and Validation
+
+### Testing the Installer Script
+
+The installer includes validation scripts to help diagnose issues:
+
+1. **Test Node.js version check**: Run `test_node_version_check.bat` to verify the Node.js version detection works correctly
+2. **Validate batch syntax**: Run `python validate_batch_syntax.py` to check for potential Windows batch parsing issues
+
+### Recent Fixes
+
+**Windows Batch Parser Error Fix (December 2024)**
+- Resolved "from: foi inesperado neste momento" error that occurred during Node.js version checking
+- Root cause: Windows batch parser was misinterpreting JavaScript syntax `process.version.slice(1)` as batch commands
+- Solution: Replaced inline JavaScript with PowerShell-based version comparison
+- This ensures compatibility across different Windows configurations and locales
+
 ## Support
 
 For build issues or questions:
 1. Check the troubleshooting section above
-2. Verify all prerequisites are installed
-3. Try the manual build steps to isolate issues
-4. Check the GitHub repository for updates and issues
+2. Run the validation scripts in the Testing section
+3. Verify all prerequisites are installed
+4. Try the manual build steps to isolate issues
+5. Check the GitHub repository for updates and issues
 
 ## License
 

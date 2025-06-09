@@ -62,7 +62,7 @@ if errorlevel 1 (
 REM Verify Python version is 3.8+
 for /f "tokens=2" %%i in ('python --version 2^>^&1') do set PYTHON_VERSION=%%i
 echo Found Python version: %PYTHON_VERSION%
-python -c "import sys; exit(0 if sys.version_info >= (3, 8) else 1)" >nul 2>&1
+python -c "import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)" >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Python version 3.8+ required, found %PYTHON_VERSION%
     echo Please upgrade Python from https://python.org
@@ -121,11 +121,11 @@ if errorlevel 1 (
 REM Verify Node.js version is 16+
 for /f "tokens=1" %%i in ('"%NODE_CMD%" --version') do set NODE_VERSION=%%i
 echo Found Node.js version: %NODE_VERSION%
-"%NODE_CMD%" -e "process.exit(parseInt(process.version.slice(1)) >= 16 ? 0 : 1)" >nul 2>&1
+powershell -Command "try { $version = & '%NODE_CMD%' --version; $major = [int]($version -replace 'v', '' -split '\.')[0]; exit ($major -ge 16 ? 0 : 1) } catch { exit 1 }" >nul 2>&1
 if errorlevel 1 (
     echo.
     echo ========================================
-    echo ERROR: Node.js version 16+ required, found %NODE_VERSION%
+    echo ERROR: Node.js version 16 or higher required, found %NODE_VERSION%
     echo ========================================
     echo.
     echo Attempting to download newer portable Node.js...
