@@ -13,6 +13,9 @@ echo.
 
 REM Get the directory where this script is located
 set SCRIPT_DIR=%~dp0
+REM Remove trailing backslash to prevent issues with paths containing parentheses
+if "%SCRIPT_DIR:~-1%"=="\" set SCRIPT_DIR=%SCRIPT_DIR:~0,-1%
+
 
 REM Navigate to the script's directory first
 echo Navigating to installer directory: %SCRIPT_DIR%
