@@ -86,7 +86,7 @@ async def create_avatar(request: AvatarRequest) -> AvatarResponse:
 
         file_path = generate_avatar(
             prompt_override=request.prompt,
-            seed=request.seed,
+            seed=request.seed or 42,
             steps=request.steps,
             height=request.height,
             width=request.width,

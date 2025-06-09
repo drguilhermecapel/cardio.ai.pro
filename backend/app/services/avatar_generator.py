@@ -8,6 +8,7 @@ from pathlib import Path
 
 import torch
 from diffusers import StableDiffusionPipeline
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ class AvatarGeneratorService:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"Avatar generator initialized with device: {self.device}")
 
-    def _load_pipeline(self, model_name: str) -> StableDiffusionPipeline:
+    def _load_pipeline(self, model_name: str) -> Any:
         """Load the Stable Diffusion pipeline with optimizations."""
         if self.pipeline is not None:
             return self.pipeline
@@ -44,7 +45,7 @@ class AvatarGeneratorService:
 
         try:
             if self.device == "cuda":
-                pipeline = StableDiffusionPipeline.from_pretrained(
+                pipeline: Any = StableDiffusionPipeline.from_pretrained(  # type: ignore[no-untyped-call]
                     model_name,
                     torch_dtype=torch.float16,
                     safety_checker=None,
@@ -56,7 +57,7 @@ class AvatarGeneratorService:
                 self.pipeline = pipeline
                 logger.info("Enabled CUDA optimizations: fp16, attention slicing, memory efficient attention")
             else:
-                pipeline = StableDiffusionPipeline.from_pretrained(
+                pipeline: Any = StableDiffusionPipeline.from_pretrained(  # type: ignore[no-untyped-call]
                     model_name,
                     torch_dtype=torch.float32,
                     safety_checker=None,
@@ -122,7 +123,7 @@ class AvatarGeneratorService:
             generator = torch.Generator(device=self.device).manual_seed(seed)
 
             with torch.inference_mode():
-                result = pipeline(
+                result = pipeline(  # type: ignore[operator]
                     prompt=prompt,
                     negative_prompt=negative_prompt,
                     height=height,
