@@ -3,14 +3,11 @@ Avatar generation service using Stable Diffusion.
 """
 
 import logging
-import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import torch
 from diffusers import StableDiffusionPipeline
-from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +41,7 @@ class AvatarGeneratorService:
             return self.pipeline
 
         logger.info(f"Loading Stable Diffusion model: {model_name}")
-        
+
         try:
             if self.device == "cuda":
                 pipeline = StableDiffusionPipeline.from_pretrained(
@@ -121,9 +118,9 @@ class AvatarGeneratorService:
 
         try:
             pipeline = self._load_pipeline(model_name)
-            
+
             generator = torch.Generator(device=self.device).manual_seed(seed)
-            
+
             with torch.inference_mode():
                 result = pipeline(
                     prompt=prompt,
@@ -134,23 +131,23 @@ class AvatarGeneratorService:
                     generator=generator,
                     guidance_scale=7.5,
                 )
-                
+
             if not result.images:
                 raise RuntimeError("No images generated")
-                
+
             image = result.images[0]
-            
+
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"{timestamp}.png"
             output_path = output_dir / filename
-            
+
             image.save(output_path, "PNG", optimize=True)
-            
+
             file_size = output_path.stat().st_size
             logger.info(f"Avatar generated successfully: {output_path} ({file_size} bytes)")
-            
+
             return output_path
-            
+
         except Exception as e:
             logger.error(f"Avatar generation failed: {e}")
             raise RuntimeError(f"Failed to generate avatar: {e}") from e
@@ -177,10 +174,10 @@ def generate_avatar(
 ) -> Path:
     """
     Standalone function to generate an avatar image.
-    
+
     This is a convenience function that creates a service instance
     and generates a single avatar.
-    
+
     Returns the file path of the generated PNG.
     """
     service = AvatarGeneratorService()

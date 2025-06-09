@@ -3,7 +3,6 @@ Avatar generation API endpoints.
 """
 
 import logging
-from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -17,7 +16,7 @@ router = APIRouter()
 
 class AvatarRequest(BaseModel):
     """Request model for avatar generation."""
-    
+
     prompt: str | None = Field(
         default=None,
         description="Custom prompt for avatar generation. Uses default if not provided."
@@ -53,7 +52,7 @@ class AvatarRequest(BaseModel):
 
 class AvatarResponse(BaseModel):
     """Response model for avatar generation."""
-    
+
     file_path: str = Field(description="Absolute path to the generated avatar image")
     filename: str = Field(description="Name of the generated file")
     size_bytes: int = Field(description="File size in bytes")
@@ -64,27 +63,27 @@ class AvatarResponse(BaseModel):
 async def create_avatar(request: AvatarRequest) -> AvatarResponse:
     """
     Generate a hyper-realistic avatar using Stable Diffusion.
-    
+
     This endpoint creates a photorealistic portrait of a 50-year-old caucasian woman
     with glasses using the specified parameters. The generation process is optimized
     for minimal VRAM usage with GPU acceleration when available.
-    
+
     Args:
         request: Avatar generation parameters
-        
+
     Returns:
         Information about the generated avatar file
-        
+
     Raises:
         HTTPException: If avatar generation fails
     """
     import time
-    
+
     start_time = time.time()
-    
+
     try:
         logger.info(f"Starting avatar generation with seed={request.seed}")
-        
+
         file_path = generate_avatar(
             prompt_override=request.prompt,
             seed=request.seed,
@@ -93,22 +92,22 @@ async def create_avatar(request: AvatarRequest) -> AvatarResponse:
             width=request.width,
             model_name=request.model_name,
         )
-        
+
         generation_time = time.time() - start_time
         file_size = file_path.stat().st_size
-        
+
         logger.info(
             f"Avatar generated successfully: {file_path.name} "
             f"({file_size} bytes, {generation_time:.2f}s)"
         )
-        
+
         return AvatarResponse(
             file_path=str(file_path.absolute()),
             filename=file_path.name,
             size_bytes=file_size,
             generation_time_seconds=round(generation_time, 2)
         )
-        
+
     except Exception as e:
         logger.error(f"Avatar generation failed: {e}")
         raise HTTPException(
@@ -121,7 +120,7 @@ async def create_avatar(request: AvatarRequest) -> AvatarResponse:
 async def avatar_health_check() -> dict[str, str]:
     """
     Health check endpoint for avatar generation service.
-    
+
     Returns:
         Service status information
     """
