@@ -56,7 +56,7 @@
 - **Desktop shortcuts**: Automatic shortcut creation
 - **Unified executable**: Backend and frontend in single installer
 - **Automatic backend startup**: Integrated server management
-- **Medical AI analysis**: ECG processing with image upload support
+- **CardioAI Pro ECG Analysis**: Electrocardiogram processing and interpretation
 - **Cross-platform compatibility**: Windows 10/11 (64-bit)
 
 ## 🔧 Technical Improvements Made

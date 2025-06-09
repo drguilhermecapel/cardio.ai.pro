@@ -12,7 +12,7 @@ function createWindow() {
     minWidth: 1200,
     minHeight: 800,
     backgroundColor: '#0f172a',
-    title: 'CardioAI Pro - Medical AI Analysis System',
+    title: 'CardioAI Pro - Cardiac AI Analysis System',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -227,7 +227,7 @@ ipcMain.handle('show-about', () => {
     title: 'About CardioAI Pro',
     message: 'CardioAI Pro v1.0.0',
     detail:
-      'AI-powered Electronic Medical Record System\nSpecialized in cardiovascular analysis and diagnostics\n\n© 2024 CardioAI Pro. All rights reserved.',
+      'AI-powered Electronic Cardiac Record System\nSpecialized in cardiovascular analysis and diagnostics\n\n© 2024 CardioAI Pro. All rights reserved.',
     buttons: ['OK'],
   })
 })

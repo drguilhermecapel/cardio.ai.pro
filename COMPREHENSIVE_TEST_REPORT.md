@@ -14,7 +14,7 @@
 - **Coverage Reports**: XML and HTML generated
 - **Key Areas Covered**:
   - ECG Analysis Service: 93% coverage
-  - Medical Image Processing: 85% coverage
+  - ECG Signal Processing: 85% coverage
   - Patient Service: 89% coverage
   - Signal Quality Analysis: 93% coverage
   - ML Model Service: 79% coverage
@@ -92,6 +92,6 @@ The comprehensive test suite demonstrates that CardioAI Pro meets all functional
 
 ### Next Steps
 - End-to-end workflow validation
-- Medical image analysis verification
+- ECG analysis verification
 - Report generation testing
 - Final system integration validation
