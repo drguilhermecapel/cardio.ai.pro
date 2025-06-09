@@ -120,9 +120,23 @@ if errorlevel 1 (
 
 REM Verify Node.js version is 16+
 REM Use PowerShell to capture Node.js version to avoid batch parsing issues
-for /f "tokens=*" %%i in ('powershell -Command "& '%NODE_CMD%' --version"') do set NODE_VERSION=%%i
+for /f "tokens=*" %%i in ('"%NODE_CMD%" --version 2^>nul') do set NODE_VERSION=%%i
 echo Found Node.js version: %NODE_VERSION%
-powershell -Command "try { $version = & '%NODE_CMD%' --version; $major = [int]($version -replace 'v', '' -split '\.')[0]; exit ($major -ge 16 ? 0 : 1) } catch { exit 1 }" >nul 2>&1
+REM Check if Node.js version is 16+ using cmd commands
+if defined NODE_VERSION (
+    if not "%NODE_VERSION%"=="unknown" (
+        for /f "tokens=1 delims=." %%a in ("%NODE_VERSION:v=%") do (
+            if %%a geq 16 (
+                echo Node.js version check passed
+            ) else (
+                goto :nodejs_version_error
+            )
+        )
+    )
+)
+goto :continue_after_version_check
+
+:nodejs_version_error
 if errorlevel 1 (
     echo.
     echo ========================================
@@ -269,7 +283,7 @@ REM Create a proper minimal ICO file instead of empty placeholder
 if not exist "cardioai.ico" (
     echo Creating minimal valid icon file...
     REM Create a minimal 16x16 ICO file with proper header
-    powershell -Command "Add-Type -AssemblyName System.Drawing; $bmp = New-Object System.Drawing.Bitmap(16,16); $bmp.Save('cardioai.ico', [System.Drawing.Imaging.ImageFormat]::Icon); $bmp.Dispose()"
+    %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -Command "Add-Type -AssemblyName System.Drawing; $bmp = New-Object System.Drawing.Bitmap(16,16); $bmp.Save('cardioai.ico', [System.Drawing.Imaging.ImageFormat]::Icon); $bmp.Dispose()"
     echo Valid icon file created. Replace with custom icon if desired.
 )
 
@@ -384,7 +398,7 @@ REM Create portable_node directory
 if not exist "%PORTABLE_NODE_DIR%" mkdir "%PORTABLE_NODE_DIR%"
 
 REM Download Node.js using PowerShell
-powershell -Command "try { Invoke-WebRequest -Uri '%NODE_URL%' -OutFile '%NODE_ZIP%' -UseBasicParsing; Write-Host 'Download completed' } catch { Write-Host 'Download failed:' $_.Exception.Message; exit 1 }"
+%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -Command "try { Invoke-WebRequest -Uri '%NODE_URL%' -OutFile '%NODE_ZIP%' -UseBasicParsing; Write-Host 'Download completed' } catch { Write-Host 'Download failed:' $_.Exception.Message; exit 1 }"
 if errorlevel 1 (
     echo Failed to download Node.js
     exit /b 1
@@ -392,7 +406,7 @@ if errorlevel 1 (
 
 REM Extract Node.js using PowerShell
 echo Extracting portable Node.js...
-powershell -Command "try { Expand-Archive -Path '%NODE_ZIP%' -DestinationPath '%TEMP%\node-extract' -Force; Write-Host 'Extraction completed' } catch { Write-Host 'Extraction failed:' $_.Exception.Message; exit 1 }"
+%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -Command "try { Expand-Archive -Path '%NODE_ZIP%' -DestinationPath '%TEMP%\node-extract' -Force; Write-Host 'Extraction completed' } catch { Write-Host 'Extraction failed:' $_.Exception.Message; exit 1 }"
 if errorlevel 1 (
     echo Failed to extract Node.js
     del "%NODE_ZIP%" >nul 2>&1
