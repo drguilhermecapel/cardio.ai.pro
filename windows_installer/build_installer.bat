@@ -42,7 +42,7 @@ if not exist "build_backend.py" (
     exit /b 1
 )
 
-echo ✅ Successfully located in installer directory
+echo [OK] Successfully located in installer directory
 
 REM Check for required tools
 echo Checking for required tools...
@@ -325,7 +325,7 @@ if "%NSIS_AVAILABLE%"=="true" (
         exit /b 1
     )
     echo.
-    echo ✅ SUCCESS: Windows installer created successfully!
+    echo [SUCCESS] Windows installer created successfully!
     echo.
     echo The installer file "CardioAI-Pro-Installer.exe" is ready for distribution.
 ) else (
@@ -409,6 +409,6 @@ REM Cleanup
 del "%NODE_ZIP%" >nul 2>&1
 rmdir /s /q "%TEMP%\node-extract" >nul 2>&1
 
-echo ✅ Portable Node.js installed successfully!
+echo [OK] Portable Node.js installed successfully!
 echo Location: %PORTABLE_NODE_DIR%
 exit /b 0
