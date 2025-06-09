@@ -4,7 +4,7 @@
 
 !define APPNAME "CardioAI Pro"
 !define COMPANYNAME "CardioAI"
-!define DESCRIPTION "Electronic Medical Record System with AI-powered ECG Analysis"
+!define DESCRIPTION "AI-powered ECG Analysis and Cardiac Monitoring System"
 !define VERSIONMAJOR 1
 !define VERSIONMINOR 0
 !define VERSIONBUILD 0
