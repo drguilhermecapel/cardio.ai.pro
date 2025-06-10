@@ -40,10 +40,10 @@ class Settings(BaseSettings):
     def assemble_db_connection(cls: "type[Settings]", v: str | None, info: ValidationInfo) -> Any:
         """Assemble database URL."""
         values = info.data
-        
+
         if values.get("STANDALONE_MODE", True):
             return "sqlite+aiosqlite:///./cardioai.db"
-            
+
         if isinstance(v, str):
             return v
 
@@ -59,10 +59,10 @@ class Settings(BaseSettings):
     def assemble_test_db_connection(cls: "type[Settings]", v: str | None, info: ValidationInfo) -> Any:
         """Assemble test database URL."""
         values = info.data
-        
+
         if values.get("STANDALONE_MODE", True):
             return "sqlite+aiosqlite:///./cardioai_test.db"
-            
+
         if isinstance(v, str):
             return v
 
