@@ -227,6 +227,8 @@ def install_dependencies_with_progress():
         timeout = 600  # 10 minutes
         
         while True:
+            if process.stdout is None:
+                break
             output = process.stdout.readline()
             if output == '' and process.poll() is not None:
                 break
@@ -239,7 +241,7 @@ def install_dependencies_with_progress():
                 raise subprocess.TimeoutExpired("poetry install", timeout)
         
         return_code = process.poll()
-        if return_code != 0:
+        if return_code is not None and return_code != 0:
             raise subprocess.CalledProcessError(return_code, "poetry install")
         
         print("✅ Dependencies installed successfully")
@@ -394,10 +396,13 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
-        'celery',
-        'redis',
         'psycopg2',
         'asyncpg',
+        'pytest',
+        'pytest-asyncio',
+        'black',
+        'isort',
+        'mypy',
     ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
@@ -457,6 +462,8 @@ def build_executable():
             timeout = 900  # 15 minutes for build
             
             while True:
+                if process.stdout is None:
+                    break
                 output = process.stdout.readline()
                 if output == '' and process.poll() is not None:
                     break
@@ -469,7 +476,7 @@ def build_executable():
                     raise subprocess.TimeoutExpired("pyinstaller", timeout)
             
             return_code = process.poll()
-            if return_code != 0:
+            if return_code is not None and return_code != 0:
                 raise subprocess.CalledProcessError(return_code, "pyinstaller")
             
             build_time = time.time() - start_time

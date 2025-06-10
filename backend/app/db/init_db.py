@@ -58,7 +58,7 @@ async def create_admin_user(session: AsyncSession) -> User | None:
         admin_user.username = "admin"
         admin_user.email = admin_email
         default_password = settings.FIRST_SUPERUSER_PASSWORD
-        if default_password == "changeme123":
+        if default_password in ("CHANGE_ME_SECURE_PASSWORD_REQUIRED", "changeme123", ""):
             import secrets
             import string
             alphabet = string.ascii_letters + string.digits + "!@#$%^&*"

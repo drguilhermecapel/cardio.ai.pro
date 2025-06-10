@@ -4,6 +4,7 @@ Simplified ECG Analysis System for Desktop
 """
 
 import sys
+import logging
 from pathlib import Path
 
 if getattr(sys, 'frozen', False):
@@ -16,6 +17,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.api import api_router
+from app.db.init_db import ensure_database_ready
+
+logger = logging.getLogger(__name__)
 
 
 # Simplified startup for standalone version
@@ -39,6 +43,22 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(api_router, prefix="/api/v1")
+
+    @app.on_event("startup")
+    async def startup_event():
+        """Initialize database on startup."""
+        try:
+            logger.info("Starting CardioAI Pro backend...")
+            await ensure_database_ready()
+            logger.info("Database initialization completed")
+        except Exception as e:
+            logger.error(f"Failed to initialize database: {str(e)}")
+            raise
+
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        """Cleanup on shutdown."""
+        logger.info("Shutting down CardioAI Pro backend...")
 
     return app
 
