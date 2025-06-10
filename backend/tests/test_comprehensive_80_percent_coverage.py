@@ -564,7 +564,7 @@ async def test_core_modules_comprehensive_coverage():
     settings = Settings()
     assert settings is not None
     
-    with patch.dict(os.environ, {"DATABASE_URL": "test://localhost"}):
+    with patch.dict(os.environ, {"DATABASE_URL": "test://localhost", "STANDALONE_MODE": "false"}):
         settings = Settings()
         assert settings.DATABASE_URL == "test://localhost"
     
