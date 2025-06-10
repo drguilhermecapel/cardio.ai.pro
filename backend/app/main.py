@@ -3,8 +3,8 @@ CardioAI Pro - Standalone FastAPI Application
 Simplified ECG Analysis System for Desktop
 """
 
-import sys
 import logging
+import sys
 from pathlib import Path
 
 if getattr(sys, 'frozen', False):
