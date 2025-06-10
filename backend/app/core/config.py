@@ -183,7 +183,7 @@ class Settings(BaseSettings):
     ENABLE_DIGITAL_SIGNATURES: bool = True
     REQUIRE_AUDIT_TRAIL: bool = True
 
-    FIRST_SUPERUSER: str = "admin@cardioai.pro"
+    FIRST_SUPERUSER: str = "admin"
     FIRST_SUPERUSER_EMAIL: str = "admin@cardioai.pro"
     FIRST_SUPERUSER_PASSWORD: str = "Admin123!@#"
 
