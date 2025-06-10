@@ -30,7 +30,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
   const fetchPatients = async (): Promise<void> => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/patients`, {
+      const response = await fetch(`/api/v1/patients`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ const PatientManagement: React.FC = (): JSX.Element => {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/patients`, {
+      const response = await fetch(`/api/v1/patients`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

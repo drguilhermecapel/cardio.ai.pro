@@ -19,9 +19,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JS
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL
-
-      const response = await fetch(`${apiUrl}/auth/login`, {
+      const response = await fetch(`/api/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
