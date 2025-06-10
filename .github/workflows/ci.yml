@@ -176,11 +176,11 @@ jobs:
         ENVIRONMENT=test
         DEBUG=false
         
-        # Database Configuration - using postgres user and database
-        DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/postgres
-        POSTGRES_USER=postgres
-        POSTGRES_PASSWORD=postgres
-        POSTGRES_DB=postgres
+        # Database Configuration - using cardioai user and database
+        DATABASE_URL=postgresql+asyncpg://cardioai:cardioai_dev_password@postgres:5432/cardioai_pro
+        POSTGRES_USER=cardioai
+        POSTGRES_PASSWORD=cardioai_dev_password
+        POSTGRES_DB=cardioai_pro
         
         # Security Configuration
         SECRET_KEY=test-secret-key-for-integration
@@ -189,11 +189,11 @@ jobs:
         ACCESS_TOKEN_EXPIRE_MINUTES=30
         
         # Redis Configuration
-        REDIS_URL=redis://:postgres@redis:6379/0
+        REDIS_URL=redis://:cardioai_dev_password@redis:6379/0
         
         # Celery Configuration
-        CELERY_BROKER_URL=redis://:postgres@redis:6379/0
-        CELERY_RESULT_BACKEND=redis://:postgres@redis:6379/0
+        CELERY_BROKER_URL=redis://:cardioai_dev_password@redis:6379/0
+        CELERY_RESULT_BACKEND=redis://:cardioai_dev_password@redis:6379/0
         
         # Application Configuration
         API_PORT=8000
