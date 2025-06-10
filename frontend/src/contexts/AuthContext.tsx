@@ -24,6 +24,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JS
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
+        credentials: 'omit',
         body: new URLSearchParams({ username, password }),
       })
 

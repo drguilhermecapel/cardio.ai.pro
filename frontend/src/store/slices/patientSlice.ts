@@ -36,6 +36,7 @@ export const fetchPatients = createAsyncThunk(
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'omit',
     })
 
     if (!response.ok) {
@@ -55,6 +56,7 @@ export const createPatient = createAsyncThunk(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'omit',
       body: JSON.stringify(patientData),
     })
 

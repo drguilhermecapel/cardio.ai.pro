@@ -36,6 +36,7 @@ export const fetchMyValidations = createAsyncThunk(
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'omit',
     })
 
     if (!response.ok) {
@@ -55,6 +56,7 @@ export const submitValidation = createAsyncThunk(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'omit',
       body: JSON.stringify(data.validationData),
     })
 

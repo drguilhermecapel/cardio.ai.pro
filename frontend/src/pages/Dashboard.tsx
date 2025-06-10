@@ -27,9 +27,9 @@ const Dashboard: React.FC = (): JSX.Element => {
         }
 
         const [patientsRes, recordsRes, consultationsRes] = await Promise.all([
-          fetch(`/api/v1/patients`, { headers }),
-          fetch(`/api/v1/medical-records`, { headers }),
-          fetch(`/api/v1/consultations`, { headers }),
+          fetch(`/api/v1/patients`, { headers, credentials: 'omit' }),
+          fetch(`/api/v1/medical-records`, { headers, credentials: 'omit' }),
+          fetch(`/api/v1/consultations`, { headers, credentials: 'omit' }),
         ])
 
         const patients = await patientsRes.json()

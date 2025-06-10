@@ -34,6 +34,7 @@ export const login = createAsyncThunk(
     const response = await fetch(`/api/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      credentials: 'omit',
       body: new URLSearchParams(credentials),
     })
 
@@ -51,6 +52,7 @@ export const logout = createAsyncThunk('auth/logout', async () => {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
+    credentials: 'omit',
   })
 })
 
