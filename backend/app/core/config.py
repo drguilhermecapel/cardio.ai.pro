@@ -39,12 +39,14 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_db_connection(cls: "type[Settings]", v: str | None, info: ValidationInfo) -> Any:
         """Assemble database URL."""
-        if isinstance(v, str):
-            return v
         values = info.data
-
+        
         if values.get("STANDALONE_MODE", True):
             return "sqlite+aiosqlite:///./cardioai.db"
+            
+        if isinstance(v, str):
+            return v
+
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
         host = values.get("POSTGRES_SERVER")
@@ -56,12 +58,14 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_test_db_connection(cls: "type[Settings]", v: str | None, info: ValidationInfo) -> Any:
         """Assemble test database URL."""
-        if isinstance(v, str):
-            return v
         values = info.data
-
+        
         if values.get("STANDALONE_MODE", True):
             return "sqlite+aiosqlite:///./cardioai_test.db"
+            
+        if isinstance(v, str):
+            return v
+
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
         host = values.get("POSTGRES_SERVER")
