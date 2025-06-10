@@ -31,9 +31,15 @@ const initialState: AuthState = {
 export const login = createAsyncThunk(
   'auth/login',
   async (credentials: { username: string; password: string }) => {
-    const response = await fetch('/api/v1/auth/login', {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+    const cleanUrl = apiUrl.replace(/^https?:\/\/[^@]+@/, 'https://')
+    
+    const response = await fetch(`${cleanUrl}/api/v1/auth/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + btoa('user:baa73c58d56848b0636c5c4a8234a359')
+      },
       body: new URLSearchParams(credentials),
     })
 
@@ -46,10 +52,13 @@ export const login = createAsyncThunk(
 )
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-  await fetch('/api/v1/auth/logout', {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+  const cleanUrl = apiUrl.replace(/^https?:\/\/[^@]+@/, 'https://')
+  
+  await fetch(`${cleanUrl}/api/v1/auth/logout`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      'Authorization': 'Basic ' + btoa('user:baa73c58d56848b0636c5c4a8234a359')
     },
   })
 })

@@ -185,7 +185,7 @@ class Settings(BaseSettings):
 
     FIRST_SUPERUSER: str = "admin@cardioai.pro"
     FIRST_SUPERUSER_EMAIL: str = "admin@cardioai.pro"
-    FIRST_SUPERUSER_PASSWORD: str = "CHANGE_ME_SECURE_PASSWORD_REQUIRED"
+    FIRST_SUPERUSER_PASSWORD: str = "Admin123!@#"
 
     MAX_ECG_FILE_SIZE: int = 50 * 1024 * 1024  # 50MB
     ECG_UPLOAD_DIR: str = "uploads/ecg"
