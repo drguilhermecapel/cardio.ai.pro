@@ -38,7 +38,6 @@ export const login = createAsyncThunk(
       method: 'POST',
       headers: { 
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + btoa('user:baa73c58d56848b0636c5c4a8234a359')
       },
       body: new URLSearchParams(credentials),
     })
@@ -58,7 +57,7 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   await fetch(`${cleanUrl}/api/v1/auth/logout`, {
     method: 'POST',
     headers: {
-      'Authorization': 'Basic ' + btoa('user:baa73c58d56848b0636c5c4a8234a359')
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
     },
   })
 })

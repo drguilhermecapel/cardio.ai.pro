@@ -32,7 +32,12 @@ def create_app() -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Allow all origins for standalone
+        allow_origins=[
+            "*",  # Allow all origins for standalone
+            "https://emr-installer-app-vxljcvay.devinapps.com",  # Deployed frontend
+            "http://localhost:5173",  # Local development
+            "http://localhost:3000",  # Alternative local port
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
