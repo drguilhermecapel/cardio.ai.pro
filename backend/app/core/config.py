@@ -41,11 +41,11 @@ class Settings(BaseSettings):
         """Assemble database URL."""
         values = info.data
 
-        if values.get("STANDALONE_MODE", True):
-            return "sqlite+aiosqlite:///./cardioai.db"
-
         if isinstance(v, str):
             return v
+
+        if values.get("STANDALONE_MODE", True):
+            return "sqlite+aiosqlite:///./cardioai.db"
 
         user = values.get("POSTGRES_USER")
         password = values.get("POSTGRES_PASSWORD")
