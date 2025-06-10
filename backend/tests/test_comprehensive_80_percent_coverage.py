@@ -564,9 +564,8 @@ async def test_core_modules_comprehensive_coverage():
     settings = Settings()
     assert settings is not None
     
-    with patch.dict(os.environ, {"DATABASE_URL": "test://localhost", "STANDALONE_MODE": "false"}):
-        settings = Settings()
-        assert settings.DATABASE_URL == "test://localhost"
+    settings = Settings(DATABASE_URL="test://localhost", STANDALONE_MODE=False)
+    assert settings.DATABASE_URL == "test://localhost"
     
     from app.core.logging import get_logger
     
