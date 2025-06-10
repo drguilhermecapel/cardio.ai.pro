@@ -45,7 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(api_router, prefix="/api/v1")
 
     @app.on_event("startup")
-    async def startup_event():
+    async def startup_event() -> None:
         """Initialize database on startup."""
         try:
             logger.info("Starting CardioAI Pro backend...")
@@ -56,7 +56,7 @@ def create_app() -> FastAPI:
             raise
 
     @app.on_event("shutdown")
-    async def shutdown_event():
+    async def shutdown_event() -> None:
         """Cleanup on shutdown."""
         logger.info("Shutting down CardioAI Pro backend...")
 
