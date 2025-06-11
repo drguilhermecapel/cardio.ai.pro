@@ -20,6 +20,7 @@ from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
 
 # from app.monitoring.structured_logging import get_ecg_logger  # Temporarily disabled for core component
+from app.preprocessing import AdvancedECGPreprocessor, EnhancedSignalQualityAnalyzer
 from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
 
@@ -565,11 +566,13 @@ class HybridECGAnalysisService:
 
         self.ecg_reader = UniversalECGReader()
         self.preprocessor = AdvancedPreprocessor()
+        self.advanced_preprocessor = AdvancedECGPreprocessor()
+        self.quality_analyzer = EnhancedSignalQualityAnalyzer()
         self.feature_extractor = FeatureExtractor()
         # self.ecg_logger = get_ecg_logger(__name__)  # Disabled for core component
         self.ecg_logger = logger
 
-        logger.info("Hybrid ECG Analysis Service initialized")
+        logger.info("Hybrid ECG Analysis Service initialized with advanced preprocessing pipeline")
 
     async def analyze_ecg_comprehensive(
         self,
@@ -588,7 +591,25 @@ class HybridECGAnalysisService:
             sampling_rate = ecg_data['sampling_rate']
             leads = ecg_data['labels']
 
-            preprocessed_signal = self.preprocessor.preprocess_signal(signal)
+            # Advanced preprocessing with quality assessment
+            logger.info("Starting advanced signal preprocessing")
+            
+            processed_signal, quality_metrics = self.advanced_preprocessor.advanced_preprocessing_pipeline(
+                signal, clinical_mode=True
+            )
+            
+            # Comprehensive quality analysis
+            comprehensive_quality = self.quality_analyzer.assess_signal_quality_comprehensive(processed_signal)
+            
+            logger.info(f"Advanced preprocessing completed. Signal shape: {processed_signal.shape}")
+            logger.info(f"Signal quality score: {quality_metrics['quality_score']:.3f}")
+            logger.info(f"R-peaks detected: {quality_metrics['r_peaks_detected']}")
+            
+            if quality_metrics['quality_score'] < 0.5:
+                logger.warning("Advanced preprocessing quality too low, falling back to standard preprocessing")
+                preprocessed_signal = self.preprocessor.preprocess_signal(signal)
+            else:
+                preprocessed_signal = processed_signal
 
             features = self.feature_extractor.extract_all_features(preprocessed_signal)
 
