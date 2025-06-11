@@ -13,9 +13,9 @@ import numpy as np
 from scipy import signal as scipy_signal
 from scipy.fft import fft, fftfreq, ifft
 
-warnings.filterwarnings('ignore')
-
 from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
+
+warnings.filterwarnings('ignore')
 
 logger = logging.getLogger(__name__)
 

@@ -11,14 +11,14 @@ from typing import Any
 import numpy as np
 
 try:
-    import shap
+    import shap  # noqa: F401
     SHAP_AVAILABLE = True
 except ImportError:
     SHAP_AVAILABLE = False
     logging.warning("SHAP not available - install with: pip install shap")
 
 try:
-    import lime
+    import lime  # noqa: F401
     from lime.lime_tabular import LimeTabularExplainer
     LIME_AVAILABLE = True
 except ImportError:

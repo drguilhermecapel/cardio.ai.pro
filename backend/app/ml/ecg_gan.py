@@ -17,9 +17,9 @@ from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
-warnings.filterwarnings('ignore')
-
 from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
+
+warnings.filterwarnings('ignore')
 
 logger = logging.getLogger(__name__)
 
