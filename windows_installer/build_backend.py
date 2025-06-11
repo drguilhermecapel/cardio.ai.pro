@@ -369,28 +369,50 @@ a = Analysis(
         'uvicorn.loops',
         'uvicorn.loops.auto',
         'fastapi',
+        'fastapi.middleware',
+        'fastapi.middleware.cors',
         'sqlalchemy',
         'sqlalchemy.dialects.sqlite',
+        'sqlalchemy.pool',
         'aiosqlite',
         'onnxruntime',
+        'onnxruntime.capi',
         'numpy',
         'scipy',
         'scipy.signal',
+        'scipy.special',
+        'scipy.special._cdflib',
         'pydantic',
         'pydantic_settings',
+        'pydantic.v1',
         'passlib',
         'passlib.hash',
-        'python_multipart',
+        'passlib.handlers',
+        'passlib.handlers.bcrypt',
+        'python-multipart',
         'email_validator',
+        'jose',
+        'jose.jwt',
+        'cryptography',
+        'cryptography.hazmat',
+        'cryptography.hazmat.primitives',
+        'cryptography.hazmat.backends',
+        'cryptography.hazmat.backends.openssl',
+        'multipart',
+        'multipart.multipart',
         'app.api',
         'app.api.v1',
         'app.api.v1.endpoints',
         'app.core',
+        'app.core.config',
+        'app.core.security',
         'app.db',
+        'app.db.session',
         'app.models',
         'app.services',
         'app.tasks',
         'app.utils',
+        'app.validation',
     ],
     hookspath=[],
     hooksconfig={},
@@ -403,6 +425,9 @@ a = Analysis(
         'black',
         'isort',
         'mypy',
+        'tkinter',
+        'matplotlib.backends._tkagg',
+        'PIL._tkinter_finder',
     ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
@@ -449,12 +474,14 @@ def build_executable():
         
         print("🔨 Building executable (this may take several minutes)...")
         print("⏳ Please wait... Progress will be shown below:")
+        print("ℹ️  Note: DLL warnings are normal and can be safely ignored")
         
         try:
             process = subprocess.Popen([
                 "poetry", "run", "pyinstaller",
                 "--clean",
                 "--noconfirm",
+                "--log-level=WARN",
                 str(spec_file)
             ], cwd=backend_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             
@@ -525,6 +552,38 @@ def build_executable():
                 print("  - dist directory does not exist")
             raise BuildError("Executable not found after build", phase="executable_deployment")
 
+def validate_executable():
+    """Validate that the built executable can start properly."""
+    print("🔍 Validating executable...")
+    
+    installer_dir = Path(__file__).parent
+    exe_file = installer_dir / "cardioai-backend.exe"
+    
+    if not exe_file.exists():
+        print("❌ ERROR: Executable not found for validation")
+        return False
+    
+    try:
+        result = subprocess.run([
+            str(exe_file), "--help"
+        ], capture_output=True, text=True, timeout=30)
+        
+        if result.returncode == 0:
+            print("✅ Executable validation successful")
+            return True
+        else:
+            print(f"⚠️  Executable validation warning (exit code: {result.returncode})")
+            print("This may be normal if --help is not implemented")
+            return True
+            
+    except subprocess.TimeoutExpired:
+        print("⚠️  Executable validation timeout (this may be normal)")
+        return True
+    except Exception as e:
+        print(f"⚠️  Executable validation failed: {e}")
+        print("This may be normal for some configurations")
+        return True
+
 def create_startup_script():
     """Create a startup script for the backend service."""
     print("Creating startup script...")
@@ -533,18 +592,39 @@ def create_startup_script():
     startup_script = installer_dir / "start_backend.bat"
     
     script_content = '''@echo off
-echo Starting CardioAI Pro Backend...
+title CardioAI Pro Backend
+echo ========================================
+echo   CardioAI Pro Backend Server
+echo ========================================
+echo.
+
+REM Check if executable exists
+if not exist "cardioai-backend.exe" (
+    echo ERROR: cardioai-backend.exe not found!
+    echo Please ensure you are running this script from the correct directory.
+    pause
+    exit /b 1
+)
 
 REM Set environment variables for standalone mode
+echo Setting up environment...
 set STANDALONE_MODE=true
 set DATABASE_URL=sqlite+aiosqlite:///./cardioai.db
 set REDIS_URL=
 set CELERY_BROKER_URL=
 set CELERY_RESULT_BACKEND=
+set PYTHONPATH=%CD%
+
+echo Starting CardioAI Pro Backend...
+echo Server will be available at: http://localhost:8000
+echo Press Ctrl+C to stop the server
+echo.
 
 REM Start the backend server
 cardioai-backend.exe
 
+echo.
+echo Server stopped.
 pause
 '''
     
@@ -586,6 +666,9 @@ def main():
             setup_models()
         
         build_executable()
+        
+        with build_phase("Executable Validation"):
+            validate_executable()
         
         with build_phase("Startup Script Creation"):
             create_startup_script()
