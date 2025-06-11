@@ -358,9 +358,9 @@ class MLModelService:
                 peaks = np.where(np.diff(np.sign(np.diff(lead_ii))) < 0)[0]
                 if len(peaks) > 1:
                     rr_intervals = np.diff(peaks) / 500.0  # Assuming 500 Hz sampling rate
-                    features['heart_rate'] = 60.0 / np.mean(rr_intervals) if len(rr_intervals) > 0 else 70.0
-                    features['rr_mean'] = np.mean(rr_intervals) * 1000  # Convert to ms
-                    features['rr_std'] = np.std(rr_intervals) * 1000
+                    features['heart_rate'] = float(60.0 / np.mean(rr_intervals)) if len(rr_intervals) > 0 else 70.0
+                    features['rr_mean'] = float(np.mean(rr_intervals) * 1000)  # Convert to ms
+                    features['rr_std'] = float(np.std(rr_intervals) * 1000)
                 else:
                     features['heart_rate'] = 70.0
                     features['rr_mean'] = 857.0  # ~70 bpm

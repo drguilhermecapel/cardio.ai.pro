@@ -579,9 +579,9 @@ class HybridECGAnalysisService:
             logger.info("✓ Advanced services initialized (multi-pathology, interpretability, adaptive thresholds)")
         except Exception as e:
             logger.warning(f"Advanced services not available, falling back to simplified analysis: {e}")
-            self.multi_pathology_service = None
-            self.interpretability_service = None
-            self.adaptive_threshold_manager = None
+            self.multi_pathology_service: MultiPathologyService | None = None
+            self.interpretability_service: InterpretabilityService | None = None
+            self.adaptive_threshold_manager: AdaptiveThresholdManager | None = None
             self.advanced_services_available = False
 
         try:
@@ -730,7 +730,7 @@ class HybridECGAnalysisService:
 
                 signal_2d = signal.T if len(signal.shape) == 2 else signal.reshape(-1, 1).T
 
-                pathology_results = await self.multi_pathology_service.analyze_hierarchical(
+                pathology_results = await self.multi_pathology_service.detect_multi_pathology(
                     signal=signal_2d,
                     features=features,
                     preprocessing_quality=features.get('signal_quality', 0.8)
@@ -739,7 +739,7 @@ class HybridECGAnalysisService:
                 if self.adaptive_threshold_manager:
                     for condition_code, result in pathology_results.get('detected_conditions', {}).items():
                         if isinstance(result, dict) and 'confidence' in result:
-                            adaptive_threshold = self.adaptive_threshold_manager.get_threshold(
+                            adaptive_threshold = self.adaptive_threshold_manager.get_adaptive_threshold(
                                 condition_code,
                                 clinical_context={'urgency': pathology_results.get('clinical_urgency', 'LOW')}
                             )
