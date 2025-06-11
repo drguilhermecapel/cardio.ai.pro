@@ -8,8 +8,16 @@ import logging
 from dataclasses import dataclass
 
 import numpy as np
-import torch
-import torch.nn as nn
+try:
+    import torch
+    import torch.nn as nn
+    HAS_TORCH = True
+except ImportError:
+    from unittest.mock import MagicMock
+    torch = MagicMock()
+    nn = MagicMock()
+    torch.nn = nn
+    HAS_TORCH = False
 
 logger = logging.getLogger(__name__)
 
