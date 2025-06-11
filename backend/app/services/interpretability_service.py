@@ -505,9 +505,9 @@ class InterpretabilityService:
         """Reference standard diagnostic criteria for the diagnosis"""
 
         condition = get_condition_by_code(diagnosis)
-        criteria = {
+        criteria: dict[str, Any] = {
             'diagnosis': diagnosis,
-            'icd10_code': condition.icd10_code if condition else 'Unknown',
+            'icd10_code': condition.icd10_codes[0] if condition and condition.icd10_codes else 'Unknown',
             'standard_criteria': {}
         }
 

@@ -14,7 +14,6 @@ from app.core.constants import ClinicalUrgency
 from app.core.scp_ecg_conditions import (
     SCP_ECG_CONDITIONS,
     SCPCategory,
-    get_conditions_by_category,
     get_conditions_by_urgency,
     get_critical_conditions,
 )
@@ -36,7 +35,7 @@ class PathologyDetectionResult:
 class MultiPathologyService:
     """Hierarchical multi-pathology detection for 71 SCP-ECG conditions"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.condition_models: dict[str, Any] = {}
         self.category_thresholds = self._initialize_category_thresholds()
         self.condition_thresholds = self._initialize_condition_thresholds()
@@ -192,7 +191,7 @@ class MultiPathologyService:
 
         if abnormal_indicators:
             weighted_score = 0
-            total_weight = 0
+            total_weight = 0.0
 
             for indicator, score in abnormal_indicators:
                 weight = 1.0
@@ -225,7 +224,7 @@ class MultiPathologyService:
 
         category_scores = {}
 
-        arrhythmia_score = 0
+        arrhythmia_score = 0.0
         hr = features.get('heart_rate', 70)
         rr_std = features.get('rr_std', 0)
         rr_mean = features.get('rr_mean', 1000)
@@ -239,7 +238,7 @@ class MultiPathologyService:
 
         category_scores[SCPCategory.ARRHYTHMIA] = min(arrhythmia_score, 1.0)
 
-        conduction_score = 0
+        conduction_score = 0.0
         qrs_duration = features.get('qrs_duration', 100)
         pr_interval = features.get('pr_interval', 160)
 
@@ -252,7 +251,7 @@ class MultiPathologyService:
 
         category_scores[SCPCategory.CONDUCTION_DISORDER] = min(conduction_score, 1.0)
 
-        ischemia_score = 0
+        ischemia_score = 0.0
         st_elevation = features.get('st_elevation_max', 0)
         st_depression = features.get('st_depression_max', 0)
         t_wave_inversion = features.get('t_wave_inversion_leads', 0)
@@ -268,7 +267,7 @@ class MultiPathologyService:
 
         category_scores[SCPCategory.ISCHEMIA] = min(ischemia_score, 1.0)
 
-        hypertrophy_score = 0
+        hypertrophy_score = 0.0
         r_wave_v5 = features.get('r_wave_v5', 0)
         s_wave_v1 = features.get('s_wave_v1', 0)
 
@@ -281,7 +280,7 @@ class MultiPathologyService:
 
         category_scores[SCPCategory.HYPERTROPHY] = min(hypertrophy_score, 1.0)
 
-        axis_score = 0
+        axis_score = 0.0
         qrs_axis = features.get('qrs_axis', 60)
 
         if qrs_axis < -30 or qrs_axis > 90:
@@ -291,7 +290,7 @@ class MultiPathologyService:
 
         category_scores[SCPCategory.AXIS_DEVIATION] = axis_score
 
-        repol_score = 0
+        repol_score = 0.0
         qtc = features.get('qtc', 420)
 
         if qtc > 450 or qtc < 350:
@@ -324,7 +323,6 @@ class MultiPathologyService:
     ) -> dict[str, Any]:
         """Level 3: Specific diagnosis within predicted category"""
 
-        get_conditions_by_category(predicted_category)
         condition_scores = {}
 
         if predicted_category == SCPCategory.ARRHYTHMIA:

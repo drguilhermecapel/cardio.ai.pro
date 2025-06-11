@@ -383,7 +383,7 @@ class ClinicalExplanationGenerator:
     def _explain_diagnostic_criteria(self, diagnosis_code: str, features: dict[str, Any]) -> dict[str, Any]:
         """Explain how the diagnosis meets established criteria"""
 
-        criteria_explanation = {
+        criteria_explanation: dict[str, Any] = {
             'condition': diagnosis_code,
             'criteria_met': [],
             'criteria_not_met': [],
@@ -759,7 +759,7 @@ class ClinicalExplanationGenerator:
     def _assess_risk_stratification(self, diagnosis_code: str, features: dict[str, Any]) -> dict[str, Any]:
         """Assess risk stratification for the diagnosis"""
 
-        risk_assessment = {
+        risk_assessment: dict[str, Any] = {
             'overall_risk': 'moderate',
             'risk_factors': [],
             'protective_factors': [],

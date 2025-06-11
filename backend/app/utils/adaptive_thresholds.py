@@ -399,7 +399,7 @@ class AdaptiveThresholdManager:
 
         return recommendations
 
-    def _save_configuration(self):
+    def _save_configuration(self) -> None:
         """Save threshold configurations to file"""
 
         try:
@@ -423,7 +423,7 @@ class AdaptiveThresholdManager:
         except Exception as e:
             logger.error(f"Error saving configuration: {e}")
 
-    def _load_configuration(self):
+    def _load_configuration(self) -> None:
         """Load threshold configurations from file"""
 
         try:
@@ -446,7 +446,7 @@ class AdaptiveThresholdManager:
         except Exception as e:
             logger.error(f"Error loading configuration: {e}")
 
-    def save_state(self):
+    def save_state(self) -> None:
         """Save current state including configurations and scalers"""
 
         self._save_configuration()
@@ -459,7 +459,7 @@ class AdaptiveThresholdManager:
         except Exception as e:
             logger.error(f"Error saving Platt scalers: {e}")
 
-    def load_state(self):
+    def load_state(self) -> None:
         """Load saved state including configurations and scalers"""
 
         self._load_configuration()
@@ -481,7 +481,7 @@ class AdaptiveThresholdManager:
             for condition_code, config in self.threshold_configs.items()
         }
 
-    def reset_condition_threshold(self, condition_code: str):
+    def reset_condition_threshold(self, condition_code: str) -> None:
         """Reset a condition's threshold to default value"""
 
         if condition_code not in self.threshold_configs:
