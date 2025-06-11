@@ -574,7 +574,7 @@ class HybridECGAnalysisService:
 
         try:
             from .dataset_service import DatasetService
-            self.dataset_service = DatasetService()
+            self.dataset_service: DatasetService | None = DatasetService()
             self.dataset_service_available = True
             logger.info("✓ Dataset service initialized for public ECG datasets")
         except Exception as e:

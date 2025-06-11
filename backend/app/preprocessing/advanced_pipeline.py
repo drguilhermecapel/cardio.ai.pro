@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-import pywt
+import pywt  # type: ignore
 from scipy import signal
 
 logger = logging.getLogger(__name__)
@@ -187,7 +187,7 @@ class AdvancedECGPreprocessor:
                     r_peaks.append(refined_peak)
 
             if len(r_peaks) > 1:
-                validated_peaks = []
+                validated_peaks: list[int] = []
 
                 for _, peak in enumerate(r_peaks):
                     is_duplicate = False
@@ -198,7 +198,7 @@ class AdvancedECGPreprocessor:
                     if not is_duplicate:
                         validated_peaks.append(peak)
 
-                final_peaks = []
+                final_peaks: list[int] = []
                 min_rr_samples = int(0.3 * fs)  # 300ms minimum RR interval
 
                 for peak in sorted(validated_peaks):
@@ -325,14 +325,20 @@ class AdvancedECGPreprocessor:
                         else:
                             normalized[:, i] = lead_data - median_val
 
-                return normalized.astype(np.float64)
+                result_multi: npt.NDArray[np.float64] = normalized.astype(np.float64)
+                return result_multi
 
             else:
-                return (combined_signal - np.mean(combined_signal)) / (np.std(combined_signal) + 1e-10)
+                normalized_signal = (combined_signal - np.mean(combined_signal)) / (np.std(combined_signal) + 1e-10)
+                result_single: npt.NDArray[np.float64] = normalized_signal.astype(np.float64)
+                return result_single
 
         except Exception as e:
             logger.warning(f"Robust normalization failed: {e}")
-            return segments[0] if segments else np.array([])
+            if segments:
+                return segments[0].astype(np.float64)
+            else:
+                return np.array([], dtype=np.float64)
 
     def _assess_signal_quality_realtime(self, signal_data: npt.NDArray[np.float64]) -> float:
         """

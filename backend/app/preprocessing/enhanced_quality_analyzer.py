@@ -43,7 +43,7 @@ class EnhancedSignalQualityAnalyzer:
             Dictionary with comprehensive quality metrics
         """
         try:
-            quality_metrics = {
+            quality_metrics: dict[str, Any] = {
                 'overall_score': 0.0,
                 'lead_scores': [],
                 'noise_characteristics': {},
@@ -56,11 +56,11 @@ class EnhancedSignalQualityAnalyzer:
             if ecg_signal.ndim == 1:
                 ecg_signal = ecg_signal.reshape(-1, 1)
 
-            lead_scores = []
+            lead_scores: list[float] = []
             for lead_idx in range(ecg_signal.shape[1]):
                 lead_data = ecg_signal[:, lead_idx]
                 lead_quality = self._analyze_lead_comprehensive(lead_data, lead_idx)
-                lead_scores.append(lead_quality['score'])
+                lead_scores.append(float(lead_quality['score']))
                 quality_metrics['lead_scores'].append(lead_quality)
 
             quality_metrics['overall_score'] = np.mean(lead_scores)
@@ -124,11 +124,15 @@ class EnhancedSignalQualityAnalyzer:
             lead_quality['artifacts'] = artifacts
             lead_quality['issues'] = issues
 
+            frequency_quality = lead_quality.get('frequency_quality', 0.5)
+            if not isinstance(frequency_quality, (int, float)):
+                frequency_quality = 0.5
+            
             score_components = [
                 min(snr_db / 20, 1.0) * 0.3,  # SNR component (normalized to 20dB max)
                 baseline_stability * 0.25,
                 amplitude_consistency * 0.25,
-                lead_quality.get('frequency_quality', 0.5) * 0.2
+                float(frequency_quality) * 0.2
             ]
 
             lead_quality['score'] = float(sum(score_components))
@@ -178,7 +182,11 @@ class EnhancedSignalQualityAnalyzer:
 
             num_leads = ecg_signal.shape[1]
             for key in ['powerline_interference', 'baseline_wander', 'muscle_artifact', 'electrode_noise']:
-                noise_characteristics[key] = float(noise_characteristics[key] / num_leads)
+                current_value = noise_characteristics[key]
+                if isinstance(current_value, (int, float)):
+                    noise_characteristics[key] = float(current_value / num_leads)
+                else:
+                    noise_characteristics[key] = 0.0
 
             noise_levels = {
                 'powerline': noise_characteristics['powerline_interference'],
@@ -187,8 +195,9 @@ class EnhancedSignalQualityAnalyzer:
                 'electrode': noise_characteristics['electrode_noise']
             }
 
-            dominant_noise = max(noise_levels.items(), key=lambda x: x[1])
-            if dominant_noise[1] > 0.1:  # Threshold for significant noise
+            dominant_noise = max(noise_levels.items(), key=lambda x: float(x[1]) if isinstance(x[1], (int, float)) else 0.0)
+            dominant_value = dominant_noise[1]
+            if isinstance(dominant_value, (int, float)) and float(dominant_value) > 0.1:  # Threshold for significant noise
                 noise_characteristics['dominant_noise_type'] = dominant_noise[0]
 
             return noise_characteristics
@@ -219,14 +228,23 @@ class EnhancedSignalQualityAnalyzer:
 
                 flat_segments = self._detect_flat_segments(lead_data)
                 if flat_segments:
-                    artifacts['flat_line_segments'].extend([(lead_idx, seg) for seg in flat_segments])
+                    flat_line_segments = artifacts.get('flat_line_segments', [])
+                    if isinstance(flat_line_segments, list):
+                        flat_line_segments.extend([(lead_idx, seg) for seg in flat_segments])
+                        artifacts['flat_line_segments'] = flat_line_segments
 
                 jumps = self._detect_sudden_jumps(lead_data)
                 if jumps:
-                    artifacts['sudden_jumps'].extend([(lead_idx, jump) for jump in jumps])
+                    sudden_jumps = artifacts.get('sudden_jumps', [])
+                    if isinstance(sudden_jumps, list):
+                        sudden_jumps.extend([(lead_idx, jump) for jump in jumps])
+                        artifacts['sudden_jumps'] = sudden_jumps
 
                 if np.std(lead_data) < 0.01:
-                    artifacts['lead_disconnection'].append(lead_idx)
+                    lead_disconnection = artifacts.get('lead_disconnection', [])
+                    if isinstance(lead_disconnection, list):
+                        lead_disconnection.append(lead_idx)
+                        artifacts['lead_disconnection'] = lead_disconnection
 
             artifacts['periodic_interference'] = self._detect_periodic_interference(ecg_signal)
 
@@ -283,7 +301,7 @@ class EnhancedSignalQualityAnalyzer:
 
             jump_indices = np.where(np.abs(diff) > threshold)[0]
 
-            return jump_indices.tolist()
+            return [int(idx) for idx in jump_indices.tolist()]
 
         except Exception as e:
             logger.error(f"Sudden jump detection failed: {e}")
@@ -354,7 +372,8 @@ class EnhancedSignalQualityAnalyzer:
                     ecg_ratios.append(ecg_power / (total_power + 1e-10))
 
             if spectral_entropies:
-                freq_analysis['spectral_entropy'] = float(np.mean(spectral_entropies))
+                spectral_entropies_array = np.array(spectral_entropies, dtype=np.float64)
+                freq_analysis['spectral_entropy'] = float(np.mean(spectral_entropies_array))
             if dominant_freqs:
                 freq_analysis['dominant_frequency'] = float(np.mean(dominant_freqs))
             if bandwidths:

@@ -9,9 +9,9 @@ import zipfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
-import h5py
+import h5py  # type: ignore
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -41,15 +41,15 @@ except ImportError:
 @dataclass
 class ECGRecord:
     """Estrutura padronizada para registros de ECG"""
-    signal: np.ndarray
+    signal: np.ndarray[np.float64, np.dtype[np.float64]]
     sampling_rate: int
     labels: list[str] = field(default_factory=list)
     patient_id: str = ""
     age: int | None = None
     sex: str | None = None
     leads: list[str] = field(default_factory=list)
-    metadata: dict = field(default_factory=dict)
-    annotations: dict | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+    annotations: dict[str, Any] | None = None
 
 
 class ECGDatasetDownloader:
@@ -159,7 +159,7 @@ class ECGDatasetDownloader:
         url = "https://physionet.org/static/published-projects/ptb-xl/ptb-xl-a-large-publicly-available-electrocardiography-dataset-1.0.3.zip"
 
         try:
-            def download_hook(block_num, block_size, total_size):
+            def download_hook(block_num: int, block_size: int, total_size: int) -> None:
                 downloaded = block_num * block_size
                 if total_size > 0:
                     percent = min(100, downloaded * 100 / total_size)
@@ -196,10 +196,10 @@ class ECGDatasetDownloader:
 
         return str(dataset_dir)
 
-    def get_dataset_info(self, dataset_name: str) -> dict:
+    def get_dataset_info(self, dataset_name: str) -> dict[str, Any]:
         return self.DATASETS_INFO.get(dataset_name, {})
 
-    def list_available_datasets(self):
+    def list_available_datasets(self) -> None:
         """Lista todos os datasets disponíveis"""
         print("\n" + "="*60)
         print("DATASETS PÚBLICOS DE ECG DISPONÍVEIS")
@@ -225,14 +225,14 @@ class ECGDatasetLoader:
             preprocessor: Instância do AdvancedECGPreprocessor para pré-processamento
         """
         if preprocessor is None and ADVANCED_PREPROCESSOR_AVAILABLE:
-            self.preprocessor = AdvancedECGPreprocessor()
+            self.preprocessor: Optional['AdvancedECGPreprocessor'] = AdvancedECGPreprocessor()
         else:
             self.preprocessor = preprocessor
 
         self.label_mappings = self._initialize_label_mappings()
         self.logger = logging.getLogger(__name__)
 
-    def _initialize_label_mappings(self) -> dict:
+    def _initialize_label_mappings(self) -> dict[str, Any]:
         """Inicializa mapeamentos de labels entre datasets"""
         return {
             'mit-bih': {
@@ -268,12 +268,12 @@ class ECGDatasetLoader:
             self.logger.error("wfdb não disponível")
             return []
 
-        dataset_path = Path(dataset_path)
-        if not dataset_path.exists():
+        dataset_path_obj = Path(dataset_path)
+        if not dataset_path_obj.exists():
             self.logger.error(f"Dataset não encontrado: {dataset_path}")
             return []
 
-        header_files = list(dataset_path.glob("*.hea"))
+        header_files = list(dataset_path_obj.glob("*.hea"))
         if max_records:
             header_files = header_files[:max_records]
 
@@ -352,10 +352,10 @@ class ECGDatasetLoader:
             max_records: Número máximo de registros
             preprocess: Se True, aplica pré-processamento
         """
-        dataset_path = Path(dataset_path)
+        dataset_path_obj = Path(dataset_path)
 
         extracted_dir = None
-        for item in dataset_path.iterdir():
+        for item in dataset_path_obj.iterdir():
             if item.is_dir() and 'ptb-xl' in item.name.lower():
                 extracted_dir = item
                 break
@@ -382,9 +382,9 @@ class ECGDatasetLoader:
 
         ecg_records = []
 
-        for idx, row in tqdm(metadata_df.iterrows(),
-                           total=len(metadata_df),
-                           desc="Carregando PTB-XL"):
+        for idx, (_, row) in enumerate(tqdm(metadata_df.iterrows(),
+                                      total=len(metadata_df),
+                                      desc="Carregando PTB-XL")):
             try:
                 filename_lr = row['filename_lr'] if sampling_rate == 100 else row['filename_hr']
                 record_path = records_dir / filename_lr
@@ -499,11 +499,11 @@ class ECGDatasetLoader:
 class ECGDatasetAnalyzer:
     """Analisador estatístico para datasets de ECG"""
 
-    def __init__(self):
-        self.stats = {}
+    def __init__(self) -> None:
+        self.stats: dict[str, Any] = {}
         self.logger = logging.getLogger(__name__)
 
-    def analyze_dataset(self, records: list[ECGRecord], dataset_name: str = "Dataset") -> dict:
+    def analyze_dataset(self, records: list[ECGRecord], dataset_name: str = "Dataset") -> dict[str, Any]:
         """
         Analisa estatísticas de um dataset
 
@@ -513,17 +513,17 @@ class ECGDatasetAnalyzer:
         """
         self.logger.info(f"Analisando {dataset_name}...")
 
-        stats = {
+        stats: dict[str, Any] = {
             'dataset_name': dataset_name,
             'total_records': len(records),
-            'total_duration_hours': 0,
+            'total_duration_hours': 0.0,
             'sampling_rates': {},
             'lead_counts': {},
             'label_distribution': {},
             'age_distribution': {'mean': None, 'std': None, 'min': None, 'max': None},
             'sex_distribution': {},
             'signal_quality': {'mean': None, 'std': None},
-            'average_length_seconds': 0
+            'average_length_seconds': 0.0
         }
 
         ages = []
@@ -532,22 +532,26 @@ class ECGDatasetAnalyzer:
         for record in tqdm(records, desc="Analisando registros"):
             duration = len(record.signal) / record.sampling_rate
             durations.append(duration)
-            stats['total_duration_hours'] += duration / 3600
+            stats['total_duration_hours'] = float(stats['total_duration_hours']) + duration / 3600
 
             fs = record.sampling_rate
-            stats['sampling_rates'][fs] = stats['sampling_rates'].get(fs, 0) + 1
+            sampling_rates = stats['sampling_rates']
+            sampling_rates[fs] = sampling_rates.get(fs, 0) + 1
 
             n_leads = len(record.leads) if record.leads else 1
-            stats['lead_counts'][n_leads] = stats['lead_counts'].get(n_leads, 0) + 1
+            lead_counts = stats['lead_counts']
+            lead_counts[n_leads] = lead_counts.get(n_leads, 0) + 1
 
             for label in record.labels:
-                stats['label_distribution'][label] = stats['label_distribution'].get(label, 0) + 1
+                label_distribution = stats['label_distribution']
+                label_distribution[label] = label_distribution.get(label, 0) + 1
 
             if record.age is not None:
                 ages.append(record.age)
 
             if record.sex:
-                stats['sex_distribution'][record.sex] = stats['sex_distribution'].get(record.sex, 0) + 1
+                sex_distribution = stats['sex_distribution']
+                sex_distribution[record.sex] = sex_distribution.get(record.sex, 0) + 1
 
         stats['average_length_seconds'] = np.mean(durations)
 
@@ -564,7 +568,7 @@ class ECGDatasetAnalyzer:
         self.stats[dataset_name] = stats
         return stats
 
-    def _print_summary(self, stats: dict):
+    def _print_summary(self, stats: dict[str, Any]) -> None:
         """Imprime resumo das estatísticas"""
         print(f"\nTotal de registros: {stats['total_records']}")
         print(f"Duração total: {stats['total_duration_hours']:.1f} horas")
@@ -665,7 +669,7 @@ def load_and_preprocess_all(dataset_paths: dict[str, str],
 
 def prepare_ml_dataset(records: list[ECGRecord],
                       window_size: int = 3600,
-                      target_labels: list[str] | None = None) -> tuple[np.ndarray, np.ndarray]:
+                      target_labels: list[str] | None = None) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     """
     Prepara dataset para treinamento de ML
 
@@ -678,8 +682,8 @@ def prepare_ml_dataset(records: list[ECGRecord],
         X: Array de sinais (n_samples, window_size)
         y: Array de labels (n_samples,)
     """
-    X = []
-    y = []
+    X: list[np.ndarray[Any, Any]] = []
+    y: list[int] = []
 
     if target_labels is None:
         all_labels = set()
@@ -709,14 +713,14 @@ def prepare_ml_dataset(records: list[ECGRecord],
                 X.append(window)
                 y.append(window_label)
 
-    X = np.array(X)
-    y = np.array(y)
+    X_array = np.array(X)
+    y_array = np.array(y)
 
-    print(f"✓ Dataset preparado: {X.shape[0]} amostras de shape {X.shape[1:]}")
+    print(f"✓ Dataset preparado: {X_array.shape[0]} amostras de shape {X_array.shape[1:]}")
     print("✓ Distribuição de classes:")
 
     for label, idx in label_to_idx.items():
-        count = np.sum(y == idx)
-        print(f"   {label}: {count} ({count/len(y)*100:.1f}%)")
+        count = np.sum(y_array == idx)
+        print(f"   {label}: {count} ({count/len(y_array)*100:.1f}%)")
 
-    return X, y
+    return X_array, y_array

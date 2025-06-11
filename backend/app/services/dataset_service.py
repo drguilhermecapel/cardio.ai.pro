@@ -5,8 +5,10 @@ Integrado com o sistema CardioAI Pro
 
 import logging
 from pathlib import Path
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 
 from ..datasets import (
     ECGDatasetAnalyzer,
@@ -32,7 +34,7 @@ class DatasetService:
 
         self.logger = logging.getLogger(__name__)
 
-    def download_dataset(self, dataset_name: str, **kwargs) -> str | None:
+    def download_dataset(self, dataset_name: str, **kwargs: Any) -> str | None:
         """
         Baixa um dataset específico
 
@@ -100,7 +102,7 @@ class DatasetService:
             self.logger.error(f"Erro ao carregar {dataset_name}: {e}")
             return []
 
-    def analyze_dataset(self, records: list[ECGRecord], dataset_name: str) -> dict:
+    def analyze_dataset(self, records: list[ECGRecord], dataset_name: str) -> dict[str, Any]:
         """
         Analisa estatísticas de um dataset
 
@@ -116,7 +118,7 @@ class DatasetService:
     def prepare_for_ml(self,
                       records: list[ECGRecord],
                       window_size: int = 3600,
-                      target_labels: list[str] | None = None) -> tuple[np.ndarray, np.ndarray]:
+                      target_labels: list[str] | None = None) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.int32]]:
         """
         Prepara dataset para machine learning
 
@@ -130,7 +132,7 @@ class DatasetService:
         """
         return prepare_ml_dataset(records, window_size, target_labels)
 
-    def quick_setup_mit_bih(self, num_records: int = 10) -> tuple[list[ECGRecord] | None, dict | None]:
+    def quick_setup_mit_bih(self, num_records: int = 10) -> tuple[list[ECGRecord] | None, dict[str, Any] | None]:
         """
         Setup rápido do MIT-BIH para testes
 
@@ -165,7 +167,7 @@ class DatasetService:
             self.logger.error(f"Erro no setup rápido: {e}")
             return None, None
 
-    def get_available_datasets(self) -> dict[str, dict]:
+    def get_available_datasets(self) -> dict[str, dict[str, Any]]:
         """Retorna informações sobre datasets disponíveis"""
         return self.downloader.DATASETS_INFO
 
@@ -200,7 +202,7 @@ class DatasetService:
             dependencies['wfdb'] = False
 
         try:
-            import h5py  # noqa: F401
+            import h5py  # type: ignore # noqa: F401
             dependencies['h5py'] = True
         except ImportError:
             dependencies['h5py'] = False

@@ -4,11 +4,12 @@ Integrado com o sistema CardioAI Pro
 """
 
 from pathlib import Path
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split  # type: ignore
+from sklearn.preprocessing import StandardScaler  # type: ignore
 
 from .ecg_public_datasets import (
     ECGDatasetAnalyzer,
@@ -21,7 +22,7 @@ from .ecg_public_datasets import (
 )
 
 
-def setup_environment():
+def setup_environment() -> bool:
     """Configura ambiente e verifica dependências"""
     print("🔧 Configurando ambiente...")
 
@@ -45,7 +46,7 @@ def setup_environment():
     return True
 
 
-def scenario_1_download_and_explore():
+def scenario_1_download_and_explore() -> list[ECGRecord] | None:
     """Cenário 1: Baixar datasets e fazer análise exploratória"""
 
     print("\n" + "="*60)
@@ -61,7 +62,7 @@ def scenario_1_download_and_explore():
 
     if not mit_path:
         print("Erro no download!")
-        return
+        return None
 
     print("\n2️⃣ Carregando e pré-processando dados...")
     loader = ECGDatasetLoader()
@@ -101,7 +102,7 @@ def scenario_1_download_and_explore():
     return records
 
 
-def scenario_2_prepare_ml_dataset(records=None):
+def scenario_2_prepare_ml_dataset(records: list[ECGRecord] | None = None) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any], np.ndarray[Any, Any], np.ndarray[Any, Any], list[str]]:
     """Cenário 2: Preparar dataset para treinamento de ML"""
 
     print("\n" + "="*60)
@@ -180,7 +181,7 @@ def scenario_2_prepare_ml_dataset(records=None):
     return X_train_cnn, X_test_cnn, y_train, y_test, target_labels
 
 
-def quick_start_mit_bih():
+def quick_start_mit_bih() -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     """Início rápido com MIT-BIH"""
     paths = quick_download_datasets(['mit-bih'])
 
@@ -195,7 +196,7 @@ def quick_start_mit_bih():
     return X, y
 
 
-def quick_visualize_ecg(record: ECGRecord, duration: float = 10.0):
+def quick_visualize_ecg(record: ECGRecord, duration: float = 10.0) -> None:
     """Visualização rápida de um ECG"""
     samples = min(int(duration * record.sampling_rate), len(record.signal))
     t = np.arange(samples) / record.sampling_rate
@@ -218,7 +219,7 @@ def quick_visualize_ecg(record: ECGRecord, duration: float = 10.0):
     plt.show()
 
 
-def main():
+def main() -> None:
     """Função principal com menu interativo"""
 
     print("\n" + "="*70)
