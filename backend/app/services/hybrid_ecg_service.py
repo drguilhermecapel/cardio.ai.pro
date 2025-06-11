@@ -25,7 +25,7 @@ from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
 
 if TYPE_CHECKING:
-    import pywt
+    import pywt  # type: ignore[import-untyped]
     import wfdb
 else:
     try:
