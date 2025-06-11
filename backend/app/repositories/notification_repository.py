@@ -2,7 +2,6 @@
 Notification Repository - Data access layer for notifications.
 """
 
-
 from sqlalchemy import and_, desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -10,7 +9,6 @@ from sqlalchemy.future import select
 from app.core.constants import UserRoles
 from app.models.notification import Notification, NotificationPreference
 from app.models.user import User
-
 
 class NotificationRepository:
     """Repository for notification data access."""

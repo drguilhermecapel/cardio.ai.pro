@@ -19,7 +19,6 @@ from ..datasets import (
 )
 from ..preprocessing import AdvancedECGPreprocessor
 
-
 class DatasetService:
     """Serviço para gerenciar datasets públicos de ECG"""
 

@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from app.models.ecg_analysis import ECGAnalysis
     from app.models.user import User
 
-
 class Validation(Base):
     """Validation model for medical review of ECG analyses."""
 
@@ -67,7 +66,6 @@ class Validation(Base):
         """Check if validation is completed."""
         return self.status in [ValidationStatus.APPROVED, ValidationStatus.REJECTED]
 
-
 class ValidationRule(Base):
     """Validation rule model for automated quality checks."""
 
@@ -90,7 +88,6 @@ class ValidationRule(Base):
 
     def __repr__(self) -> str:
         return f"<ValidationRule(id={self.id}, name='{self.name}', type='{self.rule_type}')>"
-
 
 class ValidationResult(Base):
     """Validation result model for storing rule check results."""
@@ -115,7 +112,6 @@ class ValidationResult(Base):
 
     def __repr__(self) -> str:
         return f"<ValidationResult(id={self.id}, rule_id={self.rule_id}, passed={self.passed})>"
-
 
 class QualityMetric(Base):
     """Quality metric model for tracking analysis quality over time."""

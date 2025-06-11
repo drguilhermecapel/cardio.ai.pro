@@ -15,7 +15,6 @@ from app.core.exceptions import ECGProcessingException
 
 logger = logging.getLogger(__name__)
 
-
 class ECGProcessor:
     """ECG signal processing and file handling."""
 

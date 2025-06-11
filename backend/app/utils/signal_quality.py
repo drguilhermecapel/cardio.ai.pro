@@ -10,7 +10,6 @@ from numpy.typing import NDArray
 
 logger = logging.getLogger(__name__)
 
-
 class SignalQualityAnalyzer:
     """Analyzer for ECG signal quality assessment."""
 

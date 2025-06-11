@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from app.models.ecg_analysis import ECGAnalysis
     from app.models.validation import Validation
 
-
 class User(Base):
     """User model."""
 
@@ -79,7 +78,6 @@ class User(Base):
             self.experience_years >= 5
         )
 
-
 class APIKey(Base):
     """API key model."""
 
@@ -101,7 +99,6 @@ class APIKey(Base):
 
     def __repr__(self) -> str:
         return f"<APIKey(id={self.id}, name='{self.name}', user_id={self.user_id})>"
-
 
 class UserSession(Base):
     """User session model for tracking active sessions."""

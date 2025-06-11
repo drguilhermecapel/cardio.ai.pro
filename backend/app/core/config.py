@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 from pydantic import ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
 
-
 class Settings(BaseSettings):
     """Application settings."""
 
@@ -203,6 +202,5 @@ class Settings(BaseSettings):
         "env_file_encoding": "utf-8",
         "extra": "ignore"
     }
-
 
 settings = Settings()

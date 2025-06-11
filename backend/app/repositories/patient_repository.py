@@ -10,7 +10,6 @@ from sqlalchemy.future import select
 
 from app.models.patient import Patient
 
-
 class PatientRepository:
     """Repository for patient data access."""
 

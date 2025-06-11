@@ -5,7 +5,6 @@ Constants for CardioAI Pro.
 from enum import Enum
 from typing import Dict, List
 
-
 class UserRoles(str, Enum):
     """User roles."""
     ADMIN = "admin"
@@ -15,7 +14,6 @@ class UserRoles(str, Enum):
     RESEARCHER = "researcher"
     VIEWER = "viewer"
 
-
 class AnalysisStatus(str, Enum):
     """Analysis status."""
     PENDING = "pending"
@@ -24,14 +22,12 @@ class AnalysisStatus(str, Enum):
     FAILED = "failed"
     CANCELLED = "cancelled"
 
-
 class ValidationStatus(str, Enum):
     """Validation status."""
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
     REQUIRES_REVIEW = "requires_review"
-
 
 class ECGLeads(str, Enum):
     """ECG leads."""
@@ -48,7 +44,6 @@ class ECGLeads(str, Enum):
     V5 = "V5"
     V6 = "V6"
 
-
 class DiagnosisCategory(str, Enum):
     """Diagnosis categories."""
     NORMAL = "normal"
@@ -62,14 +57,12 @@ class DiagnosisCategory(str, Enum):
     BUNDLE_BRANCH_BLOCK = "bundle_branch_block"
     OTHER = "other"
 
-
 class ClinicalUrgency(str, Enum):
     """Clinical urgency levels."""
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
-
 
 class FileType(str, Enum):
     """Supported file types."""
@@ -80,9 +73,7 @@ class FileType(str, Enum):
     XML = "application/xml"
     TXT = "text/plain"
 
-
 ECG_FILE_EXTENSIONS = {'.csv', '.txt', '.xml', '.dat', '.png', '.jpg', '.jpeg'}
-
 
 class NotificationChannel(str, Enum):
     """Notification channels."""
@@ -93,7 +84,6 @@ class NotificationChannel(str, Enum):
     WEBHOOK = "webhook"
     PHONE_CALL = "phone_call"
 
-
 class NotificationPriority(str, Enum):
     """Notification priority levels."""
     LOW = "low"
@@ -101,7 +91,6 @@ class NotificationPriority(str, Enum):
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
-
 
 class NotificationType(str, Enum):
     """Notification types."""
@@ -112,7 +101,6 @@ class NotificationType(str, Enum):
     SYSTEM_ALERT = "system_alert"
     APPOINTMENT_REMINDER = "appointment_reminder"
     REPORT_READY = "report_ready"
-
 
 class AuditEventType(str, Enum):
     """Audit event types."""
@@ -125,7 +113,6 @@ class AuditEventType(str, Enum):
     REPORT_GENERATED = "report_generated"
     SYSTEM_ERROR = "system_error"
 
-
 class ModelType(str, Enum):
     """ML model types."""
     CLASSIFICATION = "classification"
@@ -133,14 +120,12 @@ class ModelType(str, Enum):
     DETECTION = "detection"
     REGRESSION = "regression"
 
-
 class ModelStatus(str, Enum):
     """ML model status."""
     ACTIVE = "active"
     INACTIVE = "inactive"
     TRAINING = "training"
     DEPRECATED = "deprecated"
-
 
 ECG_SAMPLE_RATES = [250, 500, 1000]
 ECG_STANDARD_DURATION = 10  # seconds
@@ -154,7 +139,7 @@ QRS_DURATION_NORMAL_RANGE = (80, 120)  # ms
 
 CRITICAL_CONDITIONS = [
     "Ventricular Fibrillation",
-    "Ventricular Tachycardia", 
+    "Ventricular Tachycardia",
     "Complete Heart Block",
     "STEMI",
     "Asystole",

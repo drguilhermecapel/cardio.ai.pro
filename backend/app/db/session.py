@@ -16,7 +16,6 @@ from sqlalchemy.pool import NullPool
 _engine: AsyncEngine | None = None
 _session_factory: async_sessionmaker[AsyncSession] | None = None
 
-
 @lru_cache(maxsize=1)
 def get_engine() -> AsyncEngine:
     """
@@ -83,7 +82,6 @@ def get_engine() -> AsyncEngine:
 
     return _engine
 
-
 def get_session_factory() -> async_sessionmaker[AsyncSession]:
     """
     Get or create session factory with audit trail support.
@@ -103,7 +101,6 @@ def get_session_factory() -> async_sessionmaker[AsyncSession]:
         )
 
     return _session_factory
-
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """

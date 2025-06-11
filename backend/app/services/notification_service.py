@@ -18,7 +18,6 @@ from app.repositories.notification_repository import NotificationRepository
 
 logger = logging.getLogger(__name__)
 
-
 class NotificationService:
     """Service for managing notifications and alerts."""
 

@@ -13,7 +13,6 @@ from app.models.base import Base
 if TYPE_CHECKING:
     from app.models.ecg_analysis import ECGAnalysis
 
-
 class Patient(Base):
     """Patient model."""
 
@@ -84,7 +83,6 @@ class Patient(Base):
             height_m = self.height_cm / 100
             return round(self.weight_kg / (height_m ** 2), 1)
         return None
-
 
 class PatientNote(Base):
     """Patient note model."""

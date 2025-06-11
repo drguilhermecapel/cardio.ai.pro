@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from app.core.scp_ecg_conditions import (
-    SCP_ECG_CONDITIONS, 
+    SCP_ECG_CONDITIONS,
     get_condition_by_code,
     get_conditions_by_category,
     SCPCategory
@@ -48,17 +48,17 @@ class ClinicalExplanationGenerator:
     Generates clinical explanations for ECG diagnoses
     References established diagnostic criteria and normal population values
     """
-    
+
     def __init__(self):
         self.diagnostic_criteria = self._load_diagnostic_criteria()
         self.normal_ranges = self._load_normal_ranges()
         self.lead_territories = self._load_lead_territories()
-        
+
     def _load_diagnostic_criteria(self) -> Dict[str, List[DiagnosticCriterion]]:
         """Load established diagnostic criteria for ECG conditions"""
-        
+
         criteria = {}
-        
+
         criteria['STEMI'] = [
             DiagnosticCriterion(
                 condition_code='STEMI',
@@ -87,7 +87,7 @@ class ClinicalExplanationGenerator:
                 reference_source='ESC/AHA STEMI Guidelines 2017'
             )
         ]
-        
+
         criteria['AFIB'] = [
             DiagnosticCriterion(
                 condition_code='AFIB',
@@ -109,7 +109,7 @@ class ClinicalExplanationGenerator:
                 reference_source='AHA/ACC/HRS AF Guidelines 2019'
             )
         ]
-        
+
         criteria['LBBB'] = [
             DiagnosticCriterion(
                 condition_code='LBBB',
@@ -134,7 +134,7 @@ class ClinicalExplanationGenerator:
                 reference_source='AHA/ACCF/HRS Guidelines 2009'
             )
         ]
-        
+
         criteria['RBBB'] = [
             DiagnosticCriterion(
                 condition_code='RBBB',
@@ -159,7 +159,7 @@ class ClinicalExplanationGenerator:
                 reference_source='AHA/ACCF/HRS Guidelines 2009'
             )
         ]
-        
+
         criteria['LVH'] = [
             DiagnosticCriterion(
                 condition_code='LVH',
@@ -178,7 +178,7 @@ class ClinicalExplanationGenerator:
                 reference_source='Casale et al. 1985'
             )
         ]
-        
+
         criteria['VTAC'] = [
             DiagnosticCriterion(
                 condition_code='VTAC',
@@ -204,7 +204,7 @@ class ClinicalExplanationGenerator:
                 reference_source='AHA/ACC/HRS Guidelines 2017'
             )
         ]
-        
+
         criteria['AVB3'] = [
             DiagnosticCriterion(
                 condition_code='AVB3',
@@ -220,14 +220,14 @@ class ClinicalExplanationGenerator:
                 reference_source='AHA/ACCF/HRS Guidelines 2008'
             )
         ]
-        
+
         return criteria
-        
+
     def _load_normal_ranges(self) -> Dict[str, NormalRange]:
         """Load normal population ranges for ECG parameters"""
-        
+
         ranges = {}
-        
+
         ranges['heart_rate'] = NormalRange(
             parameter='heart_rate',
             min_value=60.0,
@@ -235,7 +235,7 @@ class ClinicalExplanationGenerator:
             unit='bpm',
             reference='AHA/ACC Guidelines'
         )
-        
+
         ranges['pr_interval'] = NormalRange(
             parameter='pr_interval',
             min_value=120.0,
@@ -243,7 +243,7 @@ class ClinicalExplanationGenerator:
             unit='ms',
             reference='AHA/ACC Guidelines'
         )
-        
+
         ranges['qrs_duration'] = NormalRange(
             parameter='qrs_duration',
             min_value=80.0,
@@ -251,7 +251,7 @@ class ClinicalExplanationGenerator:
             unit='ms',
             reference='AHA/ACC Guidelines'
         )
-        
+
         ranges['qt_interval'] = NormalRange(
             parameter='qt_interval',
             min_value=350.0,
@@ -259,7 +259,7 @@ class ClinicalExplanationGenerator:
             unit='ms',
             reference='AHA/ACC Guidelines'
         )
-        
+
         ranges['qtc'] = NormalRange(
             parameter='qtc',
             min_value=350.0,
@@ -267,7 +267,7 @@ class ClinicalExplanationGenerator:
             unit='ms',
             reference='AHA/ACC Guidelines'
         )
-        
+
         ranges['qrs_axis'] = NormalRange(
             parameter='qrs_axis',
             min_value=-30.0,
@@ -275,12 +275,12 @@ class ClinicalExplanationGenerator:
             unit='degrees',
             reference='AHA/ACC Guidelines'
         )
-        
+
         return ranges
-        
+
     def _load_lead_territories(self) -> Dict[str, Dict[str, Any]]:
         """Load anatomical territories for ECG leads"""
-        
+
         territories = {
             'inferior': {
                 'leads': ['II', 'III', 'aVF'],
@@ -308,9 +308,9 @@ class ClinicalExplanationGenerator:
                 'anatomy': 'Interventricular septum'
             }
         }
-        
+
         return territories
-        
+
     def generate_explanation(
         self,
         features: Dict[str, Any],
@@ -318,11 +318,11 @@ class ClinicalExplanationGenerator:
         shap_explanation: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """Generate comprehensive clinical explanation"""
-        
+
         try:
             primary_diagnosis = max(predictions.items(), key=lambda x: x[1])[0]
             confidence = predictions[primary_diagnosis]
-            
+
             explanation = {
                 'primary_diagnosis': self._explain_primary_diagnosis(primary_diagnosis, confidence),
                 'diagnostic_criteria': self._explain_diagnostic_criteria(primary_diagnosis, features),
@@ -334,9 +334,9 @@ class ClinicalExplanationGenerator:
                 'risk_stratification': self._assess_risk_stratification(primary_diagnosis, features),
                 'follow_up': self._recommend_follow_up(primary_diagnosis, features)
             }
-            
+
             return explanation
-            
+
         except Exception as e:
             logger.error(f"Error generating clinical explanation: {e}")
             return {
@@ -347,12 +347,12 @@ class ClinicalExplanationGenerator:
                 'clinical_significance': 'Analysis unavailable',
                 'recommendations': []
             }
-            
+
     def _explain_primary_diagnosis(self, diagnosis_code: str, confidence: float) -> Dict[str, Any]:
         """Explain the primary diagnosis with confidence assessment"""
-        
+
         condition = get_condition_by_code(diagnosis_code)
-        
+
         explanation = {
             'code': diagnosis_code,
             'name': condition.name if condition else 'Unknown condition',
@@ -361,7 +361,7 @@ class ClinicalExplanationGenerator:
             'description': condition.description if condition else 'No description available',
             'clinical_urgency': condition.clinical_urgency if condition else 'unknown'
         }
-        
+
         if confidence >= 0.9:
             explanation['interpretation'] = 'High confidence diagnosis - findings strongly support this condition'
         elif confidence >= 0.7:
@@ -370,12 +370,12 @@ class ClinicalExplanationGenerator:
             explanation['interpretation'] = 'Low confidence diagnosis - findings suggest this condition but require clinical correlation'
         else:
             explanation['interpretation'] = 'Very low confidence - findings are inconclusive'
-            
+
         return explanation
-        
+
     def _interpret_confidence(self, confidence: float) -> str:
         """Interpret confidence score in clinical terms"""
-        
+
         if confidence >= 0.95:
             return 'Very High (>95%)'
         elif confidence >= 0.85:
@@ -386,10 +386,10 @@ class ClinicalExplanationGenerator:
             return 'Low (50-70%)'
         else:
             return 'Very Low (<50%)'
-            
+
     def _explain_diagnostic_criteria(self, diagnosis_code: str, features: Dict[str, Any]) -> Dict[str, Any]:
         """Explain how the diagnosis meets established criteria"""
-        
+
         criteria_explanation = {
             'condition': diagnosis_code,
             'criteria_met': [],
@@ -397,16 +397,16 @@ class ClinicalExplanationGenerator:
             'partial_criteria': [],
             'reference_standards': []
         }
-        
+
         if diagnosis_code not in self.diagnostic_criteria:
             criteria_explanation['note'] = f'No specific criteria loaded for {diagnosis_code}'
             return criteria_explanation
-            
+
         criteria_list = self.diagnostic_criteria[diagnosis_code]
-        
+
         for criterion in criteria_list:
             criterion_assessment = self._assess_criterion(criterion, features)
-            
+
             if criterion_assessment['met']:
                 criteria_explanation['criteria_met'].append({
                     'name': criterion.criterion_name,
@@ -428,30 +428,30 @@ class ClinicalExplanationGenerator:
                     'assessment': criterion_assessment['explanation'],
                     'reference': criterion.reference_source
                 })
-                
+
         references = list(set([c.reference_source for c in criteria_list]))
         criteria_explanation['reference_standards'] = references
-        
+
         return criteria_explanation
-        
+
     def _assess_criterion(self, criterion: DiagnosticCriterion, features: Dict[str, Any]) -> Dict[str, Any]:
         """Assess whether a specific diagnostic criterion is met"""
-        
+
         assessment = {
             'met': False,
             'partial': False,
             'explanation': '',
             'value': None
         }
-        
+
         try:
             if criterion.threshold_value is not None and criterion.threshold_operator:
                 feature_name = self._map_criterion_to_feature(criterion.criterion_name)
-                
+
                 if feature_name in features:
                     value = features[feature_name]
                     assessment['value'] = value
-                    
+
                     if criterion.threshold_operator == '>=':
                         met = value >= criterion.threshold_value
                     elif criterion.threshold_operator == '>':
@@ -464,23 +464,23 @@ class ClinicalExplanationGenerator:
                         met = abs(value - criterion.threshold_value) < 0.01
                     else:
                         met = False
-                        
+
                     assessment['met'] = met
                     assessment['explanation'] = f"Measured value: {value:.1f}, Threshold: {criterion.threshold_operator}{criterion.threshold_value}"
                 else:
                     assessment['explanation'] = f"Feature {feature_name} not available for assessment"
-                    
+
             else:
                 assessment = self._assess_qualitative_criterion(criterion, features)
-                
+
         except Exception as e:
             assessment['explanation'] = f"Error assessing criterion: {str(e)}"
-            
+
         return assessment
-        
+
     def _map_criterion_to_feature(self, criterion_name: str) -> str:
         """Map diagnostic criterion names to feature names"""
-        
+
         mapping = {
             'QRS Duration': 'qrs_duration',
             'Heart Rate': 'heart_rate',
@@ -490,18 +490,18 @@ class ClinicalExplanationGenerator:
             'ST Elevation - Precordial Leads': 'st_elevation_max',
             'QRS Axis': 'qrs_axis'
         }
-        
+
         return mapping.get(criterion_name, criterion_name.lower().replace(' ', '_'))
-        
+
     def _assess_qualitative_criterion(self, criterion: DiagnosticCriterion, features: Dict[str, Any]) -> Dict[str, Any]:
         """Assess qualitative diagnostic criteria"""
-        
+
         assessment = {
             'met': False,
             'partial': False,
             'explanation': 'Qualitative assessment not available with current features'
         }
-        
+
         if 'irregular' in criterion.description.lower():
             rr_std = features.get('rr_std', 0)
             if rr_std > 100:  # High RR variability suggests irregularity
@@ -512,25 +512,25 @@ class ClinicalExplanationGenerator:
                 assessment['explanation'] = f"Moderate RR variability ({rr_std:.1f}ms) suggests some irregularity"
             else:
                 assessment['explanation'] = f"Low RR variability ({rr_std:.1f}ms) suggests regular rhythm"
-                
+
         elif 'p wave' in criterion.description.lower():
             assessment['explanation'] = "P wave morphology analysis requires detailed signal processing"
-            
+
         return assessment
-        
+
     def _analyze_parameters(self, features: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze ECG parameters against normal ranges"""
-        
+
         analysis = {
             'normal_parameters': [],
             'abnormal_parameters': [],
             'borderline_parameters': []
         }
-        
+
         for param_name, normal_range in self.normal_ranges.items():
             if param_name in features:
                 value = features[param_name]
-                
+
                 if normal_range.min_value <= value <= normal_range.max_value:
                     analysis['normal_parameters'].append({
                         'parameter': param_name,
@@ -542,7 +542,7 @@ class ClinicalExplanationGenerator:
                 else:
                     range_width = normal_range.max_value - normal_range.min_value
                     tolerance = range_width * 0.1
-                    
+
                     if (normal_range.min_value - tolerance <= value <= normal_range.min_value or
                         normal_range.max_value <= value <= normal_range.max_value + tolerance):
                         analysis['borderline_parameters'].append({
@@ -557,7 +557,7 @@ class ClinicalExplanationGenerator:
                             interpretation = f"Below normal (low {param_name})"
                         else:
                             interpretation = f"Above normal (high {param_name})"
-                            
+
                         analysis['abnormal_parameters'].append({
                             'parameter': param_name,
                             'value': value,
@@ -565,37 +565,37 @@ class ClinicalExplanationGenerator:
                             'normal_range': f"{normal_range.min_value}-{normal_range.max_value}",
                             'interpretation': interpretation
                         })
-                        
+
         return analysis
-        
+
     def _explain_clinical_significance(self, diagnosis_code: str, features: Dict[str, Any]) -> str:
         """Explain the clinical significance of the diagnosis"""
-        
+
         condition = get_condition_by_code(diagnosis_code)
-        
+
         if not condition:
             return "Clinical significance cannot be determined for unknown condition"
-            
+
         significance_map = {
             'STEMI': "ST-elevation myocardial infarction represents complete coronary artery occlusion requiring immediate reperfusion therapy. This is a medical emergency with high mortality risk if untreated.",
-            
+
             'NSTEMI': "Non-ST elevation myocardial infarction indicates partial coronary artery occlusion with myocardial necrosis. Requires urgent cardiology evaluation and risk stratification.",
-            
+
             'AFIB': "Atrial fibrillation increases stroke risk due to potential thrombus formation in the left atrium. Requires anticoagulation assessment and rate/rhythm control strategy.",
-            
+
             'VTAC': "Ventricular tachycardia is a life-threatening arrhythmia that can degenerate into ventricular fibrillation. Requires immediate evaluation and treatment.",
-            
+
             'LBBB': "Left bundle branch block may indicate underlying structural heart disease and can affect cardiac synchrony. May require pacemaker evaluation if symptomatic.",
-            
+
             'RBBB': "Right bundle branch block is often benign in young patients but may indicate right heart strain or congenital heart disease in certain contexts.",
-            
+
             'LVH': "Left ventricular hypertrophy indicates increased cardiac workload, often due to hypertension. Associated with increased cardiovascular risk.",
-            
+
             'AVB3': "Complete heart block represents complete failure of AV conduction. Often requires permanent pacemaker implantation due to risk of asystole."
         }
-        
+
         base_significance = significance_map.get(diagnosis_code, f"Clinical significance of {condition.name} requires individual assessment based on patient context.")
-        
+
         if condition.clinical_urgency == 'critical':
             urgency_context = " This condition requires immediate medical attention and emergency intervention."
         elif condition.clinical_urgency == 'high':
@@ -604,19 +604,19 @@ class ClinicalExplanationGenerator:
             urgency_context = " This condition requires timely medical evaluation and appropriate management."
         else:
             urgency_context = " This condition should be evaluated by a healthcare provider for appropriate management."
-            
+
         return base_significance + urgency_context
-        
+
     def _generate_differential_diagnosis(self, predictions: Dict[str, float]) -> List[Dict[str, Any]]:
         """Generate differential diagnosis list"""
-        
+
         sorted_predictions = sorted(predictions.items(), key=lambda x: x[1], reverse=True)
-        
+
         differential = []
-        
+
         for i, (diagnosis_code, confidence) in enumerate(sorted_predictions[:5]):  # Top 5
             condition = get_condition_by_code(diagnosis_code)
-            
+
             differential.append({
                 'rank': i + 1,
                 'diagnosis_code': diagnosis_code,
@@ -625,15 +625,15 @@ class ClinicalExplanationGenerator:
                 'likelihood': self._interpret_confidence(confidence),
                 'category': condition.category.value if condition else 'unknown'
             })
-            
+
         return differential
-        
+
     def _generate_clinical_recommendations(self, diagnosis_code: str, features: Dict[str, Any]) -> List[str]:
         """Generate clinical recommendations based on diagnosis"""
-        
+
         condition = get_condition_by_code(diagnosis_code)
         recommendations = []
-        
+
         if condition and condition.clinical_urgency == 'critical':
             recommendations.extend([
                 "URGENT: Immediate cardiology consultation required",
@@ -646,7 +646,7 @@ class ClinicalExplanationGenerator:
                 "Serial ECGs to monitor progression",
                 "Consider telemetry monitoring"
             ])
-            
+
         diagnosis_recommendations = {
             'STEMI': [
                 "Emergency cardiac catheterization (door-to-balloon <90 minutes)",
@@ -689,40 +689,40 @@ class ClinicalExplanationGenerator:
                 "Monitor for escape rhythm adequacy"
             ]
         }
-        
+
         specific_recs = diagnosis_recommendations.get(diagnosis_code, [
             "Follow standard clinical protocols for this condition",
             "Consider cardiology consultation if symptomatic",
             "Regular follow-up as clinically indicated"
         ])
-        
+
         recommendations.extend(specific_recs)
-        
+
         return recommendations
-        
+
     def _explain_anatomical_correlation(
-        self, 
-        diagnosis_code: str, 
-        features: Dict[str, Any], 
+        self,
+        diagnosis_code: str,
+        features: Dict[str, Any],
         shap_explanation: Optional[Dict[str, Any]]
     ) -> Dict[str, Any]:
         """Explain anatomical correlation of findings"""
-        
+
         correlation = {
             'affected_territories': [],
             'lead_analysis': {},
             'vascular_correlation': {}
         }
-        
+
         important_leads = []
         if shap_explanation and 'lead_importance' in shap_explanation:
             lead_importance = shap_explanation['lead_importance']
             sorted_leads = sorted(lead_importance.items(), key=lambda x: abs(x[1]), reverse=True)
             important_leads = [lead for lead, importance in sorted_leads[:3]]
-            
+
         for territory, info in self.lead_territories.items():
             territory_leads = info['leads']
-            
+
             if any(lead in important_leads for lead in territory_leads):
                 correlation['affected_territories'].append({
                     'territory': territory,
@@ -730,15 +730,15 @@ class ClinicalExplanationGenerator:
                     'artery': info['artery'],
                     'anatomy': info['anatomy']
                 })
-                
+
         for lead in important_leads:
             correlation['lead_analysis'][lead] = self._analyze_lead_significance(lead, diagnosis_code)
-            
+
         return correlation
-        
+
     def _analyze_lead_significance(self, lead: str, diagnosis_code: str) -> str:
         """Analyze the significance of findings in a specific lead"""
-        
+
         lead_significance = {
             'II': "Lead II provides good visualization of inferior wall and P wave morphology",
             'III': "Lead III is sensitive for inferior wall changes, especially RCA territory",
@@ -750,9 +750,9 @@ class ClinicalExplanationGenerator:
             'V5': "Lead V5 shows lateral wall of left ventricle",
             'V6': "Lead V6 represents lateral wall and left ventricular free wall"
         }
-        
+
         base_significance = lead_significance.get(lead, f"Lead {lead} significance varies by clinical context")
-        
+
         if diagnosis_code == 'STEMI':
             if lead in ['II', 'III', 'aVF']:
                 return base_significance + " - Inferior STEMI pattern suggests RCA occlusion"
@@ -760,25 +760,25 @@ class ClinicalExplanationGenerator:
                 return base_significance + " - Anterior STEMI pattern suggests LAD occlusion"
             elif lead in ['I', 'aVL', 'V5', 'V6']:
                 return base_significance + " - Lateral STEMI pattern suggests LCX occlusion"
-                
+
         return base_significance
-        
+
     def _assess_risk_stratification(self, diagnosis_code: str, features: Dict[str, Any]) -> Dict[str, Any]:
         """Assess risk stratification for the diagnosis"""
-        
+
         risk_assessment = {
             'overall_risk': 'moderate',
             'risk_factors': [],
             'protective_factors': [],
             'risk_scores': {}
         }
-        
+
         age = features.get('patient_age', 50)
         if age > 75:
             risk_assessment['risk_factors'].append(f"Advanced age ({age} years)")
         elif age < 40:
             risk_assessment['protective_factors'].append(f"Young age ({age} years)")
-            
+
         hr = features.get('heart_rate', 70)
         if diagnosis_code == 'AFIB':
             if hr > 110:
@@ -786,11 +786,11 @@ class ClinicalExplanationGenerator:
                 risk_assessment['overall_risk'] = 'high'
             elif hr < 50:
                 risk_assessment['risk_factors'].append("Slow ventricular response")
-                
+
         qrs = features.get('qrs_duration', 100)
         if qrs > 150:
             risk_assessment['risk_factors'].append("Severely prolonged QRS duration")
-            
+
         if diagnosis_code == 'STEMI':
             risk_assessment['overall_risk'] = 'critical'
             risk_assessment['risk_factors'].extend([
@@ -801,21 +801,21 @@ class ClinicalExplanationGenerator:
         elif diagnosis_code == 'VTAC':
             risk_assessment['overall_risk'] = 'critical'
             risk_assessment['risk_factors'].append("Risk of degeneration to ventricular fibrillation")
-            
+
         return risk_assessment
-        
+
     def _recommend_follow_up(self, diagnosis_code: str, features: Dict[str, Any]) -> Dict[str, Any]:
         """Recommend appropriate follow-up care"""
-        
+
         follow_up = {
             'immediate_actions': [],
             'short_term_follow_up': [],
             'long_term_monitoring': [],
             'specialist_referrals': []
         }
-        
+
         condition = get_condition_by_code(diagnosis_code)
-        
+
         if condition and condition.clinical_urgency == 'critical':
             follow_up['immediate_actions'].extend([
                 "Emergency department evaluation",
@@ -828,7 +828,7 @@ class ClinicalExplanationGenerator:
                 "Repeat ECG in 1-2 hours",
                 "Monitor vital signs closely"
             ])
-            
+
         follow_up_plans = {
             'STEMI': {
                 'short_term_follow_up': [
@@ -856,12 +856,12 @@ class ClinicalExplanationGenerator:
                 'specialist_referrals': ["Cardiology", "Electrophysiology if symptomatic"]
             }
         }
-        
+
         if diagnosis_code in follow_up_plans:
             plan = follow_up_plans[diagnosis_code]
             follow_up.update(plan)
         else:
             follow_up['short_term_follow_up'] = ["Repeat ECG in 24-48 hours if symptomatic"]
             follow_up['long_term_monitoring'] = ["Cardiology follow-up as clinically indicated"]
-            
+
         return follow_up

@@ -22,7 +22,7 @@ class SCPCondition:
 class SCPCategory(str, Enum):
     """SCP-ECG diagnostic categories"""
     NORMAL = "normal"
-    ARRHYTHMIA = "arrhythmia" 
+    ARRHYTHMIA = "arrhythmia"
     CONDUCTION_DISORDER = "conduction_disorder"
     ISCHEMIA = "ischemia"
     HYPERTROPHY = "hypertrophy"
@@ -41,7 +41,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Normal electrocardiogram within normal limits"
     ),
-    
+
     "AFIB": SCPCondition(
         code="AFIB",
         name="Atrial Fibrillation",
@@ -52,9 +52,9 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Atrial fibrillation with irregular RR intervals and absent P waves"
     ),
-    
+
     "AFLT": SCPCondition(
-        code="AFLT", 
+        code="AFLT",
         name="Atrial Flutter",
         category=SCPCategory.ARRHYTHMIA,
         icd10_codes=["I48.3", "I48.4"],
@@ -63,7 +63,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Atrial flutter with regular atrial rate 250-350 bpm and sawtooth pattern"
     ),
-    
+
     "SVTAC": SCPCondition(
         code="SVTAC",
         name="Supraventricular Tachycardia",
@@ -74,7 +74,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Supraventricular tachycardia with narrow QRS complexes"
     ),
-    
+
     "VTAC": SCPCondition(
         code="VTAC",
         name="Ventricular Tachycardia",
@@ -85,7 +85,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Ventricular tachycardia with wide QRS complexes >120ms"
     ),
-    
+
     "VFIB": SCPCondition(
         code="VFIB",
         name="Ventricular Fibrillation",
@@ -96,7 +96,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Ventricular fibrillation with chaotic irregular waveforms"
     ),
-    
+
     "PVC": SCPCondition(
         code="PVC",
         name="Premature Ventricular Contractions",
@@ -107,7 +107,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Premature ventricular contractions with wide QRS morphology"
     ),
-    
+
     "PAC": SCPCondition(
         code="PAC",
         name="Premature Atrial Contractions",
@@ -118,7 +118,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Premature atrial contractions with abnormal P wave morphology"
     ),
-    
+
     "BIGEMINY": SCPCondition(
         code="BIGEMINY",
         name="Ventricular Bigeminy",
@@ -129,7 +129,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Ventricular bigeminy with alternating normal and premature beats"
     ),
-    
+
     "TRIGEMINY": SCPCondition(
         code="TRIGEMINY",
         name="Ventricular Trigeminy",
@@ -140,7 +140,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Ventricular trigeminy with every third beat being premature"
     ),
-    
+
     "AVB1": SCPCondition(
         code="AVB1",
         name="First Degree AV Block",
@@ -151,7 +151,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="First degree AV block with PR interval >200ms"
     ),
-    
+
     "AVB2M1": SCPCondition(
         code="AVB2M1",
         name="Second Degree AV Block Mobitz I",
@@ -162,7 +162,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Second degree AV block Mobitz I with progressive PR prolongation"
     ),
-    
+
     "AVB2M2": SCPCondition(
         code="AVB2M2",
         name="Second Degree AV Block Mobitz II",
@@ -173,7 +173,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Second degree AV block Mobitz II with fixed PR intervals and dropped beats"
     ),
-    
+
     "AVB3": SCPCondition(
         code="AVB3",
         name="Third Degree AV Block",
@@ -184,7 +184,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Complete heart block with AV dissociation"
     ),
-    
+
     "RBBB": SCPCondition(
         code="RBBB",
         name="Right Bundle Branch Block",
@@ -195,7 +195,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Right bundle branch block with QRS >120ms and RSR' in V1"
     ),
-    
+
     "LBBB": SCPCondition(
         code="LBBB",
         name="Left Bundle Branch Block",
@@ -206,7 +206,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Left bundle branch block with QRS >120ms and broad R in V6"
     ),
-    
+
     "LAFB": SCPCondition(
         code="LAFB",
         name="Left Anterior Fascicular Block",
@@ -217,7 +217,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Left anterior fascicular block with left axis deviation"
     ),
-    
+
     "LPFB": SCPCondition(
         code="LPFB",
         name="Left Posterior Fascicular Block",
@@ -228,7 +228,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Left posterior fascicular block with right axis deviation"
     ),
-    
+
     "WPW": SCPCondition(
         code="WPW",
         name="Wolff-Parkinson-White Syndrome",
@@ -239,7 +239,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="WPW syndrome with delta waves and short PR interval"
     ),
-    
+
     "STEMI": SCPCondition(
         code="STEMI",
         name="ST Elevation Myocardial Infarction",
@@ -250,7 +250,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="ST elevation myocardial infarction with significant ST elevation"
     ),
-    
+
     "NSTEMI": SCPCondition(
         code="NSTEMI",
         name="Non-ST Elevation Myocardial Infarction",
@@ -261,7 +261,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Non-ST elevation myocardial infarction with ST depression or T wave changes"
     ),
-    
+
     "UAP": SCPCondition(
         code="UAP",
         name="Unstable Angina Pectoris",
@@ -272,7 +272,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Unstable angina with dynamic ST-T changes"
     ),
-    
+
     "ISCHEMIA": SCPCondition(
         code="ISCHEMIA",
         name="Myocardial Ischemia",
@@ -283,7 +283,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Myocardial ischemia with ST depression or T wave inversion"
     ),
-    
+
     "QWAVE": SCPCondition(
         code="QWAVE",
         name="Pathological Q Waves",
@@ -294,7 +294,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Pathological Q waves suggesting old myocardial infarction"
     ),
-    
+
     "LVH": SCPCondition(
         code="LVH",
         name="Left Ventricular Hypertrophy",
@@ -305,7 +305,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Left ventricular hypertrophy by voltage criteria"
     ),
-    
+
     "RVH": SCPCondition(
         code="RVH",
         name="Right Ventricular Hypertrophy",
@@ -316,7 +316,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Right ventricular hypertrophy with tall R in V1"
     ),
-    
+
     "LAE": SCPCondition(
         code="LAE",
         name="Left Atrial Enlargement",
@@ -327,7 +327,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Left atrial enlargement with P wave abnormalities"
     ),
-    
+
     "RAE": SCPCondition(
         code="RAE",
         name="Right Atrial Enlargement",
@@ -338,7 +338,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Right atrial enlargement with tall P waves in II"
     ),
-    
+
     "LAD": SCPCondition(
         code="LAD",
         name="Left Axis Deviation",
@@ -349,7 +349,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Left axis deviation with QRS axis -30° to -90°"
     ),
-    
+
     "RAD": SCPCondition(
         code="RAD",
         name="Right Axis Deviation",
@@ -360,7 +360,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Right axis deviation with QRS axis +90° to +180°"
     ),
-    
+
     "EAD": SCPCondition(
         code="EAD",
         name="Extreme Axis Deviation",
@@ -371,7 +371,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Extreme axis deviation with QRS axis -90° to +180°"
     ),
-    
+
     "LQTS": SCPCondition(
         code="LQTS",
         name="Long QT Syndrome",
@@ -382,7 +382,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Long QT syndrome with corrected QT >450ms (men) or >460ms (women)"
     ),
-    
+
     "SQTS": SCPCondition(
         code="SQTS",
         name="Short QT Syndrome",
@@ -393,7 +393,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Short QT syndrome with corrected QT <350ms"
     ),
-    
+
     "TWI": SCPCondition(
         code="TWI",
         name="T Wave Inversion",
@@ -404,7 +404,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="T wave inversion in multiple leads"
     ),
-    
+
     "STTC": SCPCondition(
         code="STTC",
         name="ST-T Changes",
@@ -415,7 +415,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Non-specific ST-T wave changes"
     ),
-    
+
     "EARLY_REPOL": SCPCondition(
         code="EARLY_REPOL",
         name="Early Repolarization",
@@ -426,7 +426,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Early repolarization pattern with J point elevation"
     ),
-    
+
     "BRADY": SCPCondition(
         code="BRADY",
         name="Sinus Bradycardia",
@@ -437,7 +437,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Sinus bradycardia with heart rate <60 bpm"
     ),
-    
+
     "TACHY": SCPCondition(
         code="TACHY",
         name="Sinus Tachycardia",
@@ -448,7 +448,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Sinus tachycardia with heart rate >100 bpm"
     ),
-    
+
     "PACE": SCPCondition(
         code="PACE",
         name="Paced Rhythm",
@@ -459,7 +459,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Paced rhythm with pacing spikes"
     ),
-    
+
     "ARTIFACT": SCPCondition(
         code="ARTIFACT",
         name="Artifact",
@@ -470,7 +470,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="ECG artifact affecting interpretation"
     ),
-    
+
     "LOW_VOLT": SCPCondition(
         code="LOW_VOLT",
         name="Low Voltage",
@@ -481,7 +481,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Low voltage QRS complexes in limb leads"
     ),
-    
+
     "POOR_PROG": SCPCondition(
         code="POOR_PROG",
         name="Poor R Wave Progression",
@@ -492,7 +492,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Poor R wave progression in precordial leads"
     ),
-    
+
     "JUNCTIONAL": SCPCondition(
         code="JUNCTIONAL",
         name="Junctional Rhythm",
@@ -503,7 +503,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Junctional rhythm with absent or inverted P waves"
     ),
-    
+
     "ESCAPE": SCPCondition(
         code="ESCAPE",
         name="Escape Rhythm",
@@ -514,7 +514,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Escape rhythm with slow rate and wide QRS"
     ),
-    
+
     "MULTIFOCAL_AT": SCPCondition(
         code="MULTIFOCAL_AT",
         name="Multifocal Atrial Tachycardia",
@@ -525,7 +525,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Multifocal atrial tachycardia with varying P wave morphology"
     ),
-    
+
     "BIFASCICULAR": SCPCondition(
         code="BIFASCICULAR",
         name="Bifascicular Block",
@@ -536,7 +536,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Bifascicular block with RBBB and left fascicular block"
     ),
-    
+
     "TRIFASCICULAR": SCPCondition(
         code="TRIFASCICULAR",
         name="Trifascicular Block",
@@ -547,7 +547,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Trifascicular block with bifascicular block and first degree AV block"
     ),
-    
+
     "HYPERACUTE_T": SCPCondition(
         code="HYPERACUTE_T",
         name="Hyperacute T Waves",
@@ -558,7 +558,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Hyperacute T waves suggesting acute myocardial infarction"
     ),
-    
+
     "WELLENS": SCPCondition(
         code="WELLENS",
         name="Wellens Syndrome",
@@ -569,7 +569,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Wellens syndrome with biphasic T waves in V2-V3"
     ),
-    
+
     "BRUGADA": SCPCondition(
         code="BRUGADA",
         name="Brugada Pattern",
@@ -580,7 +580,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Brugada pattern with coved ST elevation in V1-V3"
     ),
-    
+
     "ARVC": SCPCondition(
         code="ARVC",
         name="Arrhythmogenic Right Ventricular Cardiomyopathy",
@@ -591,7 +591,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="ARVC with epsilon waves and T wave inversion in V1-V3"
     ),
-    
+
     "HYPERKALEMIA": SCPCondition(
         code="HYPERKALEMIA",
         name="Hyperkalemia",
@@ -602,7 +602,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Hyperkalemia with peaked T waves and wide QRS"
     ),
-    
+
     "HYPOKALEMIA": SCPCondition(
         code="HYPOKALEMIA",
         name="Hypokalemia",
@@ -613,7 +613,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Hypokalemia with U waves and ST depression"
     ),
-    
+
     "DIGITALIS": SCPCondition(
         code="DIGITALIS",
         name="Digitalis Effect",
@@ -624,7 +624,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Digitalis effect with sagging ST depression"
     ),
-    
+
     "PERICARDITIS": SCPCondition(
         code="PERICARDITIS",
         name="Pericarditis",
@@ -635,7 +635,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Pericarditis with diffuse ST elevation and PR depression"
     ),
-    
+
     "PULM_EMBOLISM": SCPCondition(
         code="PULM_EMBOLISM",
         name="Pulmonary Embolism",
@@ -646,7 +646,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Pulmonary embolism with S1Q3T3 pattern or right heart strain"
     ),
-    
+
     "OSBORN_WAVE": SCPCondition(
         code="OSBORN_WAVE",
         name="Osborn Wave (Hypothermia)",
@@ -657,7 +657,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Osborn waves (J waves) suggesting hypothermia"
     ),
-    
+
     "EPSILON_WAVE": SCPCondition(
         code="EPSILON_WAVE",
         name="Epsilon Wave",
@@ -668,7 +668,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Epsilon waves in V1-V3 suggesting ARVC"
     ),
-    
+
     "DEXTROCARDIA": SCPCondition(
         code="DEXTROCARDIA",
         name="Dextrocardia",
@@ -679,7 +679,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Dextrocardia with inverted P waves and QRS in lead I"
     ),
-    
+
     "LEAD_REVERSAL": SCPCondition(
         code="LEAD_REVERSAL",
         name="Lead Reversal",
@@ -690,7 +690,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Lead reversal with abnormal axis and morphology"
     ),
-    
+
     "NONSPECIFIC": SCPCondition(
         code="NONSPECIFIC",
         name="Nonspecific Abnormality",
@@ -701,7 +701,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Nonspecific ECG abnormality requiring clinical correlation"
     ),
-    
+
     "SINUS_ARRHYTHMIA": SCPCondition(
         code="SINUS_ARRHYTHMIA",
         name="Sinus Arrhythmia",
@@ -712,7 +712,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Sinus arrhythmia with respiratory variation in RR intervals"
     ),
-    
+
     "WANDERING_PACEMAKER": SCPCondition(
         code="WANDERING_PACEMAKER",
         name="Wandering Atrial Pacemaker",
@@ -723,7 +723,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Wandering atrial pacemaker with varying P wave morphology"
     ),
-    
+
     "ECTOPIC_ATRIAL": SCPCondition(
         code="ECTOPIC_ATRIAL",
         name="Ectopic Atrial Rhythm",
@@ -734,7 +734,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Ectopic atrial rhythm with abnormal P wave axis"
     ),
-    
+
     "ACCELERATED_JUNCTIONAL": SCPCondition(
         code="ACCELERATED_JUNCTIONAL",
         name="Accelerated Junctional Rhythm",
@@ -745,7 +745,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Accelerated junctional rhythm with rate 60-100 bpm"
     ),
-    
+
     "ACCELERATED_VENTRICULAR": SCPCondition(
         code="ACCELERATED_VENTRICULAR",
         name="Accelerated Ventricular Rhythm",
@@ -756,7 +756,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="medium",
         description="Accelerated ventricular rhythm with rate 50-100 bpm"
     ),
-    
+
     "FUSION_BEATS": SCPCondition(
         code="FUSION_BEATS",
         name="Fusion Beats",
@@ -767,7 +767,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="low",
         description="Fusion beats with combined supraventricular and ventricular activation"
     ),
-    
+
     "ATRIAL_STANDSTILL": SCPCondition(
         code="ATRIAL_STANDSTILL",
         name="Atrial Standstill",
@@ -778,7 +778,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="high",
         description="Atrial standstill with absent P waves and junctional escape rhythm"
     ),
-    
+
     "VENTRICULAR_STANDSTILL": SCPCondition(
         code="VENTRICULAR_STANDSTILL",
         name="Ventricular Standstill",
@@ -789,7 +789,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Ventricular standstill with absent QRS complexes"
     ),
-    
+
     "TORSADES_DE_POINTES": SCPCondition(
         code="TORSADES_DE_POINTES",
         name="Torsades de Pointes",
@@ -800,7 +800,7 @@ SCP_ECG_CONDITIONS = {
         clinical_urgency="critical",
         description="Torsades de pointes with polymorphic VT and long QT"
     ),
-    
+
     "BIDIRECTIONAL_VT": SCPCondition(
         code="BIDIRECTIONAL_VT",
         name="Bidirectional Ventricular Tachycardia",
@@ -821,17 +821,17 @@ HIERARCHICAL_STRUCTURE = {
     "level_2": {
         SCPCategory.NORMAL: ["NORM"],
         SCPCategory.ARRHYTHMIA: [
-            "AFIB", "AFLT", "SVTAC", "VTAC", "VFIB", "PVC", "PAC", 
-            "BIGEMINY", "TRIGEMINY", "BRADY", "TACHY", "JUNCTIONAL", 
+            "AFIB", "AFLT", "SVTAC", "VTAC", "VFIB", "PVC", "PAC",
+            "BIGEMINY", "TRIGEMINY", "BRADY", "TACHY", "JUNCTIONAL",
             "ESCAPE", "MULTIFOCAL_AT", "SINUS_ARRHYTHMIA", "WANDERING_PACEMAKER",
             "ECTOPIC_ATRIAL", "ACCELERATED_JUNCTIONAL", "ACCELERATED_VENTRICULAR", "FUSION_BEATS"
         ],
         SCPCategory.CONDUCTION_DISORDER: [
-            "AVB1", "AVB2M1", "AVB2M2", "AVB3", "RBBB", "LBBB", 
+            "AVB1", "AVB2M1", "AVB2M2", "AVB3", "RBBB", "LBBB",
             "LAFB", "LPFB", "WPW", "BIFASCICULAR", "TRIFASCICULAR"
         ],
         SCPCategory.ISCHEMIA: [
-            "STEMI", "NSTEMI", "UAP", "ISCHEMIA", "QWAVE", 
+            "STEMI", "NSTEMI", "UAP", "ISCHEMIA", "QWAVE",
             "HYPERACUTE_T", "WELLENS"
         ],
         SCPCategory.HYPERTROPHY: ["LVH", "RVH", "LAE", "RAE"],
@@ -850,7 +850,7 @@ HIERARCHICAL_STRUCTURE = {
 
 CLINICAL_URGENCY_MAPPING = {
     "critical": [
-        "VTAC", "VFIB", "AVB3", "STEMI", "NSTEMI", "HYPERACUTE_T", 
+        "VTAC", "VFIB", "AVB3", "STEMI", "NSTEMI", "HYPERACUTE_T",
         "WELLENS", "BRUGADA", "PULM_EMBOLISM", "OSBORN_WAVE",
         "VENTRICULAR_STANDSTILL", "TORSADES_DE_POINTES", "BIDIRECTIONAL_VT"
     ],
@@ -904,5 +904,5 @@ def validate_scp_conditions() -> Dict[str, Any]:
         "high_sensitivity_conditions": len([c for c in SCP_ECG_CONDITIONS.values() if c.sensitivity_target >= 0.95]),
         "validation_passed": len(SCP_ECG_CONDITIONS) == 71
     }
-    
+
     return validation_results

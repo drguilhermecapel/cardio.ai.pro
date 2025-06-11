@@ -14,7 +14,6 @@ from scipy import signal
 
 logger = logging.getLogger(__name__)
 
-
 class AdvancedECGPreprocessor:
     """
     Advanced ECG preprocessing pipeline implementing state-of-the-art techniques

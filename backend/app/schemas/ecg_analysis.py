@@ -14,7 +14,6 @@ from app.core.constants import (
     ECGLeads,
 )
 
-
 class ECGAnalysisBase(BaseModel):
     """Base ECG analysis schema."""
     patient_id: int
@@ -38,18 +37,15 @@ class ECGAnalysisBase(BaseModel):
                 raise ValueError(f'Invalid ECG lead: {lead}')
         return v
 
-
 class ECGAnalysisCreate(ECGAnalysisBase):
     """ECG analysis creation schema."""
     pass
-
 
 class ECGAnalysisUpdate(BaseModel):
     """ECG analysis update schema."""
     clinical_notes: str | None = None
     recommendations: list[str] | None = None
     clinical_urgency: ClinicalUrgency | None = None
-
 
 class ECGAnalysisInDB(ECGAnalysisBase):
     """ECG analysis in database schema."""
@@ -93,7 +89,6 @@ class ECGAnalysisInDB(ECGAnalysisBase):
     class Config:
         from_attributes = True
 
-
 class ECGAnalysis(ECGAnalysisInDB):
     """ECG analysis response schema."""
     is_critical: bool
@@ -102,14 +97,12 @@ class ECGAnalysis(ECGAnalysisInDB):
     class Config:
         from_attributes = True
 
-
 class ECGAnalysisList(BaseModel):
     """ECG analysis list response schema."""
     analyses: list[ECGAnalysis]
     total: int
     page: int
     size: int
-
 
 class ECGAnalysisSearch(BaseModel):
     """ECG analysis search schema."""
@@ -121,7 +114,6 @@ class ECGAnalysisSearch(BaseModel):
     date_to: datetime | None = None
     is_validated: bool | None = None
     requires_validation: bool | None = None
-
 
 class ECGMeasurementBase(BaseModel):
     """Base ECG measurement schema."""
@@ -136,11 +128,9 @@ class ECGMeasurementBase(BaseModel):
     normal_min: float | None = None
     normal_max: float | None = None
 
-
 class ECGMeasurementCreate(ECGMeasurementBase):
     """ECG measurement creation schema."""
     pass
-
 
 class ECGMeasurement(ECGMeasurementBase):
     """ECG measurement response schema."""
@@ -152,7 +142,6 @@ class ECGMeasurement(ECGMeasurementBase):
     class Config:
         from_attributes = True
 
-
 class ECGAnnotationBase(BaseModel):
     """Base ECG annotation schema."""
     annotation_type: str = Field(..., min_length=1, max_length=50)
@@ -163,11 +152,9 @@ class ECGAnnotationBase(BaseModel):
     properties: dict[str, Any] | None = None
     source: str = Field(..., pattern="^(ai|manual|algorithm)$")
 
-
 class ECGAnnotationCreate(ECGAnnotationBase):
     """ECG annotation creation schema."""
     pass
-
 
 class ECGAnnotation(ECGAnnotationBase):
     """ECG annotation response schema."""
@@ -179,7 +166,6 @@ class ECGAnnotation(ECGAnnotationBase):
 
     class Config:
         from_attributes = True
-
 
 class ECGProcessingResult(BaseModel):
     """ECG processing result schema."""
@@ -194,7 +180,6 @@ class ECGProcessingResult(BaseModel):
     quality_metrics: dict[str, float]
     processing_time_ms: int
     error_message: str | None
-
 
 class ECGUploadResponse(BaseModel):
     """ECG upload response schema."""

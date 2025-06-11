@@ -15,7 +15,6 @@ from app.services.user_service import UserService
 
 router = APIRouter()
 
-
 @router.get("/", response_model=NotificationList)
 async def get_notifications(
     limit: int = 50,
@@ -39,7 +38,6 @@ async def get_notifications(
         size=limit,
     )
 
-
 @router.post("/{notification_id}/read")
 async def mark_notification_read(
     notification_id: int,
@@ -61,7 +59,6 @@ async def mark_notification_read(
 
     return {"message": "Notification marked as read"}
 
-
 @router.post("/mark-all-read")
 async def mark_all_read(
     current_user: User = Depends(UserService.get_current_user),
@@ -73,7 +70,6 @@ async def mark_all_read(
     count = await notification_service.mark_all_read(current_user.id)
 
     return {"message": f"Marked {count} notifications as read"}
-
 
 @router.get("/unread-count")
 async def get_unread_count(

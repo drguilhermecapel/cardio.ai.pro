@@ -21,7 +21,6 @@ from app.db.init_db import ensure_database_ready
 
 logger = logging.getLogger(__name__)
 
-
 # Simplified startup for standalone version
 def create_app() -> FastAPI:
     """Create FastAPI application."""
@@ -62,15 +61,12 @@ def create_app() -> FastAPI:
 
     return app
 
-
 app = create_app()
-
 
 @app.get("/health")
 async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "healthy", "service": "cardioai-pro-standalone"}
-
 
 @app.get("/")
 async def root() -> dict[str, str]:
@@ -81,7 +77,6 @@ async def root() -> dict[str, str]:
         "docs": "/docs",
         "status": "running"
     }
-
 
 if __name__ == "__main__":
     import uvicorn

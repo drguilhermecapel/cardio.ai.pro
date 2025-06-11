@@ -14,7 +14,6 @@ from app.schemas.patient import PatientCreate
 
 logger = logging.getLogger(__name__)
 
-
 class PatientService:
     """Service for patient management."""
 

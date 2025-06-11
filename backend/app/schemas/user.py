@@ -8,7 +8,6 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.core.constants import UserRoles
 
-
 class UserBase(BaseModel):
     """Base user schema."""
     username: str = Field(..., min_length=3, max_length=50)
@@ -21,7 +20,6 @@ class UserBase(BaseModel):
     specialty: str | None = Field(None, max_length=100)
     institution: str | None = Field(None, max_length=200)
     experience_years: int | None = Field(None, ge=0, le=70)
-
 
 class UserCreate(UserBase):
     """User creation schema."""
@@ -43,7 +41,6 @@ class UserCreate(UserBase):
             raise ValueError('Password must contain at least one special character')
         return v
 
-
 class UserUpdate(BaseModel):
     """User update schema."""
     email: EmailStr | None = None
@@ -54,7 +51,6 @@ class UserUpdate(BaseModel):
     specialty: str | None = Field(None, max_length=100)
     institution: str | None = Field(None, max_length=200)
     experience_years: int | None = Field(None, ge=0, le=70)
-
 
 class UserInDB(UserBase):
     """User in database schema."""
@@ -69,11 +65,9 @@ class UserInDB(UserBase):
     class Config:
         from_attributes = True
 
-
 class User(UserInDB):
     """User response schema."""
     pass
-
 
 class UserList(BaseModel):
     """User list response schema."""
@@ -81,7 +75,6 @@ class UserList(BaseModel):
     total: int
     page: int
     size: int
-
 
 class PasswordChange(BaseModel):
     """Password change schema."""
@@ -104,17 +97,14 @@ class PasswordChange(BaseModel):
             raise ValueError('Password must contain at least one special character')
         return v
 
-
 class PasswordReset(BaseModel):
     """Password reset schema."""
     email: EmailStr
-
 
 class PasswordResetConfirm(BaseModel):
     """Password reset confirmation schema."""
     token: str
     new_password: str = Field(..., min_length=8, max_length=100)
-
 
 class Token(BaseModel):
     """Token schema."""
@@ -123,18 +113,15 @@ class Token(BaseModel):
     token_type: str = "bearer"
     expires_in: int
 
-
 class TokenRefresh(BaseModel):
     """Token refresh schema."""
     refresh_token: str
-
 
 class APIKeyCreate(BaseModel):
     """API key creation schema."""
     name: str = Field(..., min_length=1, max_length=100)
     scopes: list[str] = Field(..., min_length=1)
     expires_at: datetime | None = None
-
 
 class APIKeyResponse(BaseModel):
     """API key response schema."""
@@ -147,7 +134,6 @@ class APIKeyResponse(BaseModel):
 
     class Config:
         from_attributes = True
-
 
 class APIKeyList(BaseModel):
     """API key list schema."""

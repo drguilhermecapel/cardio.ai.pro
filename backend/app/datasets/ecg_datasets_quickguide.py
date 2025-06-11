@@ -21,7 +21,6 @@ from .ecg_public_datasets import (
     quick_download_datasets,
 )
 
-
 def setup_environment() -> bool:
     """Configura ambiente e verifica dependências"""
     print("🔧 Configurando ambiente...")
@@ -44,7 +43,6 @@ def setup_environment() -> bool:
 
     print("✓ Ambiente configurado com sucesso!\n")
     return True
-
 
 def scenario_1_download_and_explore() -> list[ECGRecord] | None:
     """Cenário 1: Baixar datasets e fazer análise exploratória"""
@@ -100,7 +98,6 @@ def scenario_1_download_and_explore() -> list[ECGRecord] | None:
     print("✓ Visualização salva em: figures/mit_bih_examples.png")
 
     return records
-
 
 def scenario_2_prepare_ml_dataset(records: list[ECGRecord] | None = None) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any], np.ndarray[Any, Any], np.ndarray[Any, Any], list[str]]:
     """Cenário 2: Preparar dataset para treinamento de ML"""
@@ -180,7 +177,6 @@ def scenario_2_prepare_ml_dataset(records: list[ECGRecord] | None = None) -> tup
 
     return X_train_cnn, X_test_cnn, y_train, y_test, target_labels
 
-
 def quick_start_mit_bih() -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     """Início rápido com MIT-BIH"""
     paths = quick_download_datasets(['mit-bih'])
@@ -194,7 +190,6 @@ def quick_start_mit_bih() -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     print(f"   y shape: {y.shape}")
 
     return X, y
-
 
 def quick_visualize_ecg(record: ECGRecord, duration: float = 10.0) -> None:
     """Visualização rápida de um ECG"""
@@ -217,7 +212,6 @@ def quick_visualize_ecg(record: ECGRecord, duration: float = 10.0) -> None:
     plt.legend()
     plt.tight_layout()
     plt.show()
-
 
 def main() -> None:
     """Função principal com menu interativo"""
@@ -252,7 +246,6 @@ def main() -> None:
             print("\n❌ Opção inválida!")
 
         input("\nPressione ENTER para continuar...")
-
 
 if __name__ == "__main__":
     main()

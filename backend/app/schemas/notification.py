@@ -9,14 +9,12 @@ from pydantic import BaseModel
 
 from app.core.constants import NotificationPriority, NotificationType
 
-
 class NotificationBase(BaseModel):
     """Base notification schema."""
     title: str
     message: str
     notification_type: NotificationType
     priority: NotificationPriority
-
 
 class NotificationCreate(NotificationBase):
     """Notification creation schema."""
@@ -27,7 +25,6 @@ class NotificationCreate(NotificationBase):
     metadata: dict[str, Any] | None = None
     expires_at: datetime | None = None
 
-
 class NotificationUpdate(BaseModel):
     """Notification update schema."""
     title: str | None = None
@@ -36,7 +33,6 @@ class NotificationUpdate(BaseModel):
     priority: NotificationPriority | None = None
     is_read: bool | None = None
     metadata: dict[str, Any] | None = None
-
 
 class NotificationInDB(NotificationBase):
     """Notification in database schema."""
@@ -60,11 +56,9 @@ class NotificationInDB(NotificationBase):
     class Config:
         from_attributes = True
 
-
 class Notification(NotificationInDB):
     """Notification response schema."""
     pass
-
 
 class NotificationList(BaseModel):
     """Notification list response schema."""

@@ -2,7 +2,6 @@
 ECG Analysis Service - Core ECG processing and analysis functionality.
 """
 
-
 import hashlib
 import logging
 import uuid
@@ -25,7 +24,6 @@ from app.utils.ecg_processor import ECGProcessor
 from app.utils.signal_quality import SignalQualityAnalyzer
 
 logger = logging.getLogger(__name__)
-
 
 class ECGAnalysisService:
     """ECG Analysis Service for processing and analyzing ECG data."""

@@ -11,7 +11,6 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-
 class RiskLevel(Enum):
     """Risk levels per ISO 14971"""
     NEGLIGIBLE = "negligible"
@@ -19,7 +18,6 @@ class RiskLevel(Enum):
     MEDIUM = "medium"
     HIGH = "high"
     UNACCEPTABLE = "unacceptable"
-
 
 class DesignPhase(Enum):
     """Design control phases per ISO 13485"""
@@ -31,7 +29,6 @@ class DesignPhase(Enum):
     VALIDATION = "validation"
     TRANSFER = "transfer"
     CHANGES = "changes"
-
 
 @dataclass
 class RiskAssessment:
@@ -46,7 +43,6 @@ class RiskAssessment:
     residual_risk: RiskLevel
     acceptability: bool
 
-
 @dataclass
 class DesignControl:
     """Design control record per ISO 13485"""
@@ -58,7 +54,6 @@ class DesignControl:
     review_participants: list[str]
     approval_status: bool
     approval_date: datetime | None
-
 
 class ISO13485QualitySystem:
     """
@@ -493,7 +488,6 @@ class ISO13485QualitySystem:
         }
 
         return report
-
 
 class ContinuousImprovementSystem:
     """Continuous improvement system for quality enhancement"""

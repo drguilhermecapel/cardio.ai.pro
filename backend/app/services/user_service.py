@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
-
 class UserService:
     """Service for user management and authentication."""
 

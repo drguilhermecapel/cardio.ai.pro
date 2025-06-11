@@ -21,7 +21,6 @@ from app.services.user_service import UserService
 
 router = APIRouter()
 
-
 @router.post("/", response_model=Patient)
 async def create_patient(
     patient_data: PatientCreate,
@@ -41,7 +40,6 @@ async def create_patient(
     patient = await patient_service.create_patient(patient_data, current_user.id)
     return patient
 
-
 @router.get("/{patient_id}", response_model=Patient)
 async def get_patient(
     patient_id: str,
@@ -59,7 +57,6 @@ async def get_patient(
         )
 
     return patient
-
 
 @router.put("/{patient_id}", response_model=Patient)
 async def update_patient(
@@ -83,7 +80,6 @@ async def update_patient(
 
     return updated_patient
 
-
 @router.get("/", response_model=PatientList)
 async def list_patients(
     limit: int = 50,
@@ -103,7 +99,6 @@ async def list_patients(
         page=offset // limit + 1,
         size=limit,
     )
-
 
 @router.post("/search", response_model=PatientList)
 async def search_patients(
@@ -127,7 +122,6 @@ async def search_patients(
         page=offset // limit + 1,
         size=limit,
     )
-
 
 @router.get("/{patient_id}/ecg-analyses")
 async def get_patient_ecg_analyses(

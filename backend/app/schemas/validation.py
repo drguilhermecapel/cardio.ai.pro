@@ -8,17 +8,14 @@ from pydantic import BaseModel, Field
 
 from app.core.constants import ValidationStatus
 
-
 class ValidationBase(BaseModel):
     """Base validation schema."""
     analysis_id: int
     validator_id: int
 
-
 class ValidationCreate(ValidationBase):
     """Validation creation schema."""
     pass
-
 
 class ValidationUpdate(BaseModel):
     """Validation update schema."""
@@ -36,7 +33,6 @@ class ValidationUpdate(BaseModel):
     validation_duration_minutes: int | None = None
     digital_signature: str | None = None
 
-
 class ValidationSubmit(BaseModel):
     """Validation submission schema."""
     approved: bool = True
@@ -52,7 +48,6 @@ class ValidationSubmit(BaseModel):
     follow_up_notes: str | None = None
     validation_duration_minutes: int | None = None
     digital_signature: str | None = None
-
 
 class ValidationInDB(ValidationBase):
     """Validation in database schema."""
@@ -79,11 +74,9 @@ class ValidationInDB(ValidationBase):
     class Config:
         from_attributes = True
 
-
 class Validation(ValidationInDB):
     """Validation response schema."""
     pass
-
 
 class ValidationList(BaseModel):
     """Validation list response schema."""
