@@ -14,12 +14,12 @@ import numpy as np
 import torch
 
 from app.core.exceptions import ECGProcessingException
-from app.ml.ecg_gan import ECGTimeGAN
+from app.ml.ecg_gan import TimeGAN
 from app.ml.hybrid_architecture import HybridECGModel, ModelConfig
-from app.ml.training_pipeline import TrainingConfig, TrainingPipeline
+from app.ml.training_pipeline import TrainingConfig, ECGTrainingPipeline
 from app.services.interpretability_service import InterpretabilityService
 from app.utils.adaptive_thresholds import AdaptiveThresholdManager
-from app.utils.data_augmentation import AugmentationConfig, ECGDataAugmentation
+from app.utils.data_augmentation import AugmentationConfig, ECGDataAugmenter
 
 logger = logging.getLogger(__name__)
 
@@ -86,9 +86,9 @@ class AdvancedMLService:
         self.model_cache: dict[str, torch.nn.Module] = {}
         self.performance_metrics: dict[str, ModelPerformanceMetrics] = {}
 
-        self.interpretability_service = None
-        self.adaptive_threshold_manager = None
-        self.data_augmentation = None
+        self.interpretability_service: InterpretabilityService | None = None
+        self.adaptive_threshold_manager: AdaptiveThresholdManager | None = None
+        self.data_augmentation: ECGDataAugmenter | None = None
 
         self._initialize_services()
         self._load_models()
@@ -131,7 +131,7 @@ class AdvancedMLService:
         try:
             if self.config.enable_data_augmentation:
                 augmentation_config = AugmentationConfig()
-                self.data_augmentation = ECGDataAugmentation(augmentation_config)
+                self.data_augmentation = ECGDataAugmenter(augmentation_config)
                 logger.info("✓ Data augmentation service initialized")
         except Exception as e:
             logger.warning(f"Failed to initialize data augmentation: {e}")
@@ -505,7 +505,7 @@ class AdvancedMLService:
                     learning_rate=1e-4
                 )
 
-            training_pipeline = TrainingPipeline(training_config)
+            training_pipeline = ECGTrainingPipeline(training_config)
 
             logger.info("Starting model training...")
             training_results = await training_pipeline.train(
@@ -560,7 +560,7 @@ class AdvancedMLService:
                     'hidden_dim': 128,
                     'num_layers': 3
                 }
-                self.time_gan = ECGTimeGAN(gan_config)
+                self.time_gan = TimeGAN(gan_config)
 
             logger.info(f"Generating {num_samples} synthetic ECG samples for {condition_type}")
 

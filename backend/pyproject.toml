@@ -89,6 +89,9 @@ wfdb = "^4.3.0"
 pyedflib = "^0.1.40"
 pywavelets = "^1.8.0"
 
+# Type stubs for ML libraries
+types-scikit-learn = "^1.2.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -144,6 +147,14 @@ module = [
     "wfdb.*",
     "pyedflib.*",
     "biosppy.*",
+    "torch.*",
+    "torchvision.*",
+    "transformers.*",
+    "optuna.*",
+    "wandb.*",
+    "librosa.*",
+    "sklearn.*",
+    "tqdm.*",
 ]
 ignore_missing_imports = true
 
