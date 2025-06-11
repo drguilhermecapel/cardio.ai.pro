@@ -41,15 +41,15 @@ class AdaptiveThresholdManager:
 
     def __init__(self, config_path: str | None = None):
         self.config_path = config_path or "adaptive_thresholds_config.json"
-        self.threshold_configs = {}
-        self.platt_scalers = {}
-        self.performance_tracker = {}
+        self.threshold_configs: dict[str, ThresholdConfig] = {}
+        self.platt_scalers: dict[str, Any] = {}
+        self.performance_tracker: dict[str, dict[str, Any]] = {}
 
         self._initialize_default_thresholds()
 
         self._load_configuration()
 
-    def _initialize_default_thresholds(self):
+    def _initialize_default_thresholds(self) -> None:
         """Initialize default thresholds based on clinical urgency and condition characteristics"""
 
         critical_conditions = get_critical_conditions()
@@ -99,7 +99,7 @@ class AdaptiveThresholdManager:
                     performance_history=[]
                 )
 
-    def get_adaptive_threshold(self, condition_code: str, context: dict[str, Any] = None) -> float:
+    def get_adaptive_threshold(self, condition_code: str, context: dict[str, Any] | None = None) -> float:
         """
         Get adaptive threshold for a specific condition
         Considers clinical context, recent performance, and calibration
@@ -321,8 +321,8 @@ class AdaptiveThresholdManager:
         specificity: float,
         precision: float,
         f1_score: float,
-        auc_roc: float = None
-    ):
+        auc_roc: float | None = None
+    ) -> None:
         """Update performance metrics for a condition"""
 
         if condition_code not in self.threshold_configs:

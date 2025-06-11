@@ -42,7 +42,7 @@ class ClinicalExplanationGenerator:
     References established diagnostic criteria and normal population values
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.diagnostic_criteria = self._load_diagnostic_criteria()
         self.normal_ranges = self._load_normal_ranges()
         self.lead_territories = self._load_lead_territories()
@@ -514,7 +514,7 @@ class ClinicalExplanationGenerator:
     def _analyze_parameters(self, features: dict[str, Any]) -> dict[str, Any]:
         """Analyze ECG parameters against normal ranges"""
 
-        analysis = {
+        analysis: dict[str, list[dict[str, Any]]] = {
             'normal_parameters': [],
             'abnormal_parameters': [],
             'borderline_parameters': []
@@ -616,7 +616,7 @@ class ClinicalExplanationGenerator:
                 'diagnosis_name': condition.name if condition else diagnosis_code,
                 'confidence': confidence,
                 'likelihood': self._interpret_confidence(confidence),
-                'category': condition.category.value if condition else 'unknown'
+                'category': condition.category if condition else 'unknown'
             })
 
         return differential
@@ -625,7 +625,7 @@ class ClinicalExplanationGenerator:
         """Generate clinical recommendations based on diagnosis"""
 
         condition = get_condition_by_code(diagnosis_code)
-        recommendations = []
+        recommendations: list[str] = []
 
         if condition and condition.clinical_urgency == 'critical':
             recommendations.extend([
@@ -701,7 +701,7 @@ class ClinicalExplanationGenerator:
     ) -> dict[str, Any]:
         """Explain anatomical correlation of findings"""
 
-        correlation = {
+        correlation: dict[str, Any] = {
             'affected_territories': [],
             'lead_analysis': {},
             'vascular_correlation': {}
@@ -800,7 +800,7 @@ class ClinicalExplanationGenerator:
     def _recommend_follow_up(self, diagnosis_code: str, features: dict[str, Any]) -> dict[str, Any]:
         """Recommend appropriate follow-up care"""
 
-        follow_up = {
+        follow_up: dict[str, list[str]] = {
             'immediate_actions': [],
             'short_term_follow_up': [],
             'long_term_monitoring': [],
