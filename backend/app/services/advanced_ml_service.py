@@ -85,6 +85,7 @@ class AdvancedMLService:
         self.models: dict[str, torch.nn.Module] = {}
         self.model_cache: dict[str, torch.nn.Module] = {}
         self.performance_metrics: dict[str, ModelPerformanceMetrics] = {}
+        self.performance_history: list[float] = []
 
         self.interpretability_service: InterpretabilityService | None = None
         self.adaptive_threshold_manager: AdaptiveThresholdManager | None = None
