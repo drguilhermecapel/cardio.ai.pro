@@ -330,14 +330,15 @@ class AdvancedMLService:
                 ensemble_probabilities.append(probabilities)
 
         if len(ensemble_probabilities) > 1:
-            weights = self.config.model_ensemble_weights or [1.0] * len(ensemble_probabilities)
-            weights = weights[:len(ensemble_probabilities)]  # Trim to actual number of models
-            weights = torch.tensor(weights, device=self.device)
+            weights_list = self.config.model_ensemble_weights or [1.0] * len(ensemble_probabilities)
+            weights_list = weights_list[:len(ensemble_probabilities)]  # Trim to actual number of models
+            weights = torch.tensor(weights_list, device=self.device)
             weights = weights / weights.sum()  # Normalize
 
             ensemble_probs = torch.stack(ensemble_probabilities)
             final_probabilities = torch.sum(ensemble_probs * weights.unsqueeze(-1), dim=0)
         else:
+            weights = torch.tensor([1.0], device=self.device)
             final_probabilities = ensemble_probabilities[0]
 
         predictions = (final_probabilities > self.config.confidence_threshold).float()
