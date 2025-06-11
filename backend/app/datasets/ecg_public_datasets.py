@@ -14,7 +14,7 @@ from typing import Any, Optional
 import h5py  # type: ignore
 import numpy as np
 import pandas as pd
-from tqdm import tqdm  # type: ignore[import-untyped]
+from tqdm import tqdm
 
 try:
     import wfdb
@@ -37,7 +37,6 @@ except ImportError:
     ADVANCED_PREPROCESSOR_AVAILABLE = False
     logging.warning("AdvancedECGPreprocessor não disponível")
 
-
 @dataclass
 class ECGRecord:
     """Estrutura padronizada para registros de ECG"""
@@ -50,7 +49,6 @@ class ECGRecord:
     leads: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
     annotations: dict[str, Any] | None = None
-
 
 class ECGDatasetDownloader:
     """Downloader para datasets públicos de ECG"""
@@ -212,7 +210,6 @@ class ECGDatasetDownloader:
             print(f"   Taxa de amostragem: {info['sampling_rate']} Hz")
             print(f"   Derivações: {info['leads']}")
             print(f"   Tamanho: {info['size']}")
-
 
 class ECGDatasetLoader:
     """Carregador unificado para diferentes datasets"""
@@ -495,7 +492,6 @@ class ECGDatasetLoader:
 
         return output_path
 
-
 class ECGDatasetAnalyzer:
     """Analisador estatístico para datasets de ECG"""
 
@@ -592,7 +588,6 @@ class ECGDatasetAnalyzer:
             for sex, count in stats['sex_distribution'].items():
                 print(f"  {sex}: {count} ({count/stats['total_records']*100:.1f}%)")
 
-
 def quick_download_datasets(datasets: list[str] | None = None, base_dir: str = "ecg_datasets") -> dict[str, str]:
     """
     Download rápido de datasets
@@ -632,7 +627,6 @@ def quick_download_datasets(datasets: list[str] | None = None, base_dir: str = "
 
     return paths
 
-
 def load_and_preprocess_all(dataset_paths: dict[str, str],
                           max_records_per_dataset: int | None = None) -> dict[str, list[ECGRecord]]:
     """
@@ -665,7 +659,6 @@ def load_and_preprocess_all(dataset_paths: dict[str, str],
             all_datasets[dataset_name] = records
 
     return all_datasets
-
 
 def prepare_ml_dataset(records: list[ECGRecord],
                       window_size: int = 3600,

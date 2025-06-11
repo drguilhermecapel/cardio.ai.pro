@@ -15,7 +15,6 @@ from scipy import signal
 
 logger = logging.getLogger(__name__)
 
-
 class StressTestType(Enum):
     """Types of stress tests for robustness validation"""
     NOISE_INJECTION = "noise_injection"
@@ -26,7 +25,6 @@ class StressTestType(Enum):
     EDGE_CASES = "edge_cases"
     PERFORMANCE_STRESS = "performance_stress"
 
-
 class NoiseType(Enum):
     """Types of noise for injection testing"""
     GAUSSIAN_WHITE = "gaussian_white"
@@ -36,7 +34,6 @@ class NoiseType(Enum):
     MUSCLE_ARTIFACT = "muscle_artifact"
     MOTION_ARTIFACT = "motion_artifact"
     ELECTRODE_CONTACT = "electrode_contact"
-
 
 @dataclass
 class RobustnessMetrics:
@@ -53,7 +50,6 @@ class RobustnessMetrics:
     false_negative_rate: float
     processing_time_increase: float
 
-
 @dataclass
 class StressTestResult:
     """Individual stress test result"""
@@ -65,7 +61,6 @@ class StressTestResult:
     performance_degradation: float
     passed: bool
     processing_time_ms: float
-
 
 class RobustnessValidationFramework:
     """
@@ -227,7 +222,6 @@ class RobustnessValidationFramework:
                 replace=False
             )
             noise[dropout_indices] = -signal_data[dropout_indices] * 0.8
-
 
         return signal_data + noise
 
@@ -610,7 +604,6 @@ class RobustnessValidationFramework:
             }
 
         return report
-
 
 class FailSafeRobustnessValidator:
     """

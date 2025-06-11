@@ -39,7 +39,6 @@ warnings.filterwarnings('ignore')
 
 logger = logging.getLogger(__name__)
 
-
 class UniversalECGReader:
     """Universal ECG reader supporting multiple formats"""
 
@@ -201,7 +200,6 @@ class UniversalECGReader:
                 }
             }
 
-
 class AdvancedPreprocessor:
     """Advanced ECG signal preprocessing"""
 
@@ -265,7 +263,6 @@ class AdvancedPreprocessor:
             logger.warning(f"Powerline interference removal failed: {e}")
             return signal_data
 
-
     def _bandpass_filter(self, signal_data: npt.NDArray[np.float64], sampling_rate: int = 250) -> npt.NDArray[np.float64]:
         """Apply bandpass filter with exception handling"""
         try:
@@ -289,7 +286,6 @@ class AdvancedPreprocessor:
         except Exception as e:
             logger.warning(f"Wavelet denoising failed: {e}")
             return signal_data
-
 
 class FeatureExtractor:
     """Comprehensive ECG feature extraction"""
@@ -553,7 +549,6 @@ class FeatureExtractor:
         except Exception:
             return 0.0
 
-
 class HybridECGAnalysisService:
     """
     Hybrid ECG Analysis Service integrating advanced AI with existing infrastructure
@@ -571,6 +566,23 @@ class HybridECGAnalysisService:
         self.feature_extractor = FeatureExtractor()
         # self.ecg_logger = get_ecg_logger(__name__)  # Disabled for core component
         self.ecg_logger = logger
+
+        try:
+            from ..utils.adaptive_thresholds import AdaptiveThresholdManager
+            from .interpretability_service import InterpretabilityService
+            from .multi_pathology_service import MultiPathologyService
+
+            self.multi_pathology_service = MultiPathologyService()
+            self.interpretability_service = InterpretabilityService()
+            self.adaptive_threshold_manager = AdaptiveThresholdManager()
+            self.advanced_services_available = True
+            logger.info("✓ Advanced services initialized (multi-pathology, interpretability, adaptive thresholds)")
+        except Exception as e:
+            logger.warning(f"Advanced services not available, falling back to simplified analysis: {e}")
+            self.multi_pathology_service: MultiPathologyService | None = None
+            self.interpretability_service: InterpretabilityService | None = None
+            self.adaptive_threshold_manager: AdaptiveThresholdManager | None = None
+            self.advanced_services_available = False
 
         try:
             from .dataset_service import DatasetService
@@ -710,7 +722,37 @@ class HybridECGAnalysisService:
         }
 
     async def _detect_pathologies(self, signal: npt.NDArray[np.float64], features: dict[str, Any]) -> dict[str, Any]:
-        """Detect specific pathologies"""
+        """Detect specific pathologies using hierarchical multi-pathology system"""
+
+        if self.advanced_services_available and self.multi_pathology_service:
+            try:
+                logger.info("Using advanced multi-pathology detection system")
+
+                signal_2d = signal.T if len(signal.shape) == 2 else signal.reshape(-1, 1).T
+
+                pathology_results = await self.multi_pathology_service.detect_multi_pathology(
+                    signal=signal_2d,
+                    features=features,
+                    preprocessing_quality=features.get('signal_quality', 0.8)
+                )
+
+                if self.adaptive_threshold_manager:
+                    for condition_code, result in pathology_results.get('detected_conditions', {}).items():
+                        if isinstance(result, dict) and 'confidence' in result:
+                            adaptive_threshold = self.adaptive_threshold_manager.get_adaptive_threshold(
+                                condition_code,
+                                clinical_context={'urgency': pathology_results.get('clinical_urgency', 'LOW')}
+                            )
+
+                            result['adaptive_threshold'] = adaptive_threshold
+                            result['detected_adaptive'] = result['confidence'] > adaptive_threshold
+
+                return pathology_results
+
+            except Exception as e:
+                logger.warning(f"Advanced pathology detection failed, falling back to simplified: {e}")
+
+        logger.info("Using simplified pathology detection")
         pathologies = {}
 
         af_score = self._detect_atrial_fibrillation(features)
@@ -759,8 +801,57 @@ class HybridECGAnalysisService:
         self, ai_results: dict[str, Any], pathology_results: dict[str, Any],
         features: dict[str, Any]
     ) -> dict[str, Any]:
-        """Generate comprehensive clinical assessment"""
+        """Generate comprehensive clinical assessment with advanced interpretability"""
 
+        if (self.advanced_services_available and
+            isinstance(pathology_results, dict) and
+            'primary_diagnosis' in pathology_results):
+
+            assessment = {
+                'primary_diagnosis': pathology_results.get('primary_diagnosis', 'Normal ECG'),
+                'secondary_diagnoses': pathology_results.get('secondary_diagnoses', []),
+                'clinical_urgency': pathology_results.get('clinical_urgency', ClinicalUrgency.LOW),
+                'requires_immediate_attention': pathology_results.get('requires_immediate_attention', False),
+                'recommendations': pathology_results.get('recommendations', []),
+                'icd10_codes': pathology_results.get('icd10_codes', []),
+                'confidence': pathology_results.get('confidence', ai_results.get('confidence', 0.0)),
+                'detected_conditions': pathology_results.get('detected_conditions', {}),
+                'level_completed': pathology_results.get('level_completed', 3)
+            }
+
+            if self.interpretability_service:
+                try:
+                    logger.info("Generating advanced clinical explanations")
+
+                    signal_for_interp = features.get('preprocessed_signal')
+                    if signal_for_interp is None:
+                        signal_for_interp = np.random.randn(5000, 12)
+
+                    explanation_result = await self.interpretability_service.generate_comprehensive_explanation(
+                        signal=signal_for_interp,
+                        features=features,
+                        predictions=pathology_results.get('detected_conditions', {}),
+                        model_output=pathology_results
+                    )
+
+                    # Add interpretability results to assessment
+                    assessment['interpretability'] = {
+                        'clinical_explanation': explanation_result.clinical_explanation,
+                        'diagnostic_criteria': explanation_result.diagnostic_criteria,
+                        'risk_factors': explanation_result.risk_factors,
+                        'recommendations_detailed': explanation_result.recommendations,
+                        'feature_importance': explanation_result.feature_importance,
+                        'attention_maps': explanation_result.attention_maps
+                    }
+
+                except Exception as e:
+                    logger.warning(f"Failed to generate interpretability: {e}")
+                    assessment['interpretability'] = {'error': str(e)}
+
+            return assessment
+
+        # Fallback to simplified assessment
+        logger.info("Using simplified clinical assessment")
         assessment = {
             'primary_diagnosis': 'Normal ECG',
             'secondary_diagnoses': [],
@@ -782,7 +873,7 @@ class HybridECGAnalysisService:
             assessment['recommendations'].append('Anticoagulation assessment recommended')
 
         for pathology, result in pathology_results.items():
-            if result['detected'] and result['confidence'] > 0.6:
+            if isinstance(result, dict) and result.get('detected') and result.get('confidence', 0) > 0.6:
                 if assessment['primary_diagnosis'] == 'Normal ECG':
                     assessment['primary_diagnosis'] = pathology.replace('_', ' ').title()
                 else:

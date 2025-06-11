@@ -12,7 +12,6 @@ from app.services.hybrid_ecg_service import HybridECGAnalysisService
 
 logger = logging.getLogger(__name__)
 
-
 class ECGHybridProcessor:
     """
     Processor for integrating hybrid ECG analysis with existing infrastructure

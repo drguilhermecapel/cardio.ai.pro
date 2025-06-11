@@ -23,7 +23,6 @@ from app.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
-
 class ValidationService:
     """Service for medical validation and quality control."""
 

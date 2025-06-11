@@ -14,7 +14,6 @@ class UserRoles(str, Enum):
     RESEARCHER = "researcher"
     VIEWER = "viewer"
 
-
 class AnalysisStatus(str, Enum):
     """Analysis status."""
     PENDING = "pending"
@@ -23,14 +22,12 @@ class AnalysisStatus(str, Enum):
     FAILED = "failed"
     CANCELLED = "cancelled"
 
-
 class ValidationStatus(str, Enum):
     """Validation status."""
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
     REQUIRES_REVIEW = "requires_review"
-
 
 class ECGLeads(str, Enum):
     """ECG leads."""
@@ -47,7 +44,6 @@ class ECGLeads(str, Enum):
     V5 = "V5"
     V6 = "V6"
 
-
 class DiagnosisCategory(str, Enum):
     """Diagnosis categories."""
     NORMAL = "normal"
@@ -55,8 +51,11 @@ class DiagnosisCategory(str, Enum):
     CONDUCTION_DISORDER = "conduction_disorder"
     ISCHEMIA = "ischemia"
     HYPERTROPHY = "hypertrophy"
+    AXIS_DEVIATION = "axis_deviation"
+    REPOLARIZATION = "repolarization"
+    PACEMAKER = "pacemaker"
+    BUNDLE_BRANCH_BLOCK = "bundle_branch_block"
     OTHER = "other"
-
 
 class ClinicalUrgency(str, Enum):
     """Clinical urgency levels."""
@@ -64,7 +63,6 @@ class ClinicalUrgency(str, Enum):
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
-
 
 class FileType(str, Enum):
     """Supported file types."""
@@ -75,9 +73,7 @@ class FileType(str, Enum):
     XML = "application/xml"
     TXT = "text/plain"
 
-
 ECG_FILE_EXTENSIONS = {'.csv', '.txt', '.xml', '.dat', '.png', '.jpg', '.jpeg'}
-
 
 class NotificationChannel(str, Enum):
     """Notification channels."""
@@ -88,7 +84,6 @@ class NotificationChannel(str, Enum):
     WEBHOOK = "webhook"
     PHONE_CALL = "phone_call"
 
-
 class NotificationPriority(str, Enum):
     """Notification priority levels."""
     LOW = "low"
@@ -96,7 +91,6 @@ class NotificationPriority(str, Enum):
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
-
 
 class NotificationType(str, Enum):
     """Notification types."""
@@ -107,7 +101,6 @@ class NotificationType(str, Enum):
     SYSTEM_ALERT = "system_alert"
     APPOINTMENT_REMINDER = "appointment_reminder"
     REPORT_READY = "report_ready"
-
 
 class AuditEventType(str, Enum):
     """Audit event types."""
@@ -120,7 +113,6 @@ class AuditEventType(str, Enum):
     REPORT_GENERATED = "report_generated"
     SYSTEM_ERROR = "system_error"
 
-
 class ModelType(str, Enum):
     """ML model types."""
     CLASSIFICATION = "classification"
@@ -128,14 +120,12 @@ class ModelType(str, Enum):
     DETECTION = "detection"
     REGRESSION = "regression"
 
-
 class ModelStatus(str, Enum):
     """ML model status."""
     ACTIVE = "active"
     INACTIVE = "inactive"
     TRAINING = "training"
     DEPRECATED = "deprecated"
-
 
 ECG_SAMPLE_RATES = [250, 500, 1000]
 ECG_STANDARD_DURATION = 10  # seconds
@@ -154,6 +144,10 @@ CRITICAL_CONDITIONS = [
     "STEMI",
     "Asystole",
     "Torsades de Pointes",
+    "Acute Myocardial Infarction",
+    "Third Degree AV Block",
+    "Ventricular Flutter",
+    "Polymorphic Ventricular Tachycardia",
 ]
 
 ICD10_CODES = {
@@ -165,6 +159,46 @@ ICD10_CODES = {
     "I25.2": "Old Myocardial Infarction",
     "I42.0": "Dilated Cardiomyopathy",
     "I42.1": "Obstructive Hypertrophic Cardiomyopathy",
+    "I48.0": "Atrial Fibrillation",
+    "I48.3": "Atrial Flutter",
+    "I44.0": "First Degree AV Block",
+    "I44.1": "Second Degree AV Block",
+    "I45.0": "Right Bundle Branch Block",
+    "I45.2": "Left Bundle Branch Block",
+    "I51.7": "Cardiomegaly",
+    "I25.10": "Atherosclerotic Heart Disease",
+}
+
+SCP_ECG_CATEGORIES = {
+    "NORMAL": ["NORM"],
+    "ARRHYTHMIA": ["AFIB", "AFLT", "SVTAC", "VTAC", "BIGU", "TRIGU", "PVC", "PAC"],
+    "CONDUCTION_DISORDER": ["AVB1", "AVB2", "AVB3", "RBBB", "LBBB", "LAFB", "LPFB", "WPW"],
+    "ISCHEMIA": ["STEMI", "NSTEMI", "UAP", "ISCH", "QWAVE", "TWAVE"],
+    "HYPERTROPHY": ["LVH", "RVH", "LAE", "RAE", "BIAE"],
+    "AXIS_DEVIATION": ["LAD", "RAD", "EAXIS"],
+    "REPOLARIZATION": ["LQTS", "SQTS", "EARLY", "TWAV", "UWAVE"],
+    "PACEMAKER": ["PACE", "PACED", "PACEF"],
+    "BUNDLE_BRANCH_BLOCK": ["RBBB", "LBBB", "IVCD", "BIFB"],
+    "OTHER": ["LOWV", "ARTIF", "NOISE", "POOR"]
+}
+
+SCP_ECG_PERFORMANCE_TARGETS = {
+    "NORMAL": {"sensitivity": 0.99, "specificity": 0.95, "npv": 0.99},
+    "ARRHYTHMIA": {"sensitivity": 0.95, "specificity": 0.90, "ppv": 0.85},
+    "CONDUCTION_DISORDER": {"sensitivity": 0.90, "specificity": 0.95, "auc": 0.92},
+    "ISCHEMIA": {"sensitivity": 0.98, "specificity": 0.85, "critical": True},
+    "HYPERTROPHY": {"sensitivity": 0.85, "specificity": 0.90, "auc": 0.90},
+    "AXIS_DEVIATION": {"sensitivity": 0.90, "specificity": 0.85, "auc": 0.88},
+    "REPOLARIZATION": {"sensitivity": 0.88, "specificity": 0.90, "auc": 0.89},
+    "PACEMAKER": {"sensitivity": 0.95, "specificity": 0.98, "auc": 0.96},
+    "BUNDLE_BRANCH_BLOCK": {"sensitivity": 0.92, "specificity": 0.95, "auc": 0.93},
+}
+
+SCP_ECG_URGENCY_MAPPING = {
+    "CRITICAL": ["VTAC", "VFIB", "AVB3", "STEMI", "ASYS", "TORSADES"],
+    "HIGH": ["AFIB", "AFLT", "SVTAC", "NSTEMI", "UAP", "AVB2", "WPW"],
+    "MEDIUM": ["PVC", "PAC", "AVB1", "RBBB", "LBBB", "LVH", "RVH"],
+    "LOW": ["NORM", "SINUS", "LOWV", "MINOR"]
 }
 
 ANVISA_RETENTION_YEARS = 7

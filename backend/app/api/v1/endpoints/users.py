@@ -16,14 +16,12 @@ from app.services.user_service import UserService
 
 router = APIRouter()
 
-
 @router.get("/me", response_model=UserSchema)
 async def get_current_user_info(
     current_user: User = Depends(UserService.get_current_user),
 ) -> Any:
     """Get current user information."""
     return current_user
-
 
 @router.put("/me", response_model=UserSchema)
 async def update_current_user(
@@ -44,7 +42,6 @@ async def update_current_user(
         )
 
     return updated_user
-
 
 @router.post("/me/change-password")
 async def change_password(
@@ -70,7 +67,6 @@ async def change_password(
 
     return {"message": "Password changed successfully"}
 
-
 @router.get("/", response_model=UserList)
 async def list_users(
     limit: int = 50,
@@ -95,7 +91,6 @@ async def list_users(
         page=offset // limit + 1,
         size=limit,
     )
-
 
 @router.get("/{user_id}", response_model=UserSchema)
 async def get_user(

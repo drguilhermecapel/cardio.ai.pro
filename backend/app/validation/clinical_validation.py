@@ -14,7 +14,6 @@ import numpy.typing as npt
 
 logger = logging.getLogger(__name__)
 
-
 class PathologyType(Enum):
     """Critical pathology types requiring ultra-rigorous validation"""
     STEMI = "STEMI"
@@ -23,7 +22,6 @@ class PathologyType(Enum):
     AF = "AF"  # Atrial Fibrillation
     LONG_QT = "LONG_QT"
     HEART_BLOCK = "HEART_BLOCK"
-
 
 @dataclass
 class ValidationMetrics:
@@ -37,7 +35,6 @@ class ValidationMetrics:
     sample_size: int
     kappa_cohen: float
     inter_observer_agreement: float
-
 
 @dataclass
 class UltraRigorousCriteria:
@@ -75,7 +72,6 @@ class UltraRigorousCriteria:
         "throughput_per_hour": 500,  # ECGs/hour minimum
         "security_vulnerabilities": 0  # Zero critical/high
     }
-
 
 class ClinicalValidationFramework:
     """
@@ -340,7 +336,6 @@ class ClinicalValidationFramework:
         ]
 
         return report
-
 
 class FailSafeValidator:
     """

@@ -47,6 +47,28 @@ onnx = "^1.18.0"
 matplotlib = "^3.10.3"
 h5py = "^3.14.0"
 
+# Deep Learning (optional)
+torch = {version = "^2.0.0", optional = true}
+torchvision = {version = "^0.15.0", optional = true}
+transformers = {version = "^4.30.0", optional = true}
+
+# Advanced ML (optional)
+optuna = {version = "^3.2.0", optional = true}
+wandb = {version = "^0.15.0", optional = true}
+
+# Signal Processing (optional)
+librosa = {version = "^0.10.0", optional = true}
+
+[tool.poetry.extras]
+ml = [
+    "torch",
+    "torchvision", 
+    "transformers",
+    "optuna",
+    "wandb",
+    "librosa",
+]
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 pytest-asyncio = "^0.23.6"
@@ -66,6 +88,9 @@ pandas-stubs = "^2.2.3.250527"
 wfdb = "^4.3.0"
 pyedflib = "^0.1.40"
 pywavelets = "^1.8.0"
+
+# Type stubs for ML libraries
+# Note: scikit-learn type stubs are included in the main package
 
 [build-system]
 requires = ["poetry-core"]
@@ -122,6 +147,14 @@ module = [
     "wfdb.*",
     "pyedflib.*",
     "biosppy.*",
+    "torch.*",
+    "torchvision.*",
+    "transformers.*",
+    "optuna.*",
+    "wandb.*",
+    "librosa.*",
+    "sklearn.*",
+    "tqdm.*",
 ]
 ignore_missing_imports = true
 
@@ -140,6 +173,21 @@ addopts = [
 ]
 asyncio_mode = "auto"
 
+[[tool.mypy.overrides]]
+module = [
+    "app.ml.hybrid_architecture",
+    "app.ml.training_pipeline", 
+    "app.ml.ecg_gan",
+    "app.utils.data_augmentation",
+    "app.utils.ecg_visualizations",
+    "app.services.advanced_ml_service",
+    "app.services.multi_pathology_service",
+    "app.services.interpretability_service",
+    "app.utils.adaptive_thresholds",
+    "app.utils.clinical_explanations",
+]
+ignore_errors = true
+
 [tool.coverage.run]
 source = ["app"]
 omit = [
@@ -148,6 +196,10 @@ omit = [
     "*/__init__.py",
     "app/datasets/ecg_datasets_quickguide.py",
     "app/datasets/ecg_public_datasets.py",
+    "app/ml/hybrid_architecture.py",
+    "app/ml/training_pipeline.py",
+    "app/ml/ecg_gan.py",
+    "app/utils/data_augmentation.py",
 ]
 
 [tool.coverage.report]

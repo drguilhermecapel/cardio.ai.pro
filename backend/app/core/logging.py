@@ -44,11 +44,9 @@ def configure_logging() -> None:
         cache_logger_on_first_use=True,
     )
 
-
 def get_logger(name: str) -> Any:
     """Get a structured logger."""
     return structlog.get_logger(name)
-
 
 class AuditLogger:
     """Audit logger for regulatory compliance."""
@@ -112,6 +110,5 @@ class AuditLogger:
             ip_address=ip_address,
             audit=True,
         )
-
 
 audit_logger = AuditLogger()

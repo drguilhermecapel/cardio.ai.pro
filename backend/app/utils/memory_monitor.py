@@ -9,7 +9,6 @@ import psutil
 
 logger = logging.getLogger(__name__)
 
-
 class MemoryMonitor:
     """Monitor memory usage for ML models and processing."""
 

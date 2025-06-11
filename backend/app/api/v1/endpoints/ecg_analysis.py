@@ -29,7 +29,6 @@ from app.tasks.ecg_tasks import process_ecg_analysis_sync
 
 router = APIRouter()
 
-
 @router.post("/upload", response_model=ECGUploadResponse)
 async def upload_ecg(
     patient_id: int = Form(...),
@@ -98,7 +97,6 @@ async def upload_ecg(
         estimated_processing_time_seconds=0,
     )
 
-
 @router.get("/{analysis_id}", response_model=ECGAnalysis)
 async def get_analysis(
     analysis_id: str,
@@ -124,7 +122,6 @@ async def get_analysis(
         )
 
     return analysis
-
 
 @router.get("/", response_model=ECGAnalysisList)
 async def list_analyses(
@@ -158,7 +155,6 @@ async def list_analyses(
         page=offset // limit + 1,
         size=limit,
     )
-
 
 @router.post("/search", response_model=ECGAnalysisList)
 async def search_analyses(
@@ -204,7 +200,6 @@ async def search_analyses(
         size=limit,
     )
 
-
 @router.get("/{analysis_id}/measurements", response_model=list[ECGMeasurement])
 async def get_measurements(
     analysis_id: str,
@@ -232,7 +227,6 @@ async def get_measurements(
     measurements = await ecg_service.repository.get_measurements_by_analysis(analysis.id)
     return measurements
 
-
 @router.get("/{analysis_id}/annotations", response_model=list[ECGAnnotation])
 async def get_annotations(
     analysis_id: str,
@@ -259,7 +253,6 @@ async def get_annotations(
 
     annotations = await ecg_service.repository.get_annotations_by_analysis(analysis.id)
     return annotations
-
 
 @router.delete("/{analysis_id}")
 async def delete_analysis(
@@ -293,7 +286,6 @@ async def delete_analysis(
         )
 
     return {"message": "Analysis deleted successfully"}
-
 
 @router.post("/{analysis_id}/generate-report")
 async def generate_report(
@@ -332,7 +324,6 @@ async def generate_report(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate report: {str(e)}"
         ) from e
-
 
 @router.get("/critical/pending", response_model=list[ECGAnalysis])
 async def get_critical_pending(

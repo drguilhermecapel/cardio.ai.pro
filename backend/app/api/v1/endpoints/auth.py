@@ -19,7 +19,6 @@ from app.services.user_service import UserService
 
 router = APIRouter()
 
-
 @router.post("/login", response_model=Token)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -63,7 +62,6 @@ async def login(
         "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     }
 
-
 @router.post("/register", response_model=UserSchema)
 async def register(
     user_data: UserCreate,
@@ -88,7 +86,6 @@ async def register(
 
     user = await user_service.create_user(user_data)
     return user
-
 
 @router.post("/refresh", response_model=Token)
 async def refresh_token(
@@ -116,7 +113,6 @@ async def refresh_token(
         "token_type": "bearer",
         "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     }
-
 
 @router.post("/logout")
 async def logout(

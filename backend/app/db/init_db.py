@@ -17,7 +17,6 @@ from app.models.user import User
 
 logger = logging.getLogger(__name__)
 
-
 async def init_db() -> None:
     """Initialize database with tables and default data."""
     try:
@@ -38,7 +37,6 @@ async def init_db() -> None:
     except Exception as e:
         logger.error(f"Database initialization failed: {str(e)}")
         raise
-
 
 async def create_admin_user(session: AsyncSession) -> User | None:
     """Create default admin user if it doesn't exist."""
@@ -85,7 +83,6 @@ async def create_admin_user(session: AsyncSession) -> User | None:
         await session.rollback()
         return None
 
-
 async def check_database_exists() -> bool:
     """Check if database file exists and is accessible."""
     try:
@@ -104,7 +101,6 @@ async def check_database_exists() -> bool:
     except Exception as e:
         logger.error(f"Error checking database existence: {str(e)}")
         return False
-
 
 async def ensure_database_ready() -> None:
     """Ensure database is ready for use, initialize if needed."""
@@ -129,7 +125,6 @@ async def ensure_database_ready() -> None:
     except Exception as e:
         logger.error(f"Database preparation failed: {str(e)}")
         raise
-
 
 if __name__ == "__main__":
     asyncio.run(init_db())

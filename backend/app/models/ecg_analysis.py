@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from app.models.user import User
     from app.models.validation import Validation
 
-
 class ECGAnalysis(Base):
     """ECG Analysis model."""
 
@@ -119,7 +118,6 @@ class ECGAnalysis(Base):
             return self.processing_duration_ms / 1000
         return None
 
-
 class ECGMeasurement(Base):
     """ECG measurement model for storing detailed measurements."""
 
@@ -150,7 +148,6 @@ class ECGMeasurement(Base):
 
     def __repr__(self) -> str:
         return f"<ECGMeasurement(id={self.id}, type='{self.measurement_type}', value={self.value})>"
-
 
 class ECGAnnotation(Base):
     """ECG annotation model for storing beat annotations and events."""

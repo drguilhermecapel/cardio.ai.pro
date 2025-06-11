@@ -33,7 +33,6 @@ class PatientBase(BaseModel):
             raise ValueError('Date of birth cannot be more than 150 years ago')
         return v
 
-
 class PatientCreate(PatientBase):
     """Patient creation schema."""
     emergency_contact_name: str | None = Field(None, max_length=200)
@@ -46,7 +45,6 @@ class PatientCreate(PatientBase):
     insurance_provider: str | None = Field(None, max_length=200)
     insurance_number: str | None = Field(None, max_length=50)
     consent_for_research: bool = False
-
 
 class PatientUpdate(BaseModel):
     """Patient update schema."""
@@ -69,7 +67,6 @@ class PatientUpdate(BaseModel):
     insurance_provider: str | None = Field(None, max_length=200)
     insurance_number: str | None = Field(None, max_length=50)
 
-
 class PatientInDB(PatientBase):
     """Patient in database schema."""
     id: int
@@ -83,7 +80,6 @@ class PatientInDB(PatientBase):
     class Config:
         from_attributes = True
 
-
 class Patient(PatientInDB):
     """Patient response schema."""
     age: int
@@ -92,14 +88,12 @@ class Patient(PatientInDB):
     class Config:
         from_attributes = True
 
-
 class PatientList(BaseModel):
     """Patient list response schema."""
     patients: list[Patient]
     total: int
     page: int
     size: int
-
 
 class PatientSearch(BaseModel):
     """Patient search schema."""
@@ -109,7 +103,6 @@ class PatientSearch(BaseModel):
         min_length=1
     )
 
-
 class PatientNoteBase(BaseModel):
     """Base patient note schema."""
     title: str = Field(..., min_length=1, max_length=200)
@@ -117,11 +110,9 @@ class PatientNoteBase(BaseModel):
     note_type: str = Field(..., min_length=1, max_length=50)
     is_confidential: bool = False
 
-
 class PatientNoteCreate(PatientNoteBase):
     """Patient note creation schema."""
     pass
-
 
 class PatientNoteUpdate(BaseModel):
     """Patient note update schema."""
@@ -129,7 +120,6 @@ class PatientNoteUpdate(BaseModel):
     content: str | None = Field(None, min_length=1)
     note_type: str | None = Field(None, min_length=1, max_length=50)
     is_confidential: bool | None = None
-
 
 class PatientNote(PatientNoteBase):
     """Patient note response schema."""
@@ -141,7 +131,6 @@ class PatientNote(PatientNoteBase):
 
     class Config:
         from_attributes = True
-
 
 class PatientNoteList(BaseModel):
     """Patient note list response schema."""

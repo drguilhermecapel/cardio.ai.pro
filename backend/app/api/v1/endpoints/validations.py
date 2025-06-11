@@ -22,7 +22,6 @@ from app.services.validation_service import ValidationService
 
 router = APIRouter()
 
-
 @router.post("/", response_model=Validation)
 async def create_validation(
     validation_data: ValidationCreate,
@@ -48,7 +47,6 @@ async def create_validation(
 
     return validation
 
-
 @router.get("/my-validations", response_model=ValidationList)
 async def get_my_validations(
     limit: int = 50,
@@ -72,7 +70,6 @@ async def get_my_validations(
         size=limit,
     )
 
-
 @router.post("/{validation_id}/submit", response_model=Validation)
 async def submit_validation(
     validation_id: int,
@@ -91,7 +88,6 @@ async def submit_validation(
     )
 
     return validation
-
 
 @router.get("/{validation_id}", response_model=Validation)
 async def get_validation(
@@ -121,7 +117,6 @@ async def get_validation(
         )
 
     return validation
-
 
 @router.get("/pending/critical", response_model=list[Validation])
 async def get_pending_critical_validations(

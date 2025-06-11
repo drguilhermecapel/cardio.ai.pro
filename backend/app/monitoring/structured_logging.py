@@ -37,7 +37,6 @@ def setup_structured_logging(log_level: str = "INFO") -> None:
         cache_logger_on_first_use=True,
     )
 
-
 class ECGLogger:
     """Structured logger for ECG analysis operations"""
 
@@ -227,7 +226,6 @@ class ECGLogger:
             extraction_time_seconds=extraction_time,
             timestamp=datetime.now(UTC).isoformat()
         )
-
 
 def get_ecg_logger(name: str) -> ECGLogger:
     """Get a structured ECG logger instance"""
