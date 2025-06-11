@@ -144,8 +144,7 @@ class AdvancedMLService:
                 model_config = ModelConfig(
                     num_classes=71,
                     input_channels=12,
-                    sequence_length=5000,
-                    device=self.device
+                    sequence_length=5000
                 )
 
                 hybrid_model = HybridECGModel(model_config)
@@ -170,10 +169,7 @@ class AdvancedMLService:
             cnn_config = ModelConfig(
                 num_classes=71,
                 input_channels=12,
-                sequence_length=5000,
-                use_lstm=False,
-                use_transformer=False,
-                device=self.device
+                sequence_length=5000
             )
             cnn_model = HybridECGModel(cnn_config)
             cnn_model.to(self.device)
@@ -183,10 +179,7 @@ class AdvancedMLService:
             lstm_config = ModelConfig(
                 num_classes=71,
                 input_channels=12,
-                sequence_length=5000,
-                use_cnn=False,
-                use_transformer=False,
-                device=self.device
+                sequence_length=5000
             )
             lstm_model = HybridECGModel(lstm_config)
             lstm_model.to(self.device)
@@ -196,10 +189,7 @@ class AdvancedMLService:
             transformer_config = ModelConfig(
                 num_classes=71,
                 input_channels=12,
-                sequence_length=5000,
-                use_cnn=False,
-                use_lstm=False,
-                device=self.device
+                sequence_length=5000
             )
             transformer_model = HybridECGModel(transformer_config)
             transformer_model.to(self.device)
