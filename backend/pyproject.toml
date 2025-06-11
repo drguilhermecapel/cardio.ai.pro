@@ -45,6 +45,7 @@ aiosqlite = "^0.21.0"
 pyinstaller = "^6.3.0"
 onnx = "^1.18.0"
 matplotlib = "^3.10.3"
+h5py = "^3.14.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
@@ -145,6 +146,8 @@ omit = [
     "*/tests/*",
     "*/migrations/*",
     "*/__init__.py",
+    "app/datasets/ecg_datasets_quickguide.py",
+    "app/datasets/ecg_public_datasets.py",
 ]
 
 [tool.coverage.report]
