@@ -232,7 +232,7 @@ class AdvancedMLService:
         ecg_signal: np.ndarray,
         sampling_rate: float = 500.0,
         patient_context: dict[str, Any] | None = None,
-        return_interpretability: bool = None
+        return_interpretability: bool = False
     ) -> dict[str, Any]:
         """
         Perform advanced ECG analysis using hybrid ML architecture
@@ -436,7 +436,7 @@ class AdvancedMLService:
             detected_conditions = results.get('detected_conditions', {})
 
             for condition_code, condition_data in detected_conditions.items():
-                adaptive_threshold = self.adaptive_threshold_manager.get_threshold(
+                adaptive_threshold = self.adaptive_threshold_manager.get_adaptive_threshold(
                     condition_code, patient_context
                 )
 
