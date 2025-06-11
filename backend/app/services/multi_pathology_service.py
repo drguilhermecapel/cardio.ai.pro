@@ -533,7 +533,7 @@ class MultiPathologyService:
         """
         try:
             result = await self.detect_pathologies_hierarchical(signal, features, preprocessing_quality)
-            
+
             # Convert PathologyDetectionResult to dict format expected by caller
             return {
                 'primary_diagnosis': result.primary_diagnosis,
@@ -549,7 +549,7 @@ class MultiPathologyService:
                 'abnormal_indicators': result.abnormal_indicators,
                 'processing_time_ms': result.processing_time_ms
             }
-            
+
         except Exception as e:
             logger.error(f"Error in detect_multi_pathology: {e}")
             return {
@@ -570,7 +570,7 @@ class MultiPathologyService:
     def _generate_recommendations(self, result: PathologyDetectionResult) -> list[str]:
         """Generate clinical recommendations based on diagnosis"""
         recommendations = []
-        
+
         if result.clinical_urgency == ClinicalUrgency.CRITICAL:
             recommendations.append('URGENT: Immediate cardiology consultation required')
             recommendations.append('Consider emergency intervention if clinically indicated')
@@ -582,7 +582,7 @@ class MultiPathologyService:
             recommendations.append('Continue routine cardiac monitoring')
         else:
             recommendations.append('Routine follow-up as clinically indicated')
-            
+
         # Add specific recommendations based on diagnosis
         if result.primary_diagnosis == 'AFIB':
             recommendations.append('Assess stroke risk and consider anticoagulation')
@@ -590,7 +590,7 @@ class MultiPathologyService:
             recommendations.append('Activate cardiac catheterization protocol if indicated')
         elif result.primary_diagnosis in ['BRADY', 'AVB3']:
             recommendations.append('Evaluate for pacemaker indication')
-            
+
         return recommendations
 
     def _get_icd10_codes(self, diagnosis: str) -> list[str]:
@@ -610,5 +610,5 @@ class MultiPathologyService:
             'PVC': ['I49.3'],
             'PAC': ['I49.1']
         }
-        
+
         return icd10_mapping.get(diagnosis, [])
