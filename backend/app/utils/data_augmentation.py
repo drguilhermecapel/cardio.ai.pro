@@ -198,7 +198,7 @@ class FrequencyDomainAugmenter:
             (8.0, 15.0),  # High-frequency QRS components
         ]
 
-        mask = np.ones_like(signal_fft, dtype=bool)
+        np.ones_like(signal_fft, dtype=bool)
 
         non_critical_indices = []
         for i, freq in enumerate(frequencies):
@@ -408,7 +408,7 @@ class MorphologicalAugmenter:
 
             st_segments = []
 
-            for qrs_start, qrs_end in qrs_locations:
+            for _qrs_start, qrs_end in qrs_locations:
                 st_start = qrs_end
                 st_end = min(len(signal), st_start + int(0.1 * fs))  # 100ms
 
@@ -536,7 +536,7 @@ class ECGDataAugmenter:
         augmented_condition_codes = condition_codes.copy()
 
         for i, (signal, condition_code) in enumerate(zip(signals, condition_codes, strict=False)):
-            for aug_idx in range(augmentation_factor - 1):  # -1 because original is already included
+            for _aug_idx in range(augmentation_factor - 1):  # -1 because original is already included
                 try:
                     augmented_signal = self.augment_signal(signal, condition_code, fs)
                     augmented_signals.append(augmented_signal)

@@ -422,7 +422,7 @@ class ClinicalExplanationGenerator:
                     'reference': criterion.reference_source
                 })
 
-        references = list(set([c.reference_source for c in criteria_list]))
+        references = list({c.reference_source for c in criteria_list})
         criteria_explanation['reference_standards'] = references
 
         return criteria_explanation

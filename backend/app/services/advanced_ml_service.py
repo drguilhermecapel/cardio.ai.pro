@@ -637,7 +637,7 @@ class AdvancedMLService:
                 processing_times = []
                 accuracies = []
 
-                for i in range(num_iterations):
+                for _i in range(num_iterations):
                     sample_idx = np.random.randint(0, len(test_data['signals']))
                     ecg_sample = test_data['signals'][sample_idx]
 

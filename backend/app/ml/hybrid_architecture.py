@@ -435,7 +435,7 @@ class HybridECGModel(nn.Module):
         self.final_classifier = nn.Linear(config.num_classes, config.num_classes)
 
     def forward(self, x, return_features=False):
-        batch_size = x.size(0)
+        x.size(0)
 
         cnn_features = self.cnn(x)  # (batch, channels, seq_len)
 

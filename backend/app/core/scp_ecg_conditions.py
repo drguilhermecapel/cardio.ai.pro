@@ -899,8 +899,8 @@ def validate_scp_conditions() -> dict[str, Any]:
     validation_results = {
         "total_conditions": len(SCP_ECG_CONDITIONS),
         "target_conditions": 71,
-        "categories_covered": len(set(c.category for c in SCP_ECG_CONDITIONS.values())),
-        "urgency_levels": len(set(c.clinical_urgency for c in SCP_ECG_CONDITIONS.values())),
+        "categories_covered": len({c.category for c in SCP_ECG_CONDITIONS.values()}),
+        "urgency_levels": len({c.clinical_urgency for c in SCP_ECG_CONDITIONS.values()}),
         "conditions_with_icd10": len([c for c in SCP_ECG_CONDITIONS.values() if c.icd10_codes]),
         "high_sensitivity_conditions": len([c for c in SCP_ECG_CONDITIONS.values() if c.sensitivity_target >= 0.95]),
         "validation_passed": len(SCP_ECG_CONDITIONS) == 71

@@ -324,7 +324,7 @@ class MultiPathologyService:
     ) -> dict[str, Any]:
         """Level 3: Specific diagnosis within predicted category"""
 
-        category_conditions = get_conditions_by_category(predicted_category)
+        get_conditions_by_category(predicted_category)
         condition_scores = {}
 
         if predicted_category == SCPCategory.ARRHYTHMIA:

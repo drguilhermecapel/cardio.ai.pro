@@ -213,7 +213,7 @@ class InterpretabilityService:
         lead_importance = {}
 
         primary_diagnosis = max(predictions.items(), key=lambda x: x[1])[0]
-        condition = get_condition_by_code(primary_diagnosis)
+        get_condition_by_code(primary_diagnosis)
 
         hr = features.get('heart_rate', 70)
         if primary_diagnosis in ['BRADY', 'TACHY', 'AFIB']:
@@ -462,7 +462,7 @@ class InterpretabilityService:
         vector = []
         for feature_name in self.feature_names:
             value = features.get(feature_name, 0.0)
-            if isinstance(value, (int, float)):
+            if isinstance(value, int | float):
                 vector.append(float(value))
             else:
                 vector.append(0.0)

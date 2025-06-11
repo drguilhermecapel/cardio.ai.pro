@@ -112,7 +112,7 @@ class ECGMultimodalDataset(Dataset):
         """Precompute spectrograms and wavelet representations"""
         logger.info("Precomputing multimodal representations...")
 
-        for i, signal in enumerate(tqdm(self.signals, desc="Computing multimodal features")):
+        for _i, signal in enumerate(tqdm(self.signals, desc="Computing multimodal features")):
             if self.config.use_spectrograms:
                 spectrogram = self._compute_spectrogram(signal)
                 self.spectrograms.append(spectrogram)

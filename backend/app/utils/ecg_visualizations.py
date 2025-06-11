@@ -205,7 +205,7 @@ class ECGVisualizer:
                     y=ecg_signal[i],
                     mode='lines',
                     name=lead_name,
-                    line=dict(color='black', width=1.5),
+                    line={"color": 'black', "width": 1.5},
                     showlegend=False,
                     hovertemplate=f'<b>{lead_name}</b><br>' +
                                  'Time: %{x:.3f}s<br>' +
@@ -219,7 +219,7 @@ class ECGVisualizer:
                 self._add_plotly_annotations(fig, i, analysis_results, time_axis, row, col)
 
         fig.update_layout(
-            title=dict(text=title, x=0.5, font=dict(size=16)),
+            title={"text": title, "x": 0.5, "font": {"size": 16}},
             height=800,
             showlegend=False,
             hovermode='closest',
@@ -275,7 +275,7 @@ class ECGVisualizer:
             y=['Importance'],
             colorscale='RdYlBu_r',
             showscale=True,
-            colorbar=dict(title="Importance Score"),
+            colorbar={"title": "Importance Score"},
             hovertemplate='Feature: %{x}<br>Importance: %{z:.3f}<extra></extra>'
         ))
 
@@ -289,7 +289,7 @@ class ECGVisualizer:
                 y=['Lead Contribution'],
                 colorscale='Viridis',
                 showscale=True,
-                colorbar=dict(title="Lead Contribution", y=0.3),
+                colorbar={"title": "Lead Contribution", "y": 0.3},
                 hovertemplate='Lead: %{x}<br>Contribution: %{z:.3f}<extra></extra>'
             ))
 
@@ -344,7 +344,7 @@ class ECGVisualizer:
                     y=ecg_signal[i],
                     mode='lines',
                     name=f'{lead_name}_signal',
-                    line=dict(color='black', width=1.5),
+                    line={"color": 'black', "width": 1.5},
                     showlegend=False
                 ),
                 row=row, col=col
@@ -362,7 +362,7 @@ class ECGVisualizer:
                             mode='lines',
                             fill='tonexty',
                             name=f'{lead_name}_attention',
-                            line=dict(color='rgba(255, 0, 0, 0.3)', width=0),
+                            line={"color": 'rgba(255, 0, 0, 0.3)', "width": 0},
                             fillcolor='rgba(255, 0, 0, 0.3)',
                             showlegend=False,
                             hovertemplate=f'<b>{lead_name} Attention</b><br>' +
@@ -374,7 +374,7 @@ class ECGVisualizer:
                     )
 
         fig.update_layout(
-            title=dict(text=title, x=0.5, font=dict(size=16)),
+            title={"text": title, "x": 0.5, "font": {"size": 16}},
             height=800,
             showlegend=False,
             hovermode='closest'
@@ -397,7 +397,7 @@ class ECGVisualizer:
         Returns:
             Plotly Figure object
         """
-        primary_diagnosis = analysis_results.get('primary_diagnosis', 'Unknown')
+        analysis_results.get('primary_diagnosis', 'Unknown')
         confidence = analysis_results.get('confidence', 0.0)
         detected_conditions = analysis_results.get('detected_conditions', {})
         clinical_urgency = analysis_results.get('clinical_urgency', 'LOW')
@@ -489,7 +489,7 @@ class ECGVisualizer:
             )
 
         fig.update_layout(
-            title=dict(text=title, x=0.5, font=dict(size=16)),
+            title={"text": title, "x": 0.5, "font": {"size": 16}},
             height=600,
             showlegend=False
         )
@@ -582,7 +582,7 @@ class ECGVisualizer:
 
         fig.text(0.02, 0.02, interpretation_text.strip(),
                 transform=fig.transFigure, fontsize=10,
-                bbox=dict(boxstyle="round,pad=0.3", facecolor="lightgray", alpha=0.8))
+                bbox={"boxstyle": "round,pad=0.3", "facecolor": "lightgray", "alpha": 0.8})
 
     def save_visualization(
         self,
