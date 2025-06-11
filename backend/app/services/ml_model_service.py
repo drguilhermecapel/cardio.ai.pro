@@ -305,38 +305,93 @@ class MLModelService:
     async def _generate_interpretability(
         self, data: "np.ndarray[Any, np.dtype[np.float32]]", classification_results: dict[str, Any]
     ) -> dict[str, Any]:
-        """Generate interpretability maps using gradient-based methods."""
+        """Generate interpretability maps using SHAP-based explanations."""
         try:
+            from app.services.interpretability_service import InterpretabilityService
+            
+            interpretability_service = InterpretabilityService()
+            
+            signal = data[0].T  # Remove batch dimension and transpose back to (time, leads)
+            
+            features = self._extract_features_for_interpretability(signal)
+            
+            explanation_result = await interpretability_service.generate_comprehensive_explanation(
+                signal=signal,
+                features=features,
+                predictions=classification_results["predictions"],
+                model_output=classification_results
+            )
+            
             interpretability = {
-                "attention_maps": {},
-                "feature_importance": {},
-                "explanation": "AI detected patterns consistent with the predicted condition",
-            }
-
-            leads = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
-            for _i, lead in enumerate(leads):
-                attention = np.random.random(data.shape[2]) * classification_results["confidence"]
-                attention_maps = interpretability["attention_maps"]
-                if isinstance(attention_maps, dict):
-                    attention_maps[lead] = attention.tolist()
-
-            predictions = classification_results["predictions"]
-            top_prediction = max(predictions.items(), key=lambda x: x[1])
-
-            interpretability["feature_importance"] = {
-                "most_important_lead": "II",  # Simplified
-                "key_intervals": ["QRS", "ST_segment"],
-                "confidence_factors": [
-                    f"Strong {top_prediction[0]} pattern detected",
-                    f"Confidence: {top_prediction[1]:.2f}",
-                ],
+                "attention_maps": explanation_result.attention_maps,
+                "feature_importance": explanation_result.feature_importance,
+                "explanation": explanation_result.clinical_explanation.get('primary_diagnosis', 
+                    "AI detected patterns consistent with the predicted condition"),
+                "shap_explanation": explanation_result.shap_explanation,
+                "lime_explanation": explanation_result.lime_explanation,
+                "clinical_explanation": explanation_result.clinical_explanation,
+                "diagnostic_criteria": explanation_result.diagnostic_criteria,
+                "risk_factors": explanation_result.risk_factors,
+                "recommendations": explanation_result.recommendations
             }
 
             return interpretability
 
         except Exception as e:
-            logger.error(f"Interpretability generation failed: {str(e)}")
-            return {"explanation": "Interpretability analysis unavailable"}
+            logger.error(f"SHAP-based interpretability generation failed: {str(e)}")
+            return {
+                "explanation": "Interpretability analysis unavailable",
+                "attention_maps": {},
+                "feature_importance": {},
+                "error": str(e)
+            }
+    
+    def _extract_features_for_interpretability(self, signal: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
+        """Extract basic features from ECG signal for interpretability analysis."""
+        try:
+            features = {}
+            
+            features['signal_length'] = signal.shape[0]
+            features['num_leads'] = signal.shape[1]
+            
+            if signal.shape[0] > 0:
+                lead_ii = signal[:, 1] if signal.shape[1] > 1 else signal[:, 0]
+                peaks = np.where(np.diff(np.sign(np.diff(lead_ii))) < 0)[0]
+                if len(peaks) > 1:
+                    rr_intervals = np.diff(peaks) / 500.0  # Assuming 500 Hz sampling rate
+                    features['heart_rate'] = 60.0 / np.mean(rr_intervals) if len(rr_intervals) > 0 else 70.0
+                    features['rr_mean'] = np.mean(rr_intervals) * 1000  # Convert to ms
+                    features['rr_std'] = np.std(rr_intervals) * 1000
+                else:
+                    features['heart_rate'] = 70.0
+                    features['rr_mean'] = 857.0  # ~70 bpm
+                    features['rr_std'] = 50.0
+            
+            for i, lead_name in enumerate(["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]):
+                if i < signal.shape[1]:
+                    lead_signal = signal[:, i]
+                    features[f'{lead_name}_amplitude_max'] = float(np.max(lead_signal))
+                    features[f'{lead_name}_amplitude_min'] = float(np.min(lead_signal))
+                    features[f'{lead_name}_std'] = float(np.std(lead_signal))
+            
+            features['qrs_duration'] = 100.0  # Default values - would be calculated from actual signal
+            features['pr_interval'] = 160.0
+            features['qt_interval'] = 400.0
+            features['qtc'] = 420.0
+            features['qrs_axis'] = 60.0
+            
+            features['st_elevation_max'] = 0.0
+            features['st_depression_max'] = 0.0
+            
+            return features
+            
+        except Exception as e:
+            logger.error(f"Feature extraction failed: {str(e)}")
+            return {
+                'heart_rate': 70.0,
+                'signal_length': signal.shape[0] if signal.size > 0 else 0,
+                'num_leads': signal.shape[1] if signal.size > 0 else 0
+            }
 
     def get_model_info(self) -> dict[str, Any]:
         """Get information about loaded models."""
