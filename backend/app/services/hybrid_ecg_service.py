@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     import wfdb
 else:
     try:
-        import pywt
+        import pywt  # type: ignore[import-untyped]
         import wfdb
     except ImportError:
         pywt = None  # type: ignore
@@ -67,12 +67,11 @@ class UniversalECGReader:
                     if loop.is_running():
                         return {"data": result}
                     else:
-                        result = loop.run_until_complete(result)
+                        if inspect.iscoroutine(result):
+                            result = loop.run_until_complete(result)
                 except RuntimeError:
                     if inspect.iscoroutine(result):
                         result = asyncio.run(result)
-                    else:
-                        pass
 
             if isinstance(result, dict):
                 return result
