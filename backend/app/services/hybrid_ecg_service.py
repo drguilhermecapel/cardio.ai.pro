@@ -609,7 +609,7 @@ class HybridECGAnalysisService:
             )
             
             # Comprehensive quality analysis
-            comprehensive_quality = self.quality_analyzer.assess_signal_quality_comprehensive(processed_signal)
+            self.quality_analyzer.assess_signal_quality_comprehensive(processed_signal)
             
             logger.info(f"Advanced preprocessing completed. Signal shape: {processed_signal.shape}")
             logger.info(f"Signal quality score: {quality_metrics['quality_score']:.3f}")

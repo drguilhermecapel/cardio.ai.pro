@@ -11,7 +11,7 @@ import pandas as pd
 import requests
 import zipfile
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple, Union
+from typing import Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime
 from tqdm import tqdm
@@ -44,13 +44,13 @@ class ECGRecord:
     """Estrutura padronizada para registros de ECG"""
     signal: np.ndarray
     sampling_rate: int
-    labels: List[str] = field(default_factory=list)
+    labels: list[str] = field(default_factory=list)
     patient_id: str = ""
     age: Optional[int] = None
-    sex: Optional[str] = None
-    leads: List[str] = field(default_factory=list)
-    metadata: Dict = field(default_factory=dict)
-    annotations: Optional[Dict] = None
+    sex: str | None = None
+    leads: list[str] = field(default_factory=list)
+    metadata: dict = field(default_factory=dict)
+    annotations: dict | None = None
 
 
 class ECGDatasetDownloader:
@@ -97,8 +97,8 @@ class ECGDatasetDownloader:
         self.logger = logging.getLogger(__name__)
     
     def download_mit_bih(self, 
-                        records_to_download: Optional[List[str]] = None,
-                        force_redownload: bool = False) -> Optional[str]:
+                        records_to_download: list[str] | None = None,
+                        force_redownload: bool = False) -> str | None:
         """
         Baixa o dataset MIT-BIH Arrhythmia
         
@@ -197,7 +197,7 @@ class ECGDatasetDownloader:
         
         return str(dataset_dir)
     
-    def get_dataset_info(self, dataset_name: str) -> Dict:
+    def get_dataset_info(self, dataset_name: str) -> dict:
         return self.DATASETS_INFO.get(dataset_name, {})
     
     def list_available_datasets(self):
@@ -233,7 +233,7 @@ class ECGDatasetLoader:
         self.label_mappings = self._initialize_label_mappings()
         self.logger = logging.getLogger(__name__)
     
-    def _initialize_label_mappings(self) -> Dict:
+    def _initialize_label_mappings(self) -> dict:
         """Inicializa mapeamentos de labels entre datasets"""
         return {
             'mit-bih': {
@@ -256,7 +256,7 @@ class ECGDatasetLoader:
     def load_mit_bih(self, 
                     dataset_path: str,
                     preprocess: bool = True,
-                    max_records: Optional[int] = None) -> List[ECGRecord]:
+                    max_records: int | None = None) -> list[ECGRecord]:
         """
         Carrega registros do MIT-BIH
         
@@ -342,8 +342,8 @@ class ECGDatasetLoader:
     def load_ptb_xl(self,
                    dataset_path: str,
                    sampling_rate: int = 100,
-                   max_records: Optional[int] = None,
-                   preprocess: bool = True) -> List[ECGRecord]:
+                   max_records: int | None = None,
+                   preprocess: bool = True) -> list[ECGRecord]:
         """
         Carrega registros do PTB-XL
         
@@ -446,7 +446,7 @@ class ECGDatasetLoader:
         return ecg_records
     
     def create_unified_dataset(self, 
-                             datasets: Dict[str, List[ECGRecord]],
+                             datasets: dict[str, list[ECGRecord]],
                              output_path: str = "unified_ecg_dataset.h5") -> str:
         """
         Cria um dataset unificado em formato HDF5
@@ -504,7 +504,7 @@ class ECGDatasetAnalyzer:
         self.stats = {}
         self.logger = logging.getLogger(__name__)
         
-    def analyze_dataset(self, records: List[ECGRecord], dataset_name: str = "Dataset") -> Dict:
+    def analyze_dataset(self, records: list[ECGRecord], dataset_name: str = "Dataset") -> dict:
         """
         Analisa estatísticas de um dataset
         
@@ -565,7 +565,7 @@ class ECGDatasetAnalyzer:
         self.stats[dataset_name] = stats
         return stats
     
-    def _print_summary(self, stats: Dict):
+    def _print_summary(self, stats: dict):
         """Imprime resumo das estatísticas"""
         print(f"\nTotal de registros: {stats['total_records']}")
         print(f"Duração total: {stats['total_duration_hours']:.1f} horas")
@@ -590,7 +590,7 @@ class ECGDatasetAnalyzer:
                 print(f"  {sex}: {count} ({count/stats['total_records']*100:.1f}%)")
 
 
-def quick_download_datasets(datasets: List[str] = ['mit-bih'], base_dir: str = "ecg_datasets") -> Dict[str, str]:
+def quick_download_datasets(datasets: list[str] = ['mit-bih'], base_dir: str = "ecg_datasets") -> dict[str, str]:
     """
     Download rápido de datasets
     
@@ -627,8 +627,8 @@ def quick_download_datasets(datasets: List[str] = ['mit-bih'], base_dir: str = "
     return paths
 
 
-def load_and_preprocess_all(dataset_paths: Dict[str, str], 
-                          max_records_per_dataset: Optional[int] = None) -> Dict[str, List[ECGRecord]]:
+def load_and_preprocess_all(dataset_paths: dict[str, str], 
+                          max_records_per_dataset: int | None = None) -> dict[str, list[ECGRecord]]:
     """
     Carrega e pré-processa todos os datasets
     
@@ -661,9 +661,9 @@ def load_and_preprocess_all(dataset_paths: Dict[str, str],
     return all_datasets
 
 
-def prepare_ml_dataset(records: List[ECGRecord], 
+def prepare_ml_dataset(records: list[ECGRecord], 
                       window_size: int = 3600,
-                      target_labels: Optional[List[str]] = None) -> Tuple[np.ndarray, np.ndarray]:
+                      target_labels: list[str] | None = None) -> tuple[np.ndarray, np.ndarray]:
     """
     Prepara dataset para treinamento de ML
     

@@ -5,7 +5,7 @@ Integrado com o sistema CardioAI Pro
 
 import logging
 import numpy as np
-from typing import List, Dict, Optional, Tuple
+from typing import Optional
 from pathlib import Path
 
 from ..datasets import (
@@ -34,7 +34,7 @@ class DatasetService:
         
         self.logger = logging.getLogger(__name__)
     
-    def download_dataset(self, dataset_name: str, **kwargs) -> Optional[str]:
+    def download_dataset(self, dataset_name: str, **kwargs) -> str | None:
         """
         Baixa um dataset específico
         
@@ -62,11 +62,11 @@ class DatasetService:
             self.logger.error(f"Erro ao baixar {dataset_name}: {e}")
             return None
     
-    def load_dataset(self, 
-                    dataset_name: str, 
+    def load_dataset(self,
+                    dataset_name: str,
                     dataset_path: str,
                     preprocess: bool = True,
-                    max_records: Optional[int] = None) -> List[ECGRecord]:
+                    max_records: int | None = None) -> list[ECGRecord]:
         """
         Carrega um dataset com pré-processamento opcional
         
@@ -102,7 +102,7 @@ class DatasetService:
             self.logger.error(f"Erro ao carregar {dataset_name}: {e}")
             return []
     
-    def analyze_dataset(self, records: List[ECGRecord], dataset_name: str) -> Dict:
+    def analyze_dataset(self, records: list[ECGRecord], dataset_name: str) -> dict:
         """
         Analisa estatísticas de um dataset
         
@@ -115,10 +115,10 @@ class DatasetService:
         """
         return self.analyzer.analyze_dataset(records, dataset_name)
     
-    def prepare_for_ml(self, 
-                      records: List[ECGRecord],
+    def prepare_for_ml(self,
+                      records: list[ECGRecord],
                       window_size: int = 3600,
-                      target_labels: Optional[List[str]] = None) -> Tuple[np.ndarray, np.ndarray]:
+                      target_labels: list[str] | None = None) -> tuple[np.ndarray, np.ndarray]:
         """
         Prepara dataset para machine learning
         
@@ -132,7 +132,7 @@ class DatasetService:
         """
         return prepare_ml_dataset(records, window_size, target_labels)
     
-    def quick_setup_mit_bih(self, num_records: int = 10) -> Tuple[Optional[List[ECGRecord]], Optional[Dict]]:
+    def quick_setup_mit_bih(self, num_records: int = 10) -> tuple[list[ECGRecord] | None, dict | None]:
         """
         Setup rápido do MIT-BIH para testes
         
@@ -167,12 +167,12 @@ class DatasetService:
             self.logger.error(f"Erro no setup rápido: {e}")
             return None, None
     
-    def get_available_datasets(self) -> Dict[str, Dict]:
+    def get_available_datasets(self) -> dict[str, dict]:
         """Retorna informações sobre datasets disponíveis"""
         return self.downloader.DATASETS_INFO
     
-    def create_unified_dataset(self, 
-                             datasets: Dict[str, List[ECGRecord]],
+    def create_unified_dataset(self,
+                             datasets: dict[str, list[ECGRecord]],
                              output_path: str = "unified_ecg_dataset.h5") -> str:
         """
         Cria dataset unificado em formato HDF5
@@ -186,7 +186,7 @@ class DatasetService:
         """
         return self.loader.create_unified_dataset(datasets, output_path)
     
-    def validate_environment(self) -> Dict[str, bool]:
+    def validate_environment(self) -> dict[str, bool]:
         """
         Valida se o ambiente tem todas as dependências necessárias
         
@@ -196,25 +196,25 @@ class DatasetService:
         dependencies = {}
         
         try:
-            import wfdb
+            import wfdb  # noqa: F401
             dependencies['wfdb'] = True
         except ImportError:
             dependencies['wfdb'] = False
-        
+
         try:
-            import h5py
+            import h5py  # noqa: F401
             dependencies['h5py'] = True
         except ImportError:
             dependencies['h5py'] = False
-        
+
         try:
-            import pandas
+            import pandas  # noqa: F401
             dependencies['pandas'] = True
         except ImportError:
             dependencies['pandas'] = False
-        
+
         try:
-            from ..preprocessing import AdvancedECGPreprocessor
+            from ..preprocessing import AdvancedECGPreprocessor  # noqa: F401
             dependencies['advanced_preprocessor'] = True
         except ImportError:
             dependencies['advanced_preprocessor'] = False
