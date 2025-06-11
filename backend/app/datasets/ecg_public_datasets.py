@@ -14,7 +14,7 @@ from typing import Any, Optional
 import h5py  # type: ignore
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from tqdm import tqdm  # type: ignore[import-untyped]
 
 try:
     import wfdb
