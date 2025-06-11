@@ -9,7 +9,7 @@ unzip cardioai-pro-v1.0.0.zip
 cd cardioai-pro-v1.0.0/
 
 # 2. Executar o instalador
-./install-cardioai-pro.sh
+./docker-compose up -d --build
 ```
 
 O instalador irá:
@@ -62,8 +62,8 @@ docker-compose logs -f
    ```
 
 2. **Execute o instalador automático**
-   - Clique com o botão direito em `install-cardioai-pro.bat`
-   - Selecione "Executar como administrador"
+   - Baixe `CardioAI-Pro-1.0.0-installer.exe`
+   - Clique com o botão direito e escolha "Executar como administrador"
    - Siga as instruções na tela
 
 ### Método 1B: Instalação Manual (Sem PowerShell)
@@ -76,10 +76,14 @@ docker-compose logs -f
    https://github.com/drguilhermecapel/cardio.ai.pro
    ```
 
-2. **Execute o instalador manual**
-   - Clique duas vezes em `install-cardioai-pro-simple.bat`
-   - Siga as instruções passo-a-passo na tela
-   - Cada passo será explicado detalhadamente
+2. **Compile manualmente a partir do código fonte**
+   - Execute os scripts em `windows_installer/`:
+     ```cmd
+     python build_backend.py
+     python build_frontend.py
+     makensis cardioai_installer.nsi
+     ```
+   - Use o instalador gerado em `frontend/dist-electron/`
 
 3. **Aguarde a instalação automática**
    - O instalador irá automaticamente:
@@ -95,8 +99,8 @@ docker-compose logs -f
 # Navegue até o diretório do projeto
 cd C:\caminho\para\cardio.ai.pro
 
-# Execute o instalador PowerShell
-.\install-cardioai-pro.ps1
+# Execute o instalador
+CardioAI-Pro-1.0.0-installer.exe
 ```
 
 ### O que o Instalador Windows Faz Automaticamente
@@ -224,7 +228,7 @@ Para reinstalar completamente:
 
 3. **Executar instalador novamente:**
    ```powershell
-   .\install-cardioai-pro.ps1
+   CardioAI-Pro-1.0.0-installer.exe
    ```
 
 ### Software Necessário

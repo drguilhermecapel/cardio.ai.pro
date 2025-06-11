@@ -16,14 +16,11 @@ Esta versão standalone do CardioAI Pro foi projetada para usuários que desejam
 
 ### Opção 1: Instalação Automática (Recomendada)
 
-1. **Baixe os arquivos:**
-   - `install-cardioai-pro-standalone.bat`
+1. **Baixe o instalador:**
    - `CardioAI-Pro-v1.0.0-Setup.exe`
 
-2. **Coloque ambos os arquivos na mesma pasta**
-
-3. **Execute a instalação:**
-   - Clique duas vezes em `install-cardioai-pro-standalone.bat`
+2. **Execute a instalação:**
+   - Clique duas vezes no arquivo
    - Clique em "Sim" quando o Windows solicitar privilégios de administrador
    - Aguarde a conclusão da instalação
 

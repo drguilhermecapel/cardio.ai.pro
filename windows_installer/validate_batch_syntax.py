@@ -5,6 +5,7 @@ Validate Windows batch script syntax for potential parsing issues
 
 import re
 import sys
+from pathlib import Path
 
 def validate_batch_syntax(filepath):
     """Check for common Windows batch syntax issues"""
@@ -35,5 +36,6 @@ def validate_batch_syntax(filepath):
         return True
 
 if __name__ == "__main__":
-    success = validate_batch_syntax("build_installer.bat")
+    script_path = Path(__file__).parent / "test_node_version_check.bat"
+    success = validate_batch_syntax(str(script_path))
     sys.exit(0 if success else 1)
