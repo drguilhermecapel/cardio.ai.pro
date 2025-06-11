@@ -518,5 +518,97 @@ class MultiPathologyService:
             level_completed=3,
             category_probabilities=category_result['category_probabilities'],
             abnormal_indicators=normal_abnormal_result['abnormal_indicators'],
-            processing_time_ms=0  # Will be set by caller
+            processing_time_ms=0.0  # Will be set by caller
         )
+
+    async def detect_multi_pathology(
+        self,
+        signal: np.ndarray,
+        features: dict[str, Any],
+        preprocessing_quality: float
+    ) -> dict[str, Any]:
+        """
+        Wrapper method for detect_pathologies_hierarchical to match expected interface
+        Returns dict format expected by hybrid_ecg_service.py
+        """
+        try:
+            result = await self.detect_pathologies_hierarchical(signal, features, preprocessing_quality)
+            
+            # Convert PathologyDetectionResult to dict format expected by caller
+            return {
+                'primary_diagnosis': result.primary_diagnosis,
+                'confidence': result.confidence,
+                'clinical_urgency': result.clinical_urgency,
+                'detected_conditions': result.detected_conditions,
+                'level_completed': result.level_completed,
+                'secondary_diagnoses': [],  # Extract from detected_conditions if needed
+                'requires_immediate_attention': result.clinical_urgency in [ClinicalUrgency.CRITICAL, ClinicalUrgency.HIGH],
+                'recommendations': self._generate_recommendations(result),
+                'icd10_codes': self._get_icd10_codes(result.primary_diagnosis),
+                'category_probabilities': result.category_probabilities,
+                'abnormal_indicators': result.abnormal_indicators,
+                'processing_time_ms': result.processing_time_ms
+            }
+            
+        except Exception as e:
+            logger.error(f"Error in detect_multi_pathology: {e}")
+            return {
+                'primary_diagnosis': 'NONSPECIFIC',
+                'confidence': 0.5,
+                'clinical_urgency': ClinicalUrgency.LOW,
+                'detected_conditions': {'NONSPECIFIC': 0.5},
+                'level_completed': 0,
+                'secondary_diagnoses': [],
+                'requires_immediate_attention': False,
+                'recommendations': ['Unable to complete analysis due to processing error'],
+                'icd10_codes': [],
+                'category_probabilities': {},
+                'abnormal_indicators': [('processing_error', 1.0)],
+                'processing_time_ms': 0.0
+            }
+
+    def _generate_recommendations(self, result: PathologyDetectionResult) -> list[str]:
+        """Generate clinical recommendations based on diagnosis"""
+        recommendations = []
+        
+        if result.clinical_urgency == ClinicalUrgency.CRITICAL:
+            recommendations.append('URGENT: Immediate cardiology consultation required')
+            recommendations.append('Consider emergency intervention if clinically indicated')
+        elif result.clinical_urgency == ClinicalUrgency.HIGH:
+            recommendations.append('Cardiology consultation recommended within 24 hours')
+            recommendations.append('Monitor patient closely for symptom progression')
+        elif result.clinical_urgency == ClinicalUrgency.MEDIUM:
+            recommendations.append('Follow-up with cardiology as clinically appropriate')
+            recommendations.append('Continue routine cardiac monitoring')
+        else:
+            recommendations.append('Routine follow-up as clinically indicated')
+            
+        # Add specific recommendations based on diagnosis
+        if result.primary_diagnosis == 'AFIB':
+            recommendations.append('Assess stroke risk and consider anticoagulation')
+        elif result.primary_diagnosis in ['STEMI', 'NSTEMI']:
+            recommendations.append('Activate cardiac catheterization protocol if indicated')
+        elif result.primary_diagnosis in ['BRADY', 'AVB3']:
+            recommendations.append('Evaluate for pacemaker indication')
+            
+        return recommendations
+
+    def _get_icd10_codes(self, diagnosis: str) -> list[str]:
+        """Get ICD-10 codes for diagnosis"""
+        icd10_mapping = {
+            'AFIB': ['I48.0', 'I48.1', 'I48.2'],
+            'STEMI': ['I21.0', 'I21.1', 'I21.2', 'I21.3'],
+            'NSTEMI': ['I21.4'],
+            'BRADY': ['R00.1'],
+            'TACHY': ['R00.0'],
+            'AVB1': ['I44.0'],
+            'AVB2M1': ['I44.1'],
+            'AVB2M2': ['I44.1'],
+            'AVB3': ['I44.2'],
+            'VTAC': ['I47.2'],
+            'VFIB': ['I49.01'],
+            'PVC': ['I49.3'],
+            'PAC': ['I49.1']
+        }
+        
+        return icd10_mapping.get(diagnosis, [])
