@@ -16,7 +16,7 @@ import torch
 from app.core.exceptions import ECGProcessingException
 from app.ml.ecg_gan import TimeGAN
 from app.ml.hybrid_architecture import HybridECGModel, ModelConfig
-from app.ml.training_pipeline import TrainingConfig, ECGTrainingPipeline
+from app.ml.training_pipeline import ECGTrainingPipeline, TrainingConfig
 from app.services.interpretability_service import InterpretabilityService
 from app.utils.adaptive_thresholds import AdaptiveThresholdManager
 from app.utils.data_augmentation import AugmentationConfig, ECGDataAugmenter
@@ -376,14 +376,14 @@ class AdvancedMLService:
                     'detected_conditions': results.get('detected_conditions', {}),
                     'confidence': results.get('confidence', 0.0)
                 }
-                
+
                 model_output = {
                     'predictions': results['predictions'],
                     'probabilities': results['probabilities'],
                     'ensemble_outputs': results.get('ensemble_outputs', {}),
                     'ensemble_weights': results.get('ensemble_weights', [1.0])
                 }
-                
+
                 comprehensive_explanation = await self.interpretability_service.generate_comprehensive_explanation(
                     signal=ecg_signal,
                     features=features,
