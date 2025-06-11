@@ -31,7 +31,7 @@ const AIDiagnostics: React.FC = (): JSX.Element => {
 
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/ai/diagnose`, {
+      const response = await fetch(`/api/v1/ai/diagnose`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

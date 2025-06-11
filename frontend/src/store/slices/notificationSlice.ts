@@ -36,6 +36,7 @@ export const fetchNotifications = createAsyncThunk(
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'omit',
     })
 
     if (!response.ok) {
@@ -54,6 +55,7 @@ export const markAsRead = createAsyncThunk(
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'omit',
     })
 
     if (!response.ok) {
@@ -69,6 +71,7 @@ export const fetchUnreadCount = createAsyncThunk('notification/fetchUnreadCount'
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
+    credentials: 'omit',
   })
 
   if (!response.ok) {

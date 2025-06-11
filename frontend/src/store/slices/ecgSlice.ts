@@ -40,6 +40,7 @@ export const uploadECG = createAsyncThunk(
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'omit',
       body: formData,
     })
 
@@ -62,6 +63,7 @@ export const fetchAnalyses = createAsyncThunk(
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'omit',
     })
 
     if (!response.ok) {
@@ -77,6 +79,7 @@ export const fetchAnalysis = createAsyncThunk('ecg/fetchAnalysis', async (analys
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
+    credentials: 'omit',
   })
 
   if (!response.ok) {

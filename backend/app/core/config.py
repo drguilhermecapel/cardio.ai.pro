@@ -41,6 +41,9 @@ class Settings(BaseSettings):
         """Assemble database URL."""
         values = info.data
 
+        if isinstance(v, str) and v != "sqlite+aiosqlite:///./cardioai.db":
+            return v
+
         if values.get("STANDALONE_MODE", True):
             return "sqlite+aiosqlite:///./cardioai.db"
 

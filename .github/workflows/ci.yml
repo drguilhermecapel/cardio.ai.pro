@@ -403,7 +403,6 @@ jobs:
     - name: Run standalone mode tests
       working-directory: ./backend
       env:
-        DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/postgres
         SECRET_KEY: test-secret-key-for-standalone
         ENVIRONMENT: test
         STANDALONE_MODE: true
@@ -418,7 +417,6 @@ jobs:
     - name: Verify standalone executable
       working-directory: ./backend
       env:
-        DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/postgres
         SECRET_KEY: test-secret-key-for-standalone
         ENVIRONMENT: test
         STANDALONE_MODE: true

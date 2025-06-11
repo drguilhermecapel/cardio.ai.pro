@@ -60,7 +60,7 @@ def get_engine() -> AsyncEngine:
                 db_path = os.path.abspath(db_path)
 
             db_dir = os.path.dirname(db_path)
-            if db_dir:
+            if db_dir and db_dir != "/app":
                 try:
                     os.makedirs(db_dir, mode=0o755, exist_ok=True)
                     test_file = Path(db_dir) / ".write_test"
