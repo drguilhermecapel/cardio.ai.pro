@@ -570,6 +570,10 @@ class HybridECGAnalysisService:
         # self.ecg_logger = get_ecg_logger(__name__)  # Disabled for core component
         self.ecg_logger = logger
 
+        self.multi_pathology_service: "MultiPathologyService | None" = None
+        self.interpretability_service: "InterpretabilityService | None" = None
+        self.adaptive_threshold_manager: "AdaptiveThresholdManager | None" = None
+
         try:
             from ..utils.adaptive_thresholds import AdaptiveThresholdManager
             from .interpretability_service import InterpretabilityService
@@ -582,7 +586,6 @@ class HybridECGAnalysisService:
             logger.info("✓ Advanced services initialized (multi-pathology, interpretability, adaptive thresholds)")
         except Exception as e:
             logger.warning(f"Advanced services not available, falling back to simplified analysis: {e}")
-
             self.advanced_services_available = False
 
         try:
@@ -748,7 +751,7 @@ class HybridECGAnalysisService:
                             result['adaptive_threshold'] = adaptive_threshold
                             result['detected_adaptive'] = result['confidence'] > adaptive_threshold
 
-                return pathology_results
+                return pathology_results if isinstance(pathology_results, dict) else {}
 
             except Exception as e:
                 logger.warning(f"Advanced pathology detection failed, falling back to simplified: {e}")

@@ -362,9 +362,9 @@ class MLModelService:
                     features['rr_mean'] = float(np.mean(rr_intervals) * 1000)  # Convert to ms
                     features['rr_std'] = float(np.std(rr_intervals) * 1000)
                 else:
-                    features['heart_rate'] = 70.0
-                    features['rr_mean'] = 857.0  # ~70 bpm
-                    features['rr_std'] = 50.0
+                    features['heart_rate'] = float(70.0)
+                    features['rr_mean'] = float(857.0)  # ~70 bpm
+                    features['rr_std'] = float(50.0)
 
             for i, lead_name in enumerate(["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]):
                 if i < signal.shape[1]:
@@ -373,14 +373,14 @@ class MLModelService:
                     features[f'{lead_name}_amplitude_min'] = float(np.min(lead_signal))
                     features[f'{lead_name}_std'] = float(np.std(lead_signal))
 
-            features['qrs_duration'] = 100.0  # Default values - would be calculated from actual signal
-            features['pr_interval'] = 160.0
-            features['qt_interval'] = 400.0
-            features['qtc'] = 420.0
-            features['qrs_axis'] = 60.0
+            features['qrs_duration'] = float(100.0)  # Default values - would be calculated from actual signal
+            features['pr_interval'] = float(160.0)
+            features['qt_interval'] = float(400.0)
+            features['qtc'] = float(420.0)
+            features['qrs_axis'] = float(60.0)
 
-            features['st_elevation_max'] = 0.0
-            features['st_depression_max'] = 0.0
+            features['st_elevation_max'] = float(0.0)
+            features['st_depression_max'] = float(0.0)
 
             return features
 
