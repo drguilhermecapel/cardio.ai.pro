@@ -145,6 +145,8 @@ omit = [
     "*/tests/*",
     "*/migrations/*",
     "*/__init__.py",
+    "app/datasets/ecg_datasets_quickguide.py",
+    "app/datasets/ecg_public_datasets.py",
 ]
 
 [tool.coverage.report]
