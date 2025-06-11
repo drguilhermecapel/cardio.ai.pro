@@ -35,11 +35,12 @@
    cd cardio.ai.pro
    ```
 
-2. **Run Build Script**:
+2. **Run Build Scripts**:
    ```bash
    cd windows_installer
-   # Double-click or run from command line:
-   build_installer.bat
+   python build_backend.py
+   python build_frontend.py
+   makensis cardioai_installer.nsi
    ```
 
 3. **Generated Files**:

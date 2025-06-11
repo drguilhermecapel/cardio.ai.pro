@@ -15,8 +15,8 @@
 
 #### Opção 1: Duplo Clique (Mais Fácil) ✅
 1. Navegue até a pasta `cardio.ai.pro\windows_installer`
-2. **Duplo clique** no arquivo `build_installer.bat`
-3. ✅ O instalador navegará automaticamente para o diretório correto
+2. **Duplo clique** em `build_backend.py` e depois em `build_frontend.py`
+3. Por fim, execute `cardioai_installer.nsi` com o NSIS para gerar o instalador
 
 #### Opção 2: Prompt de Comando
 1. Abra o **Prompt de Comando** (cmd) ou **PowerShell**
@@ -24,9 +24,11 @@
    ```cmd
    cd caminho\para\cardio.ai.pro\windows_installer
    ```
-3. Execute o instalador:
+3. Execute os scripts de build e compile o instalador:
    ```cmd
-   build_installer.bat
+   python build_backend.py
+   python build_frontend.py
+   makensis cardioai_installer.nsi
    ```
 
 **✅ IMPORTANTE**: O instalador agora funciona independentemente de onde você o executa!

@@ -48,9 +48,11 @@ Before building the installer, ensure you have the following tools installed:
    ```cmd
    cd path\to\cardio.ai.pro\windows_installer
    ```
-3. Run the automated build script:
+3. Run the build scripts:
    ```cmd
-   build_installer.bat
+   python build_backend.py
+   python build_frontend.py
+   makensis cardioai_installer.nsi
    ```
 
 The script will:

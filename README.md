@@ -8,7 +8,6 @@ Sistema de análise de ECG com IA para diagnóstico médico avançado.
 
 ### Downloads Standalone
 - **[CardioAI-Pro-1.0.0-installer.exe](frontend/dist-electron/CardioAI-Pro-1.0.0-installer.exe)** (229 MB) - Instalador unificado
-- **[build_installer.bat](windows_installer/build_installer.bat)** - Script de compilação do instalador
 
 ### Instalação Simples
 ```bash
@@ -21,8 +20,11 @@ Sistema de análise de ECG com IA para diagnóstico médico avançado.
 # Opção 2: Compilar do código fonte
 # 1. Clone o repositório
 # 2. Navegue para windows_installer/
-# 3. Clique duas vezes em: build_installer.bat
-# 4. Use o instalador gerado
+# 3. Execute os scripts de build:
+#    python build_backend.py
+#    python build_frontend.py
+# 4. Compile o instalador com o NSIS:
+#    makensis cardioai_installer.nsi
 ```
 
 **📖 [Guia Completo da Versão Standalone](README-STANDALONE.md)**
@@ -74,8 +76,13 @@ Sistema de análise de ECG com IA para diagnóstico médico avançado.
 # Método 2: Compilar do Código Fonte
 1. Clone o repositório
 2. Navegue para windows_installer/
-3. Clique duas vezes em: build_installer.bat
-4. Use o instalador gerado em frontend/dist-electron/
+3. Execute:
+   ```bash
+   python build_backend.py
+   python build_frontend.py
+   makensis cardioai_installer.nsi
+   ```
+4. O instalador será gerado em `frontend/dist-electron/`
 ```
 
 ### 🐳 Versão Docker (Para Desenvolvedores)
@@ -109,9 +116,11 @@ Se você deseja compilar o instalador a partir do código fonte:
    cd windows_installer
    ```
 
-3. **Execute o script de compilação**:
+3. **Execute os scripts de build**:
    ```bash
-   build_installer.bat
+   python build_backend.py
+   python build_frontend.py
+   makensis cardioai_installer.nsi
    ```
 
 Para instruções detalhadas de desenvolvimento, consulte `windows_installer/README.md`.
