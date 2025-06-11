@@ -39,6 +39,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JS
       return false
     } catch (error) {
       console.error('Login error:', error)
+      console.log('Debug: credentials omit applied')
       return false
     }
   }
