@@ -370,9 +370,25 @@ class AdvancedMLService:
 
         if self.interpretability_service:
             try:
+                # Extract features and model output for interpretability analysis
+                features = {
+                    'signal_features': results.get('ensemble_outputs', {}),
+                    'detected_conditions': results.get('detected_conditions', {}),
+                    'confidence': results.get('confidence', 0.0)
+                }
+                
+                model_output = {
+                    'predictions': results['predictions'],
+                    'probabilities': results['probabilities'],
+                    'ensemble_outputs': results.get('ensemble_outputs', {}),
+                    'ensemble_weights': results.get('ensemble_weights', [1.0])
+                }
+                
                 comprehensive_explanation = await self.interpretability_service.generate_comprehensive_explanation(
                     signal=ecg_signal,
-                    predictions=results['probabilities']
+                    features=features,
+                    predictions=results['probabilities'],
+                    model_output=model_output
                 )
 
                 results['detailed_interpretability'] = {
