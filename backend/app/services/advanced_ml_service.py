@@ -510,10 +510,8 @@ class AdvancedMLService:
             training_pipeline = ECGTrainingPipeline(training_config)
 
             logger.info("Starting model training...")
-            training_results = await training_pipeline.train(
-                train_dataset=training_data,
-                val_dataset=validation_data
-            )
+            # Training pipeline handles data loading internally
+            training_results = training_pipeline.train()
 
             if 'best_model_path' in training_results:
                 await self._load_trained_model(training_results['best_model_path'])
