@@ -4,9 +4,17 @@ Tests deep learning components and integrated dataset functionality
 """
 
 import pytest
-import torch
-import torch.nn as nn
 import numpy as np
+from unittest.mock import Mock, patch, MagicMock
+
+try:
+    import torch
+    import torch.nn as nn
+    HAS_TORCH = True
+except ImportError:
+    HAS_TORCH = False
+    torch = MagicMock()
+    torch.nn = MagicMock()
 from unittest.mock import Mock, patch, MagicMock
 import asyncio
 from typing import Dict, Any, Tuple
