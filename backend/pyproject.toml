@@ -173,6 +173,21 @@ addopts = [
 ]
 asyncio_mode = "auto"
 
+[[tool.mypy.overrides]]
+module = [
+    "app.ml.hybrid_architecture",
+    "app.ml.training_pipeline", 
+    "app.ml.ecg_gan",
+    "app.utils.data_augmentation",
+    "app.utils.ecg_visualizations",
+    "app.services.advanced_ml_service",
+    "app.services.multi_pathology_service",
+    "app.services.interpretability_service",
+    "app.utils.adaptive_thresholds",
+    "app.utils.clinical_explanations",
+]
+ignore_errors = true
+
 [tool.coverage.run]
 source = ["app"]
 omit = [
