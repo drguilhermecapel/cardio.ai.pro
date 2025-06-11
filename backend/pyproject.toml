@@ -90,7 +90,7 @@ pyedflib = "^0.1.40"
 pywavelets = "^1.8.0"
 
 # Type stubs for ML libraries
-types-scikit-learn = "^1.2.0"
+# Note: scikit-learn type stubs are included in the main package
 
 [build-system]
 requires = ["poetry-core"]
