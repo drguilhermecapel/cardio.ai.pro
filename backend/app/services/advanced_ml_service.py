@@ -371,8 +371,7 @@ class AdvancedMLService:
             try:
                 comprehensive_explanation = await self.interpretability_service.generate_comprehensive_explanation(
                     signal=ecg_signal,
-                    model_predictions=results['probabilities'],
-                    detected_conditions=results.get('detected_conditions', {})
+                    predictions=results['probabilities']
                 )
 
                 results['detailed_interpretability'] = {
