@@ -109,10 +109,20 @@ def get_node_version():
     except:
         return "Not available"
 
+def detect_npm_command():
+    """Detect npm command with support for portable installations."""
+    portable_node_dir = Path(__file__).parent / "portable_node"
+    portable_npm = portable_node_dir / "npm.cmd"
+    
+    if portable_npm.exists():
+        return str(portable_npm)
+    return "npm"
+
 def get_npm_version():
     """Get npm version safely."""
     try:
-        result = subprocess.run(["npm", "--version"], capture_output=True, text=True, check=True)
+        npm_cmd = detect_npm_command()
+        result = subprocess.run([npm_cmd, "--version"], capture_output=True, text=True, check=True)
         return result.stdout.strip()
     except:
         return "Not available"
@@ -134,7 +144,8 @@ def check_environment():
         checks.append(("Node.js", "FAIL", "Node.js not found - install from https://nodejs.org/"))
     
     try:
-        result = subprocess.run(["npm", "--version"], capture_output=True, text=True, check=True)
+        npm_cmd = detect_npm_command()
+        result = subprocess.run([npm_cmd, "--version"], capture_output=True, text=True, check=True)
         npm_version = result.stdout.strip()
         checks.append(("npm", "PASS", f"npm {npm_version}"))
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -196,15 +207,13 @@ def check_node_npm():
         
         portable_node_dir = Path(__file__).parent / "portable_node"
         portable_node = portable_node_dir / "node.exe"
-        portable_npm = portable_node_dir / "npm.cmd"
         
         node_cmd = "node"
-        npm_cmd = "npm"
-        
-        if portable_node.exists() and portable_npm.exists():
+        if portable_node.exists():
             print(f"✅ Using portable Node.js: {portable_node}")
             node_cmd = str(portable_node)
-            npm_cmd = str(portable_npm)
+        
+        npm_cmd = detect_npm_command()
         
         try:
             result = subprocess.run([node_cmd, "--version"], capture_output=True, text=True, check=True, timeout=10)
