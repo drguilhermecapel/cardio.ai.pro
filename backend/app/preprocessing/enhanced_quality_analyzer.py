@@ -125,9 +125,9 @@ class EnhancedSignalQualityAnalyzer:
             lead_quality['issues'] = issues
 
             frequency_quality = lead_quality.get('frequency_quality', 0.5)
-            if not isinstance(frequency_quality, (int, float)):
+            if not isinstance(frequency_quality, int | float):
                 frequency_quality = 0.5
-            
+
             score_components = [
                 min(snr_db / 20, 1.0) * 0.3,  # SNR component (normalized to 20dB max)
                 baseline_stability * 0.25,
@@ -183,7 +183,7 @@ class EnhancedSignalQualityAnalyzer:
             num_leads = ecg_signal.shape[1]
             for key in ['powerline_interference', 'baseline_wander', 'muscle_artifact', 'electrode_noise']:
                 current_value = noise_characteristics[key]
-                if isinstance(current_value, (int, float)):
+                if isinstance(current_value, int | float):
                     noise_characteristics[key] = float(current_value / num_leads)
                 else:
                     noise_characteristics[key] = 0.0
@@ -195,9 +195,9 @@ class EnhancedSignalQualityAnalyzer:
                 'electrode': noise_characteristics['electrode_noise']
             }
 
-            dominant_noise = max(noise_levels.items(), key=lambda x: float(x[1]) if isinstance(x[1], (int, float)) else 0.0)
+            dominant_noise = max(noise_levels.items(), key=lambda x: float(x[1]) if isinstance(x[1], int | float) else 0.0)
             dominant_value = dominant_noise[1]
-            if isinstance(dominant_value, (int, float)) and float(dominant_value) > 0.1:  # Threshold for significant noise
+            if isinstance(dominant_value, int | float) and float(dominant_value) > 0.1:  # Threshold for significant noise
                 noise_characteristics['dominant_noise_type'] = dominant_noise[0]
 
             return noise_characteristics

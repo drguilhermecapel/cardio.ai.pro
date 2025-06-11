@@ -225,7 +225,7 @@ class ECGDatasetLoader:
             preprocessor: Instância do AdvancedECGPreprocessor para pré-processamento
         """
         if preprocessor is None and ADVANCED_PREPROCESSOR_AVAILABLE:
-            self.preprocessor: Optional['AdvancedECGPreprocessor'] = AdvancedECGPreprocessor()
+            self.preprocessor: "AdvancedECGPreprocessor" | None = AdvancedECGPreprocessor()
         else:
             self.preprocessor = preprocessor
 
