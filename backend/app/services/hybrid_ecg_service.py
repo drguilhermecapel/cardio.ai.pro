@@ -14,7 +14,7 @@ import numpy.typing as npt
 import pandas as pd
 from scipy import signal
 from scipy.stats import entropy, kurtosis, skew
-from sklearn.preprocessing import StandardScaler  # type: ignore[import-untyped]
+from sklearn.preprocessing import StandardScaler
 
 from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
@@ -25,11 +25,11 @@ from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
 
 if TYPE_CHECKING:
-    import pywt  # type: ignore[import-untyped]
+    import pywt
     import wfdb
 else:
     try:
-        import pywt  # type: ignore[import-untyped]
+        import pywt
         import wfdb
     except ImportError:
         pywt = None  # type: ignore
@@ -61,14 +61,18 @@ class UniversalECGReader:
             result = self.supported_formats[ext](filepath, sampling_rate or 500)
             if hasattr(result, '__await__'):
                 import asyncio
+                import inspect
                 try:
                     loop = asyncio.get_event_loop()
                     if loop.is_running():
                         return {"data": result}
                     else:
-                        result = loop.run_until_complete(result)  # type: ignore
+                        result = loop.run_until_complete(result)
                 except RuntimeError:
-                    result = asyncio.run(result)  # type: ignore
+                    if inspect.iscoroutine(result):
+                        result = asyncio.run(result)
+                    else:
+                        pass
 
             if isinstance(result, dict):
                 return result
