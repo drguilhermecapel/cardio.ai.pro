@@ -568,9 +568,9 @@ class HybridECGAnalysisService:
         self.ecg_logger = logger
 
         try:
-            from .multi_pathology_service import MultiPathologyService
-            from .interpretability_service import InterpretabilityService
             from ..utils.adaptive_thresholds import AdaptiveThresholdManager
+            from .interpretability_service import InterpretabilityService
+            from .multi_pathology_service import MultiPathologyService
 
             self.multi_pathology_service = MultiPathologyService()
             self.interpretability_service = InterpretabilityService()

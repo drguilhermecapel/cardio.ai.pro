@@ -4,20 +4,20 @@ Implements hierarchical detection: Normal→Category→Specific diagnosis
 Based on scientific recommendations for CardioAI Pro
 """
 
-import numpy as np
-from typing import Dict, List, Any, Tuple, Optional
 import logging
 from dataclasses import dataclass
-import asyncio
+from typing import Any
 
+import numpy as np
+
+from app.core.constants import ClinicalUrgency
 from app.core.scp_ecg_conditions import (
     SCP_ECG_CONDITIONS,
     SCPCategory,
     get_conditions_by_category,
+    get_conditions_by_urgency,
     get_critical_conditions,
-    get_conditions_by_urgency
 )
-from app.core.constants import ClinicalUrgency
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +27,10 @@ class PathologyDetectionResult:
     primary_diagnosis: str
     confidence: float
     clinical_urgency: str
-    detected_conditions: Dict[str, float]
+    detected_conditions: dict[str, float]
     level_completed: int
-    category_probabilities: Dict[str, float]
-    abnormal_indicators: List[Tuple[str, float]]
+    category_probabilities: dict[str, float]
+    abnormal_indicators: list[tuple[str, float]]
     processing_time_ms: float
 
 class MultiPathologyService:
@@ -41,7 +41,7 @@ class MultiPathologyService:
         self.category_thresholds = self._initialize_category_thresholds()
         self.condition_thresholds = self._initialize_condition_thresholds()
 
-    def _initialize_category_thresholds(self) -> Dict[str, float]:
+    def _initialize_category_thresholds(self) -> dict[str, float]:
         """Initialize adaptive thresholds for each category"""
         return {
             SCPCategory.NORMAL: 0.99,  # High threshold for normal (NPV > 99%)
@@ -54,7 +54,7 @@ class MultiPathologyService:
             SCPCategory.OTHER: 0.75
         }
 
-    def _initialize_condition_thresholds(self) -> Dict[str, float]:
+    def _initialize_condition_thresholds(self) -> dict[str, float]:
         """Initialize adaptive thresholds for specific conditions"""
         thresholds = {}
 
@@ -75,7 +75,7 @@ class MultiPathologyService:
     async def detect_pathologies_hierarchical(
         self,
         signal: np.ndarray,
-        features: Dict[str, Any],
+        features: dict[str, Any],
         preprocessing_quality: float
     ) -> PathologyDetectionResult:
         """
@@ -136,8 +136,8 @@ class MultiPathologyService:
             )
 
     async def _level1_normal_vs_abnormal(
-        self, signal: np.ndarray, features: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, signal: np.ndarray, features: dict[str, Any]
+    ) -> dict[str, Any]:
         """Level 1: High-sensitivity normal vs abnormal screening (NPV > 99%)"""
 
         abnormal_indicators = []
@@ -219,8 +219,8 @@ class MultiPathologyService:
         }
 
     async def _level2_category_classification(
-        self, signal: np.ndarray, features: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, signal: np.ndarray, features: dict[str, Any]
+    ) -> dict[str, Any]:
         """Level 2: Category classification for abnormal ECGs"""
 
         category_scores = {}
@@ -320,8 +320,8 @@ class MultiPathologyService:
         }
 
     async def _level3_specific_diagnosis(
-        self, signal: np.ndarray, features: Dict[str, Any], predicted_category: str
-    ) -> Dict[str, Any]:
+        self, signal: np.ndarray, features: dict[str, Any], predicted_category: str
+    ) -> dict[str, Any]:
         """Level 3: Specific diagnosis within predicted category"""
 
         category_conditions = get_conditions_by_category(predicted_category)
@@ -366,7 +366,7 @@ class MultiPathologyService:
             'filtered_conditions': filtered_conditions
         }
 
-    async def _diagnose_arrhythmias(self, features: Dict[str, Any]) -> Dict[str, float]:
+    async def _diagnose_arrhythmias(self, features: dict[str, Any]) -> dict[str, float]:
         """Diagnose specific arrhythmias"""
         scores = {}
 
@@ -399,7 +399,7 @@ class MultiPathologyService:
 
         return scores
 
-    async def _diagnose_conduction_disorders(self, features: Dict[str, Any]) -> Dict[str, float]:
+    async def _diagnose_conduction_disorders(self, features: dict[str, Any]) -> dict[str, float]:
         """Diagnose specific conduction disorders"""
         scores = {}
 
@@ -424,7 +424,7 @@ class MultiPathologyService:
 
         return scores
 
-    async def _diagnose_ischemia(self, features: Dict[str, Any]) -> Dict[str, float]:
+    async def _diagnose_ischemia(self, features: dict[str, Any]) -> dict[str, float]:
         """Diagnose specific ischemic conditions"""
         scores = {}
 
@@ -442,7 +442,7 @@ class MultiPathologyService:
 
         return scores
 
-    async def _diagnose_hypertrophy(self, features: Dict[str, Any]) -> Dict[str, float]:
+    async def _diagnose_hypertrophy(self, features: dict[str, Any]) -> dict[str, float]:
         """Diagnose specific hypertrophy conditions"""
         scores = {}
 
@@ -457,7 +457,7 @@ class MultiPathologyService:
 
         return scores
 
-    async def _diagnose_axis_deviation(self, features: Dict[str, Any]) -> Dict[str, float]:
+    async def _diagnose_axis_deviation(self, features: dict[str, Any]) -> dict[str, float]:
         """Diagnose axis deviation conditions"""
         scores = {}
 
@@ -470,7 +470,7 @@ class MultiPathologyService:
 
         return scores
 
-    async def _diagnose_repolarization(self, features: Dict[str, Any]) -> Dict[str, float]:
+    async def _diagnose_repolarization(self, features: dict[str, Any]) -> dict[str, float]:
         """Diagnose repolarization abnormalities"""
         scores = {}
 
@@ -483,7 +483,7 @@ class MultiPathologyService:
 
         return scores
 
-    async def _diagnose_other_conditions(self, features: Dict[str, Any]) -> Dict[str, float]:
+    async def _diagnose_other_conditions(self, features: dict[str, Any]) -> dict[str, float]:
         """Diagnose other conditions"""
         scores = {}
 
@@ -497,9 +497,9 @@ class MultiPathologyService:
 
     async def _compile_final_diagnosis(
         self,
-        normal_abnormal_result: Dict[str, Any],
-        category_result: Dict[str, Any],
-        specific_result: Dict[str, Any]
+        normal_abnormal_result: dict[str, Any],
+        category_result: dict[str, Any],
+        specific_result: dict[str, Any]
     ) -> PathologyDetectionResult:
         """Compile final diagnosis from all levels"""
 

@@ -3,17 +3,16 @@ Advanced ECG Visualizations for CardioAI Pro
 Provides comprehensive visualization capabilities for ECG analysis results
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.gridspec import GridSpec
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import plotly.express as px
-from typing import Dict, List, Optional, Tuple, Any
 import logging
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
+
+import matplotlib.pyplot as plt
+import numpy as np
+import plotly.graph_objects as go
+from matplotlib.gridspec import GridSpec
+from plotly.subplots import make_subplots
 
 logger = logging.getLogger(__name__)
 
@@ -34,19 +33,19 @@ class ECGVisualizationConfig:
     show_interpretations: bool = True
     paper_speed: float = 25.0  # mm/s
     amplitude_scale: float = 10.0  # mm/mV
-    figure_size: Tuple[int, int] = (15, 10)
+    figure_size: tuple[int, int] = (15, 10)
     dpi: int = 300
     color_scheme: str = "medical"
 
 class ECGVisualizer:
     """Advanced ECG visualization system"""
 
-    def __init__(self, config: Optional[ECGVisualizationConfig] = None):
+    def __init__(self, config: ECGVisualizationConfig | None = None):
         self.config = config or ECGVisualizationConfig()
         self.lead_names = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
         self.color_schemes = self._initialize_color_schemes()
 
-    def _initialize_color_schemes(self) -> Dict[str, Dict[str, str]]:
+    def _initialize_color_schemes(self) -> dict[str, dict[str, str]]:
         """Initialize color schemes for different visualization styles"""
         return {
             "medical": {
@@ -85,7 +84,7 @@ class ECGVisualizer:
         self,
         ecg_signal: np.ndarray,
         sampling_rate: float = 500.0,
-        analysis_results: Optional[Dict[str, Any]] = None,
+        analysis_results: dict[str, Any] | None = None,
         title: str = "12-Lead ECG"
     ) -> plt.Figure:
         """
@@ -167,7 +166,7 @@ class ECGVisualizer:
         self,
         ecg_signal: np.ndarray,
         sampling_rate: float = 500.0,
-        analysis_results: Optional[Dict[str, Any]] = None,
+        analysis_results: dict[str, Any] | None = None,
         title: str = "Interactive 12-Lead ECG"
     ) -> go.Figure:
         """
@@ -252,8 +251,8 @@ class ECGVisualizer:
 
     def create_feature_importance_heatmap(
         self,
-        feature_importance: Dict[str, float],
-        lead_contributions: Optional[Dict[str, float]] = None,
+        feature_importance: dict[str, float],
+        lead_contributions: dict[str, float] | None = None,
         title: str = "ECG Feature Importance"
     ) -> go.Figure:
         """
@@ -306,7 +305,7 @@ class ECGVisualizer:
     def create_attention_visualization(
         self,
         ecg_signal: np.ndarray,
-        attention_weights: Dict[str, List[float]],
+        attention_weights: dict[str, list[float]],
         sampling_rate: float = 500.0,
         title: str = "ECG Attention Visualization"
     ) -> go.Figure:
@@ -385,7 +384,7 @@ class ECGVisualizer:
 
     def create_diagnostic_summary_plot(
         self,
-        analysis_results: Dict[str, Any],
+        analysis_results: dict[str, Any],
         title: str = "ECG Diagnostic Summary"
     ) -> go.Figure:
         """
@@ -497,7 +496,7 @@ class ECGVisualizer:
 
         return fig
 
-    def _add_medical_grid(self, ax: plt.Axes, duration: float, colors: Dict[str, str]) -> None:
+    def _add_medical_grid(self, ax: plt.Axes, duration: float, colors: dict[str, str]) -> None:
         """Add medical-style grid to ECG plot"""
         if not self.config.show_grid:
             return
@@ -522,9 +521,9 @@ class ECGVisualizer:
         self,
         ax: plt.Axes,
         lead_idx: int,
-        analysis_results: Dict[str, Any],
+        analysis_results: dict[str, Any],
         time_axis: np.ndarray,
-        colors: Dict[str, str]
+        colors: dict[str, str]
     ) -> None:
         """Add annotations to individual lead plots"""
         if not self.config.show_annotations:
@@ -545,7 +544,7 @@ class ECGVisualizer:
         self,
         fig: go.Figure,
         lead_idx: int,
-        analysis_results: Dict[str, Any],
+        analysis_results: dict[str, Any],
         time_axis: np.ndarray,
         row: int,
         col: int
@@ -566,7 +565,7 @@ class ECGVisualizer:
                         row=row, col=col
                     )
 
-    def _add_interpretation_text(self, fig: plt.Figure, analysis_results: Dict[str, Any]) -> None:
+    def _add_interpretation_text(self, fig: plt.Figure, analysis_results: dict[str, Any]) -> None:
         """Add interpretation text to the figure"""
         if not self.config.show_interpretations:
             return
@@ -590,7 +589,7 @@ class ECGVisualizer:
         fig: plt.Figure,
         filename: str,
         format: str = "png",
-        dpi: Optional[int] = None
+        dpi: int | None = None
     ) -> str:
         """
         Save visualization to file
@@ -636,10 +635,10 @@ class ECGVisualizer:
 
 def create_standard_ecg_report(
     ecg_signal: np.ndarray,
-    analysis_results: Dict[str, Any],
+    analysis_results: dict[str, Any],
     sampling_rate: float = 500.0,
-    patient_info: Optional[Dict[str, str]] = None
-) -> Tuple[plt.Figure, go.Figure]:
+    patient_info: dict[str, str] | None = None
+) -> tuple[plt.Figure, go.Figure]:
     """
     Create comprehensive ECG report with both static and interactive visualizations
 
@@ -671,10 +670,10 @@ def create_standard_ecg_report(
 
 def create_interpretability_dashboard(
     ecg_signal: np.ndarray,
-    analysis_results: Dict[str, Any],
-    interpretability_results: Dict[str, Any],
+    analysis_results: dict[str, Any],
+    interpretability_results: dict[str, Any],
     sampling_rate: float = 500.0
-) -> List[go.Figure]:
+) -> list[go.Figure]:
     """
     Create comprehensive interpretability dashboard
 

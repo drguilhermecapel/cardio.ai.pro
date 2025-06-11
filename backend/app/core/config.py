@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 from pydantic import ValidationInfo, field_validator
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     """Application settings."""
 

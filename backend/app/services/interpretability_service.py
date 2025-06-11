@@ -4,11 +4,11 @@ Provides clinical explanations for ECG diagnoses
 Based on scientific recommendations for CardioAI Pro
 """
 
-import numpy as np
-from typing import Dict, List, Any, Optional, Tuple
 import logging
 from dataclasses import dataclass
-import asyncio
+from typing import Any
+
+import numpy as np
 
 try:
     import shap
@@ -25,8 +25,7 @@ except ImportError:
     LIME_AVAILABLE = False
     logging.warning("LIME not available - install with: pip install lime")
 
-from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS, get_condition_by_code
-from app.core.constants import ClinicalUrgency
+from app.core.scp_ecg_conditions import get_condition_by_code
 
 logger = logging.getLogger(__name__)
 
@@ -35,14 +34,14 @@ class ExplanationResult:
     """Comprehensive explanation result for ECG diagnosis"""
     primary_diagnosis: str
     confidence: float
-    shap_explanation: Optional[Dict[str, Any]]
-    lime_explanation: Optional[Dict[str, Any]]
-    clinical_explanation: Dict[str, str]
-    attention_maps: Dict[str, np.ndarray]
-    feature_importance: Dict[str, float]
-    diagnostic_criteria: Dict[str, Any]
-    risk_factors: List[str]
-    recommendations: List[str]
+    shap_explanation: dict[str, Any] | None
+    lime_explanation: dict[str, Any] | None
+    clinical_explanation: dict[str, str]
+    attention_maps: dict[str, np.ndarray]
+    feature_importance: dict[str, float]
+    diagnostic_criteria: dict[str, Any]
+    risk_factors: list[str]
+    recommendations: list[str]
 
 class InterpretabilityService:
     """Advanced interpretability with SHAP/LIME integration for ECG analysis"""
@@ -53,7 +52,7 @@ class InterpretabilityService:
         self.feature_names = self._initialize_feature_names()
         self.lead_names = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
 
-    def _initialize_feature_names(self) -> List[str]:
+    def _initialize_feature_names(self) -> list[str]:
         """Initialize comprehensive feature names for ECG analysis"""
 
         features = []
@@ -90,9 +89,9 @@ class InterpretabilityService:
     async def generate_comprehensive_explanation(
         self,
         signal: np.ndarray,
-        features: Dict[str, Any],
-        predictions: Dict[str, float],
-        model_output: Dict[str, Any]
+        features: dict[str, Any],
+        predictions: dict[str, float],
+        model_output: dict[str, Any]
     ) -> ExplanationResult:
         """Generate comprehensive clinical explanation with SHAP/LIME integration"""
 
@@ -160,10 +159,10 @@ class InterpretabilityService:
     async def _generate_shap_explanation(
         self,
         signal: np.ndarray,
-        features: Dict[str, Any],
-        predictions: Dict[str, float],
-        model_output: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
+        features: dict[str, Any],
+        predictions: dict[str, float],
+        model_output: dict[str, Any]
+    ) -> dict[str, Any] | None:
         """Generate SHAP-based feature importance explanation"""
 
         if not SHAP_AVAILABLE:
@@ -205,9 +204,9 @@ class InterpretabilityService:
     def _generate_fallback_shap_explanation(
         self,
         signal: np.ndarray,
-        features: Dict[str, Any],
-        predictions: Dict[str, float]
-    ) -> Dict[str, Any]:
+        features: dict[str, Any],
+        predictions: dict[str, float]
+    ) -> dict[str, Any]:
         """Generate fallback SHAP-like explanation when SHAP is not available"""
 
         feature_importance = {}
@@ -265,9 +264,9 @@ class InterpretabilityService:
     async def _generate_lime_explanation(
         self,
         signal: np.ndarray,
-        features: Dict[str, Any],
-        predictions: Dict[str, float]
-    ) -> Optional[Dict[str, Any]]:
+        features: dict[str, Any],
+        predictions: dict[str, float]
+    ) -> dict[str, Any] | None:
         """Generate LIME-based local explanation"""
 
         if not LIME_AVAILABLE:
@@ -311,9 +310,9 @@ class InterpretabilityService:
     def _generate_fallback_lime_explanation(
         self,
         signal: np.ndarray,
-        features: Dict[str, Any],
-        predictions: Dict[str, float]
-    ) -> Dict[str, Any]:
+        features: dict[str, Any],
+        predictions: dict[str, float]
+    ) -> dict[str, Any]:
         """Generate fallback LIME-like explanation"""
 
         primary_diagnosis = max(predictions.items(), key=lambda x: x[1])[0]
@@ -344,10 +343,10 @@ class InterpretabilityService:
     async def _generate_clinical_explanation(
         self,
         primary_diagnosis: str,
-        features: Dict[str, Any],
-        predictions: Dict[str, float],
-        shap_explanation: Optional[Dict[str, Any]]
-    ) -> Dict[str, str]:
+        features: dict[str, Any],
+        predictions: dict[str, float],
+        shap_explanation: dict[str, Any] | None
+    ) -> dict[str, str]:
         """Generate clinical text explanations"""
 
         condition = get_condition_by_code(primary_diagnosis)
@@ -400,9 +399,9 @@ class InterpretabilityService:
     async def _generate_attention_maps(
         self,
         signal: np.ndarray,
-        predictions: Dict[str, float],
-        shap_explanation: Optional[Dict[str, Any]]
-    ) -> Dict[str, np.ndarray]:
+        predictions: dict[str, float],
+        shap_explanation: dict[str, Any] | None
+    ) -> dict[str, np.ndarray]:
         """Generate attention maps for ECG visualization"""
 
         attention_maps = {}
@@ -457,7 +456,7 @@ class InterpretabilityService:
 
         return attention
 
-    def _features_to_vector(self, features: Dict[str, Any]) -> np.ndarray:
+    def _features_to_vector(self, features: dict[str, Any]) -> np.ndarray:
         """Convert feature dictionary to numpy vector"""
 
         vector = []
@@ -472,9 +471,9 @@ class InterpretabilityService:
 
     def _extract_feature_importance(
         self,
-        shap_explanation: Optional[Dict[str, Any]],
-        lime_explanation: Optional[Dict[str, Any]]
-    ) -> Dict[str, float]:
+        shap_explanation: dict[str, Any] | None,
+        lime_explanation: dict[str, Any] | None
+    ) -> dict[str, float]:
         """Extract and combine feature importance from SHAP and LIME"""
 
         importance = {}
@@ -501,8 +500,8 @@ class InterpretabilityService:
     def _reference_diagnostic_criteria(
         self,
         diagnosis: str,
-        features: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        features: dict[str, Any]
+    ) -> dict[str, Any]:
         """Reference standard diagnostic criteria for the diagnosis"""
 
         condition = get_condition_by_code(diagnosis)
@@ -539,8 +538,8 @@ class InterpretabilityService:
     def _identify_risk_factors(
         self,
         diagnosis: str,
-        features: Dict[str, Any]
-    ) -> List[str]:
+        features: dict[str, Any]
+    ) -> list[str]:
         """Identify risk factors associated with the diagnosis"""
 
         risk_factors = []
@@ -572,8 +571,8 @@ class InterpretabilityService:
     def _generate_recommendations(
         self,
         diagnosis: str,
-        features: Dict[str, Any]
-    ) -> List[str]:
+        features: dict[str, Any]
+    ) -> list[str]:
         """Generate clinical recommendations based on diagnosis"""
 
         recommendations = []

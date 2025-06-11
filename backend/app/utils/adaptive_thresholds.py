@@ -4,21 +4,19 @@ Implements Platt scaling and pathology-specific threshold optimization
 Based on scientific recommendations for CardioAI Pro
 """
 
-import numpy as np
-from typing import Dict, List, Any, Tuple, Optional
-import logging
-from dataclasses import dataclass
-from sklearn.calibration import CalibratedClassifierCV
-from sklearn.linear_model import LogisticRegression
-import pickle
 import json
+import logging
+import pickle
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
+
+import numpy as np
+from sklearn.linear_model import LogisticRegression
 
 from app.core.scp_ecg_conditions import (
-    SCP_ECG_CONDITIONS,
-    SCPCategory,
     get_conditions_by_urgency,
-    get_critical_conditions
+    get_critical_conditions,
 )
 
 logger = logging.getLogger(__name__)
@@ -31,8 +29,8 @@ class ThresholdConfig:
     sensitivity_target: float
     specificity_target: float
     clinical_urgency: str
-    platt_scaling_params: Optional[Dict[str, float]] = None
-    performance_history: Optional[List[Dict[str, float]]] = None
+    platt_scaling_params: dict[str, float] | None = None
+    performance_history: list[dict[str, float]] | None = None
 
 class AdaptiveThresholdManager:
     """
@@ -41,7 +39,7 @@ class AdaptiveThresholdManager:
     Optimizes thresholds based on clinical urgency and performance metrics
     """
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         self.config_path = config_path or "adaptive_thresholds_config.json"
         self.threshold_configs = {}
         self.platt_scalers = {}
@@ -101,7 +99,7 @@ class AdaptiveThresholdManager:
                     performance_history=[]
                 )
 
-    def get_adaptive_threshold(self, condition_code: str, context: Dict[str, Any] = None) -> float:
+    def get_adaptive_threshold(self, condition_code: str, context: dict[str, Any] = None) -> float:
         """
         Get adaptive threshold for a specific condition
         Considers clinical context, recent performance, and calibration
@@ -130,7 +128,7 @@ class AdaptiveThresholdManager:
         return final_threshold
 
     def _apply_context_adjustments(
-        self, base_threshold: float, condition_code: str, context: Dict[str, Any]
+        self, base_threshold: float, condition_code: str, context: dict[str, Any]
     ) -> float:
         """Apply context-based threshold adjustments"""
 
@@ -277,7 +275,7 @@ class AdaptiveThresholdManager:
         Supports different optimization metrics: youden, f1, balanced_accuracy
         """
 
-        from sklearn.metrics import roc_curve, precision_recall_curve
+        from sklearn.metrics import precision_recall_curve, roc_curve
 
         try:
             fpr, tpr, thresholds = roc_curve(true_labels, probabilities)
@@ -353,7 +351,7 @@ class AdaptiveThresholdManager:
         logger.debug(f"Updated performance metrics for {condition_code}: "
                     f"sens={sensitivity:.3f}, spec={specificity:.3f}, f1={f1_score:.3f}")
 
-    def get_threshold_recommendations(self, condition_code: str) -> Dict[str, Any]:
+    def get_threshold_recommendations(self, condition_code: str) -> dict[str, Any]:
         """Get threshold recommendations based on current performance"""
 
         if condition_code not in self.threshold_configs:
@@ -433,7 +431,7 @@ class AdaptiveThresholdManager:
                 logger.info(f"No existing configuration file found at {self.config_path}")
                 return
 
-            with open(self.config_path, 'r') as f:
+            with open(self.config_path) as f:
                 config_data = json.load(f)
 
             for condition_code, data in config_data.items():
@@ -475,7 +473,7 @@ class AdaptiveThresholdManager:
         except Exception as e:
             logger.error(f"Error loading Platt scalers: {e}")
 
-    def get_all_thresholds(self) -> Dict[str, float]:
+    def get_all_thresholds(self) -> dict[str, float]:
         """Get all current thresholds for all conditions"""
 
         return {

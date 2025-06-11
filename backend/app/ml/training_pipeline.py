@@ -4,34 +4,31 @@ Implements curriculum learning and multimodal processing for ECG analysis
 Based on scientific recommendations for CardioAI Pro
 """
 
+import json
+import logging
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import cv2
+import numpy as np
+import pywt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
-import numpy as np
-import pandas as pd
-from typing import Dict, List, Any, Tuple, Optional, Union
-import logging
-from pathlib import Path
-import json
-from dataclasses import dataclass, asdict
-from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
-import matplotlib.pyplot as plt
-import seaborn as sns
-from tqdm import tqdm
 import wandb
-from datetime import datetime
-import pickle
-import cv2
 from scipy import signal as scipy_signal
-import pywt
+from sklearn.metrics import classification_report, roc_auc_score
+from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
+from tqdm import tqdm
 
-from app.ml.hybrid_architecture import HybridECGModel, ModelConfig, create_hybrid_model
-from app.datasets.ecg_public_datasets import ECGDatasetManager
-from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
 from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS, get_condition_by_code
+from app.datasets.ecg_public_datasets import ECGDatasetManager
+from app.ml.hybrid_architecture import ModelConfig, create_hybrid_model
+from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +49,7 @@ class TrainingConfig:
 
     augmentation_probability: float = 0.5
     noise_std: float = 0.02
-    amplitude_scale_range: Tuple[float, float] = (0.8, 1.2)
+    amplitude_scale_range: tuple[float, float] = (0.8, 1.2)
     time_shift_range: int = 50
 
     use_spectrograms: bool = True
@@ -91,12 +88,12 @@ class ECGMultimodalDataset(Dataset):
 
     def __init__(
         self,
-        signals: List[np.ndarray],
-        labels: List[int],
-        condition_codes: List[str],
+        signals: list[np.ndarray],
+        labels: list[int],
+        condition_codes: list[str],
         config: TrainingConfig,
         is_training: bool = True,
-        preprocessor: Optional[AdvancedECGPreprocessor] = None
+        preprocessor: AdvancedECGPreprocessor | None = None
     ):
         self.signals = signals
         self.labels = labels
@@ -220,7 +217,7 @@ class ECGMultimodalDataset(Dataset):
     def __len__(self) -> int:
         return len(self.signals)
 
-    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         signal = self.signals[idx]
         signal = self._augment_signal(signal)
 
@@ -268,13 +265,13 @@ class FocalLoss(nn.Module):
 class CurriculumScheduler:
     """Curriculum learning scheduler"""
 
-    def __init__(self, config: TrainingConfig, dataset_difficulty_scores: List[float]):
+    def __init__(self, config: TrainingConfig, dataset_difficulty_scores: list[float]):
         self.config = config
         self.difficulty_scores = np.array(dataset_difficulty_scores)
         self.current_stage = 0
         self.epochs_in_stage = 0
 
-    def get_current_subset_indices(self) -> List[int]:
+    def get_current_subset_indices(self) -> list[int]:
         """Get indices for current curriculum stage"""
         if not self.config.curriculum_learning:
             return list(range(len(self.difficulty_scores)))
@@ -373,7 +370,7 @@ class ECGTrainingPipeline:
 
         logger.info(f"Model initialized with {self.model.count_parameters():,} parameters")
 
-    def load_and_prepare_data(self) -> Tuple[ECGMultimodalDataset, ECGMultimodalDataset]:
+    def load_and_prepare_data(self) -> tuple[ECGMultimodalDataset, ECGMultimodalDataset]:
         """Load and prepare training and validation datasets"""
         logger.info("Loading ECG datasets...")
 
@@ -429,7 +426,7 @@ class ECGTrainingPipeline:
             mapped_codes = []
             difficulty_scores = []
 
-            for i, (signal, code) in enumerate(zip(processed_signals, condition_codes)):
+            for i, (signal, code) in enumerate(zip(processed_signals, condition_codes, strict=False)):
                 condition = get_condition_by_code(code)
                 if condition:
                     label = list(SCP_ECG_CONDITIONS.keys()).index(code)
@@ -489,7 +486,7 @@ class ECGTrainingPipeline:
         self,
         train_dataset: ECGMultimodalDataset,
         val_dataset: ECGMultimodalDataset
-    ) -> Tuple[DataLoader, DataLoader]:
+    ) -> tuple[DataLoader, DataLoader]:
         """Create data loaders with appropriate sampling strategies"""
 
         if self.config.use_class_weights:
@@ -524,7 +521,7 @@ class ECGTrainingPipeline:
 
         return train_loader, val_loader
 
-    def train_epoch(self, train_loader: DataLoader, epoch: int) -> Dict[str, float]:
+    def train_epoch(self, train_loader: DataLoader, epoch: int) -> dict[str, float]:
         """Train for one epoch"""
         self.model.train()
 
@@ -588,7 +585,7 @@ class ECGTrainingPipeline:
             'accuracy': accuracy
         }
 
-    def validate_epoch(self, val_loader: DataLoader, epoch: int) -> Dict[str, float]:
+    def validate_epoch(self, val_loader: DataLoader, epoch: int) -> dict[str, float]:
         """Validate for one epoch"""
         self.model.eval()
 
@@ -648,7 +645,7 @@ class ECGTrainingPipeline:
             'classification_report': report
         }
 
-    def save_checkpoint(self, epoch: int, val_metrics: Dict[str, float], is_best: bool = False):
+    def save_checkpoint(self, epoch: int, val_metrics: dict[str, float], is_best: bool = False):
         """Save model checkpoint"""
         if not self.config.save_checkpoints:
             return
@@ -779,7 +776,7 @@ class ECGTrainingPipeline:
 
         self._generate_evaluation_report(val_metrics)
 
-    def _generate_evaluation_report(self, metrics: Dict[str, Any]):
+    def _generate_evaluation_report(self, metrics: dict[str, Any]):
         """Generate detailed evaluation report"""
         report_path = Path(self.config.checkpoint_dir) / "evaluation_report.json"
 

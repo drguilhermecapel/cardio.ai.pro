@@ -9,6 +9,7 @@ from sqlalchemy.future import select
 
 from app.models.user import User
 
+
 class UserRepository:
     """Repository for user data access."""
 

@@ -14,6 +14,7 @@ from app.core.constants import (
 )
 from app.models.base import Base
 
+
 class Notification(Base):
     """Notification model."""
 

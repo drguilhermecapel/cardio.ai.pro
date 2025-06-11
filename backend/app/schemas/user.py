@@ -8,6 +8,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.core.constants import UserRoles
 
+
 class UserBase(BaseModel):
     """Base user schema."""
     username: str = Field(..., min_length=3, max_length=50)

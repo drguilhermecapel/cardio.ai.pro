@@ -4,19 +4,17 @@ Implements time domain and frequency domain augmentation techniques
 Based on scientific recommendations for CardioAI Pro
 """
 
-import numpy as np
-import pandas as pd
-from typing import Dict, List, Any, Tuple, Optional, Union, Callable
 import logging
-from dataclasses import dataclass
-from scipy import signal as scipy_signal
-from scipy.fft import fft, ifft, fftfreq
 import random
-from sklearn.utils import resample
 import warnings
+from dataclasses import dataclass
+
+import numpy as np
+from scipy import signal as scipy_signal
+from scipy.fft import fft, fftfreq, ifft
+
 warnings.filterwarnings('ignore')
 
-from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS, get_condition_by_code
 from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
 
 logger = logging.getLogger(__name__)
@@ -24,13 +22,13 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AugmentationConfig:
     """Configuration for ECG data augmentation"""
-    amplitude_scale_range: Tuple[float, float] = (0.8, 1.2)
+    amplitude_scale_range: tuple[float, float] = (0.8, 1.2)
     time_shift_range: int = 50  # ±50ms
     gaussian_noise_snr_db: float = 20.0  # SNR > 20dB
     baseline_wander_amplitude: float = 0.1
 
     spectral_masking_ratio: float = 0.1  # 10% of frequency bins
-    phase_rotation_range: Tuple[float, float] = (-np.pi/4, np.pi/4)
+    phase_rotation_range: tuple[float, float] = (-np.pi/4, np.pi/4)
     heart_rate_perturbation_bpm: float = 10.0  # ±10 bpm
 
     qrs_width_variation: float = 0.1  # ±10%
@@ -48,7 +46,7 @@ class AugmentationConfig:
     min_quality_score: float = 0.7
     preserve_clinical_features: bool = True
 
-    target_balance_ratios: Dict[str, float] = None  # Will be set in __post_init__
+    target_balance_ratios: dict[str, float] = None  # Will be set in __post_init__
 
     def __post_init__(self):
         if self.target_balance_ratios is None:
@@ -69,7 +67,7 @@ class TimeDomainAugmenter:
     def __init__(self, config: AugmentationConfig):
         self.config = config
 
-    def amplitude_scaling(self, signal: np.ndarray, scale_factor: Optional[float] = None) -> np.ndarray:
+    def amplitude_scaling(self, signal: np.ndarray, scale_factor: float | None = None) -> np.ndarray:
         """
         Apply amplitude scaling to ECG signal
         Range: 0.8-1.2x as specified in recommendations
@@ -85,7 +83,7 @@ class TimeDomainAugmenter:
 
         return scaled_signal
 
-    def temporal_shift(self, signal: np.ndarray, shift_samples: Optional[int] = None, fs: int = 500) -> np.ndarray:
+    def temporal_shift(self, signal: np.ndarray, shift_samples: int | None = None, fs: int = 500) -> np.ndarray:
         """
         Apply temporal shift to ECG signal
         Range: ±50ms as specified in recommendations
@@ -108,7 +106,7 @@ class TimeDomainAugmenter:
 
         return shifted_signal
 
-    def add_gaussian_noise(self, signal: np.ndarray, snr_db: Optional[float] = None) -> np.ndarray:
+    def add_gaussian_noise(self, signal: np.ndarray, snr_db: float | None = None) -> np.ndarray:
         """
         Add calibrated Gaussian noise to ECG signal
         SNR > 20dB as specified in recommendations
@@ -219,7 +217,7 @@ class FrequencyDomainAugmenter:
 
         return augmented_signal
 
-    def phase_rotation(self, signal: np.ndarray, rotation_angle: Optional[float] = None) -> np.ndarray:
+    def phase_rotation(self, signal: np.ndarray, rotation_angle: float | None = None) -> np.ndarray:
         """
         Apply controlled phase rotation
         Rotates phase components while preserving magnitude spectrum
@@ -236,7 +234,7 @@ class FrequencyDomainAugmenter:
 
         return augmented_signal
 
-    def heart_rate_perturbation(self, signal: np.ndarray, fs: int = 500, target_hr_change: Optional[float] = None) -> np.ndarray:
+    def heart_rate_perturbation(self, signal: np.ndarray, fs: int = 500, target_hr_change: float | None = None) -> np.ndarray:
         """
         Apply heart rate perturbation (±10 bpm)
         Changes the temporal scaling to simulate different heart rates
@@ -374,7 +372,7 @@ class MorphologicalAugmenter:
             logger.warning(f"ST segment shift failed: {e}")
             return signal
 
-    def _detect_qrs_complexes(self, signal: np.ndarray, fs: int = 500) -> List[Tuple[int, int]]:
+    def _detect_qrs_complexes(self, signal: np.ndarray, fs: int = 500) -> list[tuple[int, int]]:
         """Detect QRS complex locations"""
         try:
             if len(signal.shape) == 2:
@@ -403,7 +401,7 @@ class MorphologicalAugmenter:
         except Exception:
             return []
 
-    def _detect_st_segments(self, signal: np.ndarray, fs: int = 500) -> List[Tuple[int, int]]:
+    def _detect_st_segments(self, signal: np.ndarray, fs: int = 500) -> list[tuple[int, int]]:
         """Detect ST segment locations"""
         try:
             qrs_locations = self._detect_qrs_complexes(signal, fs)
@@ -428,7 +426,7 @@ class ECGDataAugmenter:
     Combines time domain, frequency domain, and morphological augmentation
     """
 
-    def __init__(self, config: Optional[AugmentationConfig] = None):
+    def __init__(self, config: AugmentationConfig | None = None):
         self.config = config or AugmentationConfig()
 
         self.time_augmenter = TimeDomainAugmenter(self.config)
@@ -442,7 +440,7 @@ class ECGDataAugmenter:
         signal: np.ndarray,
         condition_code: str = 'NORM',
         fs: int = 500,
-        augmentation_methods: Optional[List[str]] = None
+        augmentation_methods: list[str] | None = None
     ) -> np.ndarray:
         """
         Apply comprehensive augmentation to a single ECG signal
@@ -515,11 +513,11 @@ class ECGDataAugmenter:
 
     def augment_dataset(
         self,
-        signals: List[np.ndarray],
-        condition_codes: List[str],
+        signals: list[np.ndarray],
+        condition_codes: list[str],
         augmentation_factor: int = 2,
         fs: int = 500
-    ) -> Tuple[List[np.ndarray], List[str]]:
+    ) -> tuple[list[np.ndarray], list[str]]:
         """
         Augment entire dataset
 
@@ -537,7 +535,7 @@ class ECGDataAugmenter:
         augmented_signals = signals.copy()
         augmented_condition_codes = condition_codes.copy()
 
-        for i, (signal, condition_code) in enumerate(zip(signals, condition_codes)):
+        for i, (signal, condition_code) in enumerate(zip(signals, condition_codes, strict=False)):
             for aug_idx in range(augmentation_factor - 1):  # -1 because original is already included
                 try:
                     augmented_signal = self.augment_signal(signal, condition_code, fs)
@@ -553,11 +551,11 @@ class ECGDataAugmenter:
 
     def balance_rare_conditions(
         self,
-        signals: List[np.ndarray],
-        condition_codes: List[str],
-        target_ratios: Optional[Dict[str, float]] = None,
+        signals: list[np.ndarray],
+        condition_codes: list[str],
+        target_ratios: dict[str, float] | None = None,
         fs: int = 500
-    ) -> Tuple[List[np.ndarray], List[str]]:
+    ) -> tuple[list[np.ndarray], list[str]]:
         """
         Balance rare conditions using data augmentation
 
@@ -663,13 +661,13 @@ def create_augmentation_config(**kwargs) -> AugmentationConfig:
     return AugmentationConfig(**kwargs)
 
 def augment_ecg_dataset(
-    signals: List[np.ndarray],
-    condition_codes: List[str],
-    config: Optional[AugmentationConfig] = None,
+    signals: list[np.ndarray],
+    condition_codes: list[str],
+    config: AugmentationConfig | None = None,
     balance_rare_conditions: bool = True,
     augmentation_factor: int = 2,
     fs: int = 500
-) -> Tuple[List[np.ndarray], List[str]]:
+) -> tuple[list[np.ndarray], list[str]]:
     """
     High-level function to augment ECG dataset
 

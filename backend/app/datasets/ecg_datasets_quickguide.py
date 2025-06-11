@@ -21,6 +21,7 @@ from .ecg_public_datasets import (
     quick_download_datasets,
 )
 
+
 def setup_environment() -> bool:
     """Configura ambiente e verifica dependências"""
     print("🔧 Configurando ambiente...")

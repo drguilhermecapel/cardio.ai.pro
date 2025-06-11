@@ -4,25 +4,22 @@ Orchestrates advanced machine learning capabilities including hybrid architectur
 ensemble methods, and specialized ECG analysis models
 """
 
-import asyncio
 import logging
-from typing import Dict, List, Optional, Any, Tuple, Union
-import numpy as np
-import torch
-import torch.nn as nn
+import time
 from dataclasses import dataclass
 from enum import Enum
-import time
-from pathlib import Path
+from typing import Any
 
-from app.core.config import settings
+import numpy as np
+import torch
+
 from app.core.exceptions import ECGProcessingException
-from app.ml.hybrid_architecture import HybridECGModel, ModelConfig, EnsembleVoting
-from app.ml.training_pipeline import TrainingPipeline, TrainingConfig
-from app.ml.ecg_gan import TimeGAN, ECGTimeGAN
-from app.utils.data_augmentation import ECGDataAugmentation, AugmentationConfig
+from app.ml.ecg_gan import ECGTimeGAN
+from app.ml.hybrid_architecture import HybridECGModel, ModelConfig
+from app.ml.training_pipeline import TrainingConfig, TrainingPipeline
 from app.services.interpretability_service import InterpretabilityService
 from app.utils.adaptive_thresholds import AdaptiveThresholdManager
+from app.utils.data_augmentation import AugmentationConfig, ECGDataAugmentation
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +59,7 @@ class AdvancedMLConfig:
     enable_interpretability: bool = True
     enable_adaptive_thresholds: bool = True
     enable_data_augmentation: bool = False
-    model_ensemble_weights: List[float] = None
+    model_ensemble_weights: list[float] = None
     confidence_threshold: float = 0.8
     batch_size: int = 32
     device: str = "cpu"  # Will auto-detect GPU if available
@@ -82,12 +79,12 @@ class AdvancedMLService:
     - Data augmentation for training
     """
 
-    def __init__(self, config: Optional[AdvancedMLConfig] = None):
+    def __init__(self, config: AdvancedMLConfig | None = None):
         self.config = config or AdvancedMLConfig()
         self.device = self._setup_device()
-        self.models: Dict[str, torch.nn.Module] = {}
-        self.model_cache: Dict[str, torch.nn.Module] = {}
-        self.performance_metrics: Dict[str, ModelPerformanceMetrics] = {}
+        self.models: dict[str, torch.nn.Module] = {}
+        self.model_cache: dict[str, torch.nn.Module] = {}
+        self.performance_metrics: dict[str, ModelPerformanceMetrics] = {}
 
         self.interpretability_service = None
         self.adaptive_threshold_manager = None
@@ -233,9 +230,9 @@ class AdvancedMLService:
         self,
         ecg_signal: np.ndarray,
         sampling_rate: float = 500.0,
-        patient_context: Optional[Dict[str, Any]] = None,
+        patient_context: dict[str, Any] | None = None,
         return_interpretability: bool = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Perform advanced ECG analysis using hybrid ML architecture
 
@@ -299,7 +296,7 @@ class AdvancedMLService:
             logger.error(f"Advanced ECG analysis failed: {e}")
             raise ECGProcessingException(f"Advanced ML analysis failed: {e}")
 
-    async def _fast_inference(self, ecg_tensor: torch.Tensor) -> Dict[str, Any]:
+    async def _fast_inference(self, ecg_tensor: torch.Tensor) -> dict[str, Any]:
         """Fast inference using single best model"""
         model = self.models.get("hybrid") or list(self.models.values())[0]
 
@@ -323,7 +320,7 @@ class AdvancedMLService:
 
         return results
 
-    async def _accurate_inference(self, ecg_tensor: torch.Tensor) -> Dict[str, Any]:
+    async def _accurate_inference(self, ecg_tensor: torch.Tensor) -> dict[str, Any]:
         """Accurate inference using ensemble of models"""
         ensemble_outputs = {}
         ensemble_probabilities = []
@@ -375,7 +372,7 @@ class AdvancedMLService:
         self,
         ecg_tensor: torch.Tensor,
         ecg_signal: np.ndarray
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Interpretable inference with full analysis"""
         results = await self._accurate_inference(ecg_tensor)
 
@@ -404,12 +401,12 @@ class AdvancedMLService:
 
         return results
 
-    def _format_detected_conditions(self, probabilities: torch.Tensor) -> Dict[str, Dict[str, Any]]:
+    def _format_detected_conditions(self, probabilities: torch.Tensor) -> dict[str, dict[str, Any]]:
         """Format detected conditions from probabilities"""
         condition_codes = [f"SCP_{i:03d}" for i in range(len(probabilities))]
 
         detected_conditions = {}
-        for i, (code, prob) in enumerate(zip(condition_codes, probabilities)):
+        for i, (code, prob) in enumerate(zip(condition_codes, probabilities, strict=False)):
             if prob > 0.1:  # Include conditions with >10% probability
                 detected_conditions[code] = {
                     'probability': float(prob),
@@ -427,9 +424,9 @@ class AdvancedMLService:
 
     async def _apply_adaptive_thresholds(
         self,
-        results: Dict[str, Any],
-        patient_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        results: dict[str, Any],
+        patient_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Apply adaptive thresholds based on patient context"""
         if not self.adaptive_threshold_manager:
             return results
@@ -456,7 +453,7 @@ class AdvancedMLService:
 
         return results
 
-    def _calculate_feature_attribution(self, results: Dict[str, Any]) -> Dict[str, float]:
+    def _calculate_feature_attribution(self, results: dict[str, Any]) -> dict[str, float]:
         """Calculate feature attribution scores"""
         feature_attribution = {
             'heart_rate': 0.15,
@@ -471,7 +468,7 @@ class AdvancedMLService:
 
         return feature_attribution
 
-    def _extract_attention_weights(self, results: Dict[str, Any]) -> Dict[str, List[float]]:
+    def _extract_attention_weights(self, results: dict[str, Any]) -> dict[str, list[float]]:
         """Extract attention weights from transformer models"""
         attention_weights = {}
 
@@ -484,10 +481,10 @@ class AdvancedMLService:
 
     async def train_model(
         self,
-        training_data: Dict[str, Any],
-        validation_data: Dict[str, Any],
-        training_config: Optional[TrainingConfig] = None
-    ) -> Dict[str, Any]:
+        training_data: dict[str, Any],
+        validation_data: dict[str, Any],
+        training_config: TrainingConfig | None = None
+    ) -> dict[str, Any]:
         """
         Train or fine-tune models with provided data
 
@@ -543,7 +540,7 @@ class AdvancedMLService:
         condition_type: str,
         num_samples: int = 100,
         quality_threshold: float = 0.8
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate synthetic ECG data using TimeGAN
 
@@ -580,11 +577,11 @@ class AdvancedMLService:
             logger.error(f"Synthetic data generation failed: {e}")
             raise ECGProcessingException(f"GAN generation failed: {e}")
 
-    def get_model_performance(self) -> Dict[str, ModelPerformanceMetrics]:
+    def get_model_performance(self) -> dict[str, ModelPerformanceMetrics]:
         """Get performance metrics for all models"""
         return self.performance_metrics.copy()
 
-    def get_service_status(self) -> Dict[str, Any]:
+    def get_service_status(self) -> dict[str, Any]:
         """Get comprehensive service status"""
         return {
             'device': self.device,
@@ -612,9 +609,9 @@ class AdvancedMLService:
 
     async def benchmark_performance(
         self,
-        test_data: Dict[str, Any],
+        test_data: dict[str, Any],
         num_iterations: int = 100
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Benchmark model performance on test data
 
@@ -705,7 +702,7 @@ async def quick_ecg_analysis(
     ecg_signal: np.ndarray,
     sampling_rate: float = 500.0,
     return_interpretability: bool = True
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Quick ECG analysis using default advanced ML service
 

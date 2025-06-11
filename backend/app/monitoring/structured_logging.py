@@ -9,6 +9,7 @@ from typing import Any
 
 import structlog
 
+
 def setup_structured_logging(log_level: str = "INFO") -> None:
     """Configure structured logging for the ECG system"""
 

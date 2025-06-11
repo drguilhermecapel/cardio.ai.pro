@@ -4,28 +4,21 @@ Generates synthetic ECG signals for rare conditions and data augmentation
 Based on scientific recommendations for CardioAI Pro
 """
 
+import logging
+import warnings
+from dataclasses import dataclass
+from pathlib import Path
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset
-import numpy as np
-import pandas as pd
-from typing import Dict, List, Any, Tuple, Optional, Union
-import logging
-from pathlib import Path
-import json
-from dataclasses import dataclass, asdict
-from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
-import seaborn as sns
+from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
-import pickle
-from datetime import datetime
-import warnings
+
 warnings.filterwarnings('ignore')
 
-from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS, get_condition_by_code
 from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
 
 logger = logging.getLogger(__name__)
@@ -55,10 +48,10 @@ class ECGTimeSeriesDataset(Dataset):
 
     def __init__(
         self,
-        signals: List[np.ndarray],
-        condition_codes: List[str],
+        signals: list[np.ndarray],
+        condition_codes: list[str],
         sequence_length: int = 5000,
-        preprocessor: Optional[AdvancedECGPreprocessor] = None
+        preprocessor: AdvancedECGPreprocessor | None = None
     ):
         self.signals = signals
         self.condition_codes = condition_codes
@@ -104,7 +97,7 @@ class ECGTimeSeriesDataset(Dataset):
     def __len__(self) -> int:
         return len(self.processed_signals)
 
-    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         signal = torch.from_numpy(self.processed_signals[idx]).float()
 
         return {
@@ -314,7 +307,7 @@ class TimeGAN(nn.Module):
             'Y_fake': Y_fake
         }
 
-    def generate(self, num_samples: int, condition_code: Optional[str] = None) -> np.ndarray:
+    def generate(self, num_samples: int, condition_code: str | None = None) -> np.ndarray:
         """Generate synthetic ECG signals"""
         self.eval()
 
@@ -338,10 +331,10 @@ class TimeGAN(nn.Module):
 class ECGQualityValidator:
     """Validates the quality and realism of synthetic ECG signals"""
 
-    def __init__(self, preprocessor: Optional[AdvancedECGPreprocessor] = None):
+    def __init__(self, preprocessor: AdvancedECGPreprocessor | None = None):
         self.preprocessor = preprocessor or AdvancedECGPreprocessor()
 
-    def validate_signal_quality(self, signal: np.ndarray) -> Dict[str, float]:
+    def validate_signal_quality(self, signal: np.ndarray) -> dict[str, float]:
         """Validate basic signal quality metrics"""
         try:
             result = self.preprocessor.process(signal)
@@ -361,7 +354,7 @@ class ECGQualityValidator:
             logger.warning(f"Quality validation failed: {e}")
             return {'overall_score': 0.0}
 
-    def validate_morphological_features(self, signal: np.ndarray) -> Dict[str, float]:
+    def validate_morphological_features(self, signal: np.ndarray) -> dict[str, float]:
         """Validate ECG morphological features"""
         try:
             lead_ii = signal[:, 1] if signal.shape[1] > 1 else signal[:, 0]
@@ -409,7 +402,7 @@ class ECGQualityValidator:
         except Exception:
             return np.array([])
 
-    def compute_realism_score(self, synthetic_signals: List[np.ndarray]) -> float:
+    def compute_realism_score(self, synthetic_signals: list[np.ndarray]) -> float:
         """Compute overall realism score for synthetic signals"""
         total_score = 0.0
         valid_signals = 0
@@ -639,7 +632,7 @@ class TimeGANTrainer:
 class ECGSynthesizer:
     """High-level interface for ECG synthesis using TimeGAN"""
 
-    def __init__(self, model_path: Optional[str] = None, config: Optional[TimeGANConfig] = None):
+    def __init__(self, model_path: str | None = None, config: TimeGANConfig | None = None):
         self.config = config or TimeGANConfig()
         self.trainer = TimeGANTrainer(self.config)
 
@@ -651,9 +644,9 @@ class ECGSynthesizer:
 
     def train_on_data(
         self,
-        signals: List[np.ndarray],
-        condition_codes: List[str],
-        save_path: Optional[str] = None
+        signals: list[np.ndarray],
+        condition_codes: list[str],
+        save_path: str | None = None
     ) -> float:
         """Train TimeGAN on provided ECG data"""
         logger.info(f"Training TimeGAN on {len(signals)} ECG signals...")
@@ -682,8 +675,8 @@ class ECGSynthesizer:
     def generate_synthetic_ecgs(
         self,
         num_samples: int,
-        condition_code: Optional[str] = None
-    ) -> List[np.ndarray]:
+        condition_code: str | None = None
+    ) -> list[np.ndarray]:
         """Generate synthetic ECG signals"""
         if not self.is_trained:
             raise ValueError("Model must be trained before generating samples")
@@ -701,10 +694,10 @@ class ECGSynthesizer:
 
     def balance_rare_conditions(
         self,
-        original_signals: List[np.ndarray],
-        original_conditions: List[str],
-        target_balance: Dict[str, int]
-    ) -> Tuple[List[np.ndarray], List[str]]:
+        original_signals: list[np.ndarray],
+        original_conditions: list[str],
+        target_balance: dict[str, int]
+    ) -> tuple[list[np.ndarray], list[str]]:
         """Balance rare conditions by generating synthetic samples"""
         logger.info("Balancing rare conditions with synthetic data...")
 
@@ -738,10 +731,10 @@ def create_timegan_config(**kwargs) -> TimeGANConfig:
     return TimeGANConfig(**kwargs)
 
 def train_ecg_timegan(
-    signals: List[np.ndarray],
-    condition_codes: List[str],
-    config: Optional[TimeGANConfig] = None,
-    save_path: Optional[str] = None
+    signals: list[np.ndarray],
+    condition_codes: list[str],
+    config: TimeGANConfig | None = None,
+    save_path: str | None = None
 ) -> ECGSynthesizer:
     """Train TimeGAN on ECG data"""
 
@@ -756,10 +749,10 @@ def train_ecg_timegan(
     return synthesizer
 
 def balance_stemi_condition(
-    original_signals: List[np.ndarray],
-    original_conditions: List[str],
+    original_signals: list[np.ndarray],
+    original_conditions: list[str],
     synthesizer: ECGSynthesizer
-) -> Tuple[List[np.ndarray], List[str]]:
+) -> tuple[list[np.ndarray], list[str]]:
     """
     Example: Balance STEMI condition from 0.4% to 5% as specified in requirements
     """

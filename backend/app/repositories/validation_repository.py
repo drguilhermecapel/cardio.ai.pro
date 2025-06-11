@@ -19,6 +19,7 @@ from app.models.validation import (
     ValidationRule,
 )
 
+
 class ValidationRepository:
     """Repository for validation data access."""
 

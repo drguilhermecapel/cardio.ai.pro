@@ -12,6 +12,7 @@ from sqlalchemy.orm import selectinload
 from app.core.constants import AnalysisStatus
 from app.models.ecg_analysis import ECGAnalysis, ECGAnnotation, ECGMeasurement
 
+
 class ECGRepository:
     """Repository for ECG analysis data access."""
 

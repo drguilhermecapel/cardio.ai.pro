@@ -4,6 +4,7 @@ Custom exceptions for CardioAI Pro.
 
 from typing import Any
 
+
 class CardioAIException(Exception):
     """Base exception for CardioAI Pro."""
 

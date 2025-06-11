@@ -4,18 +4,11 @@ Provides automated text explanations with diagnostic criteria references
 Based on scientific recommendations for CardioAI Pro
 """
 
-import numpy as np
-from typing import Dict, List, Any, Optional, Tuple
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from typing import Any
 
-from app.core.scp_ecg_conditions import (
-    SCP_ECG_CONDITIONS,
-    get_condition_by_code,
-    get_conditions_by_category,
-    SCPCategory
-)
+from app.core.scp_ecg_conditions import get_condition_by_code
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +29,11 @@ class DiagnosticCriterion:
     condition_code: str
     criterion_name: str
     description: str
-    threshold_value: Optional[float] = None
-    threshold_operator: Optional[str] = None  # >, <, >=, <=, ==
-    leads_affected: Optional[List[str]] = None
-    duration_requirement: Optional[str] = None
-    clinical_context: Optional[str] = None
+    threshold_value: float | None = None
+    threshold_operator: str | None = None  # >, <, >=, <=, ==
+    leads_affected: list[str] | None = None
+    duration_requirement: str | None = None
+    clinical_context: str | None = None
     reference_source: str = "Clinical Guidelines"
 
 class ClinicalExplanationGenerator:
@@ -54,7 +47,7 @@ class ClinicalExplanationGenerator:
         self.normal_ranges = self._load_normal_ranges()
         self.lead_territories = self._load_lead_territories()
 
-    def _load_diagnostic_criteria(self) -> Dict[str, List[DiagnosticCriterion]]:
+    def _load_diagnostic_criteria(self) -> dict[str, list[DiagnosticCriterion]]:
         """Load established diagnostic criteria for ECG conditions"""
 
         criteria = {}
@@ -223,7 +216,7 @@ class ClinicalExplanationGenerator:
 
         return criteria
 
-    def _load_normal_ranges(self) -> Dict[str, NormalRange]:
+    def _load_normal_ranges(self) -> dict[str, NormalRange]:
         """Load normal population ranges for ECG parameters"""
 
         ranges = {}
@@ -278,7 +271,7 @@ class ClinicalExplanationGenerator:
 
         return ranges
 
-    def _load_lead_territories(self) -> Dict[str, Dict[str, Any]]:
+    def _load_lead_territories(self) -> dict[str, dict[str, Any]]:
         """Load anatomical territories for ECG leads"""
 
         territories = {
@@ -313,10 +306,10 @@ class ClinicalExplanationGenerator:
 
     def generate_explanation(
         self,
-        features: Dict[str, Any],
-        predictions: Dict[str, float],
-        shap_explanation: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        features: dict[str, Any],
+        predictions: dict[str, float],
+        shap_explanation: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Generate comprehensive clinical explanation"""
 
         try:
@@ -348,7 +341,7 @@ class ClinicalExplanationGenerator:
                 'recommendations': []
             }
 
-    def _explain_primary_diagnosis(self, diagnosis_code: str, confidence: float) -> Dict[str, Any]:
+    def _explain_primary_diagnosis(self, diagnosis_code: str, confidence: float) -> dict[str, Any]:
         """Explain the primary diagnosis with confidence assessment"""
 
         condition = get_condition_by_code(diagnosis_code)
@@ -387,7 +380,7 @@ class ClinicalExplanationGenerator:
         else:
             return 'Very Low (<50%)'
 
-    def _explain_diagnostic_criteria(self, diagnosis_code: str, features: Dict[str, Any]) -> Dict[str, Any]:
+    def _explain_diagnostic_criteria(self, diagnosis_code: str, features: dict[str, Any]) -> dict[str, Any]:
         """Explain how the diagnosis meets established criteria"""
 
         criteria_explanation = {
@@ -434,7 +427,7 @@ class ClinicalExplanationGenerator:
 
         return criteria_explanation
 
-    def _assess_criterion(self, criterion: DiagnosticCriterion, features: Dict[str, Any]) -> Dict[str, Any]:
+    def _assess_criterion(self, criterion: DiagnosticCriterion, features: dict[str, Any]) -> dict[str, Any]:
         """Assess whether a specific diagnostic criterion is met"""
 
         assessment = {
@@ -493,7 +486,7 @@ class ClinicalExplanationGenerator:
 
         return mapping.get(criterion_name, criterion_name.lower().replace(' ', '_'))
 
-    def _assess_qualitative_criterion(self, criterion: DiagnosticCriterion, features: Dict[str, Any]) -> Dict[str, Any]:
+    def _assess_qualitative_criterion(self, criterion: DiagnosticCriterion, features: dict[str, Any]) -> dict[str, Any]:
         """Assess qualitative diagnostic criteria"""
 
         assessment = {
@@ -518,7 +511,7 @@ class ClinicalExplanationGenerator:
 
         return assessment
 
-    def _analyze_parameters(self, features: Dict[str, Any]) -> Dict[str, Any]:
+    def _analyze_parameters(self, features: dict[str, Any]) -> dict[str, Any]:
         """Analyze ECG parameters against normal ranges"""
 
         analysis = {
@@ -568,7 +561,7 @@ class ClinicalExplanationGenerator:
 
         return analysis
 
-    def _explain_clinical_significance(self, diagnosis_code: str, features: Dict[str, Any]) -> str:
+    def _explain_clinical_significance(self, diagnosis_code: str, features: dict[str, Any]) -> str:
         """Explain the clinical significance of the diagnosis"""
 
         condition = get_condition_by_code(diagnosis_code)
@@ -607,7 +600,7 @@ class ClinicalExplanationGenerator:
 
         return base_significance + urgency_context
 
-    def _generate_differential_diagnosis(self, predictions: Dict[str, float]) -> List[Dict[str, Any]]:
+    def _generate_differential_diagnosis(self, predictions: dict[str, float]) -> list[dict[str, Any]]:
         """Generate differential diagnosis list"""
 
         sorted_predictions = sorted(predictions.items(), key=lambda x: x[1], reverse=True)
@@ -628,7 +621,7 @@ class ClinicalExplanationGenerator:
 
         return differential
 
-    def _generate_clinical_recommendations(self, diagnosis_code: str, features: Dict[str, Any]) -> List[str]:
+    def _generate_clinical_recommendations(self, diagnosis_code: str, features: dict[str, Any]) -> list[str]:
         """Generate clinical recommendations based on diagnosis"""
 
         condition = get_condition_by_code(diagnosis_code)
@@ -703,9 +696,9 @@ class ClinicalExplanationGenerator:
     def _explain_anatomical_correlation(
         self,
         diagnosis_code: str,
-        features: Dict[str, Any],
-        shap_explanation: Optional[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        features: dict[str, Any],
+        shap_explanation: dict[str, Any] | None
+    ) -> dict[str, Any]:
         """Explain anatomical correlation of findings"""
 
         correlation = {
@@ -763,7 +756,7 @@ class ClinicalExplanationGenerator:
 
         return base_significance
 
-    def _assess_risk_stratification(self, diagnosis_code: str, features: Dict[str, Any]) -> Dict[str, Any]:
+    def _assess_risk_stratification(self, diagnosis_code: str, features: dict[str, Any]) -> dict[str, Any]:
         """Assess risk stratification for the diagnosis"""
 
         risk_assessment = {
@@ -804,7 +797,7 @@ class ClinicalExplanationGenerator:
 
         return risk_assessment
 
-    def _recommend_follow_up(self, diagnosis_code: str, features: Dict[str, Any]) -> Dict[str, Any]:
+    def _recommend_follow_up(self, diagnosis_code: str, features: dict[str, Any]) -> dict[str, Any]:
         """Recommend appropriate follow-up care"""
 
         follow_up = {

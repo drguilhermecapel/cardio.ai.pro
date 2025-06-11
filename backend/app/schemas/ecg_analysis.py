@@ -14,6 +14,7 @@ from app.core.constants import (
     ECGLeads,
 )
 
+
 class ECGAnalysisBase(BaseModel):
     """Base ECG analysis schema."""
     patient_id: int

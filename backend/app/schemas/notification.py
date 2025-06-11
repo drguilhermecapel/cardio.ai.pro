@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from app.core.constants import NotificationPriority, NotificationType
 
+
 class NotificationBase(BaseModel):
     """Base notification schema."""
     title: str

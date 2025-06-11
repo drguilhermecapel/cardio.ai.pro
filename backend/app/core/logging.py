@@ -11,6 +11,7 @@ from structlog.types import Processor
 
 from app.core.config import settings
 
+
 def configure_logging() -> None:
     """Configure structured logging."""
 

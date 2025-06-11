@@ -10,6 +10,7 @@ from app.core.constants import UserRoles
 from app.models.notification import Notification, NotificationPreference
 from app.models.user import User
 
+
 class NotificationRepository:
     """Repository for notification data access."""
 

@@ -3,9 +3,10 @@ SCP-ECG Standardized Diagnostic Statements for CardioAI Pro
 Based on SCP-ECG recommendations for automated ECG interpretation
 """
 
-from enum import Enum
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
+from enum import Enum
+from typing import Any
+
 
 @dataclass
 class SCPCondition:
@@ -13,7 +14,7 @@ class SCPCondition:
     code: str
     name: str
     category: str
-    icd10_codes: List[str]
+    icd10_codes: list[str]
     sensitivity_target: float
     specificity_target: float
     clinical_urgency: str
@@ -872,28 +873,28 @@ CLINICAL_URGENCY_MAPPING = {
     ]
 }
 
-def get_condition_by_code(code: str) -> Optional[SCPCondition]:
+def get_condition_by_code(code: str) -> SCPCondition | None:
     """Get SCP condition by code"""
     return SCP_ECG_CONDITIONS.get(code)
 
-def get_conditions_by_category(category: SCPCategory) -> List[SCPCondition]:
+def get_conditions_by_category(category: SCPCategory) -> list[SCPCondition]:
     """Get all conditions in a specific category"""
     return [
         condition for condition in SCP_ECG_CONDITIONS.values()
         if condition.category == category
     ]
 
-def get_critical_conditions() -> List[SCPCondition]:
+def get_critical_conditions() -> list[SCPCondition]:
     """Get all critical conditions requiring immediate attention"""
     critical_codes = CLINICAL_URGENCY_MAPPING["critical"]
     return [SCP_ECG_CONDITIONS[code] for code in critical_codes if code in SCP_ECG_CONDITIONS]
 
-def get_conditions_by_urgency(urgency: str) -> List[SCPCondition]:
+def get_conditions_by_urgency(urgency: str) -> list[SCPCondition]:
     """Get all conditions by clinical urgency level"""
     urgency_codes = CLINICAL_URGENCY_MAPPING.get(urgency, [])
     return [SCP_ECG_CONDITIONS[code] for code in urgency_codes if code in SCP_ECG_CONDITIONS]
 
-def validate_scp_conditions() -> Dict[str, Any]:
+def validate_scp_conditions() -> dict[str, Any]:
     """Validate SCP-ECG conditions completeness and consistency"""
     validation_results = {
         "total_conditions": len(SCP_ECG_CONDITIONS),

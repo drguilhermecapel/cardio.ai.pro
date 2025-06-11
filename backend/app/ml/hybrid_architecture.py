@@ -4,13 +4,12 @@ Implements the scientific recommendation for advanced neural architecture
 Based on Dr. Guilherme Capel's recommendations for CardioAI Pro
 """
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import numpy as np
-from typing import Dict, List, Any, Tuple, Optional
 import logging
 from dataclasses import dataclass
+
+import numpy as np
+import torch
+import torch.nn as nn
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +24,7 @@ class ModelConfig:
     transformer_heads: int = 8
     transformer_layers: int = 4
     dropout_rate: float = 0.2
-    ensemble_weights: Optional[List[float]] = None
+    ensemble_weights: list[float] | None = None
 
 class FrequencyChannelAttention(nn.Module):
     """
@@ -270,7 +269,7 @@ class EnsembleVotingSystem(nn.Module):
     Combines predictions from CNN, BiLSTM, and Transformer
     """
 
-    def __init__(self, input_dim: int, num_classes: int, ensemble_weights: Optional[List[float]] = None):
+    def __init__(self, input_dim: int, num_classes: int, ensemble_weights: list[float] | None = None):
         super().__init__()
 
         self.num_classes = num_classes
@@ -559,7 +558,7 @@ def create_hybrid_model(
 
     return model
 
-def load_pretrained_model(checkpoint_path: str, config: Optional[ModelConfig] = None) -> HybridECGModel:
+def load_pretrained_model(checkpoint_path: str, config: ModelConfig | None = None) -> HybridECGModel:
     """
     Load a pretrained hybrid model
 

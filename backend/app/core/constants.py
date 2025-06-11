@@ -3,7 +3,7 @@ Constants for CardioAI Pro.
 """
 
 from enum import Enum
-from typing import Dict, List
+
 
 class UserRoles(str, Enum):
     """User roles."""

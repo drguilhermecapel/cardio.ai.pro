@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from app.core.constants import ValidationStatus
 
+
 class ValidationBase(BaseModel):
     """Base validation schema."""
     analysis_id: int
