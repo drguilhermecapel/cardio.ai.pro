@@ -406,7 +406,7 @@ class EnhancedSignalQualityAnalyzer:
             logger.error(f"Morphology assessment failed: {e}")
             return {}
     
-    def _detect_lead_artifacts(self, lead_data: npt.NDArray[np.float64]) -> Tuple[List[str], List[str]]:
+    def _detect_lead_artifacts(self, lead_data: npt.NDArray[np.float64]) -> tuple[list[str], list[str]]:
         """
         Detect artifacts in a single lead.
         """
@@ -432,7 +432,7 @@ class EnhancedSignalQualityAnalyzer:
             logger.error(f"Lead artifact detection failed: {e}")
             return [], []
     
-    def _generate_quality_recommendations(self, quality_metrics: Dict[str, Any]) -> List[str]:
+    def _generate_quality_recommendations(self, quality_metrics: dict[str, Any]) -> list[str]:
         """
         Generate recommendations based on quality assessment.
         """
@@ -473,7 +473,7 @@ class EnhancedSignalQualityAnalyzer:
             logger.error(f"Recommendation generation failed: {e}")
             return ["Quality assessment incomplete"]
     
-    def _get_default_quality_metrics(self) -> Dict[str, Any]:
+    def _get_default_quality_metrics(self) -> dict[str, Any]:
         """
         Return default quality metrics in case of failure.
         """

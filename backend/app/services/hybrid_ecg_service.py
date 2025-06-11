@@ -603,18 +603,18 @@ class HybridECGAnalysisService:
 
             # Advanced preprocessing with quality assessment
             logger.info("Starting advanced signal preprocessing")
-            
+
             processed_signal, quality_metrics = self.advanced_preprocessor.advanced_preprocessing_pipeline(
                 signal, clinical_mode=True
             )
-            
+
             # Comprehensive quality analysis
             self.quality_analyzer.assess_signal_quality_comprehensive(processed_signal)
-            
+
             logger.info(f"Advanced preprocessing completed. Signal shape: {processed_signal.shape}")
             logger.info(f"Signal quality score: {quality_metrics['quality_score']:.3f}")
             logger.info(f"R-peaks detected: {quality_metrics['r_peaks_detected']}")
-            
+
             if quality_metrics['quality_score'] < 0.5:
                 logger.warning("Advanced preprocessing quality too low, falling back to standard preprocessing")
                 preprocessed_signal = self.preprocessor.preprocess_signal(signal)

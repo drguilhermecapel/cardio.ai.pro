@@ -4,17 +4,15 @@ Integrado com o sistema CardioAI Pro
 """
 
 import logging
-import numpy as np
-from typing import Optional
 from pathlib import Path
+
+import numpy as np
 
 from ..datasets import (
     ECGDatasetDownloader,
-    ECGDatasetLoader, 
+    ECGDatasetLoader,
     ECGDatasetAnalyzer,
     ECGRecord,
-    quick_download_datasets,
-    load_and_preprocess_all,
     prepare_ml_dataset
 )
 from ..preprocessing import AdvancedECGPreprocessor
