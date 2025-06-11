@@ -210,8 +210,8 @@ class AdaptiveThresholdManager:
     def calibrate_probabilities_platt(
         self,
         condition_code: str,
-        raw_scores: np.ndarray,
-        true_labels: np.ndarray
+        raw_scores: np.ndarray[np.floating, np.dtype[np.floating]],
+        true_labels: np.ndarray[np.integer, np.dtype[np.integer]]
     ) -> np.ndarray:
         """
         Apply Platt scaling to calibrate probabilities
@@ -266,8 +266,8 @@ class AdaptiveThresholdManager:
     def optimize_threshold_roc(
         self,
         condition_code: str,
-        probabilities: np.ndarray,
-        true_labels: np.ndarray,
+        probabilities: np.ndarray[np.floating, np.dtype[np.floating]],
+        true_labels: np.ndarray[np.integer, np.dtype[np.integer]],
         optimization_metric: str = 'youden'
     ) -> float:
         """
