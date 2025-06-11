@@ -9,11 +9,11 @@ from pathlib import Path
 import numpy as np
 
 from ..datasets import (
+    ECGDatasetAnalyzer,
     ECGDatasetDownloader,
     ECGDatasetLoader,
-    ECGDatasetAnalyzer,
     ECGRecord,
-    prepare_ml_dataset
+    prepare_ml_dataset,
 )
 from ..preprocessing import AdvancedECGPreprocessor
 

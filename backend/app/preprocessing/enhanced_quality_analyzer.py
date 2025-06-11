@@ -4,7 +4,7 @@ Implements real-time quality assessment with 95% efficiency target.
 """
 
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -32,7 +32,7 @@ class EnhancedSignalQualityAnalyzer:
     def assess_signal_quality_comprehensive(
         self,
         ecg_signal: npt.NDArray[np.float64]
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Comprehensive signal quality assessment with detailed metrics.
 
@@ -139,7 +139,7 @@ class EnhancedSignalQualityAnalyzer:
             logger.error(f"Lead analysis failed for lead {lead_idx}: {e}")
             return {'lead_index': lead_idx, 'score': 0.5, 'artifacts': [], 'issues': []}
 
-    def _characterize_noise(self, ecg_signal: npt.NDArray[np.float64]) -> Dict[str, Any]:
+    def _characterize_noise(self, ecg_signal: npt.NDArray[np.float64]) -> dict[str, Any]:
         """
         Characterize noise patterns in the ECG signal.
         """
@@ -197,7 +197,7 @@ class EnhancedSignalQualityAnalyzer:
             logger.error(f"Noise characterization failed: {e}")
             return {'dominant_noise_type': 'unknown'}
 
-    def _detect_artifacts(self, ecg_signal: npt.NDArray[np.float64]) -> Dict[str, Any]:
+    def _detect_artifacts(self, ecg_signal: npt.NDArray[np.float64]) -> dict[str, Any]:
         """
         Detect various types of artifacts in the ECG signal.
         """
@@ -236,12 +236,11 @@ class EnhancedSignalQualityAnalyzer:
             logger.error(f"Artifact detection failed: {e}")
             return {}
 
-    def _detect_flat_segments(self, lead_data: npt.NDArray[np.float64]) -> List[Tuple[int, int]]:
+    def _detect_flat_segments(self, lead_data: npt.NDArray[np.float64]) -> list[tuple[int, int]]:
         """
         Detect flat line segments in a lead.
         """
         try:
-            flat_segments = []
             threshold = 0.001  # Very small variation threshold
             min_length = int(0.1 * self.fs)  # 100ms minimum
 
@@ -273,7 +272,7 @@ class EnhancedSignalQualityAnalyzer:
             logger.error(f"Flat segment detection failed: {e}")
             return []
 
-    def _detect_sudden_jumps(self, lead_data: npt.NDArray[np.float64]) -> List[int]:
+    def _detect_sudden_jumps(self, lead_data: npt.NDArray[np.float64]) -> list[int]:
         """
         Detect sudden amplitude jumps in a lead.
         """
@@ -313,7 +312,7 @@ class EnhancedSignalQualityAnalyzer:
             logger.error(f"Periodic interference detection failed: {e}")
             return False
 
-    def _analyze_frequency_domain(self, ecg_signal: npt.NDArray[np.float64]) -> Dict[str, Any]:
+    def _analyze_frequency_domain(self, ecg_signal: npt.NDArray[np.float64]) -> dict[str, Any]:
         """
         Analyze frequency domain characteristics.
         """
