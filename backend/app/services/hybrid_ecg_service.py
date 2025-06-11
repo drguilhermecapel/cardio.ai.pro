@@ -572,6 +572,16 @@ class HybridECGAnalysisService:
         # self.ecg_logger = get_ecg_logger(__name__)  # Disabled for core component
         self.ecg_logger = logger
 
+        try:
+            from .dataset_service import DatasetService
+            self.dataset_service = DatasetService()
+            self.dataset_service_available = True
+            logger.info("✓ Dataset service initialized for public ECG datasets")
+        except Exception as e:
+            logger.warning(f"Dataset service not available: {e}")
+            self.dataset_service = None
+            self.dataset_service_available = False
+
         logger.info("Hybrid ECG Analysis Service initialized with advanced preprocessing pipeline")
 
     async def analyze_ecg_comprehensive(
