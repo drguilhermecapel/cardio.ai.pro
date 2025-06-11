@@ -3,6 +3,7 @@ Constants for CardioAI Pro.
 """
 
 from enum import Enum
+from typing import Dict, List
 
 
 class UserRoles(str, Enum):
@@ -55,6 +56,10 @@ class DiagnosisCategory(str, Enum):
     CONDUCTION_DISORDER = "conduction_disorder"
     ISCHEMIA = "ischemia"
     HYPERTROPHY = "hypertrophy"
+    AXIS_DEVIATION = "axis_deviation"
+    REPOLARIZATION = "repolarization"
+    PACEMAKER = "pacemaker"
+    BUNDLE_BRANCH_BLOCK = "bundle_branch_block"
     OTHER = "other"
 
 
@@ -149,11 +154,15 @@ QRS_DURATION_NORMAL_RANGE = (80, 120)  # ms
 
 CRITICAL_CONDITIONS = [
     "Ventricular Fibrillation",
-    "Ventricular Tachycardia",
+    "Ventricular Tachycardia", 
     "Complete Heart Block",
     "STEMI",
     "Asystole",
     "Torsades de Pointes",
+    "Acute Myocardial Infarction",
+    "Third Degree AV Block",
+    "Ventricular Flutter",
+    "Polymorphic Ventricular Tachycardia",
 ]
 
 ICD10_CODES = {
@@ -165,6 +174,46 @@ ICD10_CODES = {
     "I25.2": "Old Myocardial Infarction",
     "I42.0": "Dilated Cardiomyopathy",
     "I42.1": "Obstructive Hypertrophic Cardiomyopathy",
+    "I48.0": "Atrial Fibrillation",
+    "I48.3": "Atrial Flutter",
+    "I44.0": "First Degree AV Block",
+    "I44.1": "Second Degree AV Block",
+    "I45.0": "Right Bundle Branch Block",
+    "I45.2": "Left Bundle Branch Block",
+    "I51.7": "Cardiomegaly",
+    "I25.10": "Atherosclerotic Heart Disease",
+}
+
+SCP_ECG_CATEGORIES = {
+    "NORMAL": ["NORM"],
+    "ARRHYTHMIA": ["AFIB", "AFLT", "SVTAC", "VTAC", "BIGU", "TRIGU", "PVC", "PAC"],
+    "CONDUCTION_DISORDER": ["AVB1", "AVB2", "AVB3", "RBBB", "LBBB", "LAFB", "LPFB", "WPW"],
+    "ISCHEMIA": ["STEMI", "NSTEMI", "UAP", "ISCH", "QWAVE", "TWAVE"],
+    "HYPERTROPHY": ["LVH", "RVH", "LAE", "RAE", "BIAE"],
+    "AXIS_DEVIATION": ["LAD", "RAD", "EAXIS"],
+    "REPOLARIZATION": ["LQTS", "SQTS", "EARLY", "TWAV", "UWAVE"],
+    "PACEMAKER": ["PACE", "PACED", "PACEF"],
+    "BUNDLE_BRANCH_BLOCK": ["RBBB", "LBBB", "IVCD", "BIFB"],
+    "OTHER": ["LOWV", "ARTIF", "NOISE", "POOR"]
+}
+
+SCP_ECG_PERFORMANCE_TARGETS = {
+    "NORMAL": {"sensitivity": 0.99, "specificity": 0.95, "npv": 0.99},
+    "ARRHYTHMIA": {"sensitivity": 0.95, "specificity": 0.90, "ppv": 0.85},
+    "CONDUCTION_DISORDER": {"sensitivity": 0.90, "specificity": 0.95, "auc": 0.92},
+    "ISCHEMIA": {"sensitivity": 0.98, "specificity": 0.85, "critical": True},
+    "HYPERTROPHY": {"sensitivity": 0.85, "specificity": 0.90, "auc": 0.90},
+    "AXIS_DEVIATION": {"sensitivity": 0.90, "specificity": 0.85, "auc": 0.88},
+    "REPOLARIZATION": {"sensitivity": 0.88, "specificity": 0.90, "auc": 0.89},
+    "PACEMAKER": {"sensitivity": 0.95, "specificity": 0.98, "auc": 0.96},
+    "BUNDLE_BRANCH_BLOCK": {"sensitivity": 0.92, "specificity": 0.95, "auc": 0.93},
+}
+
+SCP_ECG_URGENCY_MAPPING = {
+    "CRITICAL": ["VTAC", "VFIB", "AVB3", "STEMI", "ASYS", "TORSADES"],
+    "HIGH": ["AFIB", "AFLT", "SVTAC", "NSTEMI", "UAP", "AVB2", "WPW"],
+    "MEDIUM": ["PVC", "PAC", "AVB1", "RBBB", "LBBB", "LVH", "RVH"],
+    "LOW": ["NORM", "SINUS", "LOWV", "MINOR"]
 }
 
 ANVISA_RETENTION_YEARS = 7
