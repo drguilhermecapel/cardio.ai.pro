@@ -379,19 +379,14 @@ class AdvancedMLService:
 
         if self.interpretability_service:
             try:
-                shap_explanation = await self.interpretability_service.generate_shap_explanation(
+                comprehensive_explanation = await self.interpretability_service.generate_comprehensive_explanation(
                     signal=ecg_signal,
-                    model_predictions=results['probabilities']
-                )
-
-                lime_explanation = await self.interpretability_service.generate_lime_explanation(
-                    signal=ecg_signal,
-                    model_predictions=results['probabilities']
+                    model_predictions=results['probabilities'],
+                    detected_conditions=results.get('detected_conditions', {})
                 )
 
                 results['detailed_interpretability'] = {
-                    'shap': shap_explanation,
-                    'lime': lime_explanation,
+                    'comprehensive_explanation': comprehensive_explanation,
                     'feature_attribution': self._calculate_feature_attribution(results),
                     'attention_analysis': self._extract_attention_weights(results)
                 }
