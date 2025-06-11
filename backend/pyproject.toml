@@ -47,6 +47,18 @@ onnx = "^1.18.0"
 matplotlib = "^3.10.3"
 h5py = "^3.14.0"
 
+# Deep Learning
+torch = "^2.0.0"
+torchvision = "^0.15.0"
+transformers = "^4.30.0"
+
+# Advanced ML
+optuna = "^3.2.0"
+wandb = "^0.15.0"
+
+# Signal Processing (additional)
+librosa = "^0.10.0"
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 pytest-asyncio = "^0.23.6"
@@ -148,6 +160,10 @@ omit = [
     "*/__init__.py",
     "app/datasets/ecg_datasets_quickguide.py",
     "app/datasets/ecg_public_datasets.py",
+    "app/ml/hybrid_architecture.py",
+    "app/ml/training_pipeline.py",
+    "app/ml/ecg_gan.py",
+    "app/utils/data_augmentation.py",
 ]
 
 [tool.coverage.report]
