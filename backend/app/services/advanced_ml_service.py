@@ -161,7 +161,7 @@ class AdvancedMLService:
 
         except Exception as e:
             logger.error(f"Failed to load models: {e}")
-            raise ECGProcessingException(f"Model loading failed: {e}")
+            raise ECGProcessingException(f"Model loading failed: {e}") from e
 
     def _load_ensemble_models(self) -> None:
         """Load individual models for ensemble inference"""
@@ -294,7 +294,7 @@ class AdvancedMLService:
 
         except Exception as e:
             logger.error(f"Advanced ECG analysis failed: {e}")
-            raise ECGProcessingException(f"Advanced ML analysis failed: {e}")
+            raise ECGProcessingException(f"Advanced ML analysis failed: {e}") from e
 
     async def _fast_inference(self, ecg_tensor: torch.Tensor) -> dict[str, Any]:
         """Fast inference using single best model"""
@@ -521,7 +521,7 @@ class AdvancedMLService:
 
         except Exception as e:
             logger.error(f"Model training failed: {e}")
-            raise ECGProcessingException(f"Training failed: {e}")
+            raise ECGProcessingException(f"Training failed: {e}") from e
 
     async def _load_trained_model(self, model_path: str) -> None:
         """Load trained model weights"""
@@ -575,7 +575,7 @@ class AdvancedMLService:
 
         except Exception as e:
             logger.error(f"Synthetic data generation failed: {e}")
-            raise ECGProcessingException(f"GAN generation failed: {e}")
+            raise ECGProcessingException(f"GAN generation failed: {e}") from e
 
     def get_model_performance(self) -> dict[str, ModelPerformanceMetrics]:
         """Get performance metrics for all models"""
@@ -669,7 +669,7 @@ class AdvancedMLService:
 
         except Exception as e:
             logger.error(f"Performance benchmark failed: {e}")
-            raise ECGProcessingException(f"Benchmark failed: {e}")
+            raise ECGProcessingException(f"Benchmark failed: {e}") from e
 
 async def create_advanced_ml_service(
     model_type: ModelType = ModelType.HYBRID_CNN_LSTM_TRANSFORMER,

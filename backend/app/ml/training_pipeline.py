@@ -426,7 +426,7 @@ class ECGTrainingPipeline:
             mapped_codes = []
             difficulty_scores = []
 
-            for i, (signal, code) in enumerate(zip(processed_signals, condition_codes, strict=False)):
+            for i, (_, code) in enumerate(zip(processed_signals, condition_codes, strict=False)):
                 condition = get_condition_by_code(code)
                 if condition:
                     label = list(SCP_ECG_CONDITIONS.keys()).index(code)
@@ -630,7 +630,7 @@ class ECGTrainingPipeline:
                     all_labels, all_predictions,
                     multi_class='ovr', average='weighted'
                 )
-            except:
+            except Exception:
                 auc_score = 0.0
 
         except Exception as e:
