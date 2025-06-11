@@ -241,7 +241,7 @@ trio = ["trio (>=0.26.1)"]
 name = "appdirs"
 version = "1.4.4"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
@@ -339,7 +339,7 @@ tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 name = "audioread"
 version = "3.0.1"
 description = "Multi-library, cross-platform audio decoding."
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "audioread-3.0.1-py3-none-any.whl", hash = "sha256:4cdce70b8adc0da0a3c9e0d85fb10b3ace30fbdf8d1670fd443929b61d117c33"},
@@ -846,7 +846,7 @@ cron = ["capturer (>=2.4)"]
 name = "colorlog"
 version = "6.9.0"
 description = "Add colours to the output of Python's logging module."
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "colorlog-6.9.0-py3-none-any.whl", hash = "sha256:5906e71acd67cb07a71e779c47c4bcb45fb8c2993eebe9e5adcd6a6f1b283eff"},
@@ -1092,7 +1092,7 @@ tests = ["pytest", "pytest-cov", "pytest-xdist"]
 name = "decorator"
 version = "5.2.1"
 description = "Decorators for Humans"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "decorator-5.2.1-py3-none-any.whl", hash = "sha256:d316bb415a2d9e2d2b3abcc4084c6502fc09240e292cd76a76afc106a1c8e04a"},
@@ -1134,7 +1134,7 @@ wmi = ["wmi (>=1.5.1)"]
 name = "docker-pycreds"
 version = "0.4.0"
 description = "Python bindings for the docker credentials store API"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "docker-pycreds-0.4.0.tar.gz", hash = "sha256:6ce3270bcaf404cc4c3e27e4b6c70d3521deae82fb508767870fdbf772d584d4"},
@@ -1444,7 +1444,7 @@ tqdm = ["tqdm"]
 name = "gitdb"
 version = "4.0.12"
 description = "Git Object Database"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "gitdb-4.0.12-py3-none-any.whl", hash = "sha256:67073e15955400952c6565cc3e707c554a4eea2e428946f7a4c162fab9bd9bcf"},
@@ -1458,7 +1458,7 @@ smmap = ">=3.0.1,<6"
 name = "gitpython"
 version = "3.1.44"
 description = "GitPython is a Python library used to interact with Git repositories"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "GitPython-3.1.44-py3-none-any.whl", hash = "sha256:9e0e10cda9bed1ee64bc9a6de50e7e38a9c9943241cd7f585f6df3ed28011110"},
@@ -1592,7 +1592,7 @@ numpy = ">=1.19.3"
 name = "hf-xet"
 version = "1.1.3"
 description = "Fast transfer of large files with the Hugging Face Hub."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "hf_xet-1.1.3-cp37-abi3-macosx_10_12_x86_64.whl", hash = "sha256:c3b508b5f583a75641aebf732853deb058953370ce8184f5dabc49f803b0819b"},
@@ -1713,7 +1713,7 @@ zstd = ["zstandard (>=0.18.0)"]
 name = "huggingface-hub"
 version = "0.33.0"
 description = "Client library to download and publish models, datasets and other repos on the huggingface.co hub"
-optional = false
+optional = true
 python-versions = ">=3.8.0"
 files = [
     {file = "huggingface_hub-0.33.0-py3-none-any.whl", hash = "sha256:e8668875b40c68f9929150d99727d39e5ebb8a05a98e4191b908dc7ded9074b3"},
@@ -1851,7 +1851,7 @@ colors = ["colorama (>=0.4.6)"]
 name = "jinja2"
 version = "3.1.6"
 description = "A very fast and expressive template engine."
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67"},
@@ -2022,7 +2022,7 @@ test = ["pytest (>=7.4)", "pytest-cov (>=4.1)"]
 name = "librosa"
 version = "0.10.2.post1"
 description = "Python module for audio and music processing"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "librosa-0.10.2.post1-py3-none-any.whl", hash = "sha256:dc882750e8b577a63039f25661b7e39ec4cfbacc99c1cffba666cd664fb0a7a0"},
@@ -2281,7 +2281,7 @@ tests = ["pytest (>=4.6)"]
 name = "msgpack"
 version = "1.1.0"
 description = "MessagePack serializer"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "msgpack-1.1.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:7ad442d527a7e358a469faf43fda45aaf4ac3249c8310a82f0ccff9164e5dccd"},
@@ -2768,7 +2768,7 @@ numpy = [
 name = "optuna"
 version = "3.6.2"
 description = "A hyperparameter optimization framework"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "optuna-3.6.2-py3-none-any.whl", hash = "sha256:052dafa62964d0c700098275f449c39692aa6b97c4c15509163c5bb15ed852fa"},
@@ -2954,7 +2954,7 @@ files = [
 name = "pathtools"
 version = "0.1.2"
 description = "File system general utilities"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "pathtools-0.1.2.tar.gz", hash = "sha256:7c35c5421a39bb82e58018febd90e3b6e5db34c5443aaaf742b3f33d4655f1c0"},
@@ -3118,7 +3118,7 @@ testing = ["coverage", "pytest", "pytest-benchmark"]
 name = "pooch"
 version = "1.8.2"
 description = "A friend to fetch your data files"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "pooch-1.8.2-py3-none-any.whl", hash = "sha256:3529a57096f7198778a5ceefd5ac3ef0e4d06a6ddaf9fc2d609b806f25302c47"},
@@ -3913,7 +3913,7 @@ files = [
 name = "regex"
 version = "2024.11.6"
 description = "Alternative regular expression module, to replace re."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "regex-2024.11.6-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:ff590880083d60acc0433f9c3f713c51f7ac6ebb9adf889c79a261ecf541aa91"},
@@ -4077,7 +4077,7 @@ files = [
 name = "safetensors"
 version = "0.5.3"
 description = ""
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "safetensors-0.5.3-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:bd20eb133db8ed15b40110b7c00c6df51655a2998132193de2f75f72d99c7073"},
@@ -4340,7 +4340,7 @@ tornado = ["tornado (>=5)"]
 name = "setproctitle"
 version = "1.3.6"
 description = "A Python module to customize the process title"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "setproctitle-1.3.6-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:ebcf34b69df4ca0eabaaaf4a3d890f637f355fed00ba806f7ebdd2d040658c26"},
@@ -4544,7 +4544,7 @@ files = [
 name = "smmap"
 version = "5.0.2"
 description = "A pure Python implementation of a sliding window memory map manager"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "smmap-5.0.2-py3-none-any.whl", hash = "sha256:b30115f0def7d7531d22a0fb6502488d879e75b260a9db4d0819cfb25403af5e"},
@@ -4587,7 +4587,7 @@ numpy = "*"
 name = "soxr"
 version = "0.5.0.post1"
 description = "High quality, one-dimensional sample-rate conversion library"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "soxr-0.5.0.post1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:7406d782d85f8cf64e66b65e6b7721973de8a1dc50b9e88bc2288c343a987484"},
@@ -4818,7 +4818,7 @@ zarr = ["fsspec", "kerchunk", "zarr (>=3)"]
 name = "tokenizers"
 version = "0.21.1"
 description = ""
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "tokenizers-0.21.1-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:e78e413e9e668ad790a29456e677d9d3aa50a9ad311a40905d6861ba7692cf41"},
@@ -4850,7 +4850,7 @@ testing = ["black (==22.3)", "datasets", "numpy", "pytest", "requests", "ruff"]
 name = "torch"
 version = "2.0.1"
 description = "Tensors and Dynamic neural networks in Python with strong GPU acceleration"
-optional = false
+optional = true
 python-versions = ">=3.8.0"
 files = [
     {file = "torch-2.0.1-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:8ced00b3ba471856b993822508f77c98f48a458623596a4c43136158781e306a"},
@@ -4889,7 +4889,7 @@ opt-einsum = ["opt-einsum (>=3.3)"]
 name = "torchvision"
 version = "0.15.2"
 description = "image and video datasets and models for torch deep learning"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "torchvision-0.15.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:7754088774e810c5672b142a45dcf20b1bd986a5a7da90f8660c43dc43fb850c"},
@@ -4948,7 +4948,7 @@ telegram = ["requests"]
 name = "transformers"
 version = "4.52.4"
 description = "State-of-the-art Machine Learning for JAX, PyTorch and TensorFlow"
-optional = false
+optional = true
 python-versions = ">=3.9.0"
 files = [
     {file = "transformers-4.52.4-py3-none-any.whl", hash = "sha256:203f5c19416d5877e36e88633943761719538a25d9775977a24fe77a1e5adfc7"},
@@ -5251,7 +5251,7 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 name = "wandb"
 version = "0.15.12"
 description = "A CLI and library for interacting with the Weights & Biases API."
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "wandb-0.15.12-py3-none-any.whl", hash = "sha256:75c57b5bb8ddae21d45a02f644628585bdd112fea686de3177099a0996f1c41c"},
@@ -5602,7 +5602,10 @@ idna = ">=2.0"
 multidict = ">=4.0"
 propcache = ">=0.2.1"
 
+[extras]
+ml = ["librosa", "optuna", "torch", "torchvision", "transformers", "wandb"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "4f8304ba9c9a59945d69bef41e58526632c3fe0b338c13a2c7a09c16d58f261c"
+content-hash = "9ff2dcfd6dfc066ccc1d03b9a84c96dbaa114f89bb59c2925bef9f46c75d4351"
