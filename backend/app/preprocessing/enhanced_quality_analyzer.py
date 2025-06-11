@@ -81,7 +81,7 @@ class EnhancedSignalQualityAnalyzer:
             logger.error(f"Comprehensive quality assessment failed: {e}")
             return self._get_default_quality_metrics()
     
-    def _analyze_lead_comprehensive(self, lead_data: npt.NDArray[np.float64], lead_idx: int) -> Dict[str, Any]:
+    def _analyze_lead_comprehensive(self, lead_data: npt.NDArray[np.float64], lead_idx: int) -> dict[str, Any]:
         """
         Comprehensive analysis of a single ECG lead.
         """
@@ -342,18 +342,18 @@ class EnhancedSignalQualityAnalyzer:
                     
                     dominant_idx = np.argmax(psd)
                     dominant_freqs.append(freqs[dominant_idx])
-                    
+
                     cumsum_psd = np.cumsum(psd)
                     total_power = cumsum_psd[-1]
                     idx_90 = np.where(cumsum_psd >= 0.9 * total_power)[0]
                     if len(idx_90) > 0:
                         bandwidths.append(freqs[idx_90[0]])
-                    
+
                     ecg_mask = (freqs >= 0.5) & (freqs <= 40)
                     ecg_power = np.sum(psd[ecg_mask])
                     total_power = np.sum(psd)
                     ecg_ratios.append(ecg_power / (total_power + 1e-10))
-            
+
             if spectral_entropies:
                 freq_analysis['spectral_entropy'] = float(np.mean(spectral_entropies))
             if dominant_freqs:
@@ -362,14 +362,14 @@ class EnhancedSignalQualityAnalyzer:
                 freq_analysis['bandwidth_90'] = float(np.mean(bandwidths))
             if ecg_ratios:
                 freq_analysis['ecg_band_power_ratio'] = float(np.mean(ecg_ratios))
-            
+
             return freq_analysis
-            
+
         except Exception as e:
             logger.error(f"Frequency domain analysis failed: {e}")
             return {}
-    
-    def _assess_morphology(self, ecg_signal: npt.NDArray[np.float64]) -> Dict[str, Any]:
+
+    def _assess_morphology(self, ecg_signal: npt.NDArray[np.float64]) -> dict[str, Any]:
         """
         Assess ECG morphology characteristics.
         """
@@ -387,7 +387,7 @@ class EnhancedSignalQualityAnalyzer:
                 amplitude_mean = np.mean(np.abs(lead_data))
                 amp_variation = amplitude_std / (amplitude_mean + 1e-10)
                 morphology['amplitude_variation'] += amp_variation
-                
+
                 if len(lead_data) >= 256:
                     freqs, psd = signal.welch(lead_data, fs=self.fs, nperseg=256)
                     hf_mask = freqs > 40
@@ -395,17 +395,17 @@ class EnhancedSignalQualityAnalyzer:
                     total_power = np.sum(psd)
                     stability = 1.0 - (hf_power / (total_power + 1e-10))
                     morphology['morphology_stability'] += stability
-            
+
             num_leads = ecg_signal.shape[1]
             morphology['amplitude_variation'] = float(morphology['amplitude_variation'] / num_leads)
             morphology['morphology_stability'] = float(morphology['morphology_stability'] / num_leads)
-            
+
             return morphology
-            
+
         except Exception as e:
             logger.error(f"Morphology assessment failed: {e}")
             return {}
-    
+
     def _detect_lead_artifacts(self, lead_data: npt.NDArray[np.float64]) -> tuple[list[str], list[str]]:
         """
         Detect artifacts in a single lead.
