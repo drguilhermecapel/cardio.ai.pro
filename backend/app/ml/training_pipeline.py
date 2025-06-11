@@ -108,7 +108,7 @@ class ECGMultimodalDataset(Dataset):
         if config.use_spectrograms or config.use_wavelets:
             self._precompute_multimodal_representations()
 
-    def _precompute_multimodal_representations(self):
+    def _precompute_multimodal_representations(self) -> None:
         """Precompute spectrograms and wavelet representations"""
         logger.info("Precomputing multimodal representations...")
 
@@ -336,7 +336,7 @@ class ECGTrainingPipeline:
                 name=f"hybrid_ecg_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
             )
 
-    def setup_model(self):
+    def setup_model(self) -> None:
         """Initialize model, optimizer, and loss function"""
         self.model = create_hybrid_model(
             num_classes=self.config.model_config.num_classes,
