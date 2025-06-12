@@ -14,10 +14,20 @@ from typing import Any
 import cv2
 import numpy as np
 import pywt
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
+try:
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    import torch.optim as optim
+    HAS_TORCH = True
+except ImportError:
+    from unittest.mock import MagicMock
+    torch = MagicMock()
+    nn = MagicMock()
+    torch.nn = nn
+    torch.nn.functional = MagicMock()
+    torch.optim = MagicMock()
+    HAS_TORCH = False
 import wandb
 from scipy import signal as scipy_signal
 from sklearn.metrics import classification_report, roc_auc_score

@@ -21,7 +21,7 @@ from typing import Dict, Any, Tuple
 
 from app.ml.hybrid_architecture import (
     HybridECGModel, ModelConfig, FrequencyChannelAttention,
-    DenseBlock, TransitionLayer, EnsembleVoting
+    DenseBlock, TransitionLayer, EnsembleVotingSystem
 )
 from app.ml.training_pipeline import TrainingPipeline, TrainingConfig, ECGMultimodalDataset
 
@@ -145,7 +145,7 @@ class TestHybridArchitecture:
         assert hasattr(model.transformer_branch, 'transformer_encoder')
         assert hasattr(model.transformer_branch, 'positional_encoding')
         
-        assert isinstance(model.ensemble_voting, EnsembleVoting)
+        assert isinstance(model.ensemble_voting, EnsembleVotingSystem)
     
     def test_hybrid_model_forward_pass(self, model_config, sample_ecg_batch):
         """Test hybrid model forward pass"""
@@ -184,7 +184,7 @@ class TestHybridArchitecture:
         batch_size = 4
         weights = [0.3, 0.3, 0.4]
         
-        ensemble = EnsembleVoting(weights)
+        ensemble = EnsembleVotingSystem(weights)
         
         cnn_logits = torch.randn(batch_size, num_classes)
         lstm_logits = torch.randn(batch_size, num_classes)
