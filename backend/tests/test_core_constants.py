@@ -38,6 +38,10 @@ def test_diagnosis_category_enum():
     assert DiagnosisCategory.ISCHEMIA == "ischemia"
     assert DiagnosisCategory.CONDUCTION_DISORDER == "conduction_disorder"
     assert DiagnosisCategory.HYPERTROPHY == "hypertrophy"
+    assert DiagnosisCategory.AXIS_DEVIATION == "axis_deviation"
+    assert DiagnosisCategory.REPOLARIZATION == "repolarization"
+    assert DiagnosisCategory.PACEMAKER == "pacemaker"
+    assert DiagnosisCategory.BUNDLE_BRANCH_BLOCK == "bundle_branch_block"
     assert DiagnosisCategory.OTHER == "other"
 
 
@@ -87,7 +91,7 @@ def test_enum_completeness():
     assert len(UserRoles) == 6
     assert len(AnalysisStatus) == 5
     assert len(ClinicalUrgency) == 4
-    assert len(DiagnosisCategory) == 6
+    assert len(DiagnosisCategory) == 10
     assert len(NotificationType) == 7
     assert len(NotificationPriority) == 5
     assert len(ValidationStatus) == 4
