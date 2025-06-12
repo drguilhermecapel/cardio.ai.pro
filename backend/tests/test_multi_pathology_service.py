@@ -10,7 +10,8 @@ import asyncio
 from typing import Dict, Any
 
 from app.services.multi_pathology_service import MultiPathologyService
-from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS, SCPCategory, ClinicalUrgency
+from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS, SCPCategory
+from app.core.constants import ClinicalUrgency
 
 
 class TestMultiPathologyService:

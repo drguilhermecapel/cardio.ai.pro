@@ -346,9 +346,12 @@ class MLModelService:
             }
 
     def _extract_features_for_interpretability(self, signal: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
-        """Extract basic features from ECG signal for interpretability analysis."""
+        """Extract basic features from ECG signal for interpretability analysis.
+
+        All numeric values maintain float precision for medical diagnostic accuracy.
+        """
         try:
-            features = {}
+            features: dict[str, Any] = {}
 
             features['signal_length'] = signal.shape[0]
             features['num_leads'] = signal.shape[1]

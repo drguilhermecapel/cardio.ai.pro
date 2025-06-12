@@ -4,18 +4,26 @@ Tests deep learning components and integrated dataset functionality
 """
 
 import pytest
-import torch
-import torch.nn as nn
 import numpy as np
+from unittest.mock import Mock, patch, MagicMock
+
+try:
+    import torch
+    import torch.nn as nn
+    HAS_TORCH = True
+except ImportError:
+    HAS_TORCH = False
+    torch = MagicMock()
+    torch.nn = MagicMock()
 from unittest.mock import Mock, patch, MagicMock
 import asyncio
 from typing import Dict, Any, Tuple
 
 from app.ml.hybrid_architecture import (
     HybridECGModel, ModelConfig, FrequencyChannelAttention,
-    DenseBlock, TransitionLayer, EnsembleVoting
+    DenseBlock, TransitionLayer, EnsembleVotingSystem
 )
-from app.ml.training_pipeline import TrainingPipeline, TrainingConfig, ECGMultimodalDataset
+from app.ml.training_pipeline import ECGTrainingPipeline, TrainingConfig, ECGMultimodalDataset
 
 
 class TestHybridArchitecture:
@@ -25,17 +33,14 @@ class TestHybridArchitecture:
     def model_config(self):
         """Create model configuration for testing"""
         return ModelConfig(
-            num_classes=71,
             input_channels=12,
             sequence_length=5000,
-            cnn_channels=[64, 128, 256],
-            lstm_hidden_size=256,
-            lstm_num_layers=2,
-            transformer_d_model=512,
-            transformer_nhead=8,
-            transformer_num_layers=6,
-            dropout=0.1,
-            use_attention=True,
+            num_classes=71,
+            cnn_growth_rate=32,
+            lstm_hidden_dim=256,
+            transformer_heads=8,
+            transformer_layers=4,
+            dropout_rate=0.2,
             ensemble_weights=[0.3, 0.3, 0.4]
         )
     
@@ -137,7 +142,7 @@ class TestHybridArchitecture:
         assert hasattr(model.transformer_branch, 'transformer_encoder')
         assert hasattr(model.transformer_branch, 'positional_encoding')
         
-        assert isinstance(model.ensemble_voting, EnsembleVoting)
+        assert isinstance(model.ensemble_voting, EnsembleVotingSystem)
     
     def test_hybrid_model_forward_pass(self, model_config, sample_ecg_batch):
         """Test hybrid model forward pass"""
@@ -176,7 +181,7 @@ class TestHybridArchitecture:
         batch_size = 4
         weights = [0.3, 0.3, 0.4]
         
-        ensemble = EnsembleVoting(weights)
+        ensemble = EnsembleVotingSystem(weights)
         
         cnn_logits = torch.randn(batch_size, num_classes)
         lstm_logits = torch.randn(batch_size, num_classes)
@@ -270,26 +275,27 @@ class TestTrainingPipeline:
         """Create training configuration for testing"""
         return TrainingConfig(
             model_config=ModelConfig(
-                num_classes=71,
                 input_channels=12,
-                sequence_length=5000
+                sequence_length=5000,
+                num_classes=71,
+                cnn_growth_rate=32,
+                lstm_hidden_dim=256,
+                transformer_heads=8,
+                transformer_layers=4,
+                dropout_rate=0.2
             ),
             batch_size=8,
             learning_rate=1e-4,
-            num_epochs=2,  # Small for testing
+            num_epochs=2,
             weight_decay=1e-5,
-            scheduler_step_size=10,
-            scheduler_gamma=0.1,
-            early_stopping_patience=5,
+            gradient_clip_norm=1.0,
             curriculum_learning=True,
-            curriculum_epochs=[1, 2],
-            curriculum_difficulties=[0.5, 1.0],
-            use_wandb=False,  # Disable for testing
-            wandb_project="test_project",
-            save_checkpoints=True,
+            curriculum_stages=2,
+            curriculum_epochs_per_stage=1,
+            early_stopping_patience=5,
+            use_wandb=False,
             checkpoint_dir="/tmp/test_checkpoints",
-            validate_every=1,
-            log_every=10
+            device="cpu"
         )
     
     @pytest.fixture
@@ -336,7 +342,7 @@ class TestTrainingPipeline:
     
     def test_training_pipeline_initialization(self, training_config):
         """Test training pipeline initialization"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         assert hasattr(pipeline, 'config')
         assert hasattr(pipeline, 'model')
@@ -353,7 +359,7 @@ class TestTrainingPipeline:
     @pytest.mark.asyncio
     async def test_training_pipeline_train_epoch(self, training_config, sample_dataset):
         """Test training pipeline epoch training"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         from torch.utils.data import DataLoader
         train_loader = DataLoader(sample_dataset, batch_size=4, shuffle=True)
@@ -375,7 +381,7 @@ class TestTrainingPipeline:
     @pytest.mark.asyncio
     async def test_training_pipeline_validate_epoch(self, training_config, sample_dataset):
         """Test training pipeline epoch validation"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         from torch.utils.data import DataLoader
         val_loader = DataLoader(sample_dataset, batch_size=4, shuffle=False)
@@ -396,7 +402,7 @@ class TestTrainingPipeline:
     
     def test_curriculum_learning_setup(self, training_config):
         """Test curriculum learning setup"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         difficulty_1 = pipeline._get_curriculum_difficulty(epoch=1)
         difficulty_2 = pipeline._get_curriculum_difficulty(epoch=2)
@@ -413,7 +419,7 @@ class TestTrainingPipeline:
         
         with tempfile.TemporaryDirectory() as temp_dir:
             training_config.checkpoint_dir = temp_dir
-            pipeline = TrainingPipeline(training_config)
+            pipeline = ECGTrainingPipeline(training_config)
             
             checkpoint_path = pipeline._save_checkpoint(
                 epoch=1,
@@ -437,7 +443,7 @@ class TestTrainingPipeline:
     
     def test_performance_metrics_calculation(self, training_config):
         """Test performance metrics calculation"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         batch_size = 8
         num_classes = 71
@@ -459,7 +465,7 @@ class TestTrainingPipeline:
     
     def test_early_stopping_mechanism(self, training_config):
         """Test early stopping mechanism"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         val_losses = [1.0, 0.9, 0.85, 0.84, 0.84, 0.84, 0.84]  # No improvement after epoch 3
         
@@ -475,7 +481,7 @@ class TestTrainingPipeline:
     @pytest.mark.asyncio
     async def test_training_pipeline_accuracy_improvement(self, training_config, sample_dataset):
         """Test that training pipeline achieves accuracy improvement target (2-5%)"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         from torch.utils.data import DataLoader, random_split
         
@@ -501,7 +507,7 @@ class TestTrainingPipeline:
     
     def test_ensemble_confidence_calibration(self, training_config):
         """Test ensemble confidence calibration"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         batch_size = 16
         num_classes = 71
@@ -562,7 +568,7 @@ class TestIntegratedDatasetFunctionality:
             augment=False
         )
         
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         from torch.utils.data import DataLoader
         data_loader = DataLoader(dataset, batch_size=4, shuffle=True)

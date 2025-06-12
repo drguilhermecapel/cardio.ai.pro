@@ -57,6 +57,21 @@ class DiagnosisCategory(str, Enum):
     BUNDLE_BRANCH_BLOCK = "bundle_branch_block"
     OTHER = "other"
 
+class SCPCategory(str, Enum):
+    """SCP-ECG categories for hierarchical analysis."""
+    NORMAL = "normal"
+    ARRHYTHMIA = "arrhythmia"
+    CONDUCTION_DISORDER = "conduction_disorder"
+    ISCHEMIA = "ischemia"
+    HYPERTROPHY = "hypertrophy"
+    AXIS_DEVIATION = "axis_deviation"
+    CONDUCTION_ABNORMALITIES = "conduction_disorder"
+    ISCHEMIC_CHANGES = "ischemia"
+    STRUCTURAL_ABNORMALITIES = "structural"
+    REPOLARIZATION = "repolarization"
+    PACEMAKER = "pacemaker"
+    OTHER = "other"
+
 class ClinicalUrgency(str, Enum):
     """Clinical urgency levels."""
     LOW = "low"

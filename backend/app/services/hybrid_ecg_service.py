@@ -14,7 +14,7 @@ import numpy.typing as npt
 import pandas as pd
 from scipy import signal
 from scipy.stats import entropy, kurtosis, skew
-from sklearn.preprocessing import StandardScaler  # type: ignore[import-untyped]
+from sklearn.preprocessing import StandardScaler
 
 from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
@@ -61,14 +61,17 @@ class UniversalECGReader:
             result = self.supported_formats[ext](filepath, sampling_rate or 500)
             if hasattr(result, '__await__'):
                 import asyncio
+                import inspect
                 try:
                     loop = asyncio.get_event_loop()
                     if loop.is_running():
                         return {"data": result}
                     else:
-                        result = loop.run_until_complete(result)  # type: ignore
+                        if inspect.iscoroutine(result):
+                            result = loop.run_until_complete(result)
                 except RuntimeError:
-                    result = asyncio.run(result)  # type: ignore
+                    if inspect.iscoroutine(result):
+                        result = asyncio.run(result)
 
             if isinstance(result, dict):
                 return result
@@ -567,6 +570,10 @@ class HybridECGAnalysisService:
         # self.ecg_logger = get_ecg_logger(__name__)  # Disabled for core component
         self.ecg_logger = logger
 
+        self.multi_pathology_service: "MultiPathologyService | None" = None
+        self.interpretability_service: "InterpretabilityService | None" = None
+        self.adaptive_threshold_manager: "AdaptiveThresholdManager | None" = None
+
         try:
             from ..utils.adaptive_thresholds import AdaptiveThresholdManager
             from .interpretability_service import InterpretabilityService
@@ -579,9 +586,6 @@ class HybridECGAnalysisService:
             logger.info("✓ Advanced services initialized (multi-pathology, interpretability, adaptive thresholds)")
         except Exception as e:
             logger.warning(f"Advanced services not available, falling back to simplified analysis: {e}")
-            self.multi_pathology_service: MultiPathologyService | None = None
-            self.interpretability_service: InterpretabilityService | None = None
-            self.adaptive_threshold_manager: AdaptiveThresholdManager | None = None
             self.advanced_services_available = False
 
         try:
@@ -741,13 +745,13 @@ class HybridECGAnalysisService:
                         if isinstance(result, dict) and 'confidence' in result:
                             adaptive_threshold = self.adaptive_threshold_manager.get_adaptive_threshold(
                                 condition_code,
-                                clinical_context={'urgency': pathology_results.get('clinical_urgency', 'LOW')}
+                                context={'urgency': pathology_results.get('clinical_urgency', 'LOW')}
                             )
 
                             result['adaptive_threshold'] = adaptive_threshold
                             result['detected_adaptive'] = result['confidence'] > adaptive_threshold
 
-                return pathology_results
+                return pathology_results if isinstance(pathology_results, dict) else {}
 
             except Exception as e:
                 logger.warning(f"Advanced pathology detection failed, falling back to simplified: {e}")

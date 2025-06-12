@@ -31,6 +31,14 @@ class SCPCategory(str, Enum):
     REPOLARIZATION = "repolarization"
     OTHER = "other"
 
+
+class ClinicalUrgency(str, Enum):
+    """Clinical urgency levels for ECG findings"""
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
 SCP_ECG_CONDITIONS = {
     "NORM": SCPCondition(
         code="NORM",
