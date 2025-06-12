@@ -415,7 +415,7 @@ class ECGDatasetLoader:
             preprocessor: Instância do AdvancedECGPreprocessor para pré-processamento
         """
         if preprocessor is None and ADVANCED_PREPROCESSOR_AVAILABLE:
-            self.preprocessor: "AdvancedECGPreprocessor" | None = AdvancedECGPreprocessor()
+            self.preprocessor: AdvancedECGPreprocessor | None = AdvancedECGPreprocessor()
         else:
             self.preprocessor = preprocessor
 
@@ -647,19 +647,19 @@ class ECGDatasetLoader:
             preprocess: Se True, aplica pré-processamento
         """
         dataset_path_obj = Path(dataset_path)
-        
+
         extracted_dir = None
         for item in dataset_path_obj.iterdir():
             if item.is_dir() and 'challenge-2020' in item.name.lower():
                 extracted_dir = item
                 break
-        
+
         if not extracted_dir:
             self.logger.error("Diretório PhysioNet Challenge 2020 não encontrado")
             return []
 
         data_files = list(extracted_dir.glob("**/*.mat")) + list(extracted_dir.glob("**/*.hea"))
-        
+
         if not data_files:
             self.logger.error("Arquivos de dados não encontrados")
             return []
@@ -674,13 +674,13 @@ class ECGDatasetLoader:
                 if data_file.suffix == '.hea':
                     record = wfdb.rdrecord(str(data_file.with_suffix('')))
                     signal_data = record.p_signal
-                    
+
                     if preprocess and self.preprocessor:
                         try:
                             processed_signal, quality_metrics = self.preprocessor.advanced_preprocessing_pipeline(
                                 signal_data[:, 0], clinical_mode=True
                             )
-                            
+
                             if quality_metrics['quality_score'] > 0.5:
                                 signal_data[:, 0] = processed_signal[:len(signal_data)]
                         except Exception as e:
@@ -700,7 +700,7 @@ class ECGDatasetLoader:
                             'units': record.units if hasattr(record, 'units') else None
                         }
                     )
-                    
+
                     ecg_records.append(ecg_record)
 
             except Exception as e:
@@ -723,19 +723,19 @@ class ECGDatasetLoader:
             preprocess: Se True, aplica pré-processamento
         """
         dataset_path_obj = Path(dataset_path)
-        
+
         extracted_dir = None
         for item in dataset_path_obj.iterdir():
             if item.is_dir() and 'challenge-2021' in item.name.lower():
                 extracted_dir = item
                 break
-        
+
         if not extracted_dir:
             self.logger.error("Diretório PhysioNet Challenge 2021 não encontrado")
             return []
 
         data_files = list(extracted_dir.glob("**/*.mat")) + list(extracted_dir.glob("**/*.hea"))
-        
+
         if not data_files:
             self.logger.error("Arquivos de dados não encontrados")
             return []
@@ -750,13 +750,13 @@ class ECGDatasetLoader:
                 if data_file.suffix == '.hea':
                     record = wfdb.rdrecord(str(data_file.with_suffix('')))
                     signal_data = record.p_signal
-                    
+
                     if preprocess and self.preprocessor:
                         try:
                             processed_signal, quality_metrics = self.preprocessor.advanced_preprocessing_pipeline(
                                 signal_data[:, 0], clinical_mode=True
                             )
-                            
+
                             if quality_metrics['quality_score'] > 0.5:
                                 signal_data[:, 0] = processed_signal[:len(signal_data)]
                         except Exception as e:
@@ -776,7 +776,7 @@ class ECGDatasetLoader:
                             'units': record.units if hasattr(record, 'units') else None
                         }
                     )
-                    
+
                     ecg_records.append(ecg_record)
 
             except Exception as e:
@@ -799,13 +799,13 @@ class ECGDatasetLoader:
             preprocess: Se True, aplica pré-processamento
         """
         dataset_path_obj = Path(dataset_path)
-        
+
         if not dataset_path_obj.exists():
             self.logger.error(f"Dataset MIMIC-IV-ECG não encontrado: {dataset_path}")
             return []
 
         data_files = list(dataset_path_obj.glob("**/*.hea"))
-        
+
         if not data_files:
             self.logger.error("Arquivos de dados MIMIC-IV-ECG não encontrados")
             return []
@@ -819,13 +819,13 @@ class ECGDatasetLoader:
             try:
                 record = wfdb.rdrecord(str(data_file.with_suffix('')))
                 signal_data = record.p_signal
-                
+
                 if preprocess and self.preprocessor:
                     try:
                         processed_signal, quality_metrics = self.preprocessor.advanced_preprocessing_pipeline(
                             signal_data[:, 0], clinical_mode=True
                         )
-                        
+
                         if quality_metrics['quality_score'] > 0.5:
                             signal_data[:, 0] = processed_signal[:len(signal_data)]
                     except Exception as e:
@@ -845,7 +845,7 @@ class ECGDatasetLoader:
                         'units': record.units if hasattr(record, 'units') else None
                     }
                 )
-                
+
                 ecg_records.append(ecg_record)
 
             except Exception as e:
@@ -868,13 +868,13 @@ class ECGDatasetLoader:
             preprocess: Se True, aplica pré-processamento
         """
         dataset_path_obj = Path(dataset_path)
-        
+
         if not dataset_path_obj.exists():
             self.logger.error(f"Dataset Icentia11k não encontrado: {dataset_path}")
             return []
 
         data_files = list(dataset_path_obj.glob("**/*.hdf5")) + list(dataset_path_obj.glob("**/*.h5"))
-        
+
         if not data_files:
             self.logger.error("Arquivos de dados Icentia11k não encontrados")
             return []
@@ -890,16 +890,16 @@ class ECGDatasetLoader:
                     if 'ecg' in f:
                         signal_data = f['ecg'][:]
                         sampling_rate = f.attrs.get('sampling_rate', 250)
-                        
+
                         if signal_data.ndim == 1:
                             signal_data = signal_data.reshape(-1, 1)
-                        
+
                         if preprocess and self.preprocessor:
                             try:
                                 processed_signal, quality_metrics = self.preprocessor.advanced_preprocessing_pipeline(
                                     signal_data[:, 0], clinical_mode=True
                                 )
-                                
+
                                 if quality_metrics['quality_score'] > 0.5:
                                     signal_data[:, 0] = processed_signal[:len(signal_data)]
                             except Exception as e:
@@ -918,7 +918,7 @@ class ECGDatasetLoader:
                                 'continuous_monitoring': True
                             }
                         )
-                        
+
                         ecg_records.append(ecg_record)
 
             except Exception as e:
