@@ -572,9 +572,9 @@ class HybridECGAnalysisService:
             from .interpretability_service import InterpretabilityService
             from .multi_pathology_service import MultiPathologyService
 
-            self.multi_pathology_service = MultiPathologyService()
-            self.interpretability_service = InterpretabilityService()
-            self.adaptive_threshold_manager = AdaptiveThresholdManager()
+            self.multi_pathology_service: MultiPathologyService | None = MultiPathologyService()
+            self.interpretability_service: InterpretabilityService | None = InterpretabilityService()
+            self.adaptive_threshold_manager: AdaptiveThresholdManager | None = AdaptiveThresholdManager()
             self.advanced_services_available = True
             logger.info("✓ Advanced services initialized (multi-pathology, interpretability, adaptive thresholds)")
         except Exception as e:
