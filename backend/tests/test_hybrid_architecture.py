@@ -4,18 +4,32 @@ Tests deep learning components and integrated dataset functionality
 """
 
 import pytest
-import torch
-import torch.nn as nn
 import numpy as np
 from unittest.mock import Mock, patch, MagicMock
 import asyncio
 from typing import Dict, Any, Tuple
 
-from app.ml.hybrid_architecture import (
-    HybridECGModel, ModelConfig, FrequencyChannelAttention,
-    DenseBlock, TransitionLayer, EnsembleVoting
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+
+try:
+    from app.ml.hybrid_architecture import (
+        HybridECGModel, ModelConfig, FrequencyChannelAttention,
+        DenseBlock, TransitionLayer, EnsembleVoting
+    )
+    from app.ml.training_pipeline import TrainingPipeline, TrainingConfig, ECGMultimodalDataset
+    ML_MODULES_AVAILABLE = True
+except ImportError:
+    ML_MODULES_AVAILABLE = False
+
+pytestmark = pytest.mark.skipif(
+    not TORCH_AVAILABLE or not ML_MODULES_AVAILABLE,
+    reason="torch or ML modules not available - requires 'poetry install --extras ml'"
 )
-from app.ml.training_pipeline import TrainingPipeline, TrainingConfig, ECGMultimodalDataset
 
 
 class TestHybridArchitecture:
