@@ -727,39 +727,41 @@ class ECGDatasetManager:
         self.data_dir.mkdir(parents=True, exist_ok=True)
         
         self.downloader = ECGDatasetDownloader(str(self.data_dir))
-        self.loader = ECGDatasetLoader(str(self.data_dir))
+        self.loader = ECGDatasetLoader()
         self.analyzer = ECGDatasetAnalyzer()
         
     def download_dataset(self, dataset_name: str) -> bool:
         """Download a specific dataset"""
+        result: str | None = None
         if dataset_name.lower() == "mit_bih":
-            return self.downloader.download_mit_bih()
+            result = self.downloader.download_mit_bih()
         elif dataset_name.lower() == "ptb_xl":
-            return self.downloader.download_ptb_xl()
+            result = self.downloader.download_ptb_xl()
         elif dataset_name.lower() == "cpsc2018":
-            return self.downloader.download_cpsc2018()
+            result = self.downloader.download_cpsc2018()
         else:
             logging.error(f"Unknown dataset: {dataset_name}")
             return False
+        return result is not None
     
-    def load_dataset(self, dataset_name: str) -> list[ECGRecord]:
+    def load_dataset(self, dataset_name: str, dataset_path: str) -> list[ECGRecord]:
         """Load a specific dataset"""
         if dataset_name.lower() == "mit_bih":
-            return self.loader.load_mit_bih()
+            return self.loader.load_mit_bih(dataset_path)
         elif dataset_name.lower() == "ptb_xl":
-            return self.loader.load_ptb_xl()
+            return self.loader.load_ptb_xl(dataset_path)
         else:
             logging.error(f"Unknown dataset: {dataset_name}")
             return []
     
-    def get_unified_dataset(self) -> list[ECGRecord]:
+    def get_unified_dataset(self, datasets: dict[str, list[ECGRecord]]) -> str:
         """Get unified dataset from all available sources"""
-        return self.loader.create_unified_dataset()
+        return self.loader.create_unified_dataset(datasets)
     
-    def analyze_dataset(self, records: list[ECGRecord]) -> dict[str, Any]:
+    def analyze_dataset(self, records: list[ECGRecord], dataset_name: str = "Dataset") -> dict[str, Any]:
         """Analyze dataset statistics"""
-        return self.analyzer.analyze_dataset(records)
+        return self.analyzer.analyze_dataset(records, dataset_name)
     
-    def prepare_for_ml(self, records: list[ECGRecord], **kwargs) -> tuple[np.ndarray, np.ndarray]:
+    def prepare_for_ml(self, records: list[ECGRecord], **kwargs: Any) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
         """Prepare dataset for machine learning"""
         return prepare_ml_dataset(records, **kwargs)
