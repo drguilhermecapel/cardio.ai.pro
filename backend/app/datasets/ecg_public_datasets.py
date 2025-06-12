@@ -721,15 +721,15 @@ def prepare_ml_dataset(records: list[ECGRecord],
 
 class ECGDatasetManager:
     """Unified manager for ECG dataset operations combining download, load, and analysis"""
-    
+
     def __init__(self, data_dir: str = "data/ecg_datasets"):
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
-        
+
         self.downloader = ECGDatasetDownloader(str(self.data_dir))
         self.loader = ECGDatasetLoader()
         self.analyzer = ECGDatasetAnalyzer()
-        
+
     def download_dataset(self, dataset_name: str) -> bool:
         """Download a specific dataset"""
         result: str | None = None
@@ -743,7 +743,7 @@ class ECGDatasetManager:
             logging.error(f"Unknown dataset: {dataset_name}")
             return False
         return result is not None
-    
+
     def load_dataset(self, dataset_name: str, dataset_path: str) -> list[ECGRecord]:
         """Load a specific dataset"""
         if dataset_name.lower() == "mit_bih":
@@ -753,15 +753,15 @@ class ECGDatasetManager:
         else:
             logging.error(f"Unknown dataset: {dataset_name}")
             return []
-    
+
     def get_unified_dataset(self, datasets: dict[str, list[ECGRecord]]) -> str:
         """Get unified dataset from all available sources"""
         return self.loader.create_unified_dataset(datasets)
-    
+
     def analyze_dataset(self, records: list[ECGRecord], dataset_name: str = "Dataset") -> dict[str, Any]:
         """Analyze dataset statistics"""
         return self.analyzer.analyze_dataset(records, dataset_name)
-    
+
     def prepare_for_ml(self, records: list[ECGRecord], **kwargs: Any) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
         """Prepare dataset for machine learning"""
         return prepare_ml_dataset(records, **kwargs)
