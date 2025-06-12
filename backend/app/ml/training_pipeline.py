@@ -20,6 +20,7 @@ try:
     import torch.nn as nn
     import torch.nn.functional as F
     import torch.optim as optim
+    from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
     HAS_TORCH = True
 except ImportError:
     from unittest.mock import MagicMock
@@ -28,6 +29,11 @@ except ImportError:
     torch.nn = nn
     torch.nn.functional = MagicMock()
     torch.optim = MagicMock()
+    torch.utils = MagicMock()
+    torch.utils.data = MagicMock()
+    DataLoader = MagicMock()
+    Dataset = MagicMock()
+    WeightedRandomSampler = MagicMock()
     HAS_TORCH = False
 try:
     import wandb
@@ -39,7 +45,6 @@ except ImportError:
 from scipy import signal as scipy_signal
 from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.model_selection import train_test_split
-from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
 from tqdm import tqdm
 
 from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS, get_condition_by_code
