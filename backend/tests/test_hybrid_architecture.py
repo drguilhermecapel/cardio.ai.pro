@@ -23,7 +23,7 @@ from app.ml.hybrid_architecture import (
     HybridECGModel, ModelConfig, FrequencyChannelAttention,
     DenseBlock, TransitionLayer, EnsembleVotingSystem
 )
-from app.ml.training_pipeline import TrainingPipeline, TrainingConfig, ECGMultimodalDataset
+from app.ml.training_pipeline import ECGTrainingPipeline, TrainingConfig, ECGMultimodalDataset
 
 
 class TestHybridArchitecture:
@@ -344,7 +344,7 @@ class TestTrainingPipeline:
     
     def test_training_pipeline_initialization(self, training_config):
         """Test training pipeline initialization"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         assert hasattr(pipeline, 'config')
         assert hasattr(pipeline, 'model')
@@ -361,7 +361,7 @@ class TestTrainingPipeline:
     @pytest.mark.asyncio
     async def test_training_pipeline_train_epoch(self, training_config, sample_dataset):
         """Test training pipeline epoch training"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         from torch.utils.data import DataLoader
         train_loader = DataLoader(sample_dataset, batch_size=4, shuffle=True)
@@ -383,7 +383,7 @@ class TestTrainingPipeline:
     @pytest.mark.asyncio
     async def test_training_pipeline_validate_epoch(self, training_config, sample_dataset):
         """Test training pipeline epoch validation"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         from torch.utils.data import DataLoader
         val_loader = DataLoader(sample_dataset, batch_size=4, shuffle=False)
@@ -404,7 +404,7 @@ class TestTrainingPipeline:
     
     def test_curriculum_learning_setup(self, training_config):
         """Test curriculum learning setup"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         difficulty_1 = pipeline._get_curriculum_difficulty(epoch=1)
         difficulty_2 = pipeline._get_curriculum_difficulty(epoch=2)
@@ -421,7 +421,7 @@ class TestTrainingPipeline:
         
         with tempfile.TemporaryDirectory() as temp_dir:
             training_config.checkpoint_dir = temp_dir
-            pipeline = TrainingPipeline(training_config)
+            pipeline = ECGTrainingPipeline(training_config)
             
             checkpoint_path = pipeline._save_checkpoint(
                 epoch=1,
@@ -445,7 +445,7 @@ class TestTrainingPipeline:
     
     def test_performance_metrics_calculation(self, training_config):
         """Test performance metrics calculation"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         batch_size = 8
         num_classes = 71
@@ -467,7 +467,7 @@ class TestTrainingPipeline:
     
     def test_early_stopping_mechanism(self, training_config):
         """Test early stopping mechanism"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         val_losses = [1.0, 0.9, 0.85, 0.84, 0.84, 0.84, 0.84]  # No improvement after epoch 3
         
@@ -483,7 +483,7 @@ class TestTrainingPipeline:
     @pytest.mark.asyncio
     async def test_training_pipeline_accuracy_improvement(self, training_config, sample_dataset):
         """Test that training pipeline achieves accuracy improvement target (2-5%)"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         from torch.utils.data import DataLoader, random_split
         
@@ -509,7 +509,7 @@ class TestTrainingPipeline:
     
     def test_ensemble_confidence_calibration(self, training_config):
         """Test ensemble confidence calibration"""
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         batch_size = 16
         num_classes = 71
@@ -570,7 +570,7 @@ class TestIntegratedDatasetFunctionality:
             augment=False
         )
         
-        pipeline = TrainingPipeline(training_config)
+        pipeline = ECGTrainingPipeline(training_config)
         
         from torch.utils.data import DataLoader
         data_loader = DataLoader(dataset, batch_size=4, shuffle=True)
