@@ -28,7 +28,13 @@ except ImportError:
     torch.nn.functional = MagicMock()
     torch.optim = MagicMock()
     HAS_TORCH = False
-import wandb
+try:
+    import wandb
+    HAS_WANDB = True
+except ImportError:
+    from unittest.mock import MagicMock
+    wandb = MagicMock()
+    HAS_WANDB = False
 from scipy import signal as scipy_signal
 from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.model_selection import train_test_split
