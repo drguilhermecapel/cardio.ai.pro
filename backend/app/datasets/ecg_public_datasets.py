@@ -83,6 +83,46 @@ class ECGDatasetDownloader:
             'sampling_rate': 500,
             'leads': 12,
             'duration': 'Variável (6-60s)'
+        },
+        'mimic-iv-ecg': {
+            'name': 'MIMIC-IV-ECG Database',
+            'url': 'https://physionet.org/content/mimic-iv-ecg/1.0/',
+            'description': '800,000+ ECGs de 12 derivações de pacientes de UTI',
+            'size': '~50GB',
+            'records': 800000,
+            'sampling_rate': 500,
+            'leads': 12,
+            'duration': '10s por registro'
+        },
+        'icentia11k': {
+            'name': 'Icentia11k Database',
+            'url': 'https://physionet.org/content/icentia11k-continuous-ecg/1.0/',
+            'description': '11,000 pacientes com ECG contínuo de 24h',
+            'size': '~2TB',
+            'records': 11000,
+            'sampling_rate': 250,
+            'leads': 1,
+            'duration': '24h por paciente'
+        },
+        'physionet-challenge-2020': {
+            'name': 'PhysioNet Challenge 2020',
+            'url': 'https://physionet.org/content/challenge-2020/1.0.2/',
+            'description': '43,101 ECGs de 12 derivações para classificação de arritmias',
+            'size': '~6GB',
+            'records': 43101,
+            'sampling_rate': 500,
+            'leads': 12,
+            'duration': 'Variável (6-300s)'
+        },
+        'physionet-challenge-2021': {
+            'name': 'PhysioNet Challenge 2021',
+            'url': 'https://physionet.org/content/challenge-2021/1.0.3/',
+            'description': '88,253 ECGs de 12 derivações para diagnóstico de múltiplas condições',
+            'size': '~12GB',
+            'records': 88253,
+            'sampling_rate': 500,
+            'leads': 12,
+            'duration': 'Variável (6-300s)'
         }
     }
 
@@ -193,6 +233,159 @@ class ECGDatasetDownloader:
         self.logger.info("Baixe os arquivos e coloque em: " + str(dataset_dir))
 
         return str(dataset_dir)
+
+    def download_mimic_iv_ecg(self, force_redownload: bool = False) -> str | None:
+        """
+        Baixa o dataset MIMIC-IV-ECG (requer credenciais PhysioNet)
+
+        Args:
+            force_redownload: Se True, redownload mesmo se já existir
+        """
+        dataset_dir = self.base_dir / "mimic-iv-ecg"
+        dataset_dir.mkdir(exist_ok=True)
+
+        self.logger.info("📋 MIMIC-IV-ECG requer credenciais PhysioNet")
+        self.logger.info("1. Crie conta em: https://physionet.org/register/")
+        self.logger.info("2. Complete o treinamento CITI")
+        self.logger.info("3. Solicite acesso ao MIMIC-IV-ECG")
+        self.logger.info("4. Use wget com suas credenciais:")
+        self.logger.info(f"   wget -r -N -c -np --user YOUR_USERNAME --ask-password https://physionet.org/files/mimic-iv-ecg/1.0/ -P {dataset_dir}")
+
+        return str(dataset_dir)
+
+    def download_icentia11k(self, force_redownload: bool = False) -> str | None:
+        """
+        Baixa o dataset Icentia11k (requer credenciais PhysioNet)
+
+        Args:
+            force_redownload: Se True, redownload mesmo se já existir
+        """
+        dataset_dir = self.base_dir / "icentia11k"
+        dataset_dir.mkdir(exist_ok=True)
+
+        self.logger.info("📋 Icentia11k requer credenciais PhysioNet")
+        self.logger.info("1. Crie conta em: https://physionet.org/register/")
+        self.logger.info("2. Complete o treinamento CITI")
+        self.logger.info("3. Solicite acesso ao Icentia11k")
+        self.logger.info("4. Use wget com suas credenciais:")
+        self.logger.info(f"   wget -r -N -c -np --user YOUR_USERNAME --ask-password https://physionet.org/files/icentia11k-continuous-ecg/1.0/ -P {dataset_dir}")
+
+        return str(dataset_dir)
+
+    def download_physionet_challenge_2020(self, force_redownload: bool = False) -> str | None:
+        """
+        Baixa o dataset PhysioNet Challenge 2020
+
+        Args:
+            force_redownload: Se True, redownload mesmo se já existir
+        """
+        dataset_dir = self.base_dir / "physionet-challenge-2020"
+        dataset_dir.mkdir(exist_ok=True)
+
+        expected_file = dataset_dir / "challenge-2020-1.0.2.zip"
+        if expected_file.exists() and not force_redownload:
+            self.logger.info("PhysioNet Challenge 2020 já existe. Use force_redownload=True para redownload")
+            return str(dataset_dir)
+
+        self.logger.info("Baixando PhysioNet Challenge 2020...")
+
+        url = "https://physionet.org/static/published-projects/challenge-2020/classification-of-12-lead-ecgs-the-physionet-computing-in-cardiology-challenge-2020-1.0.2.zip"
+
+        try:
+            def download_hook(block_num: int, block_size: int, total_size: int) -> None:
+                downloaded = block_num * block_size
+                if total_size > 0:
+                    percent = min(100, downloaded * 100 / total_size)
+                    print(f"\rDownload: {percent:.1f}% ({downloaded/1024/1024:.1f}MB)", end='')
+
+            import urllib.request
+            urllib.request.urlretrieve(url, expected_file, download_hook)
+            print()
+
+            self.logger.info("Extraindo arquivos...")
+            with zipfile.ZipFile(expected_file, 'r') as zip_ref:
+                zip_ref.extractall(dataset_dir)
+
+            self.logger.info(f"✓ PhysioNet Challenge 2020 baixado e extraído em: {dataset_dir}")
+            return str(dataset_dir)
+
+        except Exception as e:
+            self.logger.error(f"Erro ao baixar PhysioNet Challenge 2020: {e}")
+            return None
+
+    def download_physionet_challenge_2021(self, force_redownload: bool = False) -> str | None:
+        """
+        Baixa o dataset PhysioNet Challenge 2021
+
+        Args:
+            force_redownload: Se True, redownload mesmo se já existir
+        """
+        dataset_dir = self.base_dir / "physionet-challenge-2021"
+        dataset_dir.mkdir(exist_ok=True)
+
+        expected_file = dataset_dir / "challenge-2021-1.0.3.zip"
+        if expected_file.exists() and not force_redownload:
+            self.logger.info("PhysioNet Challenge 2021 já existe. Use force_redownload=True para redownload")
+            return str(dataset_dir)
+
+        self.logger.info("Baixando PhysioNet Challenge 2021...")
+
+        url = "https://physionet.org/static/published-projects/challenge-2021/will-two-do-varying-dimensions-in-electrocardiography-the-physionet-computing-in-cardiology-challenge-2021-1.0.3.zip"
+
+        try:
+            def download_hook(block_num: int, block_size: int, total_size: int) -> None:
+                downloaded = block_num * block_size
+                if total_size > 0:
+                    percent = min(100, downloaded * 100 / total_size)
+                    print(f"\rDownload: {percent:.1f}% ({downloaded/1024/1024:.1f}MB)", end='')
+
+            import urllib.request
+            urllib.request.urlretrieve(url, expected_file, download_hook)
+            print()
+
+            self.logger.info("Extraindo arquivos...")
+            with zipfile.ZipFile(expected_file, 'r') as zip_ref:
+                zip_ref.extractall(dataset_dir)
+
+            self.logger.info(f"✓ PhysioNet Challenge 2021 baixado e extraído em: {dataset_dir}")
+            return str(dataset_dir)
+
+        except Exception as e:
+            self.logger.error(f"Erro ao baixar PhysioNet Challenge 2021: {e}")
+            return None
+
+    def download_all_datasets(self, force_redownload: bool = False) -> dict[str, str | None]:
+        """
+        Baixa todos os datasets disponíveis
+
+        Args:
+            force_redownload: Se True, redownload mesmo se já existir
+
+        Returns:
+            Dicionário com nome do dataset -> caminho (ou None se falhou)
+        """
+        results = {}
+
+        self.logger.info("🚀 Iniciando download de todos os datasets...")
+
+        results['mit-bih'] = self.download_mit_bih(force_redownload=force_redownload)
+        results['ptb-xl'] = self.download_ptb_xl(force_redownload=force_redownload)
+        results['cpsc2018'] = self.download_cpsc2018(force_redownload=force_redownload)
+        results['mimic-iv-ecg'] = self.download_mimic_iv_ecg(force_redownload=force_redownload)
+        results['icentia11k'] = self.download_icentia11k(force_redownload=force_redownload)
+        results['physionet-challenge-2020'] = self.download_physionet_challenge_2020(force_redownload=force_redownload)
+        results['physionet-challenge-2021'] = self.download_physionet_challenge_2021(force_redownload=force_redownload)
+
+        successful_downloads = [name for name, path in results.items() if path is not None]
+        failed_downloads = [name for name, path in results.items() if path is None]
+
+        self.logger.info(f"✅ Downloads concluídos: {len(successful_downloads)}/{len(results)}")
+        if successful_downloads:
+            self.logger.info(f"   Sucessos: {', '.join(successful_downloads)}")
+        if failed_downloads:
+            self.logger.warning(f"   Falhas: {', '.join(failed_downloads)}")
+
+        return results
 
     def get_dataset_info(self, dataset_name: str) -> dict[str, Any]:
         return self.DATASETS_INFO.get(dataset_name, {})
@@ -439,6 +632,300 @@ class ECGDatasetLoader:
                 continue
 
         self.logger.info(f"✓ Carregados {len(ecg_records)} registros do PTB-XL")
+        return ecg_records
+
+    def load_physionet_challenge_2020(self,
+                                     dataset_path: str,
+                                     max_records: int | None = None,
+                                     preprocess: bool = True) -> list[ECGRecord]:
+        """
+        Carrega registros do PhysioNet Challenge 2020
+
+        Args:
+            dataset_path: Caminho para o dataset
+            max_records: Número máximo de registros
+            preprocess: Se True, aplica pré-processamento
+        """
+        dataset_path_obj = Path(dataset_path)
+        
+        extracted_dir = None
+        for item in dataset_path_obj.iterdir():
+            if item.is_dir() and 'challenge-2020' in item.name.lower():
+                extracted_dir = item
+                break
+        
+        if not extracted_dir:
+            self.logger.error("Diretório PhysioNet Challenge 2020 não encontrado")
+            return []
+
+        data_files = list(extracted_dir.glob("**/*.mat")) + list(extracted_dir.glob("**/*.hea"))
+        
+        if not data_files:
+            self.logger.error("Arquivos de dados não encontrados")
+            return []
+
+        if max_records:
+            data_files = data_files[:max_records]
+
+        ecg_records = []
+
+        for data_file in tqdm(data_files, desc="Carregando PhysioNet Challenge 2020"):
+            try:
+                if data_file.suffix == '.hea':
+                    record = wfdb.rdrecord(str(data_file.with_suffix('')))
+                    signal_data = record.p_signal
+                    
+                    if preprocess and self.preprocessor:
+                        try:
+                            processed_signal, quality_metrics = self.preprocessor.advanced_preprocessing_pipeline(
+                                signal_data[:, 0], clinical_mode=True
+                            )
+                            
+                            if quality_metrics['quality_score'] > 0.5:
+                                signal_data[:, 0] = processed_signal[:len(signal_data)]
+                        except Exception as e:
+                            self.logger.warning(f"Erro no pré-processamento: {e}")
+
+                    ecg_record = ECGRecord(
+                        signal=signal_data,
+                        sampling_rate=record.fs,
+                        labels=['challenge_2020'],  # Labels específicos do challenge
+                        patient_id=data_file.stem,
+                        leads=['I', 'II', 'III', 'aVR', 'aVL', 'aVF',
+                              'V1', 'V2', 'V3', 'V4', 'V5', 'V6'],
+                        metadata={
+                            'dataset': 'physionet-challenge-2020',
+                            'record_name': data_file.stem,
+                            'duration': len(signal_data) / record.fs,
+                            'units': record.units if hasattr(record, 'units') else None
+                        }
+                    )
+                    
+                    ecg_records.append(ecg_record)
+
+            except Exception as e:
+                self.logger.warning(f"Erro ao carregar {data_file.stem}: {e}")
+                continue
+
+        self.logger.info(f"✓ Carregados {len(ecg_records)} registros do PhysioNet Challenge 2020")
+        return ecg_records
+
+    def load_physionet_challenge_2021(self,
+                                     dataset_path: str,
+                                     max_records: int | None = None,
+                                     preprocess: bool = True) -> list[ECGRecord]:
+        """
+        Carrega registros do PhysioNet Challenge 2021
+
+        Args:
+            dataset_path: Caminho para o dataset
+            max_records: Número máximo de registros
+            preprocess: Se True, aplica pré-processamento
+        """
+        dataset_path_obj = Path(dataset_path)
+        
+        extracted_dir = None
+        for item in dataset_path_obj.iterdir():
+            if item.is_dir() and 'challenge-2021' in item.name.lower():
+                extracted_dir = item
+                break
+        
+        if not extracted_dir:
+            self.logger.error("Diretório PhysioNet Challenge 2021 não encontrado")
+            return []
+
+        data_files = list(extracted_dir.glob("**/*.mat")) + list(extracted_dir.glob("**/*.hea"))
+        
+        if not data_files:
+            self.logger.error("Arquivos de dados não encontrados")
+            return []
+
+        if max_records:
+            data_files = data_files[:max_records]
+
+        ecg_records = []
+
+        for data_file in tqdm(data_files, desc="Carregando PhysioNet Challenge 2021"):
+            try:
+                if data_file.suffix == '.hea':
+                    record = wfdb.rdrecord(str(data_file.with_suffix('')))
+                    signal_data = record.p_signal
+                    
+                    if preprocess and self.preprocessor:
+                        try:
+                            processed_signal, quality_metrics = self.preprocessor.advanced_preprocessing_pipeline(
+                                signal_data[:, 0], clinical_mode=True
+                            )
+                            
+                            if quality_metrics['quality_score'] > 0.5:
+                                signal_data[:, 0] = processed_signal[:len(signal_data)]
+                        except Exception as e:
+                            self.logger.warning(f"Erro no pré-processamento: {e}")
+
+                    ecg_record = ECGRecord(
+                        signal=signal_data,
+                        sampling_rate=record.fs,
+                        labels=['challenge_2021'],  # Labels específicos do challenge
+                        patient_id=data_file.stem,
+                        leads=['I', 'II', 'III', 'aVR', 'aVL', 'aVF',
+                              'V1', 'V2', 'V3', 'V4', 'V5', 'V6'],
+                        metadata={
+                            'dataset': 'physionet-challenge-2021',
+                            'record_name': data_file.stem,
+                            'duration': len(signal_data) / record.fs,
+                            'units': record.units if hasattr(record, 'units') else None
+                        }
+                    )
+                    
+                    ecg_records.append(ecg_record)
+
+            except Exception as e:
+                self.logger.warning(f"Erro ao carregar {data_file.stem}: {e}")
+                continue
+
+        self.logger.info(f"✓ Carregados {len(ecg_records)} registros do PhysioNet Challenge 2021")
+        return ecg_records
+
+    def load_mimic_iv_ecg(self,
+                         dataset_path: str,
+                         max_records: int | None = None,
+                         preprocess: bool = True) -> list[ECGRecord]:
+        """
+        Carrega registros do MIMIC-IV-ECG
+
+        Args:
+            dataset_path: Caminho para o dataset
+            max_records: Número máximo de registros
+            preprocess: Se True, aplica pré-processamento
+        """
+        dataset_path_obj = Path(dataset_path)
+        
+        if not dataset_path_obj.exists():
+            self.logger.error(f"Dataset MIMIC-IV-ECG não encontrado: {dataset_path}")
+            return []
+
+        data_files = list(dataset_path_obj.glob("**/*.hea"))
+        
+        if not data_files:
+            self.logger.error("Arquivos de dados MIMIC-IV-ECG não encontrados")
+            return []
+
+        if max_records:
+            data_files = data_files[:max_records]
+
+        ecg_records = []
+
+        for data_file in tqdm(data_files, desc="Carregando MIMIC-IV-ECG"):
+            try:
+                record = wfdb.rdrecord(str(data_file.with_suffix('')))
+                signal_data = record.p_signal
+                
+                if preprocess and self.preprocessor:
+                    try:
+                        processed_signal, quality_metrics = self.preprocessor.advanced_preprocessing_pipeline(
+                            signal_data[:, 0], clinical_mode=True
+                        )
+                        
+                        if quality_metrics['quality_score'] > 0.5:
+                            signal_data[:, 0] = processed_signal[:len(signal_data)]
+                    except Exception as e:
+                        self.logger.warning(f"Erro no pré-processamento: {e}")
+
+                ecg_record = ECGRecord(
+                    signal=signal_data,
+                    sampling_rate=record.fs,
+                    labels=['mimic_icu'],  # Labels específicos do MIMIC
+                    patient_id=data_file.stem,
+                    leads=['I', 'II', 'III', 'aVR', 'aVL', 'aVF',
+                          'V1', 'V2', 'V3', 'V4', 'V5', 'V6'],
+                    metadata={
+                        'dataset': 'mimic-iv-ecg',
+                        'record_name': data_file.stem,
+                        'duration': len(signal_data) / record.fs,
+                        'units': record.units if hasattr(record, 'units') else None
+                    }
+                )
+                
+                ecg_records.append(ecg_record)
+
+            except Exception as e:
+                self.logger.warning(f"Erro ao carregar {data_file.stem}: {e}")
+                continue
+
+        self.logger.info(f"✓ Carregados {len(ecg_records)} registros do MIMIC-IV-ECG")
+        return ecg_records
+
+    def load_icentia11k(self,
+                       dataset_path: str,
+                       max_records: int | None = None,
+                       preprocess: bool = True) -> list[ECGRecord]:
+        """
+        Carrega registros do Icentia11k
+
+        Args:
+            dataset_path: Caminho para o dataset
+            max_records: Número máximo de registros
+            preprocess: Se True, aplica pré-processamento
+        """
+        dataset_path_obj = Path(dataset_path)
+        
+        if not dataset_path_obj.exists():
+            self.logger.error(f"Dataset Icentia11k não encontrado: {dataset_path}")
+            return []
+
+        data_files = list(dataset_path_obj.glob("**/*.hdf5")) + list(dataset_path_obj.glob("**/*.h5"))
+        
+        if not data_files:
+            self.logger.error("Arquivos de dados Icentia11k não encontrados")
+            return []
+
+        if max_records:
+            data_files = data_files[:max_records]
+
+        ecg_records = []
+
+        for data_file in tqdm(data_files, desc="Carregando Icentia11k"):
+            try:
+                with h5py.File(data_file, 'r') as f:
+                    if 'ecg' in f:
+                        signal_data = f['ecg'][:]
+                        sampling_rate = f.attrs.get('sampling_rate', 250)
+                        
+                        if signal_data.ndim == 1:
+                            signal_data = signal_data.reshape(-1, 1)
+                        
+                        if preprocess and self.preprocessor:
+                            try:
+                                processed_signal, quality_metrics = self.preprocessor.advanced_preprocessing_pipeline(
+                                    signal_data[:, 0], clinical_mode=True
+                                )
+                                
+                                if quality_metrics['quality_score'] > 0.5:
+                                    signal_data[:, 0] = processed_signal[:len(signal_data)]
+                            except Exception as e:
+                                self.logger.warning(f"Erro no pré-processamento: {e}")
+
+                        ecg_record = ECGRecord(
+                            signal=signal_data,
+                            sampling_rate=int(sampling_rate),
+                            labels=['continuous_monitoring'],  # Labels específicos do Icentia11k
+                            patient_id=data_file.stem,
+                            leads=['Lead_I'],  # Single lead
+                            metadata={
+                                'dataset': 'icentia11k',
+                                'record_name': data_file.stem,
+                                'duration': len(signal_data) / sampling_rate,
+                                'continuous_monitoring': True
+                            }
+                        )
+                        
+                        ecg_records.append(ecg_record)
+
+            except Exception as e:
+                self.logger.warning(f"Erro ao carregar {data_file.stem}: {e}")
+                continue
+
+        self.logger.info(f"✓ Carregados {len(ecg_records)} registros do Icentia11k")
         return ecg_records
 
     def create_unified_dataset(self,
