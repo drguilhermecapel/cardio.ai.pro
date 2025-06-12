@@ -533,7 +533,7 @@ class MultiPathologyService:
         and returns results in a dictionary format for compatibility.
         """
         result = await self.detect_pathologies_hierarchical(signal, features, preprocessing_quality)
-        
+
         return {
             'primary_diagnosis': result.primary_diagnosis,
             'confidence': result.confidence,
