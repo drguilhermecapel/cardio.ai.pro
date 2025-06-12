@@ -520,3 +520,31 @@ class MultiPathologyService:
             abnormal_indicators=normal_abnormal_result['abnormal_indicators'],
             processing_time_ms=0  # Will be set by caller
         )
+
+    async def analyze_pathologies(
+        self,
+        signal: np.ndarray,
+        features: dict[str, Any],
+        preprocessing_quality: float
+    ) -> dict[str, Any]:
+        """
+        Analyze pathologies using hierarchical detection system.
+        This is a wrapper method that calls detect_pathologies_hierarchical
+        and returns results in a dictionary format for compatibility.
+        """
+        result = await self.detect_pathologies_hierarchical(signal, features, preprocessing_quality)
+        
+        return {
+            'primary_diagnosis': result.primary_diagnosis,
+            'confidence': result.confidence,
+            'clinical_urgency': result.clinical_urgency,
+            'detected_conditions': result.detected_conditions,
+            'level_completed': result.level_completed,
+            'category_probabilities': result.category_probabilities,
+            'abnormal_indicators': result.abnormal_indicators,
+            'processing_time_ms': result.processing_time_ms,
+            'secondary_diagnoses': [],
+            'recommendations': [],
+            'icd10_codes': [],
+            'requires_immediate_attention': result.clinical_urgency == 'CRITICAL'
+        }

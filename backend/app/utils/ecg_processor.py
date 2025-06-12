@@ -189,3 +189,22 @@ class ECGProcessor:
         except Exception as e:
             logger.error("Signal preprocessing failed: %s", str(e))
             return ecg_data
+
+    async def process_file(self, file_path: str) -> dict[str, Any]:
+        """Process ECG file and return processed data with metadata."""
+        try:
+            ecg_data = await self.load_ecg_file(file_path)
+            metadata = await self.extract_metadata(file_path)
+            preprocessed_data = await self.preprocess_signal(ecg_data)
+            
+            return {
+                "raw_data": ecg_data,
+                "preprocessed_data": preprocessed_data,
+                "metadata": metadata,
+                "file_path": file_path,
+                "processing_success": True
+            }
+            
+        except Exception as e:
+            logger.error("Failed to process ECG file %s: %s", file_path, str(e))
+            raise ECGProcessingException(f"Failed to process file: {str(e)}") from e

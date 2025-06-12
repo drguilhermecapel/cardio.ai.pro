@@ -637,3 +637,40 @@ class ECGAnalysisService:
             recommendations.append("Cardiology consultation within 24 hours")
 
         return list(set(recommendations))  # Remove duplicates
+
+    async def process_ecg_file(
+        self,
+        file_path: str,
+        patient_id: int,
+        original_filename: str,
+        created_by: int,
+        metadata: dict[str, Any] | None = None,
+    ) -> ECGAnalysis:
+        """Process ECG file and create analysis record."""
+        try:
+            processed_data = await self.processor.process_file(file_path)
+            
+            if not processed_data.get("processing_success", False):
+                raise ECGProcessingException("ECG file processing failed")
+            
+            analysis = await self.create_analysis(
+                patient_id=patient_id,
+                file_path=file_path,
+                original_filename=original_filename,
+                created_by=created_by,
+                metadata=metadata
+            )
+            
+            logger.info(
+                f"ECG file processed successfully: analysis_id={analysis.analysis_id}, "
+                f"file={original_filename}, patient_id={patient_id}"
+            )
+            
+            return analysis
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to process ECG file: file={original_filename}, "
+                f"patient_id={patient_id}, error={str(e)}"
+            )
+            raise ECGProcessingException(f"Failed to process ECG file: {str(e)}") from e
