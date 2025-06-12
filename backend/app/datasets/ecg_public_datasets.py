@@ -717,3 +717,49 @@ def prepare_ml_dataset(records: list[ECGRecord],
         print(f"   {label}: {count} ({count/len(y_array)*100:.1f}%)")
 
     return X_array, y_array
+
+
+class ECGDatasetManager:
+    """Unified manager for ECG dataset operations combining download, load, and analysis"""
+    
+    def __init__(self, data_dir: str = "data/ecg_datasets"):
+        self.data_dir = Path(data_dir)
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        
+        self.downloader = ECGDatasetDownloader(str(self.data_dir))
+        self.loader = ECGDatasetLoader(str(self.data_dir))
+        self.analyzer = ECGDatasetAnalyzer()
+        
+    def download_dataset(self, dataset_name: str) -> bool:
+        """Download a specific dataset"""
+        if dataset_name.lower() == "mit_bih":
+            return self.downloader.download_mit_bih()
+        elif dataset_name.lower() == "ptb_xl":
+            return self.downloader.download_ptb_xl()
+        elif dataset_name.lower() == "cpsc2018":
+            return self.downloader.download_cpsc2018()
+        else:
+            logging.error(f"Unknown dataset: {dataset_name}")
+            return False
+    
+    def load_dataset(self, dataset_name: str) -> list[ECGRecord]:
+        """Load a specific dataset"""
+        if dataset_name.lower() == "mit_bih":
+            return self.loader.load_mit_bih()
+        elif dataset_name.lower() == "ptb_xl":
+            return self.loader.load_ptb_xl()
+        else:
+            logging.error(f"Unknown dataset: {dataset_name}")
+            return []
+    
+    def get_unified_dataset(self) -> list[ECGRecord]:
+        """Get unified dataset from all available sources"""
+        return self.loader.create_unified_dataset()
+    
+    def analyze_dataset(self, records: list[ECGRecord]) -> dict[str, Any]:
+        """Analyze dataset statistics"""
+        return self.analyzer.analyze_dataset(records)
+    
+    def prepare_for_ml(self, records: list[ECGRecord], **kwargs) -> tuple[np.ndarray, np.ndarray]:
+        """Prepare dataset for machine learning"""
+        return prepare_ml_dataset(records, **kwargs)
