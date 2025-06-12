@@ -49,6 +49,7 @@ class InterpretabilityService:
     def __init__(self) -> None:
         self.shap_explainer: Any = None
         self.lime_explainer: Any = None
+        self.clinical_explainer: Any = None
         self.lead_names = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
         self.feature_names = self._initialize_feature_names()
 

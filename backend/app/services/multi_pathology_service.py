@@ -37,6 +37,7 @@ class MultiPathologyService:
 
     def __init__(self) -> None:
         self.condition_models: dict[str, Any] = {}
+        self.scp_conditions = SCP_ECG_CONDITIONS
         self.category_thresholds = self._initialize_category_thresholds()
         self.condition_thresholds = self._initialize_condition_thresholds()
 
