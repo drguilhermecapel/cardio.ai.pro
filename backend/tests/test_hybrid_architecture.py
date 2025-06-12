@@ -33,17 +33,14 @@ class TestHybridArchitecture:
     def model_config(self):
         """Create model configuration for testing"""
         return ModelConfig(
-            num_classes=71,
             input_channels=12,
             sequence_length=5000,
-            cnn_channels=[64, 128, 256],
-            lstm_hidden_size=256,
-            lstm_num_layers=2,
-            transformer_d_model=512,
-            transformer_nhead=8,
-            transformer_num_layers=6,
-            dropout=0.1,
-            use_attention=True,
+            num_classes=71,
+            cnn_growth_rate=32,
+            lstm_hidden_dim=256,
+            transformer_heads=8,
+            transformer_layers=4,
+            dropout_rate=0.2,
             ensemble_weights=[0.3, 0.3, 0.4]
         )
     
@@ -278,26 +275,27 @@ class TestTrainingPipeline:
         """Create training configuration for testing"""
         return TrainingConfig(
             model_config=ModelConfig(
-                num_classes=71,
                 input_channels=12,
-                sequence_length=5000
+                sequence_length=5000,
+                num_classes=71,
+                cnn_growth_rate=32,
+                lstm_hidden_dim=256,
+                transformer_heads=8,
+                transformer_layers=4,
+                dropout_rate=0.2
             ),
             batch_size=8,
             learning_rate=1e-4,
-            num_epochs=2,  # Small for testing
+            num_epochs=2,
             weight_decay=1e-5,
-            scheduler_step_size=10,
-            scheduler_gamma=0.1,
-            early_stopping_patience=5,
+            gradient_clip_norm=1.0,
             curriculum_learning=True,
-            curriculum_epochs=[1, 2],
-            curriculum_difficulties=[0.5, 1.0],
-            use_wandb=False,  # Disable for testing
-            wandb_project="test_project",
-            save_checkpoints=True,
+            curriculum_stages=2,
+            curriculum_epochs_per_stage=1,
+            early_stopping_patience=5,
+            use_wandb=False,
             checkpoint_dir="/tmp/test_checkpoints",
-            validate_every=1,
-            log_every=10
+            device="cpu"
         )
     
     @pytest.fixture
