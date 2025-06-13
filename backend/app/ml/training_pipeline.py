@@ -22,10 +22,18 @@ try:
 except ImportError:
     F = None
 import torch.optim as optim
-import wandb
+try:
+    import wandb
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    wandb = None
 from scipy import signal as scipy_signal
-from sklearn.metrics import classification_report, roc_auc_score
-from sklearn.model_selection import train_test_split
+try:
+    from sklearn.metrics import classification_report, roc_auc_score
+    from sklearn.model_selection import train_test_split
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    classification_report = None
+    roc_auc_score = None
+    train_test_split = None
 from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
 from tqdm import tqdm
 
@@ -334,6 +342,8 @@ class ECGTrainingPipeline:
         }
 
         if config.use_wandb:
+            if wandb is None:
+                raise ImportError("Weights & Biases is required when use_wandb=True")
             wandb.init(
                 project=config.wandb_project,
                 config=asdict(config),
@@ -454,11 +464,18 @@ class ECGTrainingPipeline:
 
         logger.info(f"Total processed samples: {len(all_signals)}")
 
+        if train_test_split is None:
+            raise ImportError(
+                "scikit-learn is required for data splitting"
+            )
         train_signals, val_signals, train_labels, val_labels, train_codes, val_codes, train_difficulty, val_difficulty = train_test_split(
-            all_signals, all_labels, all_condition_codes, all_difficulty_scores,
+            all_signals,
+            all_labels,
+            all_condition_codes,
+            all_difficulty_scores,
             test_size=self.config.validation_split,
             stratify=all_labels,
-            random_state=42
+            random_state=42,
         )
 
         train_dataset = ECGMultimodalDataset(
@@ -624,15 +641,21 @@ class ECGTrainingPipeline:
         accuracy = 100. * correct_predictions / total_samples
 
         try:
+            if classification_report is None or roc_auc_score is None:
+                raise ImportError("scikit-learn is required for metrics")
             report = classification_report(
-                all_labels, all_predictions,
-                output_dict=True, zero_division=0
+                all_labels,
+                all_predictions,
+                output_dict=True,
+                zero_division=0,
             )
 
             try:
                 auc_score = roc_auc_score(
-                    all_labels, all_predictions,
-                    multi_class='ovr', average='weighted'
+                    all_labels,
+                    all_predictions,
+                    multi_class="ovr",
+                    average="weighted",
                 )
             except Exception:
                 auc_score = 0.0
