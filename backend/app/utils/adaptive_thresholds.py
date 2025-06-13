@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-
 try:
     from sklearn.linear_model import LogisticRegression
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
