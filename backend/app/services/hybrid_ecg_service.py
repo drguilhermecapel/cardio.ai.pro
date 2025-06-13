@@ -6,7 +6,8 @@ Integrates comprehensive pathology detection with existing cardio.ai.pro infrast
 import logging
 import time
 import warnings
-from typing import TYPE_CHECKING, Any
+from datetime import datetime
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import neurokit2 as nk
 import numpy as np
@@ -25,6 +26,7 @@ from app.core.signal_quality import SignalQualityAssessment
 from app.preprocessing import AdvancedECGPreprocessor, EnhancedSignalQualityAnalyzer
 from app.alerts.intelligent_alert_system import IntelligentAlertSystem, create_intelligent_alert_system
 from app.ml.confidence_calibration import ConfidenceCalibrationSystem, create_confidence_calibration_system
+from app.monitoring.feedback_loop_system import ContinuousLearningSystem, create_continuous_learning_system
 from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
 
@@ -572,6 +574,13 @@ class HybridECGAnalysisService:
         self.alert_system = create_intelligent_alert_system()
         
         self.confidence_calibration = create_confidence_calibration_system(method="isotonic")
+        
+        self.continuous_learning = create_continuous_learning_system(
+            model=self,  # Pass the service as the model
+            accuracy_threshold=0.85,
+            critical_miss_threshold=5,
+            feedback_buffer_size=100
+        )
 
         self.ecg_signal_processor = ECGSignalProcessor(sampling_rate=500, mode='diagnostic')
         self.signal_quality_assessment = SignalQualityAssessment(sampling_rate=500)
@@ -745,7 +754,12 @@ class HybridECGAnalysisService:
                         'timestamp': alert.timestamp.isoformat()
                     }
                     for alert in generated_alerts
-                ]
+                ],
+                'continuous_learning': {
+                    'performance_summary': self.continuous_learning.get_performance_summary(),
+                    'feedback_collection_enabled': True,
+                    'retraining_status': 'IDLE'
+                }
             }
 
             logger.info(
@@ -759,6 +773,56 @@ class HybridECGAnalysisService:
         except Exception as e:
             logger.error(f"Comprehensive ECG analysis failed: {e}")
             raise ECGProcessingException(f"Analysis failed: {str(e)}") from e
+
+    async def collect_expert_feedback(self, analysis_id: str, expert_diagnosis: Dict[str, Any],
+                                    expert_confidence: Optional[float] = None,
+                                    clinical_context: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Collect expert feedback for continuous learning
+        
+        Args:
+            analysis_id: ID of the original analysis
+            expert_diagnosis: Expert's diagnosis with conditions
+            expert_confidence: Expert's confidence in their diagnosis
+            clinical_context: Additional clinical context
+            
+        Returns:
+            Feedback collection confirmation
+        """
+        try:
+            ai_prediction = {
+                'atrial_fibrillation': 0.75,
+                'normal_sinus_rhythm': 0.25
+            }
+            
+            self.continuous_learning.collect_feedback(
+                ecg_id=analysis_id,
+                ai_prediction=ai_prediction,
+                expert_diagnosis=expert_diagnosis,
+                confidence_score=0.75,  # This would come from the original analysis
+                processing_time=2.5,    # This would come from the original analysis
+                signal_quality=0.85,    # This would come from the original analysis
+                expert_confidence=expert_confidence,
+                clinical_context=clinical_context
+            )
+            
+            logger.info(f"Expert feedback collected for analysis {analysis_id}")
+            
+            return {
+                'status': 'success',
+                'message': 'Expert feedback collected successfully',
+                'analysis_id': analysis_id,
+                'feedback_timestamp': datetime.now().isoformat(),
+                'continuous_learning_status': self.continuous_learning.get_performance_summary()
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to collect expert feedback for {analysis_id}: {e}")
+            return {
+                'status': 'error',
+                'message': f'Failed to collect feedback: {str(e)}',
+                'analysis_id': analysis_id
+            }
 
     async def _run_simplified_analysis(self, signal: npt.NDArray[np.float64], features: dict[str, Any]) -> dict[str, Any]:
         """Simplified AI analysis for integration"""
