@@ -12,10 +12,10 @@ class TestAdvancedECGPreprocessor:
     
     def setup_method(self):
         """Setup test fixtures"""
-        self.preprocessor = AdvancedECGPreprocessor(sampling_rate=360)
-        self.quality_analyzer = EnhancedSignalQualityAnalyzer(sampling_rate=360)
+        self.preprocessor = AdvancedECGPreprocessor(sampling_rate=500)
+        self.quality_analyzer = EnhancedSignalQualityAnalyzer(sampling_rate=500)
         
-        self.fs = 360
+        self.fs = 500
         self.duration = 10  # seconds
         self.t = np.linspace(0, self.duration, self.fs * self.duration)
         
@@ -153,9 +153,9 @@ class TestEnhancedSignalQualityAnalyzer:
     
     def setup_method(self):
         """Setup test fixtures"""
-        self.analyzer = EnhancedSignalQualityAnalyzer(sampling_rate=360)
+        self.analyzer = EnhancedSignalQualityAnalyzer(sampling_rate=500)
         
-        self.fs = 360
+        self.fs = 500
         self.duration = 10
         self.t = np.linspace(0, self.duration, self.fs * self.duration)
         

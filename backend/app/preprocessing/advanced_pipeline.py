@@ -20,7 +20,12 @@ class AdvancedECGPreprocessor:
     for improved diagnostic precision according to Phase 1 specifications.
     """
 
-    def __init__(self, sampling_rate: int = 360) -> None:
+    def __init__(self, sampling_rate: int = 500) -> None:
+        if sampling_rate < 500:
+            raise ValueError(
+                f"Taxa de amostragem {sampling_rate} Hz é inadequada! "
+                f"Mínimo: 500 Hz, Recomendado: 1000 Hz"
+            )
         self.fs = sampling_rate
         self.quality_threshold = 0.7
 
@@ -41,7 +46,7 @@ class AdvancedECGPreprocessor:
         """
         start_time = time.time()
 
-        filtered_signal = self._butterworth_bandpass_filter(ecg_signal, 0.05, 40, self.fs)
+        filtered_signal = self._butterworth_bandpass_filter(ecg_signal, 0.05, 150, self.fs)
 
         denoised_signal = self._wavelet_artifact_removal(filtered_signal)
 
@@ -79,7 +84,8 @@ class AdvancedECGPreprocessor:
         fs: int
     ) -> npt.NDArray[np.float64]:
         """
-        Apply Butterworth bandpass filter (0.5-40 Hz) as specified.
+        Apply Butterworth bandpass filter (0.05-150 Hz) for diagnostic mode.
+        CRITICAL: Uses 0.05 Hz high-pass to preserve ST segment morphology.
         """
         try:
             nyquist = fs / 2

@@ -2,8 +2,8 @@ import logging
 from typing import Any
 
 import numpy as np
-from numpy.typing import NDArray
 import pywt  # type: ignore[import-untyped]
+from numpy.typing import NDArray
 from scipy.signal import butter, iirnotch, sosfiltfilt
 
 logger = logging.getLogger(__name__)

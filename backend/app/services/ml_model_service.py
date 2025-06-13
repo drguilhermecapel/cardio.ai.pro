@@ -324,8 +324,7 @@ class MLModelService:
             interpretability = {
                 "attention_maps": explanation_result.attention_maps,
                 "feature_importance": explanation_result.feature_importance,
-                "explanation": explanation_result.clinical_explanation.get('primary_diagnosis',
-                    "AI detected patterns consistent with the predicted condition"),
+                "explanation": explanation_result.clinical_explanation or "AI detected patterns consistent with the predicted condition",
                 "shap_explanation": explanation_result.shap_explanation,
                 "lime_explanation": explanation_result.lime_explanation,
                 "clinical_explanation": explanation_result.clinical_explanation,

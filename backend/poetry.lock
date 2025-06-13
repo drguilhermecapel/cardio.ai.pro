@@ -5608,4 +5608,4 @@ ml = ["librosa", "optuna", "torch", "torchvision", "transformers", "wandb"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "9ff2dcfd6dfc066ccc1d03b9a84c96dbaa114f89bb59c2925bef9f46c75d4351"
+content-hash = "46efe54306cc00044156e4202cb169a13869a5419a07b22d44a4898065ed53d6"

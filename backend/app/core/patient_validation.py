@@ -291,8 +291,8 @@ class PatientAwareValidator:
 
         recommendations = report.get('recommendations')
         fold_consistency = report.get('fold_size_consistency')
-        if (isinstance(recommendations, list) and 
-            isinstance(fold_consistency, dict) and 
+        if (isinstance(recommendations, list) and
+            isinstance(fold_consistency, dict) and
             fold_consistency.get('train_cv', 0) > 0.1):
             recommendations.append(
                 "ATENÇÃO: Grande variação no tamanho dos folds de treino. "

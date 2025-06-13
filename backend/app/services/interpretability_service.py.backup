@@ -31,17 +31,17 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ExplanationResult:
-    """Result of model interpretation"""
-    clinical_explanation: str
-    diagnostic_criteria: list[str]
-    risk_factors: list[str]
-    recommendations: list[str]
-    feature_importance: dict[str, float]
-    attention_maps: dict[str, list[float]]
+    """Comprehensive explanation result for ECG diagnosis"""
     primary_diagnosis: str
     confidence: float
-    shap_explanation: dict[str, Any] | None = None
-    lime_explanation: dict[str, Any] | None = None
+    shap_explanation: dict[str, Any] | None
+    lime_explanation: dict[str, Any] | None
+    clinical_explanation: dict[str, str]
+    attention_maps: dict[str, np.ndarray]
+    feature_importance: dict[str, float]
+    diagnostic_criteria: dict[str, Any]
+    risk_factors: list[str]
+    recommendations: list[str]
 
 class InterpretabilityService:
     """Advanced interpretability with SHAP/LIME integration for ECG analysis"""
@@ -49,9 +49,8 @@ class InterpretabilityService:
     def __init__(self) -> None:
         self.shap_explainer: Any = None
         self.lime_explainer: Any = None
-        self.clinical_explainer: Any = None
-        self.lead_names = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
         self.feature_names = self._initialize_feature_names()
+        self.lead_names = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
 
     def _initialize_feature_names(self) -> list[str]:
         """Initialize comprehensive feature names for ECG analysis"""
