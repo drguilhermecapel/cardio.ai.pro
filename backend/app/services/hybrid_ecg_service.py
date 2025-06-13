@@ -8,13 +8,19 @@ import time
 import warnings
 from typing import TYPE_CHECKING, Any
 
-import neurokit2 as nk
+try:
+    import neurokit2 as nk
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    nk = None
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from scipy import signal
 from scipy.stats import entropy, kurtosis, skew
-from sklearn.preprocessing import StandardScaler
+try:
+    from sklearn.preprocessing import StandardScaler
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    StandardScaler = None
 
 from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
@@ -207,6 +213,10 @@ class AdvancedPreprocessor:
 
     def __init__(self, sampling_rate: int = 500) -> None:
         self.fs = sampling_rate
+        if StandardScaler is None:
+            raise ImportError(
+                "scikit-learn is required for signal preprocessing"
+            )
         self.scaler = StandardScaler()
 
     def preprocess_signal(self, signal_data: npt.NDArray[np.float64], remove_baseline: bool = True,
@@ -314,8 +324,12 @@ class FeatureExtractor:
     def _detect_r_peaks(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.int64]:
         """R peak detection using Pan-Tompkins algorithm"""
         try:
-            signals, info = nk.ecg_process(signal_data[:, 0] if signal_data.ndim > 1 else signal_data,
-                                         sampling_rate=self.fs)
+            if nk is None:
+                raise ImportError("neurokit2 is required for ECG processing")
+            signals, info = nk.ecg_process(
+                signal_data[:, 0] if signal_data.ndim > 1 else signal_data,
+                sampling_rate=self.fs,
+            )
             return np.array(info.get("ECG_R_Peaks", np.array([])), dtype=np.int64)
         except Exception as e:
             logger.warning(f"R peak detection failed: {e}")
@@ -556,12 +570,13 @@ class HybridECGAnalysisService:
     Hybrid ECG Analysis Service integrating advanced AI with existing infrastructure
     """
 
-    def __init__(self, db: Any, validation_service: ValidationService) -> None:
+    def __init__(self, db: Any | None = None, validation_service: ValidationService | None = None) -> None:
         self.db = db
-        self.repository = ECGRepository(db)
+        self.repository = ECGRepository(db) if db is not None else None
         self.validation_service = validation_service
 
-        self.ecg_reader = UniversalECGReader()
+        self.universal_reader = UniversalECGReader()
+        self.ecg_reader = self.universal_reader
         self.preprocessor = AdvancedPreprocessor()
         self.advanced_preprocessor = AdvancedECGPreprocessor()
         self.quality_analyzer = EnhancedSignalQualityAnalyzer()
