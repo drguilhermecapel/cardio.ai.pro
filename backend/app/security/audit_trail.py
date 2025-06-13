@@ -7,12 +7,12 @@ import hashlib
 import json
 import logging
 import sqlite3
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
-from dataclasses import dataclass, asdict
-from enum import Enum
 import uuid
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from enum import Enum
+from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -44,19 +44,19 @@ class AuditEntry:
     audit_id: str
     timestamp: datetime
     event_type: AuditEventType
-    user_id: Optional[str]
-    session_id: Optional[str]
-    ecg_hash: Optional[str]
+    user_id: str | None
+    session_id: str | None
+    ecg_hash: str | None
     model_version: str
-    prediction_data: Optional[Dict[str, Any]]
-    preprocessing_params: Optional[Dict[str, Any]]
-    confidence_scores: Optional[Dict[str, float]]
-    processing_time: Optional[float]
-    system_metadata: Dict[str, Any]
-    compliance_flags: List[ComplianceLevel]
+    prediction_data: dict[str, Any] | None
+    preprocessing_params: dict[str, Any] | None
+    confidence_scores: dict[str, float] | None
+    processing_time: float | None
+    system_metadata: dict[str, Any]
+    compliance_flags: list[ComplianceLevel]
     data_integrity_hash: str
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert audit entry to dictionary for storage"""
         result = asdict(self)
         result['timestamp'] = self.timestamp.isoformat()
@@ -70,20 +70,20 @@ class AuditTrail:
     Comprehensive audit trail system for ECG analysis
     Provides regulatory compliance and complete traceability
     """
-    
+
     def __init__(self, storage_path: str = "/tmp/ecg_audit.db"):
         self.storage_path = Path(storage_path)
-        self.audit_log: List[AuditEntry] = []
+        self.audit_log: list[AuditEntry] = []
         self._init_storage()
-        
+
     def _init_storage(self) -> None:
         """Initialize secure storage for audit logs"""
         try:
             self.storage_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             conn = sqlite3.connect(str(self.storage_path))
             cursor = conn.cursor()
-            
+
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS audit_entries (
                     audit_id TEXT PRIMARY KEY,
@@ -103,7 +103,7 @@ class AuditTrail:
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
+
             cursor.execute('''
                 CREATE INDEX IF NOT EXISTS idx_timestamp ON audit_entries(timestamp)
             ''')
@@ -116,17 +116,17 @@ class AuditTrail:
             cursor.execute('''
                 CREATE INDEX IF NOT EXISTS idx_ecg_hash ON audit_entries(ecg_hash)
             ''')
-            
+
             conn.commit()
             conn.close()
-            
+
             logger.info(f"Audit trail storage initialized at {self.storage_path}")
-            
+
         except Exception as e:
             logger.error(f"Failed to initialize audit storage: {e}")
             raise
-    
-    def _hash_ecg(self, ecg_data: Union[Dict[str, Any], bytes, str]) -> str:
+
+    def _hash_ecg(self, ecg_data: dict[str, Any] | bytes | str) -> str:
         """Generate secure hash of ECG data for traceability"""
         if isinstance(ecg_data, dict):
             ecg_str = json.dumps(ecg_data, sort_keys=True)
@@ -134,37 +134,37 @@ class AuditTrail:
             ecg_str = ecg_data.decode('utf-8', errors='ignore')
         else:
             ecg_str = str(ecg_data)
-            
+
         return hashlib.sha256(ecg_str.encode()).hexdigest()
-    
-    def _generate_integrity_hash(self, entry_data: Dict[str, Any]) -> str:
+
+    def _generate_integrity_hash(self, entry_data: dict[str, Any]) -> str:
         """Generate integrity hash for audit entry"""
         entry_str = json.dumps(entry_data, sort_keys=True)
         return hashlib.sha256(entry_str.encode()).hexdigest()
-    
-    def log_prediction(self, 
+
+    def log_prediction(self,
                       ecg_data: Any,
-                      prediction: Dict[str, Any],
-                      metadata: Dict[str, Any],
-                      user_id: Optional[str] = None,
-                      session_id: Optional[str] = None) -> str:
+                      prediction: dict[str, Any],
+                      metadata: dict[str, Any],
+                      user_id: str | None = None,
+                      session_id: str | None = None) -> str:
         """
         Log ECG prediction for audit trail
-        
+
         Args:
             ecg_data: ECG signal data
             prediction: AI prediction results
             metadata: Analysis metadata
             user_id: User performing the analysis
             session_id: Session identifier
-            
+
         Returns:
             Audit entry ID
         """
         try:
             audit_id = str(uuid.uuid4())
             ecg_hash = self._hash_ecg(ecg_data)
-            
+
             entry_data = {
                 'audit_id': audit_id,
                 'timestamp': datetime.now(),
@@ -189,31 +189,31 @@ class AuditTrail:
                     ComplianceLevel.ISO_13485
                 ]
             }
-            
+
             entry_data['data_integrity_hash'] = self._generate_integrity_hash(entry_data)
-            
+
             audit_entry = AuditEntry(**entry_data)
-            
+
             self.audit_log.append(audit_entry)
             self._persist_to_secure_storage(audit_entry)
-            
+
             logger.info(f"Audit entry logged: {audit_id}")
             return audit_id
-            
+
         except Exception as e:
             logger.error(f"Failed to log prediction audit: {e}")
             raise
-    
+
     def log_expert_feedback(self,
                            ecg_id: str,
-                           expert_diagnosis: Dict[str, Any],
-                           ai_prediction: Dict[str, Any],
+                           expert_diagnosis: dict[str, Any],
+                           ai_prediction: dict[str, Any],
                            expert_id: str,
-                           discrepancy_analysis: Optional[Dict[str, Any]] = None) -> str:
+                           discrepancy_analysis: dict[str, Any] | None = None) -> str:
         """Log expert feedback for continuous learning audit"""
         try:
             audit_id = str(uuid.uuid4())
-            
+
             entry_data = {
                 'audit_id': audit_id,
                 'timestamp': datetime.now(),
@@ -236,30 +236,30 @@ class AuditTrail:
                 },
                 'compliance_flags': [ComplianceLevel.FDA_510K, ComplianceLevel.ISO_13485]
             }
-            
+
             entry_data['data_integrity_hash'] = self._generate_integrity_hash(entry_data)
             audit_entry = AuditEntry(**entry_data)
-            
+
             self.audit_log.append(audit_entry)
             self._persist_to_secure_storage(audit_entry)
-            
+
             logger.info(f"Expert feedback audit logged: {audit_id}")
             return audit_id
-            
+
         except Exception as e:
             logger.error(f"Failed to log expert feedback audit: {e}")
             raise
-    
+
     def log_model_update(self,
                         old_version: str,
                         new_version: str,
                         update_reason: str,
-                        performance_metrics: Dict[str, float],
+                        performance_metrics: dict[str, float],
                         user_id: str) -> str:
         """Log model updates for regulatory compliance"""
         try:
             audit_id = str(uuid.uuid4())
-            
+
             entry_data = {
                 'audit_id': audit_id,
                 'timestamp': datetime.now(),
@@ -288,28 +288,28 @@ class AuditTrail:
                     ComplianceLevel.ISO_13485
                 ]
             }
-            
+
             entry_data['data_integrity_hash'] = self._generate_integrity_hash(entry_data)
             audit_entry = AuditEntry(**entry_data)
-            
+
             self.audit_log.append(audit_entry)
             self._persist_to_secure_storage(audit_entry)
-            
+
             logger.info(f"Model update audit logged: {audit_id}")
             return audit_id
-            
+
         except Exception as e:
             logger.error(f"Failed to log model update audit: {e}")
             raise
-    
+
     def _persist_to_secure_storage(self, entry: AuditEntry) -> None:
         """Persist audit entry to secure storage"""
         try:
             conn = sqlite3.connect(str(self.storage_path))
             cursor = conn.cursor()
-            
+
             entry_dict = entry.to_dict()
-            
+
             cursor.execute('''
                 INSERT INTO audit_entries (
                     audit_id, timestamp, event_type, user_id, session_id,
@@ -333,51 +333,51 @@ class AuditTrail:
                 json.dumps(entry_dict['compliance_flags']),
                 entry_dict['data_integrity_hash']
             ))
-            
+
             conn.commit()
             conn.close()
-            
+
         except Exception as e:
             logger.error(f"Failed to persist audit entry: {e}")
             raise
-    
-    def generate_compliance_report(self, 
+
+    def generate_compliance_report(self,
                                  period_days: int = 30,
-                                 compliance_level: ComplianceLevel = ComplianceLevel.FDA_510K) -> Dict[str, Any]:
+                                 compliance_level: ComplianceLevel = ComplianceLevel.FDA_510K) -> dict[str, Any]:
         """
         Generate comprehensive compliance report for regulatory bodies
-        
+
         Args:
             period_days: Number of days to include in report
             compliance_level: Regulatory standard to report against
-            
+
         Returns:
             Comprehensive compliance report
         """
         try:
             end_date = datetime.now()
             start_date = end_date - timedelta(days=period_days)
-            
+
             conn = sqlite3.connect(str(self.storage_path))
             cursor = conn.cursor()
-            
+
             cursor.execute('''
-                SELECT * FROM audit_entries 
+                SELECT * FROM audit_entries
                 WHERE timestamp >= ? AND timestamp <= ?
                 ORDER BY timestamp DESC
             ''', (start_date.isoformat(), end_date.isoformat()))
-            
+
             entries = cursor.fetchall()
             conn.close()
-            
+
             total_analyses = len([e for e in entries if json.loads(e[2]) == AuditEventType.ECG_ANALYSIS.value])
             expert_feedback_count = len([e for e in entries if json.loads(e[2]) == AuditEventType.EXPERT_FEEDBACK.value])
             model_updates = len([e for e in entries if json.loads(e[2]) == AuditEventType.MODEL_UPDATE.value])
-            
+
             accuracy_metrics = self._calculate_period_metrics(entries)
             error_analysis = self._analyze_errors(entries)
             model_changes = self._track_model_updates(entries)
-            
+
             report = {
                 'report_id': str(uuid.uuid4()),
                 'generated_at': datetime.now().isoformat(),
@@ -405,30 +405,30 @@ class AuditTrail:
                 },
                 'recommendations': self._generate_compliance_recommendations(accuracy_metrics, error_analysis)
             }
-            
+
             logger.info(f"Compliance report generated: {report['report_id']}")
             return report
-            
+
         except Exception as e:
             logger.error(f"Failed to generate compliance report: {e}")
             raise
-    
-    def _calculate_period_metrics(self, entries: List[Any]) -> Dict[str, float]:
+
+    def _calculate_period_metrics(self, entries: list[Any]) -> dict[str, float]:
         """Calculate performance metrics for the reporting period"""
         if not entries:
             return {'accuracy': 0.0, 'precision': 0.0, 'recall': 0.0, 'f1_score': 0.0}
-        
+
         analysis_entries = [e for e in entries if e[2] == AuditEventType.ECG_ANALYSIS.value]
         feedback_entries = [e for e in entries if e[2] == AuditEventType.EXPERT_FEEDBACK.value]
-        
+
         if not analysis_entries:
             return {'accuracy': 0.0, 'precision': 0.0, 'recall': 0.0, 'f1_score': 0.0}
-        
+
         total_predictions = len(analysis_entries)
         corrections = len(feedback_entries)
-        
+
         accuracy = max(0.0, (total_predictions - corrections) / total_predictions) if total_predictions > 0 else 0.0
-        
+
         return {
             'accuracy': accuracy,
             'precision': accuracy * 0.95,  # Estimated based on typical performance
@@ -437,11 +437,11 @@ class AuditTrail:
             'total_predictions': total_predictions,
             'expert_corrections': corrections
         }
-    
-    def _analyze_errors(self, entries: List[Any]) -> Dict[str, Any]:
+
+    def _analyze_errors(self, entries: list[Any]) -> dict[str, Any]:
         """Analyze error patterns from audit entries"""
         feedback_entries = [e for e in entries if e[2] == AuditEventType.EXPERT_FEEDBACK.value]
-        
+
         if not feedback_entries:
             return {
                 'total_errors': 0,
@@ -449,20 +449,20 @@ class AuditTrail:
                 'common_patterns': [],
                 'severity_distribution': {}
             }
-        
+
         error_categories = {}
         for entry in feedback_entries:
             try:
                 prediction_data = json.loads(entry[8]) if entry[8] else {}
                 expert_diagnosis = prediction_data.get('expert_diagnosis', {})
-                
-                for condition, diagnosis in expert_diagnosis.items():
+
+                for condition, _diagnosis in expert_diagnosis.items():
                     if condition not in error_categories:
                         error_categories[condition] = 0
                     error_categories[condition] += 1
             except (json.JSONDecodeError, KeyError):
                 continue
-        
+
         return {
             'total_errors': len(feedback_entries),
             'error_categories': error_categories,
@@ -473,11 +473,11 @@ class AuditTrail:
                 'low': len(feedback_entries) - (2 * len(feedback_entries) // 3)
             }
         }
-    
-    def _track_model_updates(self, entries: List[Any]) -> List[Dict[str, Any]]:
+
+    def _track_model_updates(self, entries: list[Any]) -> list[dict[str, Any]]:
         """Track model version changes"""
         update_entries = [e for e in entries if e[2] == AuditEventType.MODEL_UPDATE.value]
-        
+
         updates = []
         for entry in update_entries:
             try:
@@ -491,50 +491,50 @@ class AuditTrail:
                 })
             except (json.JSONDecodeError, KeyError):
                 continue
-        
+
         return updates
-    
-    def _generate_compliance_recommendations(self, 
-                                           accuracy_metrics: Dict[str, float],
-                                           error_analysis: Dict[str, Any]) -> List[str]:
+
+    def _generate_compliance_recommendations(self,
+                                           accuracy_metrics: dict[str, float],
+                                           error_analysis: dict[str, Any]) -> list[str]:
         """Generate recommendations for regulatory compliance"""
         recommendations = []
-        
+
         accuracy = accuracy_metrics.get('accuracy', 0.0)
         total_errors = error_analysis.get('total_errors', 0)
-        
+
         if accuracy < 0.95:
             recommendations.append("Consider model retraining to improve accuracy above 95% threshold")
-        
+
         if total_errors > 10:
             recommendations.append("Implement additional expert review process for high-error conditions")
-        
+
         if accuracy_metrics.get('total_predictions', 0) < 100:
             recommendations.append("Increase validation dataset size for more robust performance metrics")
-        
+
         recommendations.extend([
             "Maintain regular backup of audit logs for regulatory compliance",
             "Schedule quarterly compliance reviews with regulatory affairs team",
             "Ensure all model updates undergo proper validation before deployment"
         ])
-        
+
         return recommendations
-    
+
     def verify_data_integrity(self, audit_id: str) -> bool:
         """Verify data integrity of specific audit entry"""
         try:
             conn = sqlite3.connect(str(self.storage_path))
             cursor = conn.cursor()
-            
+
             cursor.execute('SELECT * FROM audit_entries WHERE audit_id = ?', (audit_id,))
             entry = cursor.fetchone()
             conn.close()
-            
+
             if not entry:
                 return False
-            
+
             stored_hash = entry[13]  # data_integrity_hash column
-            
+
             entry_data = {
                 'audit_id': entry[0],
                 'timestamp': entry[1],
@@ -550,33 +550,33 @@ class AuditTrail:
                 'system_metadata': json.loads(entry[11]) if entry[11] else {},
                 'compliance_flags': json.loads(entry[12]) if entry[12] else []
             }
-            
+
             calculated_hash = self._generate_integrity_hash(entry_data)
-            
+
             return stored_hash == calculated_hash
-            
+
         except Exception as e:
             logger.error(f"Failed to verify data integrity for {audit_id}: {e}")
             return False
-    
-    def get_audit_summary(self, days: int = 7) -> Dict[str, Any]:
+
+    def get_audit_summary(self, days: int = 7) -> dict[str, Any]:
         """Get summary of audit activities for specified period"""
         try:
             end_date = datetime.now()
             start_date = end_date - timedelta(days=days)
-            
+
             conn = sqlite3.connect(str(self.storage_path))
             cursor = conn.cursor()
-            
+
             cursor.execute('''
-                SELECT event_type, COUNT(*) FROM audit_entries 
+                SELECT event_type, COUNT(*) FROM audit_entries
                 WHERE timestamp >= ? AND timestamp <= ?
                 GROUP BY event_type
             ''', (start_date.isoformat(), end_date.isoformat()))
-            
+
             event_counts = dict(cursor.fetchall())
             conn.close()
-            
+
             return {
                 'period_days': days,
                 'total_events': sum(event_counts.values()),
@@ -584,7 +584,7 @@ class AuditTrail:
                 'compliance_status': 'ACTIVE',
                 'last_updated': datetime.now().isoformat()
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to get audit summary: {e}")
             return {}
@@ -597,7 +597,7 @@ def create_audit_trail(storage_path: str = "/tmp/ecg_audit.db") -> AuditTrail:
 
 if __name__ == "__main__":
     audit = create_audit_trail()
-    
+
     sample_ecg_data = {"signal": [1, 2, 3, 4, 5], "sampling_rate": 500}
     sample_prediction = {
         "atrial_fibrillation": 0.85,
@@ -610,7 +610,7 @@ if __name__ == "__main__":
         "preprocessing": {"filters_applied": ["bandpass", "notch"]},
         "system_version": "cardio.ai.pro-v1.0"
     }
-    
+
     audit_id = audit.log_prediction(
         ecg_data=sample_ecg_data,
         prediction=sample_prediction,
@@ -618,14 +618,14 @@ if __name__ == "__main__":
         user_id="cardiologist_001",
         session_id="session_123"
     )
-    
+
     print(f"Logged audit entry: {audit_id}")
-    
+
     report = audit.generate_compliance_report(period_days=30)
     print(f"Generated compliance report: {report['report_id']}")
-    
+
     integrity_ok = audit.verify_data_integrity(audit_id)
     print(f"Data integrity verified: {integrity_ok}")
-    
+
     summary = audit.get_audit_summary(days=7)
     print(f"Audit summary: {summary}")
