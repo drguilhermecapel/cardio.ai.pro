@@ -16,7 +16,11 @@ import numpy as np
 import pywt
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+
+try:
+    import torch.nn.functional as F
+except ImportError:
+    F = None
 import torch.optim as optim
 import wandb
 from scipy import signal as scipy_signal

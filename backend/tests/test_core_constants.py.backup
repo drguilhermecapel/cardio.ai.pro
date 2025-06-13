@@ -87,7 +87,7 @@ def test_enum_completeness():
     assert len(UserRoles) == 6
     assert len(AnalysisStatus) == 5
     assert len(ClinicalUrgency) == 4
-    assert len(DiagnosisCategory) == 10  # Era 6, mas o enum tem 10 valores
+    assert len(DiagnosisCategory) == 6
     assert len(NotificationType) == 7
     assert len(NotificationPriority) == 5
     assert len(ValidationStatus) == 4

@@ -36,85 +36,16 @@ class MultiPathologyService:
     """Hierarchical multi-pathology detection for 71 SCP-ECG conditions"""
 
     def __init__(self) -> None:
-        logger.info("Initializing MultiPathologyService")
-
-        self.scp_conditions = self._initialize_scp_conditions()
-
-        # Category thresholds
-        self.category_thresholds = {
-            SCPCategory.ARRHYTHMIA: 0.3,
-            SCPCategory.CONDUCTION_DISORDERS: 0.4,
-            SCPCategory.ISCHEMIA: 0.5,
-            SCPCategory.STRUCTURAL: 0.4,
-            SCPCategory.NORMAL: 0.7
-        }
-
         self.condition_models: dict[str, Any] = {}
+        self.category_thresholds = self._initialize_category_thresholds()
         self.condition_thresholds = self._initialize_condition_thresholds()
-
-    def _initialize_scp_conditions(self) -> dict[str, dict[str, Any]]:
-        """Initialize all 71 SCP-ECG conditions"""
-        # Simplified version with key conditions
-        conditions = {}
-
-        condition_list = [
-            'NORM', 'MI', 'STTC', 'ISC_', 'LVH', 'LAFB', 'IRBBB', 'LBBB', 'RBBB',
-            'AFIB', 'AFLT', 'SVTAC', 'PSVT', 'PAC', 'PVC', 'BIGU', 'TRIGU',
-            'IVCD', 'LAD', 'RAD', 'LQRSV', 'LPFB', 'WPW', 'PR', 'SINUS',
-            'SARRH', 'SBRAD', 'STACH', 'PACE', 'FUSION', 'VESC', 'AV1', 'AV2',
-            'AV3', 'AVB', 'ISCHANT', 'ISCHEMIA', 'ISCHLAT', 'ISCHINF', 'INJAL',
-            'INJLA', 'INJIL', 'INJIN', 'LMI', 'LAE', 'RAE', 'RVH', 'ALMI',
-            'ASMI', 'IMI', 'ILMI', 'PMI', 'IPLMI', 'IPMI', 'LVS', 'LVOLT',
-            'HVOLT', 'RAA/RVA', 'LAA/LVA', 'VH', 'SEHYP', 'VCLVH', 'QWAVE',
-            'LOWT', 'INVT', 'NT_', 'PAC_', 'PVC_', 'STD_', 'STE_'
-        ]
-
-        for i, condition in enumerate(condition_list[:71]):  # Ensure 71 conditions
-            conditions[condition] = {
-                'name': condition,
-                'category': self._map_condition_to_category(condition),
-                'severity': self._get_condition_severity(condition),
-                'index': i
-            }
-
-        return conditions
-
-    def _map_condition_to_category(self, condition: str) -> SCPCategory:
-        """Map SCP condition to category"""
-        arrhythmia_conditions = ['AFIB', 'AFLT', 'SVTAC', 'PSVT', 'PAC', 'PVC']
-        conduction_conditions = ['LBBB', 'RBBB', 'IRBBB', 'LAFB', 'LPFB', 'AVB']
-        ischemia_conditions = ['MI', 'STTC', 'ISC_', 'ISCHANT', 'ISCHEMIA']
-        structural_conditions = ['LVH', 'RVH', 'LAE', 'RAE', 'VCLVH']
-
-        if condition in arrhythmia_conditions:
-            return SCPCategory.ARRHYTHMIA
-        elif condition in conduction_conditions:
-            return SCPCategory.CONDUCTION_DISORDERS
-        elif condition in ischemia_conditions:
-            return SCPCategory.ISCHEMIA
-        elif condition in structural_conditions:
-            return SCPCategory.STRUCTURAL
-        else:
-            return SCPCategory.NORMAL
-
-    def _get_condition_severity(self, condition: str) -> float:
-        """Get severity score for condition"""
-        high_severity = ['MI', 'AFIB', 'VT', 'AVB']
-        medium_severity = ['LBBB', 'RBBB', 'SVTAC', 'LVH']
-
-        if condition in high_severity:
-            return 0.9
-        elif condition in medium_severity:
-            return 0.6
-        else:
-            return 0.3
 
     def _initialize_category_thresholds(self) -> dict[str, float]:
         """Initialize adaptive thresholds for each category"""
         return {
             SCPCategory.NORMAL: 0.99,  # High threshold for normal (NPV > 99%)
             SCPCategory.ARRHYTHMIA: 0.85,  # Sensitivity > 95% target
-            SCPCategory.CONDUCTION_DISORDERS: 0.90,  # Specificity > 95% target
+            SCPCategory.CONDUCTION_DISORDER: 0.90,  # Specificity > 95% target
             SCPCategory.ISCHEMIA: 0.80,  # High sensitivity for STEMI detection
             SCPCategory.HYPERTROPHY: 0.85,  # AUC > 0.90 target
             SCPCategory.AXIS_DEVIATION: 0.80,
@@ -283,8 +214,7 @@ class MultiPathologyService:
             'confidence': max(normal_prob, abnormal_prob),
             'normal_probability': normal_prob,
             'abnormal_probability': abnormal_prob,
-            'abnormal_indicators': abnormal_indicators,
-            'npv_score': normal_prob  # Negative Predictive Value for normal classification
+            'abnormal_indicators': abnormal_indicators
         }
 
     async def _level2_category_classification(
@@ -385,8 +315,7 @@ class MultiPathologyService:
         return {
             'predicted_category': predicted_category,
             'category_probabilities': category_scores,
-            'confidence': category_scores[predicted_category],
-            'detected_categories': [cat for cat, score in category_scores.items() if score > 0.3]
+            'confidence': category_scores[predicted_category]
         }
 
     async def _level3_specific_diagnosis(
@@ -432,8 +361,7 @@ class MultiPathologyService:
             'primary_diagnosis': primary_diagnosis,
             'confidence': primary_confidence,
             'all_conditions': condition_scores,
-            'filtered_conditions': filtered_conditions,
-            'detected_conditions': filtered_conditions
+            'filtered_conditions': filtered_conditions
         }
 
     async def _diagnose_arrhythmias(self, features: dict[str, Any]) -> dict[str, float]:
@@ -620,64 +548,3 @@ class MultiPathologyService:
             'icd10_codes': [],
             'requires_immediate_attention': result.clinical_urgency == 'CRITICAL'
         }
-
-    async def analyze_hierarchical(
-        self,
-        signal: np.ndarray,
-        features: dict[str, float],
-        preprocessing_quality: float
-    ) -> dict[str, Any]:
-        """Perform hierarchical multi-pathology analysis"""
-
-        # Level 1: Normal vs Abnormal
-        level1_result = await self._level1_normal_vs_abnormal(signal, features)
-
-        if level1_result['is_normal'] and level1_result['confidence'] > 0.8:
-            return {
-                'diagnosis': 'NORMAL',
-                'confidence': level1_result['confidence'],
-                'urgency': ClinicalUrgency.LOW,
-                'details': level1_result,
-                'preprocessing_quality': preprocessing_quality,
-                'level_completed': 1,
-                'clinical_urgency': ClinicalUrgency.LOW
-            }
-
-        # Level 2: Category classification
-        level2_result = await self._level2_category_classification(signal, features)
-
-        # Level 3: Specific diagnosis
-        target_categories = [level2_result['predicted_category']]
-        level3_result = await self._level3_specific_diagnosis(
-            signal, features, target_categories
-        )
-
-        urgency = self._determine_clinical_urgency(level3_result)
-
-        return {
-            'diagnosis': level3_result['primary_diagnosis'],
-            'confidence': level3_result['confidence'],
-            'urgency': urgency,
-            'level1': level1_result,
-            'level2': level2_result,
-            'level3': level3_result,
-            'preprocessing_quality': preprocessing_quality,
-            'level_completed': 3,
-            'clinical_urgency': urgency
-        }
-
-    def _determine_clinical_urgency(self, level3_result: dict[str, Any]) -> ClinicalUrgency:
-        """Determine clinical urgency based on diagnosis"""
-        critical_conditions = ['MI', 'STEMI', 'VT', 'AVB']
-        high_conditions = ['AFIB', 'LBBB', 'RBBB', 'SVTAC']
-
-        diagnosis = level3_result.get('primary_diagnosis', '')
-
-        if diagnosis in critical_conditions:
-            return ClinicalUrgency.CRITICAL
-        elif diagnosis in high_conditions:
-            return ClinicalUrgency.HIGH
-        elif diagnosis == 'NORMAL':
-            return ClinicalUrgency.LOW
-        else:
-            return ClinicalUrgency.MEDIUM

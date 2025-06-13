@@ -24,12 +24,18 @@ class SCPCategory(str, Enum):
     """SCP-ECG diagnostic categories"""
     NORMAL = "normal"
     ARRHYTHMIA = "arrhythmia"
-    CONDUCTION_DISORDER = "conduction_disorder"
+    CONDUCTION_DISORDERS = "conduction_disorders"  # Era CONDUCTION_DISORDER
     ISCHEMIA = "ischemia"
-    HYPERTROPHY = "hypertrophy"
+    STRUCTURAL = "structural"  # Nova categoria
     AXIS_DEVIATION = "axis_deviation"
+    HYPERTROPHY = "hypertrophy"
     REPOLARIZATION = "repolarization"
     OTHER = "other"
+
+    CONDUCTION_DISORDER = "conduction_disorders"  # Alias
+    CONDUCTION_ABNORMALITIES = "conduction_disorders"  # Alias
+    ISCHEMIC_CHANGES = "ischemia"  # Alias
+    STRUCTURAL_ABNORMALITIES = "structural"  # Alias
 
 SCP_ECG_CONDITIONS = {
     "NORM": SCPCondition(

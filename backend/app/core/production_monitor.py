@@ -1,7 +1,7 @@
 import logging
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Any, Deque
+from typing import Any
 
 import numpy as np
 
@@ -18,9 +18,9 @@ class ProductionMonitor:
         self.alert_email = alert_email
         self.threshold = performance_threshold
 
-        self.prediction_buffer: Deque[dict[str, Any]] = deque(maxlen=10000)
-        self.quality_buffer: Deque[float] = deque(maxlen=1000)
-        self.error_buffer: Deque[dict[str, Any]] = deque(maxlen=100)
+        self.prediction_buffer: deque[dict[str, Any]] = deque(maxlen=10000)
+        self.quality_buffer: deque[float] = deque(maxlen=1000)
+        self.error_buffer: deque[dict[str, Any]] = deque(maxlen=100)
 
         logging.basicConfig(
             level=logging.INFO,

@@ -23,6 +23,7 @@ python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 numpy = "^1.26.4"
 scipy = "^1.13.0"
 scipy-stubs = "^1.11.0"
+scikit-learn = "^1.4.0"
 onnxruntime = "^1.17.3"
 neurokit2 = "^0.2.7"
 pywavelets = "^1.4.1"
@@ -155,8 +156,19 @@ module = [
     "librosa.*",
     "sklearn.*",
     "tqdm.*",
+    "app.ml.hybrid_architecture",
+    "app.ml.training_pipeline", 
+    "app.ml.ecg_gan",
+    "app.utils.data_augmentation",
+    "app.utils.ecg_visualizations",
+    "app.services.advanced_ml_service",
+    "app.services.multi_pathology_service",
+    "app.services.interpretability_service",
+    "app.utils.adaptive_thresholds",
+    "app.utils.clinical_explanations",
 ]
 ignore_missing_imports = true
+ignore_errors = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -172,21 +184,6 @@ addopts = [
     "--cov-fail-under=80",
 ]
 asyncio_mode = "auto"
-
-[[tool.mypy.overrides]]
-module = [
-    "app.ml.hybrid_architecture",
-    "app.ml.training_pipeline", 
-    "app.ml.ecg_gan",
-    "app.utils.data_augmentation",
-    "app.utils.ecg_visualizations",
-    "app.services.advanced_ml_service",
-    "app.services.multi_pathology_service",
-    "app.services.interpretability_service",
-    "app.utils.adaptive_thresholds",
-    "app.utils.clinical_explanations",
-]
-ignore_errors = true
 
 [tool.coverage.run]
 source = ["app"]
