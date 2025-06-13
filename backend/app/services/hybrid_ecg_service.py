@@ -24,6 +24,7 @@ from app.core.signal_quality import SignalQualityAssessment
 # from app.monitoring.structured_logging import get_ecg_logger  # Temporarily disabled for core component
 from app.preprocessing import AdvancedECGPreprocessor, EnhancedSignalQualityAnalyzer
 from app.alerts.intelligent_alert_system import IntelligentAlertSystem, create_intelligent_alert_system
+from app.ml.confidence_calibration import ConfidenceCalibrationSystem, create_confidence_calibration_system
 from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
 
@@ -569,6 +570,8 @@ class HybridECGAnalysisService:
         self.feature_extractor = FeatureExtractor()
         
         self.alert_system = create_intelligent_alert_system()
+        
+        self.confidence_calibration = create_confidence_calibration_system(method="isotonic")
 
         self.ecg_signal_processor = ECGSignalProcessor(sampling_rate=500, mode='diagnostic')
         self.signal_quality_assessment = SignalQualityAssessment(sampling_rate=500)
@@ -695,6 +698,16 @@ class HybridECGAnalysisService:
             }
             
             generated_alerts = self.alert_system.process_ecg_analysis(analysis_for_alerts)
+
+            if 'predictions' in ai_results:
+                calibrated_predictions = self.confidence_calibration.calibrate_predictions(ai_results['predictions'])
+                ai_results['calibrated_predictions'] = calibrated_predictions
+                ai_results['calibration_applied'] = True
+                
+                if calibrated_predictions:
+                    ai_results['calibrated_confidence'] = max(calibrated_predictions.values())
+                    logger.info(f"Applied confidence calibration: original={ai_results.get('confidence', 0.0):.3f}, "
+                              f"calibrated={ai_results['calibrated_confidence']:.3f}")
 
             comprehensive_results = {
                 'analysis_id': analysis_id,
