@@ -22,13 +22,11 @@ try:
 except ImportError:
     F = None
 import torch.optim as optim
-
 try:
     import wandb
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     wandb = None
 from scipy import signal as scipy_signal
-
 try:
     from sklearn.metrics import classification_report, roc_auc_score
     from sklearn.model_selection import train_test_split

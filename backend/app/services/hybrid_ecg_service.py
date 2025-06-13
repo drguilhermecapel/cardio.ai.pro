@@ -7,7 +7,7 @@ import logging
 import time
 import warnings
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 try:
     import neurokit2 as nk
@@ -18,34 +18,24 @@ import numpy.typing as npt
 import pandas as pd
 from scipy import signal
 from scipy.stats import entropy, kurtosis, skew
-
 try:
     from sklearn.preprocessing import StandardScaler
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     StandardScaler = None
 
-from app.alerts.intelligent_alert_system import (
-    create_intelligent_alert_system,
-)
 from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
 from app.core.signal_processing import ECGSignalProcessor
 from app.core.signal_quality import SignalQualityAssessment
-from app.ml.confidence_calibration import (
-    create_confidence_calibration_system,
-)
-from app.monitoring.feedback_loop_system import (
-    create_continuous_learning_system,
-)
 
 # from app.monitoring.structured_logging import get_ecg_logger  # Temporarily disabled for core component
 from app.preprocessing import AdvancedECGPreprocessor, EnhancedSignalQualityAnalyzer
+from app.alerts.intelligent_alert_system import IntelligentAlertSystem, create_intelligent_alert_system
+from app.ml.confidence_calibration import ConfidenceCalibrationSystem, create_confidence_calibration_system
+from app.monitoring.feedback_loop_system import ContinuousLearningSystem, create_continuous_learning_system
+from app.security.audit_trail import AuditTrail, create_audit_trail
+from app.security.privacy_preserving import PrivacyPreservingECG, create_privacy_preserving_system, PrivacyLevel
 from app.repositories.ecg_repository import ECGRepository
-from app.security.audit_trail import create_audit_trail
-from app.security.privacy_preserving import (
-    PrivacyLevel,
-    create_privacy_preserving_system,
-)
 from app.services.validation_service import ValidationService
 
 if TYPE_CHECKING:
@@ -597,20 +587,20 @@ class HybridECGAnalysisService:
         self.advanced_preprocessor = AdvancedECGPreprocessor()
         self.quality_analyzer = EnhancedSignalQualityAnalyzer()
         self.feature_extractor = FeatureExtractor()
-
+        
         self.alert_system = create_intelligent_alert_system()
-
+        
         self.confidence_calibration = create_confidence_calibration_system(method="isotonic")
-
+        
         self.continuous_learning = create_continuous_learning_system(
             model=self,  # Pass the service as the model
             accuracy_threshold=0.85,
             critical_miss_threshold=5,
             feedback_buffer_size=100
         )
-
+        
         self.audit_trail = create_audit_trail(storage_path="/tmp/cardio_ai_audit.db")
-
+        
         self.privacy_system = create_privacy_preserving_system(privacy_level=PrivacyLevel.MEDIUM)
 
         self.ecg_signal_processor = ECGSignalProcessor(sampling_rate=500, mode='diagnostic')
@@ -740,8 +730,8 @@ class HybridECGAnalysisService:
                 'system_version': 'cardio.ai.pro-v1.0',
                 'environment': 'production'
             }
-
-            self.audit_trail.log_prediction(
+            
+            audit_id = self.audit_trail.log_prediction(
                 ecg_data=ecg_data,
                 prediction=ai_results,
                 metadata=audit_metadata,
@@ -755,14 +745,14 @@ class HybridECGAnalysisService:
                 'quality_metrics': quality_metrics,
                 'preprocessed_signal': preprocessed_signal
             }
-
+            
             generated_alerts = self.alert_system.process_ecg_analysis(analysis_for_alerts)
 
             if 'predictions' in ai_results:
                 calibrated_predictions = self.confidence_calibration.calibrate_predictions(ai_results['predictions'])
                 ai_results['calibrated_predictions'] = calibrated_predictions
                 ai_results['calibration_applied'] = True
-
+                
                 if calibrated_predictions:
                     ai_results['calibrated_confidence'] = max(calibrated_predictions.values())
                     logger.info(f"Applied confidence calibration: original={ai_results.get('confidence', 0.0):.3f}, "
@@ -826,18 +816,18 @@ class HybridECGAnalysisService:
             logger.error(f"Comprehensive ECG analysis failed: {e}")
             raise ECGProcessingException(f"Analysis failed: {str(e)}") from e
 
-    async def collect_expert_feedback(self, analysis_id: str, expert_diagnosis: dict[str, Any],
-                                    expert_confidence: float | None = None,
-                                    clinical_context: str | None = None) -> dict[str, Any]:
+    async def collect_expert_feedback(self, analysis_id: str, expert_diagnosis: Dict[str, Any],
+                                    expert_confidence: Optional[float] = None,
+                                    clinical_context: Optional[str] = None) -> Dict[str, Any]:
         """
         Collect expert feedback for continuous learning
-
+        
         Args:
             analysis_id: ID of the original analysis
             expert_diagnosis: Expert's diagnosis with conditions
             expert_confidence: Expert's confidence in their diagnosis
             clinical_context: Additional clinical context
-
+            
         Returns:
             Feedback collection confirmation
         """
@@ -846,7 +836,7 @@ class HybridECGAnalysisService:
                 'atrial_fibrillation': 0.75,
                 'normal_sinus_rhythm': 0.25
             }
-
+            
             self.continuous_learning.collect_feedback(
                 ecg_id=analysis_id,
                 ai_prediction=ai_prediction,
@@ -857,9 +847,9 @@ class HybridECGAnalysisService:
                 expert_confidence=expert_confidence,
                 clinical_context=clinical_context
             )
-
+            
             logger.info(f"Expert feedback collected for analysis {analysis_id}")
-
+            
             return {
                 'status': 'success',
                 'message': 'Expert feedback collected successfully',
@@ -867,7 +857,7 @@ class HybridECGAnalysisService:
                 'feedback_timestamp': datetime.now().isoformat(),
                 'continuous_learning_status': self.continuous_learning.get_performance_summary()
             }
-
+            
         except Exception as e:
             logger.error(f"Failed to collect expert feedback for {analysis_id}: {e}")
             return {

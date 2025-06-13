@@ -11,8 +11,7 @@ import numpy as np
 import numpy.typing as npt
 import pywt  # type: ignore
 from scipy import signal
-
-from app.preprocessing.adaptive_filters import create_adaptive_filter
+from app.preprocessing.adaptive_filters import AdaptiveECGFilter, create_adaptive_filter
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +29,7 @@ class AdvancedECGPreprocessor:
             )
         self.fs = sampling_rate
         self.quality_threshold = 0.7
-
+        
         self.adaptive_filter = create_adaptive_filter(
             adaptation_mode="rls",  # Use RLS for better performance with non-stationary noise
             filter_order=32,
@@ -57,7 +56,7 @@ class AdvancedECGPreprocessor:
         filtered_signal = self._butterworth_bandpass_filter(ecg_signal, 0.05, 150, self.fs)
 
         denoised_signal = self._wavelet_artifact_removal(filtered_signal)
-
+        
         try:
             adaptive_filtered_signal = self.adaptive_filter.multi_channel_adaptive_filtering(denoised_signal)
             logger.info("Applied adaptive filtering for non-stationary noise removal")
