@@ -41,7 +41,7 @@ class AdvancedECGPreprocessor:
         """
         start_time = time.time()
 
-        filtered_signal = self._butterworth_bandpass_filter(ecg_signal, 0.5, 40, self.fs)
+        filtered_signal = self._butterworth_bandpass_filter(ecg_signal, 0.05, 40, self.fs)
 
         denoised_signal = self._wavelet_artifact_removal(filtered_signal)
 
