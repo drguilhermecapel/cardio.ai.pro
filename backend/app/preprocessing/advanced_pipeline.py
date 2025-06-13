@@ -363,7 +363,7 @@ class AdvancedECGPreprocessor:
                                         for i in range(signal_data.shape[1])])
 
             snr = signal_power / (noise_estimate + 1e-10)
-            snr_score = min(snr / 100, 1.0)  # Normalize to 0-1
+            snr_score = min(float(snr / 100), 1.0)  # Normalize to 0-1
             quality_factors.append(snr_score)
 
             if signal_data.ndim == 1:
@@ -384,7 +384,7 @@ class AdvancedECGPreprocessor:
                 amplitude_mean = np.mean([np.mean(np.abs(signal_data[:, i]))
                                         for i in range(signal_data.shape[1])])
 
-            amplitude_consistency = 1.0 - min(amplitude_std / (amplitude_mean + 1e-10), 1.0)
+            amplitude_consistency = 1.0 - min(float(amplitude_std / (amplitude_mean + 1e-10)), 1.0)
             quality_factors.append(amplitude_consistency)
 
             if len(signal_data) >= 256:  # Minimum for meaningful FFT

@@ -575,6 +575,9 @@ def load_pretrained_model(checkpoint_path: str, config: ModelConfig | None = Non
     if config is None:
         config = checkpoint.get('config', ModelConfig())
 
+    if not isinstance(config, ModelConfig):
+        config = ModelConfig()
+
     model = HybridECGModel(config)
     model.load_state_dict(checkpoint['model_state_dict'])
 

@@ -670,17 +670,17 @@ class HybridECGAnalysisService:
                     'meets_quality_threshold': quality_report['acceptable_for_diagnosis']
                 }
 
-            features = self.feature_extractor.extract_all_features(preprocessed_signal)
+            features = self.feature_extractor.extract_all_features(np.asarray(preprocessed_signal, dtype=np.float64))
 
-            ai_results = await self._run_simplified_analysis(preprocessed_signal, features)
+            ai_results = await self._run_simplified_analysis(np.asarray(preprocessed_signal, dtype=np.float64), features)
 
-            pathology_results = await self._detect_pathologies(preprocessed_signal, features)
+            pathology_results = await self._detect_pathologies(np.asarray(preprocessed_signal, dtype=np.float64), features)
 
             clinical_assessment = await self._generate_clinical_assessment(
                 ai_results, pathology_results, features
             )
 
-            quality_metrics = await self._assess_signal_quality(preprocessed_signal)
+            quality_metrics = await self._assess_signal_quality(np.asarray(preprocessed_signal, dtype=np.float64))
 
             processing_time = time.time() - start_time
 
