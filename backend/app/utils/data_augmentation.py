@@ -46,7 +46,7 @@ class AugmentationConfig:
     min_quality_score: float = 0.7
     preserve_clinical_features: bool = True
 
-    target_balance_ratios: dict[str, float] = None  # Will be set in __post_init__
+    target_balance_ratios: dict[str, float] | None = None  # Will be set in __post_init__
 
     def __post_init__(self):
         if self.target_balance_ratios is None:
@@ -210,12 +210,12 @@ class FrequencyDomainAugmenter:
         num_to_mask = int(len(non_critical_indices) * self.config.spectral_masking_ratio)
         indices_to_mask = np.random.choice(non_critical_indices, num_to_mask, replace=False)
 
-        signal_fft_masked = signal_fft.copy()
+        signal_fft_masked = np.array(signal_fft)
         signal_fft_masked[indices_to_mask] = 0
 
-        augmented_signal = np.real(ifft(signal_fft_masked, axis=0))
+        augmented_signal = np.real(ifft(signal_fft_masked))
 
-        return augmented_signal
+        return np.asarray(augmented_signal)
 
     def phase_rotation(self, signal: np.ndarray, rotation_angle: float | None = None) -> np.ndarray:
         """
@@ -230,9 +230,9 @@ class FrequencyDomainAugmenter:
         phase_shift = np.exp(1j * rotation_angle)
         signal_fft_rotated = signal_fft * phase_shift
 
-        augmented_signal = np.real(ifft(signal_fft_rotated, axis=0))
+        augmented_signal = np.real(ifft(signal_fft_rotated))
 
-        return augmented_signal
+        return np.asarray(augmented_signal)
 
     def heart_rate_perturbation(self, signal: np.ndarray, fs: int = 500, target_hr_change: float | None = None) -> np.ndarray:
         """
@@ -273,7 +273,7 @@ class FrequencyDomainAugmenter:
                 else:
                     augmented_signal[:len(resampled_lead), lead] = resampled_lead
 
-        return augmented_signal
+        return np.asarray(augmented_signal)
 
     def _estimate_heart_rate(self, signal: np.ndarray, fs: int = 500) -> float:
         """Estimate heart rate from ECG signal"""
@@ -303,7 +303,7 @@ class FrequencyDomainAugmenter:
 
             heart_rate = 60.0 / np.mean(rr_intervals)
 
-            return heart_rate
+            return float(heart_rate)
 
         except Exception:
             return 70.0  # Default heart rate
@@ -506,8 +506,8 @@ class ECGDataAugmenter:
     def _assess_signal_quality(self, signal: np.ndarray) -> float:
         """Assess signal quality after augmentation"""
         try:
-            result = self.preprocessor.process(signal)
-            return result.quality_metrics.overall_score
+            processed_signal, quality_metrics = self.preprocessor.advanced_preprocessing_pipeline(signal)
+            return quality_metrics.get('quality_score', 0.0)
         except Exception:
             return 0.0
 

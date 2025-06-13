@@ -11,6 +11,7 @@ import numpy as np
 import numpy.typing as npt
 import pywt  # type: ignore
 from scipy import signal
+from app.preprocessing.adaptive_filters import AdaptiveECGFilter, create_adaptive_filter
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,12 @@ class AdvancedECGPreprocessor:
             )
         self.fs = sampling_rate
         self.quality_threshold = 0.7
+        
+        self.adaptive_filter = create_adaptive_filter(
+            adaptation_mode="rls",  # Use RLS for better performance with non-stationary noise
+            filter_order=32,
+            rls_forgetting_factor=0.99
+        )
 
     def advanced_preprocessing_pipeline(
         self,
@@ -49,6 +56,13 @@ class AdvancedECGPreprocessor:
         filtered_signal = self._butterworth_bandpass_filter(ecg_signal, 0.05, 150, self.fs)
 
         denoised_signal = self._wavelet_artifact_removal(filtered_signal)
+        
+        try:
+            adaptive_filtered_signal = self.adaptive_filter.multi_channel_adaptive_filtering(denoised_signal)
+            logger.info("Applied adaptive filtering for non-stationary noise removal")
+            denoised_signal = adaptive_filtered_signal
+        except Exception as e:
+            logger.warning(f"Adaptive filtering failed: {e}, using standard denoised signal")
 
         r_peaks = self._pan_tompkins_detector(denoised_signal, self.fs)
 
@@ -363,7 +377,7 @@ class AdvancedECGPreprocessor:
                                         for i in range(signal_data.shape[1])])
 
             snr = signal_power / (noise_estimate + 1e-10)
-            snr_score = min(snr / 100, 1.0)  # Normalize to 0-1
+            snr_score = min(float(snr / 100), 1.0)  # Normalize to 0-1
             quality_factors.append(snr_score)
 
             if signal_data.ndim == 1:
@@ -384,7 +398,7 @@ class AdvancedECGPreprocessor:
                 amplitude_mean = np.mean([np.mean(np.abs(signal_data[:, i]))
                                         for i in range(signal_data.shape[1])])
 
-            amplitude_consistency = 1.0 - min(amplitude_std / (amplitude_mean + 1e-10), 1.0)
+            amplitude_consistency = 1.0 - min(float(amplitude_std / (amplitude_mean + 1e-10)), 1.0)
             quality_factors.append(amplitude_consistency)
 
             if len(signal_data) >= 256:  # Minimum for meaningful FFT
