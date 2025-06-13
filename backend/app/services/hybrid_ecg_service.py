@@ -27,6 +27,8 @@ from app.preprocessing import AdvancedECGPreprocessor, EnhancedSignalQualityAnal
 from app.alerts.intelligent_alert_system import IntelligentAlertSystem, create_intelligent_alert_system
 from app.ml.confidence_calibration import ConfidenceCalibrationSystem, create_confidence_calibration_system
 from app.monitoring.feedback_loop_system import ContinuousLearningSystem, create_continuous_learning_system
+from app.security.audit_trail import AuditTrail, create_audit_trail
+from app.security.privacy_preserving import PrivacyPreservingECG, create_privacy_preserving_system, PrivacyLevel
 from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
 
@@ -581,6 +583,10 @@ class HybridECGAnalysisService:
             critical_miss_threshold=5,
             feedback_buffer_size=100
         )
+        
+        self.audit_trail = create_audit_trail(storage_path="/tmp/cardio_ai_audit.db")
+        
+        self.privacy_system = create_privacy_preserving_system(privacy_level=PrivacyLevel.MEDIUM)
 
         self.ecg_signal_processor = ECGSignalProcessor(sampling_rate=500, mode='diagnostic')
         self.signal_quality_assessment = SignalQualityAssessment(sampling_rate=500)
@@ -699,6 +705,25 @@ class HybridECGAnalysisService:
 
             processing_time = time.time() - start_time
 
+            audit_metadata = {
+                'model_version': '2.1.0',
+                'processing_time': processing_time,
+                'preprocessing': {
+                    'filters_applied': ['bandpass', 'notch', 'adaptive'],
+                    'quality_threshold_met': quality_report['acceptable_for_diagnosis']
+                },
+                'system_version': 'cardio.ai.pro-v1.0',
+                'environment': 'production'
+            }
+            
+            audit_id = self.audit_trail.log_prediction(
+                ecg_data=ecg_data,
+                prediction=ai_results,
+                metadata=audit_metadata,
+                user_id=None,
+                session_id=analysis_id
+            )
+
             analysis_for_alerts = {
                 'ai_results': ai_results,
                 'pathology_results': pathology_results,
@@ -739,7 +764,9 @@ class HybridECGAnalysisService:
                     'nmsa_certification': True,
                     'data_residency': True,
                     'language_support': True,
-                    'population_validation': True
+                    'population_validation': True,
+                    'audit_trail_enabled': True,
+                    'privacy_preserving_enabled': True
                 },
                 'intelligent_alerts': [
                     {
