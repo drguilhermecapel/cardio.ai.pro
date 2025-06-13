@@ -12,7 +12,10 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from sklearn.linear_model import LogisticRegression
+try:
+    from sklearn.linear_model import LogisticRegression
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    LogisticRegression = None
 
 from app.core.scp_ecg_conditions import (
     get_conditions_by_urgency,
@@ -219,6 +222,8 @@ class AdaptiveThresholdManager:
         """
 
         try:
+            if LogisticRegression is None:
+                raise ImportError("scikit-learn is required for Platt scaling")
             if condition_code not in self.platt_scalers:
                 self.platt_scalers[condition_code] = LogisticRegression()
 
