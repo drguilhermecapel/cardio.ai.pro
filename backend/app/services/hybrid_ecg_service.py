@@ -14,10 +14,12 @@ import numpy.typing as npt
 import pandas as pd
 from scipy import signal
 from scipy.stats import entropy, kurtosis, skew
-from sklearn.preprocessing import StandardScaler  # type: ignore[import-untyped]
+from sklearn.preprocessing import StandardScaler
 
 from app.core.constants import ClinicalUrgency
 from app.core.exceptions import ECGProcessingException
+from app.core.signal_processing import ECGSignalProcessor
+from app.core.signal_quality import SignalQualityAssessment
 
 # from app.monitoring.structured_logging import get_ecg_logger  # Temporarily disabled for core component
 from app.preprocessing import AdvancedECGPreprocessor, EnhancedSignalQualityAnalyzer
@@ -564,6 +566,9 @@ class HybridECGAnalysisService:
         self.advanced_preprocessor = AdvancedECGPreprocessor()
         self.quality_analyzer = EnhancedSignalQualityAnalyzer()
         self.feature_extractor = FeatureExtractor()
+
+        self.ecg_signal_processor = ECGSignalProcessor(sampling_rate=500, mode='diagnostic')
+        self.signal_quality_assessment = SignalQualityAssessment(sampling_rate=500)
         # self.ecg_logger = get_ecg_logger(__name__)  # Disabled for core component
         self.ecg_logger = logger
 
@@ -572,16 +577,16 @@ class HybridECGAnalysisService:
             from .interpretability_service import InterpretabilityService
             from .multi_pathology_service import MultiPathologyService
 
-            self.multi_pathology_service = MultiPathologyService()
-            self.interpretability_service = InterpretabilityService()
-            self.adaptive_threshold_manager = AdaptiveThresholdManager()
+            self.multi_pathology_service: MultiPathologyService | None = MultiPathologyService()
+            self.interpretability_service: InterpretabilityService | None = InterpretabilityService()
+            self.adaptive_threshold_manager: AdaptiveThresholdManager | None = AdaptiveThresholdManager()
             self.advanced_services_available = True
             logger.info("✓ Advanced services initialized (multi-pathology, interpretability, adaptive thresholds)")
         except Exception as e:
             logger.warning(f"Advanced services not available, falling back to simplified analysis: {e}")
-            self.multi_pathology_service: MultiPathologyService | None = None
-            self.interpretability_service: InterpretabilityService | None = None
-            self.adaptive_threshold_manager: AdaptiveThresholdManager | None = None
+            self.multi_pathology_service = None
+            self.interpretability_service = None
+            self.adaptive_threshold_manager = None
             self.advanced_services_available = False
 
         try:
@@ -613,25 +618,57 @@ class HybridECGAnalysisService:
             sampling_rate = ecg_data['sampling_rate']
             leads = ecg_data['labels']
 
-            # Advanced preprocessing with quality assessment
-            logger.info("Starting advanced signal preprocessing")
+            logger.info("Starting medical-grade signal quality assessment")
 
-            processed_signal, quality_metrics = self.advanced_preprocessor.advanced_preprocessing_pipeline(
-                signal, clinical_mode=True
-            )
-
-            # Comprehensive quality analysis
-            self.quality_analyzer.assess_signal_quality_comprehensive(processed_signal)
-
-            logger.info(f"Advanced preprocessing completed. Signal shape: {processed_signal.shape}")
-            logger.info(f"Signal quality score: {quality_metrics['quality_score']:.3f}")
-            logger.info(f"R-peaks detected: {quality_metrics['r_peaks_detected']}")
-
-            if quality_metrics['quality_score'] < 0.5:
-                logger.warning("Advanced preprocessing quality too low, falling back to standard preprocessing")
-                preprocessed_signal = self.preprocessor.preprocess_signal(signal)
+            # Convert signal to lead dictionary format for quality assessment
+            if len(signal.shape) == 1:
+                ecg_leads = {'Lead_I': signal}
             else:
+                ecg_leads = {f'Lead_{i+1}': signal[:, i] for i in range(min(signal.shape[1], len(leads)))}
+
+            # Comprehensive quality assessment using new system
+            quality_report = self.signal_quality_assessment.assess_comprehensive(ecg_leads)
+
+            logger.info(f"Signal quality assessment completed. Overall quality: {quality_report['overall_quality']:.3f}")
+            logger.info(f"Acceptable for diagnosis: {quality_report['acceptable_for_diagnosis']}")
+
+            if not quality_report['acceptable_for_diagnosis']:
+                logger.warning("Signal quality inadequate for medical diagnosis")
+
+            logger.info("Starting medical-grade signal processing")
+
+            if len(signal.shape) == 1:
+                processed_signal = self.ecg_signal_processor.process_diagnostic(signal)
+            else:
+                processed_signal = np.zeros_like(signal)
+                for i in range(signal.shape[1]):
+                    processed_signal[:, i] = self.ecg_signal_processor.process_diagnostic(signal[:, i])
+
+            logger.info(f"Medical-grade processing completed. Signal shape: {processed_signal.shape}")
+
+            # Fallback to advanced preprocessing if needed
+            try:
+                fallback_signal, quality_metrics = self.advanced_preprocessor.advanced_preprocessing_pipeline(
+                    signal, clinical_mode=True
+                )
+
+                if quality_report['overall_quality'] >= 0.7:
+                    preprocessed_signal = processed_signal
+                    logger.info("Using medical-grade processed signal")
+                else:
+                    preprocessed_signal = fallback_signal
+                    logger.info("Using fallback processed signal due to quality concerns")
+
+            except Exception as e:
+                logger.warning(f"Fallback preprocessing failed: {e}, using medical-grade processing")
                 preprocessed_signal = processed_signal
+                quality_metrics = {
+                    'quality_score': quality_report['overall_quality'],
+                    'r_peaks_detected': 0,  # Will be calculated in feature extraction
+                    'processing_time_ms': 0,
+                    'segments_created': 0,
+                    'meets_quality_threshold': quality_report['acceptable_for_diagnosis']
+                }
 
             features = self.feature_extractor.extract_all_features(preprocessed_signal)
 
@@ -730,7 +767,7 @@ class HybridECGAnalysisService:
 
                 signal_2d = signal.T if len(signal.shape) == 2 else signal.reshape(-1, 1).T
 
-                pathology_results = await self.multi_pathology_service.detect_multi_pathology(
+                pathology_results = await self.multi_pathology_service.analyze_pathologies(
                     signal=signal_2d,
                     features=features,
                     preprocessing_quality=features.get('signal_quality', 0.8)
@@ -740,14 +777,13 @@ class HybridECGAnalysisService:
                     for condition_code, result in pathology_results.get('detected_conditions', {}).items():
                         if isinstance(result, dict) and 'confidence' in result:
                             adaptive_threshold = self.adaptive_threshold_manager.get_adaptive_threshold(
-                                condition_code,
-                                clinical_context={'urgency': pathology_results.get('clinical_urgency', 'LOW')}
+                                condition_code
                             )
 
                             result['adaptive_threshold'] = adaptive_threshold
                             result['detected_adaptive'] = result['confidence'] > adaptive_threshold
 
-                return pathology_results
+                return dict(pathology_results)
 
             except Exception as e:
                 logger.warning(f"Advanced pathology detection failed, falling back to simplified: {e}")

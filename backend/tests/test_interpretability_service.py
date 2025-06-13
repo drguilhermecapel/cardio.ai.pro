@@ -10,7 +10,7 @@ import asyncio
 from typing import Dict, Any
 
 from app.services.interpretability_service import InterpretabilityService, ExplanationResult
-from app.core.scp_ecg_conditions import ClinicalUrgency
+from app.core.constants import ClinicalUrgency
 
 
 class TestInterpretabilityService:

@@ -348,10 +348,10 @@ class MLModelService:
     def _extract_features_for_interpretability(self, signal: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
         """Extract basic features from ECG signal for interpretability analysis."""
         try:
-            features = {}
+            features: dict[str, Any] = {}
 
-            features['signal_length'] = signal.shape[0]
-            features['num_leads'] = signal.shape[1]
+            features['signal_length'] = int(signal.shape[0])
+            features['num_leads'] = int(signal.shape[1])
 
             if signal.shape[0] > 0:
                 lead_ii = signal[:, 1] if signal.shape[1] > 1 else signal[:, 0]
@@ -388,8 +388,8 @@ class MLModelService:
             logger.error(f"Feature extraction failed: {str(e)}")
             return {
                 'heart_rate': 70.0,
-                'signal_length': signal.shape[0] if signal.size > 0 else 0,
-                'num_leads': signal.shape[1] if signal.size > 0 else 0
+                'signal_length': int(signal.shape[0]) if signal.size > 0 else 0,
+                'num_leads': int(signal.shape[1]) if signal.size > 0 else 0
             }
 
     def get_model_info(self) -> dict[str, Any]:

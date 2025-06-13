@@ -141,9 +141,26 @@ class Settings(BaseSettings):
     MODEL_CACHE_SIZE: int = 3
     INFERENCE_TIMEOUT: int = 30
 
-    ECG_SAMPLE_RATE: int = 500
+    ECG_SAMPLE_RATE: int = 500  # Minimum acceptable sampling rate
     ECG_DURATION_SECONDS: int = 10
     ECG_LEADS: list[str] = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+
+    ECG_FILTER_DIAGNOSTIC_HIGHPASS: float = 0.05  # Hz - CRITICAL for ST segment preservation
+    ECG_FILTER_DIAGNOSTIC_LOWPASS: float = 150.0  # Hz - Diagnostic bandwidth
+    ECG_FILTER_MONITORING_HIGHPASS: float = 0.5   # Hz - For monitoring mode
+    ECG_POWER_LINE_FREQUENCY: int = 60  # Hz - Brazil standard
+
+    ECG_MIN_QUALITY_SCORE: float = 0.7
+    ECG_REJECT_LOW_QUALITY: bool = True
+    ECG_QUALITY_FEEDBACK: bool = True
+
+    MEDICAL_DEVICE_STANDARD: str = "IEC_60601_2_47"  # International standard for ECG equipment
+    REGULATORY_COMPLIANCE: str = "ANVISA_RDC_185"    # Brazilian regulatory compliance
+    DATA_PROTECTION_STANDARD: str = "LGPD"           # Brazilian data protection law
+
+    ENABLE_PRODUCTION_MONITORING: bool = True
+    PERFORMANCE_THRESHOLD: float = 0.85
+    MONITORING_ALERT_EMAIL: str = "team@cardioai.pro"
 
     MIN_VALIDATION_SCORE: float = 0.8
     REQUIRE_DOUBLE_VALIDATION_CRITICAL: bool = True

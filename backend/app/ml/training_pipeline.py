@@ -26,7 +26,7 @@ from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
 from tqdm import tqdm
 
 from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS, get_condition_by_code
-from app.datasets.ecg_public_datasets import ECGDatasetManager
+from app.datasets.ecg_public_datasets import ECGDatasetLoader
 from app.ml.hybrid_architecture import ModelConfig, create_hybrid_model
 from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
 
@@ -315,7 +315,7 @@ class ECGTrainingPipeline:
         self.optimizer = None
         self.scheduler = None
         self.criterion = None
-        self.dataset_manager = ECGDatasetManager()
+        self.dataset_manager = ECGDatasetLoader()
         self.preprocessor = AdvancedECGPreprocessor()
 
         self.current_epoch = 0
