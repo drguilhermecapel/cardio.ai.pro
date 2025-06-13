@@ -23,6 +23,7 @@ from app.core.signal_quality import SignalQualityAssessment
 
 # from app.monitoring.structured_logging import get_ecg_logger  # Temporarily disabled for core component
 from app.preprocessing import AdvancedECGPreprocessor, EnhancedSignalQualityAnalyzer
+from app.alerts.intelligent_alert_system import IntelligentAlertSystem, create_intelligent_alert_system
 from app.repositories.ecg_repository import ECGRepository
 from app.services.validation_service import ValidationService
 
@@ -566,6 +567,8 @@ class HybridECGAnalysisService:
         self.advanced_preprocessor = AdvancedECGPreprocessor()
         self.quality_analyzer = EnhancedSignalQualityAnalyzer()
         self.feature_extractor = FeatureExtractor()
+        
+        self.alert_system = create_intelligent_alert_system()
 
         self.ecg_signal_processor = ECGSignalProcessor(sampling_rate=500, mode='diagnostic')
         self.signal_quality_assessment = SignalQualityAssessment(sampling_rate=500)
@@ -684,6 +687,15 @@ class HybridECGAnalysisService:
 
             processing_time = time.time() - start_time
 
+            analysis_for_alerts = {
+                'ai_results': ai_results,
+                'pathology_results': pathology_results,
+                'quality_metrics': quality_metrics,
+                'preprocessed_signal': preprocessed_signal
+            }
+            
+            generated_alerts = self.alert_system.process_ecg_analysis(analysis_for_alerts)
+
             comprehensive_results = {
                 'analysis_id': analysis_id,
                 'patient_id': patient_id,
@@ -706,7 +718,21 @@ class HybridECGAnalysisService:
                     'data_residency': True,
                     'language_support': True,
                     'population_validation': True
-                }
+                },
+                'intelligent_alerts': [
+                    {
+                        'alert_id': alert.alert_id,
+                        'priority': alert.priority.value,
+                        'category': alert.category.value,
+                        'condition': alert.condition_name,
+                        'confidence': alert.confidence_score,
+                        'message': alert.message,
+                        'clinical_context': alert.clinical_context,
+                        'recommended_actions': alert.recommended_actions,
+                        'timestamp': alert.timestamp.isoformat()
+                    }
+                    for alert in generated_alerts
+                ]
             }
 
             logger.info(
