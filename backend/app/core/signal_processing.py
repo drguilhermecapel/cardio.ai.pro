@@ -52,8 +52,11 @@ class ECGSignalProcessor:
             4, self.DIAGNOSTIC_LOWPASS, 'lp', fs=self.fs, output='sos'
         )
 
-        self.notch_60 = iirnotch(60, 30, self.fs)
-        self.notch_50 = iirnotch(50, 30, self.fs)
+        b_60, a_60 = iirnotch(60, 30, self.fs)
+        self.notch_60 = butter(2, [59, 61], 'bandstop', fs=self.fs, output='sos')
+
+        b_50, a_50 = iirnotch(50, 30, self.fs)
+        self.notch_50 = butter(2, [49, 51], 'bandstop', fs=self.fs, output='sos')
 
     def process_diagnostic(self, ecg_signal: NDArray[np.floating[Any]],
                          power_line_freq: int = 60) -> NDArray[np.floating[Any]]:

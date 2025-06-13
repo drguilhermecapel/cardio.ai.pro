@@ -79,7 +79,7 @@ class TestInterpretabilityServiceComprehensive:
         )
         
         assert isinstance(result, dict)
-        assert 'primary_diagnosis' in result
+        assert 'clinical_explanation' in result
     
     @pytest.mark.asyncio
     async def test_generate_attention_maps_success(self, service, sample_signal, sample_predictions):
@@ -167,7 +167,7 @@ class TestInterpretabilityServiceComprehensive:
             primary_diagnosis, sample_features, predictions, shap_explanation
         )
         
-        assert 'Atrial fibrillation' in result.get('description', '')
+        assert 'Atrial fibrillation' in result.get('clinical_explanation', '')
     
     @pytest.mark.asyncio
     async def test_clinical_explanation_stemi(self, service, sample_features):
@@ -180,4 +180,4 @@ class TestInterpretabilityServiceComprehensive:
             primary_diagnosis, sample_features, predictions, shap_explanation
         )
         
-        assert 'ST-elevation myocardial infarction' in result.get('description', '')
+        assert 'ST-elevation myocardial infarction' in result.get('clinical_explanation', '')
