@@ -268,7 +268,7 @@ class AdaptiveECGFilter:
             else:
                 improvement_ratio = 1.0
 
-            return float(min(improvement_ratio, 10.0))  # Cap at 10x improvement
+            return float(min(float(improvement_ratio), 10.0))  # Cap at 10x improvement
 
         except Exception:
             return 1.0
@@ -298,7 +298,7 @@ if __name__ == "__main__":
     noise_freq = 50 + 10 * np.sin(2 * np.pi * 0.1 * t)  # Time-varying frequency
     noise = 0.3 * np.sin(2 * np.pi * noise_freq * t)
 
-    noisy_signal = ecg_signal + noise
+    noisy_signal = (ecg_signal + noise).astype(np.float64)
 
     adaptive_filter = create_adaptive_filter(adaptation_mode="rls")
     filtered_signal = adaptive_filter.adaptive_filtering(noisy_signal)
