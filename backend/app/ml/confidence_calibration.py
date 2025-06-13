@@ -64,10 +64,10 @@ class TemperatureScaling:
             probs = 1 / (1 + np.exp(-scaled_logits))  # Sigmoid for binary
             probs = np.clip(probs, 1e-7, 1 - 1e-7)
             loss = -np.mean(labels * np.log(probs) + (1 - labels) * np.log(1 - probs))
-            return loss
+            return float(loss)
 
-        result = minimize_scalar(temperature_loss, bounds=(0.1, 10.0), method='bounded')
-        self.temperature = result.x
+        result = minimize_scalar(temperature_loss, bounds=(0.1, 10.0), args=(), method='bounded')
+        self.temperature = float(result.x)
         self.is_fitted = True
 
         logger.info(f"Temperature scaling fitted with temperature: {self.temperature:.3f}")
@@ -88,7 +88,7 @@ class TemperatureScaling:
         scaled_logits = logits / self.temperature
         calibrated_probs = 1 / (1 + np.exp(-scaled_logits))
 
-        return calibrated_probs
+        return np.asarray(calibrated_probs, dtype=np.float64)
 
 
 class PlattScaling:
@@ -97,7 +97,7 @@ class PlattScaling:
     Maps classifier outputs to calibrated probabilities
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.calibrator = LogisticRegression()
         self.is_fitted = False
 
@@ -132,7 +132,7 @@ class PlattScaling:
         scores_reshaped = scores.reshape(-1, 1)
         calibrated_probs = self.calibrator.predict_proba(scores_reshaped)[:, 1]
 
-        return calibrated_probs
+        return np.asarray(calibrated_probs, dtype=np.float64)
 
 
 class IsotonicCalibration:
@@ -141,7 +141,7 @@ class IsotonicCalibration:
     Non-parametric method that preserves ranking
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.calibrator = IsotonicRegression(out_of_bounds='clip')
         self.is_fitted = False
 
@@ -173,7 +173,7 @@ class IsotonicCalibration:
 
         calibrated_probs = self.calibrator.predict(scores)
 
-        return calibrated_probs
+        return np.asarray(calibrated_probs, dtype=np.float64)
 
 
 class CalibratedPrediction:
@@ -283,7 +283,7 @@ class ConfidenceCalibrationSystem:
                 continue
 
             if self.config.method == "platt":
-                calibrator = PlattScaling()
+                calibrator: Any = PlattScaling()
             elif self.config.method == "isotonic":
                 calibrator = IsotonicCalibration()
             elif self.config.method == "temperature":
@@ -462,7 +462,7 @@ class ConfidenceCalibrationSystem:
             'bin_centers': bin_centers,
             'accuracies': accuracies,
             'confidences': confidences,
-            'counts': counts
+            'counts': [float(x) for x in counts]
         }
 
     def _confidence_histogram(self, scores: npt.NDArray[np.float64]) -> dict[str, list[float]]:
@@ -471,13 +471,13 @@ class ConfidenceCalibrationSystem:
         bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
         return {
-            'bin_centers': bin_centers.tolist(),
-            'counts': hist.tolist(),
-            'frequencies': (hist / len(scores)).tolist()
+            'bin_centers': [float(x) for x in bin_centers],
+            'counts': [float(x) for x in hist],
+            'frequencies': [float(x) for x in (hist / len(scores))]
         }
 
 
-def create_confidence_calibration_system(method: str = "isotonic", **kwargs) -> ConfidenceCalibrationSystem:
+def create_confidence_calibration_system(method: str = "isotonic", **kwargs: Any) -> ConfidenceCalibrationSystem:
     """
     Factory function to create confidence calibration system
 

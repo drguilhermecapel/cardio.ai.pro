@@ -58,7 +58,7 @@ class DifferentialPrivacy:
     def _calculate_noise_scale(self) -> float:
         """Calculate noise scale for Gaussian mechanism"""
         sensitivity = 1.0
-        return np.sqrt(2 * np.log(1.25 / self.delta)) * sensitivity / self.epsilon
+        return float(np.sqrt(2 * np.log(1.25 / self.delta)) * sensitivity / self.epsilon)
 
     def add_noise(self, signal: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """
@@ -91,7 +91,7 @@ class DifferentialPrivacy:
             'epsilon': self.epsilon,
             'delta': self.delta,
             'noise_scale': self.noise_scale,
-            'privacy_level': self._classify_privacy_level().value
+            'privacy_level': float(self._classify_privacy_level().value)
         }
 
     def _classify_privacy_level(self) -> PrivacyLevel:
@@ -121,7 +121,7 @@ class PrivacyPreservingECG:
         """
         self.privacy_level = privacy_level
         self.differential_privacy = self._create_dp_mechanism(privacy_level)
-        self._unique_patterns_cache = {}
+        self._unique_patterns_cache: dict[str, list[int]] = {}
 
     def _create_dp_mechanism(self, privacy_level: PrivacyLevel) -> DifferentialPrivacy:
         """Create differential privacy mechanism based on privacy level"""
@@ -248,7 +248,7 @@ class PrivacyPreservingECG:
         kernel = np.ones(kernel_size) / kernel_size
 
         if len(signal.shape) == 1:
-            return np.convolve(signal, kernel, mode='same')
+            return np.convolve(signal, kernel, mode='same').astype(np.float64)
         else:
             smoothed = np.zeros_like(signal)
             for i in range(signal.shape[1]):
@@ -261,7 +261,7 @@ class PrivacyPreservingECG:
         kernel = np.ones(kernel_size) / kernel_size
 
         if len(signal.shape) == 1:
-            return np.convolve(signal, kernel, mode='same')
+            return np.convolve(signal, kernel, mode='same').astype(np.float64)
         else:
             smoothed = np.zeros_like(signal)
             for i in range(signal.shape[1]):
@@ -271,7 +271,7 @@ class PrivacyPreservingECG:
     def _normalize_baseline(self, signal: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Normalize baseline to remove patient-specific drift"""
         if len(signal.shape) == 1:
-            return signal - np.mean(signal)
+            return (signal - np.mean(signal)).astype(np.float64)
         else:
             normalized = np.zeros_like(signal)
             for i in range(signal.shape[1]):
@@ -283,7 +283,7 @@ class PrivacyPreservingECG:
         if len(signal.shape) == 1:
             std = np.std(signal)
             if std > 0:
-                return signal / std
+                return (signal / std).astype(np.float64)
             return signal
         else:
             normalized = np.zeros_like(signal)
@@ -379,7 +379,7 @@ class PrivacyPreservingECG:
 
                 correlation = np.mean(correlations) if correlations else 0.0
 
-            return abs(correlation) if not np.isnan(correlation) else 0.0
+            return float(abs(correlation)) if not np.isnan(correlation) else 0.0
 
         except Exception:
             return 0.0
@@ -398,7 +398,7 @@ class PrivacyPreservingECG:
                 return 1.0
 
             snr = signal_power / noise_estimate
-            quality_score = min(snr / 100.0, 1.0)  # Normalize to 0-1 range
+            quality_score = min(float(snr / 100.0), 1.0)  # Normalize to 0-1 range
 
             return float(quality_score)
 
@@ -476,7 +476,7 @@ def create_privacy_preserving_system(privacy_level: PrivacyLevel = PrivacyLevel.
 if __name__ == "__main__":
     privacy_system = create_privacy_preserving_system(PrivacyLevel.HIGH)
 
-    sample_ecg = np.random.randn(5000, 12) * 0.5
+    sample_ecg = np.random.randn(5000, 12).astype(np.float64) * 0.5
     patient_id = "PATIENT_12345"
 
     anonymized_result = privacy_system.anonymize_ecg(

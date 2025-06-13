@@ -84,7 +84,7 @@ class PerformanceTracker:
 
     def __init__(self, window_size: int = 1000):
         self.window_size = window_size
-        self.performance_history: deque = deque(maxlen=window_size)
+        self.performance_history: deque[Any] = deque(maxlen=window_size)
         self.baseline_metrics: PerformanceMetrics | None = None
         self.current_metrics: PerformanceMetrics | None = None
 
@@ -128,14 +128,14 @@ class PerformanceTracker:
                                        confidence_scores: list[float]) -> PerformanceMetrics:
         """Calculate comprehensive performance metrics"""
 
-        all_conditions = set()
+        all_conditions_set: set[str] = set()
         for pred in predictions:
-            all_conditions.update(pred.keys())
+            all_conditions_set.update(pred.keys())
         for gt in ground_truth:
             if 'conditions' in gt:
-                all_conditions.update(gt['conditions'].keys())
+                all_conditions_set.update(gt['conditions'].keys())
 
-        all_conditions = list(all_conditions)
+        all_conditions = list(all_conditions_set)
 
         per_class_sensitivity = {}
         per_class_specificity = {}
@@ -296,7 +296,7 @@ class ErrorPatternAnalyzer:
     Analyzes feedback to identify common error patterns
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.identified_patterns: list[ErrorPattern] = []
         self.pattern_history: list[dict[str, Any]] = []
 
@@ -675,7 +675,7 @@ class ContinuousLearningSystem:
         logger.info(f"Performance data exported to {filepath}")
 
 
-def create_continuous_learning_system(model: Any, **kwargs) -> ContinuousLearningSystem:
+def create_continuous_learning_system(model: Any, **kwargs: Any) -> ContinuousLearningSystem:
     """
     Factory function to create continuous learning system
 
@@ -692,7 +692,7 @@ def create_continuous_learning_system(model: Any, **kwargs) -> ContinuousLearnin
 
 if __name__ == "__main__":
     class MockModel:
-        def predict_proba(self, X):
+        def predict_proba(self, X: Any) -> Any:
             return np.random.random((len(X), 2))
 
     mock_model = MockModel()

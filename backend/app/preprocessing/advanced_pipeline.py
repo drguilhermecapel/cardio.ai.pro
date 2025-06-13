@@ -388,7 +388,7 @@ class AdvancedECGPreprocessor:
                                       for i in range(signal_data.shape[1])])
 
             baseline_score = 1.0 / (1.0 + baseline_var)
-            quality_factors.append(baseline_score)
+            quality_factors.append(float(baseline_score))
 
             if signal_data.ndim == 1:
                 amplitude_std = np.std(np.abs(signal_data))

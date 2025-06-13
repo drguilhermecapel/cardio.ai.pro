@@ -6,6 +6,7 @@ Based on Phase 1 optimization specifications for CardioAI Pro
 
 import logging
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -69,7 +70,7 @@ class LMSAdaptiveFilter:
 
         return filtered_signal
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset filter state"""
         self.weights.fill(0.0)
         self.input_buffer.fill(0.0)
@@ -131,7 +132,7 @@ class RLSAdaptiveFilter:
 
         return filtered_signal
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset filter state"""
         self.weights.fill(0.0)
         self.P = np.eye(self.filter_order) / self.regularization
@@ -210,7 +211,7 @@ class AdaptiveECGFilter:
 
         return filtered_signal
 
-    def _assess_noise_characteristics(self, signal: npt.NDArray[np.float64]) -> dict:
+    def _assess_noise_characteristics(self, signal: npt.NDArray[np.float64]) -> dict[str, Any]:
         """
         Assess noise characteristics to determine optimal filtering strategy
 
@@ -273,7 +274,7 @@ class AdaptiveECGFilter:
             return 1.0
 
 
-def create_adaptive_filter(adaptation_mode: str = "lms", **kwargs) -> AdaptiveECGFilter:
+def create_adaptive_filter(adaptation_mode: str = "lms", **kwargs: Any) -> AdaptiveECGFilter:
     """
     Factory function to create adaptive ECG filter
 

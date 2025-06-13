@@ -75,7 +75,7 @@ class IntelligentAlertSystem:
     Intelligent alert system for ECG analysis with contextual prioritization
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.alert_rules = self._initialize_alert_rules()
         self.active_alerts: list[ECGAlert] = []
         self.alert_history: list[ECGAlert] = []
@@ -303,10 +303,10 @@ class IntelligentAlertSystem:
 
         alert_id = f"{condition_key}_{int(timestamp.timestamp())}"
 
-        message_kwargs = {'confidence': confidence}
+        message_kwargs: dict[str, Any] = {'confidence': confidence}
         if details and 'leads' in details:
             message_kwargs['leads'] = ', '.join(details['leads'])
-        if 'quality' in (details or {}):
+        if details and 'quality' in details:
             message_kwargs['quality'] = details['quality']
 
         try:

@@ -12,7 +12,7 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
@@ -192,7 +192,22 @@ class AuditTrail:
 
             entry_data['data_integrity_hash'] = self._generate_integrity_hash(entry_data)
 
-            audit_entry = AuditEntry(**entry_data)
+            audit_entry = AuditEntry(
+                audit_id=str(entry_data['audit_id']),
+                timestamp=entry_data['timestamp'] if isinstance(entry_data['timestamp'], datetime) else datetime.fromisoformat(str(entry_data['timestamp'])),
+                event_type=entry_data['event_type'] if isinstance(entry_data['event_type'], AuditEventType) else AuditEventType(entry_data['event_type']),
+                user_id=str(entry_data['user_id']) if entry_data['user_id'] is not None else None,
+                session_id=str(entry_data['session_id']) if entry_data['session_id'] is not None else None,
+                ecg_hash=str(entry_data['ecg_hash']) if entry_data['ecg_hash'] is not None else None,
+                model_version=str(entry_data['model_version']),
+                prediction_data=cast(dict[str, Any] | None, entry_data['prediction_data']),
+                preprocessing_params=cast(dict[str, Any] | None, entry_data['preprocessing_params']),
+                confidence_scores=cast(dict[str, float] | None, entry_data['confidence_scores']),
+                processing_time=cast(float | None, entry_data['processing_time']),
+                system_metadata=cast(dict[str, Any], entry_data['system_metadata']),
+                compliance_flags=cast(list[ComplianceLevel], entry_data['compliance_flags']),
+                data_integrity_hash=str(entry_data['data_integrity_hash'])
+            )
 
             self.audit_log.append(audit_entry)
             self._persist_to_secure_storage(audit_entry)
@@ -238,7 +253,22 @@ class AuditTrail:
             }
 
             entry_data['data_integrity_hash'] = self._generate_integrity_hash(entry_data)
-            audit_entry = AuditEntry(**entry_data)
+            audit_entry = AuditEntry(
+                audit_id=str(entry_data['audit_id']),
+                timestamp=entry_data['timestamp'] if isinstance(entry_data['timestamp'], datetime) else datetime.fromisoformat(str(entry_data['timestamp'])),
+                event_type=entry_data['event_type'] if isinstance(entry_data['event_type'], AuditEventType) else AuditEventType(entry_data['event_type']),
+                user_id=str(entry_data['user_id']) if entry_data['user_id'] is not None else None,
+                session_id=str(entry_data['session_id']) if entry_data['session_id'] is not None else None,
+                ecg_hash=str(entry_data['ecg_hash']) if entry_data['ecg_hash'] is not None else None,
+                model_version=str(entry_data['model_version']),
+                prediction_data=cast(dict[str, Any] | None, entry_data['prediction_data']),
+                preprocessing_params=cast(dict[str, Any] | None, entry_data['preprocessing_params']),
+                confidence_scores=cast(dict[str, float] | None, entry_data['confidence_scores']),
+                processing_time=cast(float | None, entry_data['processing_time']),
+                system_metadata=cast(dict[str, Any], entry_data['system_metadata']),
+                compliance_flags=cast(list[ComplianceLevel], entry_data['compliance_flags']),
+                data_integrity_hash=str(entry_data['data_integrity_hash'])
+            )
 
             self.audit_log.append(audit_entry)
             self._persist_to_secure_storage(audit_entry)
@@ -290,7 +320,22 @@ class AuditTrail:
             }
 
             entry_data['data_integrity_hash'] = self._generate_integrity_hash(entry_data)
-            audit_entry = AuditEntry(**entry_data)
+            audit_entry = AuditEntry(
+                audit_id=str(entry_data['audit_id']),
+                timestamp=entry_data['timestamp'] if isinstance(entry_data['timestamp'], datetime) else datetime.fromisoformat(str(entry_data['timestamp'])),
+                event_type=entry_data['event_type'] if isinstance(entry_data['event_type'], AuditEventType) else AuditEventType(entry_data['event_type']),
+                user_id=str(entry_data['user_id']) if entry_data['user_id'] is not None else None,
+                session_id=str(entry_data['session_id']) if entry_data['session_id'] is not None else None,
+                ecg_hash=str(entry_data['ecg_hash']) if entry_data['ecg_hash'] is not None else None,
+                model_version=str(entry_data['model_version']),
+                prediction_data=cast(dict[str, Any] | None, entry_data['prediction_data']),
+                preprocessing_params=cast(dict[str, Any] | None, entry_data['preprocessing_params']),
+                confidence_scores=cast(dict[str, float] | None, entry_data['confidence_scores']),
+                processing_time=cast(float | None, entry_data['processing_time']),
+                system_metadata=cast(dict[str, Any], entry_data['system_metadata']),
+                compliance_flags=cast(list[ComplianceLevel], entry_data['compliance_flags']),
+                data_integrity_hash=str(entry_data['data_integrity_hash'])
+            )
 
             self.audit_log.append(audit_entry)
             self._persist_to_secure_storage(audit_entry)
@@ -553,7 +598,7 @@ class AuditTrail:
 
             calculated_hash = self._generate_integrity_hash(entry_data)
 
-            return stored_hash == calculated_hash
+            return bool(stored_hash == calculated_hash)
 
         except Exception as e:
             logger.error(f"Failed to verify data integrity for {audit_id}: {e}")
