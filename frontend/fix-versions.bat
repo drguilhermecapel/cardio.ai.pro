@@ -1,37 +1,62 @@
-@echo off
-REM Script para corrigir versões após npm audit fix --force
+// eslint.config.js - Configuração para ESLint v9
+import js from '@eslint/js'
+import typescript from '@typescript-eslint/eslint-plugin'
+import typescriptParser from '@typescript-eslint/parser'
+import react from 'eslint-plugin-react'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
 
-echo =====================================
-echo  Corrigindo versoes dos pacotes...
-echo =====================================
-echo.
-
-REM Remover node_modules e package-lock.json
-echo Limpando instalacao anterior...
-rmdir /s /q node_modules 2>nul
-del package-lock.json 2>nul
-
-REM Instalar versões específicas estáveis
-echo.
-echo Instalando versoes estaveis...
-echo.
-
-REM Downgrade para versões compatíveis
-npm install --save-dev vite@5.0.11
-npm install --save-dev vitest@1.2.1 @vitest/ui@1.2.1 @vitest/coverage-v8@1.2.1
-npm install --save-dev eslint@8.56.0
-
-REM Reinstalar todas as dependências
-echo.
-echo Reinstalando todas as dependencias...
-npm install
-
-echo.
-echo =====================================
-echo  Versoes corrigidas com sucesso!
-echo =====================================
-echo.
-echo Proximos passos:
-echo 1. npm run test:coverage
-echo.
-pause
+export default [
+  js.configs.recommended,
+  {
+    files: ['**/*.{ts,tsx}'],
+    ignores: ['dist/**', 'node_modules/**', 'coverage/**', '*.config.js'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true
+        }
+      },
+      globals: {
+        window: 'readonly',
+        document: 'readonly',
+        console: 'readonly',
+        process: 'readonly',
+        vi: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        afterEach: 'readonly',
+        beforeEach: 'readonly',
+        afterAll: 'readonly'
+      }
+    },
+    plugins: {
+      '@typescript-eslint': typescript,
+      'react': react,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh
+    },
+    rules: {
+      ...typescript.configs.recommended.rules,
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true }
+      ],
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'no-console': ['warn', { allow: ['warn', 'error'] }]
+    },
+    settings: {
+      react: {
+        version: 'detect'
+      }
+    }
+  }
+]
