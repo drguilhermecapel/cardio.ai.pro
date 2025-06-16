@@ -12,6 +12,15 @@ if getattr(sys, 'frozen', False):
     app_dir = bundle_dir / 'app'
     if app_dir.exists():
         sys.path.insert(0, str(app_dir))
+else:
+    # When executed directly (e.g. `python app/main.py`) the parent
+    # directory is not on ``sys.path`` which prevents importing the
+    # ``app`` package. Ensure the package root is available so that the
+    # application can be started without modifying PYTHONPATH.
+    current_dir = Path(__file__).resolve().parent
+    package_root = current_dir.parent
+    if str(package_root) not in sys.path:
+        sys.path.insert(0, str(package_root))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
