@@ -690,6 +690,11 @@ def create_continuous_learning_system(model: Any, **kwargs) -> ContinuousLearnin
     return ContinuousLearningSystem(model, config)
 
 
+class ContinuousLearningService(ContinuousLearningSystem):
+    """Backward compatible alias for ContinuousLearningSystem."""
+    pass
+
+
 if __name__ == "__main__":
     class MockModel:
         def predict_proba(self, X):

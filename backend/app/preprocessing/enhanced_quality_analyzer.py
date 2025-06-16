@@ -503,3 +503,8 @@ class EnhancedSignalQualityAnalyzer:
             'morphology_assessment': {},
             'recommendations': ["Quality assessment failed - use with caution"]
         }
+
+
+class EnhancedQualityAnalyzer(EnhancedSignalQualityAnalyzer):
+    """Backward compatible alias for EnhancedSignalQualityAnalyzer."""
+    pass
