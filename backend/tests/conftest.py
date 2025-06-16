@@ -2,13 +2,26 @@
 
 import asyncio
 import os
+import sys
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+
+# Ensure tests run without the heavy onnxruntime dependency installed.
+sys.modules.setdefault("onnxruntime", MagicMock())
+for _mod in [
+    "pywt",
+    "tqdm",
+    "pyedflib",
+    "wfdb",
+    "cv2",
+    "pytesseract",
+]:
+    sys.modules.setdefault(_mod, MagicMock())
 
 os.environ["ENVIRONMENT"] = "test"
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test_cardio.db"
