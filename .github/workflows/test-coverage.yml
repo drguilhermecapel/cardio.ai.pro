@@ -55,6 +55,12 @@ jobs:
         working-directory: ./backend
         run: poetry install --no-interaction --no-root
       
+      - name: Install test dependencies
+        working-directory: ./backend
+        run: |
+          poetry add --group dev pytest-cov radon bandit pip-audit || true
+          poetry install --with dev
+      
       - name: Run tests with coverage
         working-directory: ./backend
         env:
@@ -90,6 +96,16 @@ jobs:
           file: ./backend/coverage.xml
           flags: backend
           name: backend-coverage
+      
+      - name: Run security audit
+        working-directory: ./backend
+        run: |
+          poetry run pip-audit || echo "Security audit completed with warnings"
+      
+      - name: Run code complexity check
+        working-directory: ./backend
+        run: |
+          poetry run radon cc app -a -nc || echo "Complexity check completed"
       
       - name: Archive coverage reports
         uses: actions/upload-artifact@v3
