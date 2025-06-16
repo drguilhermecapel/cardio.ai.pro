@@ -1,47 +1,63 @@
 {
+  "name": "cardioai-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
-    "test:coverage:ui": "vitest --coverage --ui",
-    "test:coverage:html": "vitest --coverage && npx serve coverage",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest --watch",
-    "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
-    "test:medical": "vitest --run --coverage --config vitest.medical.config.ts",
-    "coverage:check": "vitest run --coverage && node scripts/check-coverage.js",
-    "coverage:report": "nyc report --reporter=html --reporter=text --reporter=lcov",
-    "coverage:badge": "coverage-badge-creator --output coverage/badge.svg"
+    "test:medical": "vitest run --coverage src/components/medical src/utils/ecg src/services/diagnosis",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.4",
+    "@mui/material": "^5.15.4",
+    "@mui/x-charts": "^6.18.3",
+    "@mui/x-data-grid": "^6.18.7",
+    "@reduxjs/toolkit": "^2.0.1",
+    "axios": "^1.6.5",
+    "chart.js": "^4.4.1",
+    "date-fns": "^3.2.0",
+    "formik": "^2.4.5",
+    "framer-motion": "^10.18.0",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-redux": "^9.1.0",
+    "react-router-dom": "^6.21.2",
+    "recharts": "^2.10.4",
+    "socket.io-client": "^4.6.0",
+    "yup": "^1.3.3"
   },
   "devDependencies": {
-    "@vitest/coverage-c8": "^0.33.0",
-    "@vitest/coverage-istanbul": "^0.33.0",
-    "@vitest/ui": "^0.33.0",
-    "c8": "^8.0.1",
-    "coverage-badge-creator": "^1.0.0",
-    "nyc": "^15.1.0"
-  },
-  "nyc": {
-    "all": true,
-    "include": [
-      "src/**/*.{js,jsx,ts,tsx}"
-    ],
-    "exclude": [
-      "src/**/*.test.{js,jsx,ts,tsx}",
-      "src/**/*.spec.{js,jsx,ts,tsx}",
-      "src/**/*.d.ts",
-      "src/vite-env.d.ts",
-      "src/main.tsx",
-      "src/setupTests.ts"
-    ],
-    "reporter": [
-      "html",
-      "text",
-      "lcov",
-      "json"
-    ],
-    "check-coverage": true,
-    "branches": 80,
-    "lines": 80,
-    "functions": 80,
-    "statements": 80
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/coverage-v8": "^1.2.1",
+    "@vitest/ui": "^1.2.1",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "jsdom": "^24.0.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "vitest": "^1.2.1"
   }
+}
