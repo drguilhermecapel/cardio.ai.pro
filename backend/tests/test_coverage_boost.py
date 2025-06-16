@@ -26,6 +26,15 @@ from app.core.constants import *
 from app.core.exceptions import *
 from app.core.security import *
 from app.core.logging import *
+# Import validators at module level (fix for the error)
+from app.utils.validators import (
+    validate_ecg_signal,
+    validate_patient_data,
+    validate_email,
+    validate_phone_number,
+    validate_heart_rate,
+    validate_blood_pressure
+)
 
 
 class TestAllCoreModules:
@@ -287,7 +296,6 @@ class TestAsyncComponents:
         from app.utils.ecg_processor import ECGProcessor
         from app.utils.signal_quality import SignalQualityAnalyzer
         from app.utils.memory_monitor import MemoryMonitor
-        from app.utils.validators import *
         
         # ECG Processor
         processor = ECGProcessor()
@@ -311,7 +319,7 @@ class TestAsyncComponents:
         monitor.check_memory_threshold(80.0)
         monitor.get_process_memory_info()
         
-        # Validators
+        # Validators (now imported at module level)
         assert validate_ecg_signal(signal) is True
         assert validate_patient_data({
             "name": "Test", 
