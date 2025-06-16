@@ -1,0 +1,190 @@
+# .pre-commit-config.yaml
+# Configuração de pre-commit hooks para garantir qualidade e cobertura
+
+default_language_version:
+  python: python3.11
+  node: 18.19.0
+
+repos:
+  # Python - Formatação e Linting
+  - repo: https://github.com/psf/black
+    rev: 24.1.1
+    hooks:
+      - id: black
+        args: ['--line-length', '100']
+        files: ^backend/
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--profile', 'black', '--line-length', '100']
+        files: ^backend/
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: ['--max-line-length', '100', '--extend-ignore', 'E203,W503']
+        files: ^backend/
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        args: ['--ignore-missing-imports', '--strict']
+        files: ^backend/
+        additional_dependencies:
+          - types-requests
+          - types-python-dateutil
+
+  # Python - Segurança
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        args: ['-ll', '-r', 'backend/app']
+        files: ^backend/
+
+  # Frontend - Formatação e Linting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        files: ^frontend/
+        types_or: [javascript, jsx, ts, tsx, css, scss, json, yaml, markdown]
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.56.0
+    hooks:
+      - id: eslint
+        files: ^frontend/.*\.[jt]sx?$
+        additional_dependencies:
+          - eslint@8.56.0
+          - eslint-plugin-react@7.33.2
+          - eslint-plugin-react-hooks@4.6.0
+          - '@typescript-eslint/eslint-plugin@6.19.0'
+          - '@typescript-eslint/parser@6.19.0'
+
+  # Geral - Validações
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+
+  # Verificação de Secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+
+  # Verificação de Dependências
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.3
+    hooks:
+      - id: python-safety-dependencies-check
+        files: ^backend/pyproject\.toml$
+
+  # Hooks Locais - Cobertura de Testes
+  - repo: local
+    hooks:
+      # Backend - Verificação de Cobertura
+      - id: backend-coverage-check
+        name: Backend Coverage Check
+        entry: bash -c 'cd backend && poetry run pytest --cov=app --cov-fail-under=80 -x'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+        stages: [push]
+
+      # Backend - Componentes Críticos
+      - id: backend-critical-coverage
+        name: Backend Critical Components Coverage
+        entry: bash -c 'cd backend && poetry run pytest tests/test_medical_critical_components.py --cov=app.services.ecg --cov=app.services.diagnosis --cov-fail-under=100'
+        language: system
+        files: ^backend/app/(services/(ecg|diagnosis)|utils/medical)/.*\.py$
+        pass_filenames: false
+        stages: [push]
+
+      # Frontend - Verificação de Cobertura
+      - id: frontend-coverage-check
+        name: Frontend Coverage Check
+        entry: bash -c 'cd frontend && npm run test:coverage:check'
+        language: system
+        files: ^frontend/src/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+        stages: [push]
+
+      # Frontend - Componentes Médicos
+      - id: frontend-medical-coverage
+        name: Frontend Medical Components Coverage
+        entry: bash -c 'cd frontend && npm run test:critical'
+        language: system
+        files: ^frontend/src/(components/medical|services/(ecg|diagnosis))/.*\.(ts|tsx)$
+        pass_filenames: false
+        stages: [push]
+
+      # Verificação de Documentação
+      - id: check-test-documentation
+        name: Check Test Documentation
+        entry: python scripts/check_test_docs.py
+        language: python
+        files: ^(backend|frontend)/.*test.*\.(py|ts|tsx)$
+        pass_filenames: true
+
+      # Análise de Complexidade
+      - id: complexity-check
+        name: Check Code Complexity
+        entry: bash -c 'cd backend && poetry run radon cc app -nc'
+        language: system
+        files: ^backend/app/.*\.py$
+        pass_filenames: false
+
+      # Verificação de TODOs Críticos
+      - id: check-critical-todos
+        name: Check Critical TODOs
+        entry: bash -c '! grep -r "TODO.*CRITICAL\|FIXME.*SECURITY\|XXX.*URGENT" --include="*.py" --include="*.ts" --include="*.tsx" .'
+        language: system
+        pass_filenames: false
+
+      # Validação de Commits Médicos
+      - id: validate-medical-changes
+        name: Validate Medical Component Changes
+        entry: python scripts/validate_medical_changes.py
+        language: python
+        files: ^(backend/app/(services/(ecg|diagnosis)|utils/medical)|frontend/src/components/medical)/
+        pass_filenames: true
+        stages: [commit]
+
+      # Geração de Relatório de Cobertura
+      - id: generate-coverage-report
+        name: Generate Coverage Report
+        entry: python scripts/generate_coverage_summary.py
+        language: python
+        pass_filenames: false
+        stages: [push]
+        always_run: true
+
+# Configuração adicional
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: [backend-coverage-check, frontend-coverage-check]  # Skip coverage in CI
+  submodules: false
