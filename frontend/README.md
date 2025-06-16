@@ -1,19 +1,16 @@
 # CardioAI Pro - Frontend
 
-## 🚀 Setup Inicial
-
-### Pré-requisitos
-- Node.js 18+ 
-- NPM 9+
-
-### Instalação
+## 🚀 Quick Start
 
 ```bash
-# 1. Instalar dependências
-npm install
+# 1. Clone o repositório
+git clone https://github.com/seu-usuario/cardio.ai.pro.git
 
-# 2. Verificar instalação
-npm run test
+# 2. Entre na pasta frontend
+cd cardio.ai.pro/frontend
 
-# 3. Executar em desenvolvimento
+# 3. Execute o setup (OBRIGATÓRIO)
+npm run setup
+
+# 4. Inicie o desenvolvimento
 npm run dev
