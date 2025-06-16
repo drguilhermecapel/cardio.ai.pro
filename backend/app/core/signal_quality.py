@@ -236,3 +236,8 @@ class SignalQualityAssessment:
             recommendations.append("Verificar respiração do paciente e posicionamento dos eletrodos")
 
         return recommendations
+
+
+class MedicalGradeSignalQuality(SignalQualityAssessment):
+    """Backward compatible alias for SignalQualityAssessment."""
+    pass
