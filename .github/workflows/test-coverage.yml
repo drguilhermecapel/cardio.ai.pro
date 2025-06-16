@@ -55,6 +55,12 @@ jobs:
         working-directory: ./backend
         run: poetry install --no-interaction --no-root
       
+      - name: Install test dependencies
+        working-directory: ./backend
+        run: |
+          poetry add --group dev pytest-cov radon bandit pip-audit || true
+          poetry install --with dev
+      
       - name: Run tests with coverage
         working-directory: ./backend
         env:
