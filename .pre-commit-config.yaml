@@ -45,6 +45,16 @@ repos:
       - id: bandit
         args: ['-ll', '-r', 'backend/app']
         files: ^backend/
+  
+  # Python - Auditoria de Dependências
+  - repo: local
+    hooks:
+      - id: pip-audit
+        name: Pip Audit Security Check
+        entry: bash -c 'cd backend && poetry run pip-audit --desc || true'
+        language: system
+        pass_filenames: false
+        files: ^backend/(pyproject\.toml|poetry\.lock)$
 
   # Frontend - Formatação e Linting
   - repo: https://github.com/pre-commit/mirrors-prettier
