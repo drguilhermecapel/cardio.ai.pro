@@ -19,6 +19,7 @@ pydantic-settings = "^2.2.1"
 email-validator = "^2.1.1"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+pyedflib = "^0.1.40"
 
 numpy = "^1.26.4"
 scipy = "^1.13.0"
