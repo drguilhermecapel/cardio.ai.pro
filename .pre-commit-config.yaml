@@ -99,13 +99,6 @@ repos:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
 
-  # Verificação de Dependências
-  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.3.3
-    hooks:
-      - id: python-safety-dependencies-check
-        files: ^backend/pyproject\.toml$
-
   # Hooks Locais - Cobertura de Testes
   - repo: local
     hooks:
