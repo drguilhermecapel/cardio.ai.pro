@@ -11,7 +11,12 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "setup": "npm install && npm run verify",
+    "verify": "vitest --version && echo 'Vitest instalado com sucesso!'",
+    "clean": "rimraf node_modules package-lock.json",
+    "reinstall": "npm run clean && npm install",
+    "postinstall": "echo 'Dependencias instaladas! Execute: npm test'"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
@@ -52,8 +57,13 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "jsdom": "^24.0.0",
     "prettier": "^3.2.4",
+    "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
     "vite": "^5.0.11",
     "vitest": "^1.2.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
