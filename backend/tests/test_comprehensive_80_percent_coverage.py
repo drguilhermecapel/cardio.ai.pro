@@ -270,4 +270,4 @@ class TestSignalQualityAnalyzer:
         assert analyzer is not None
         
     async def test_analyze_quality_invalid_input(self):
-        """Test q
+        """Test q"""
