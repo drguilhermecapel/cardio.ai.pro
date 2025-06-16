@@ -590,6 +590,11 @@ class AuditTrail:
             return {}
 
 
+class AuditTrailService(AuditTrail):
+    """Backward compatible alias for AuditTrail."""
+    pass
+
+
 def create_audit_trail(storage_path: str = "/tmp/ecg_audit.db") -> AuditTrail:
     """Factory function to create audit trail instance"""
     return AuditTrail(storage_path=storage_path)

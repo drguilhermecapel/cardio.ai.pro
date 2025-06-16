@@ -406,10 +406,11 @@ async def test_error_handling_and_edge_cases(client, auth_headers):
     
     with patch('app.api.v1.endpoints.patients.get_current_active_user', return_value=mock_user):
         # Test invalid JSON
-        response = client.post("/api/v1/patients/",
-            headers=auth_headers,
+        response = client.post(
+            "/api/v1/patients/",
             data="invalid json{",
-            headers={**auth_headers, "Content-Type": "application/json"})
+            headers={**auth_headers, "Content-Type": "application/json"},
+        )
         assert response.status_code in [400, 422]
         
         # Test missing required fields

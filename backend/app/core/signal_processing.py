@@ -93,3 +93,8 @@ class ECGSignalProcessor:
         except Exception as e:
             logger.warning(f"Wavelet baseline removal failed: {e}")
             return ecg_signal
+
+
+class MedicalGradeECGProcessor(ECGSignalProcessor):
+    """Backward compatible alias for ECGSignalProcessor."""
+    pass
