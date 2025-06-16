@@ -97,6 +97,16 @@ jobs:
           flags: backend
           name: backend-coverage
       
+      - name: Run security audit
+        working-directory: ./backend
+        run: |
+          poetry run pip-audit || echo "Security audit completed with warnings"
+      
+      - name: Run code complexity check
+        working-directory: ./backend
+        run: |
+          poetry run radon cc app -a -nc || echo "Complexity check completed"
+      
       - name: Archive coverage reports
         uses: actions/upload-artifact@v3
         with:
