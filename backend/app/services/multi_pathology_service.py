@@ -1,683 +1,416 @@
 """
-Multi-pathology Detection Service for 71 SCP-ECG conditions
-Implements hierarchical detection: Normal→Category→Specific diagnosis
-Based on scientific recommendations for CardioAI Pro
+Multi-Pathology Service for comprehensive ECG analysis
+Implements hierarchical classification approach
 """
-
 import logging
-from dataclasses import dataclass
-from typing import Any
-
+from typing import Dict, Any, List, Optional, Set, Tuple
 import numpy as np
+from enum import Enum
 
-from app.core.constants import ClinicalUrgency
-from app.core.scp_ecg_conditions import (
-    SCP_ECG_CONDITIONS,
-    SCPCategory,
-    get_conditions_by_urgency,
-    get_critical_conditions,
-)
+from app.core.constants import ClinicalUrgency, DiagnosisCode
+from app.core.exceptions import MultiPathologyException
+from app.ml.ml_model_service import MLModelService
 
 logger = logging.getLogger(__name__)
 
-@dataclass
-class PathologyDetectionResult:
-    """Result of pathology detection with confidence scores"""
-    primary_diagnosis: str
-    confidence: float
-    clinical_urgency: str
-    detected_conditions: dict[str, float]
-    level_completed: int
-    category_probabilities: dict[str, float]
-    abnormal_indicators: list[tuple[str, float]]
-    processing_time_ms: float
+
+class SCPCategory(Enum):
+    """SCP ECG diagnostic categories"""
+    NORMAL = "normal"
+    ARRHYTHMIA = "arrhythmia"
+    CONDUCTION = "conduction"
+    ISCHEMIA = "ischemia"
+    HYPERTROPHY = "hypertrophy"
+    AXIS_DEVIATION = "axis_deviation"
+    OTHER = "other"
+
 
 class MultiPathologyService:
-    """Hierarchical multi-pathology detection for 71 SCP-ECG conditions"""
-
-    def __init__(self) -> None:
-        logger.info("Initializing MultiPathologyService")
-
-        self.scp_conditions = self._initialize_scp_conditions()
-
-        # Category thresholds
+    """Service for multi-pathology ECG analysis"""
+    
+    # Complete SCP conditions mapping (71 conditions)
+    SCP_CONDITIONS = {
+        # Normal
+        'NORM': {'index': 0, 'category': SCPCategory.NORMAL, 'severity': 0.0},
+        'SR': {'index': 1, 'category': SCPCategory.NORMAL, 'severity': 0.0},
+        'ISCA': {'index': 2, 'category': SCPCategory.NORMAL, 'severity': 0.1},
+        'ISCI': {'index': 3, 'category': SCPCategory.NORMAL, 'severity': 0.2},
+        'ASMI': {'index': 48, 'category': SCPCategory.NORMAL, 'severity': 0.3},
+        
+        # Arrhythmias
+        'AFIB': {'index': 9, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.9},
+        'AFLT': {'index': 10, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.8},
+        'PSVT': {'index': 11, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.7},
+        'SVTAC': {'index': 12, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.7},
+        'AT': {'index': 13, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.6},
+        'AVNRT': {'index': 14, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.6},
+        'AVRT': {'index': 15, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.6},
+        'SAAWR': {'index': 16, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.5},
+        'STACH': {'index': 17, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.6},
+        'SARRH': {'index': 18, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.4},
+        'SBRAD': {'index': 19, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.5},
+        'PACE': {'index': 20, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.3},
+        'TRIGU': {'index': 21, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.4},
+        'BIGU': {'index': 22, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.4},
+        'VEB': {'index': 23, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.5},
+        'SVEB': {'index': 24, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.4},
+        
+        # Conduction disturbances
+        'IAVB': {'index': 4, 'category': SCPCategory.CONDUCTION, 'severity': 0.6},
+        'AVB2': {'index': 5, 'category': SCPCategory.CONDUCTION, 'severity': 0.7},
+        'AVB3': {'index': 6, 'category': SCPCategory.CONDUCTION, 'severity': 0.9},
+        'LAFB': {'index': 7, 'category': SCPCategory.CONDUCTION, 'severity': 0.4},
+        'LPFB': {'index': 8, 'category': SCPCategory.CONDUCTION, 'severity': 0.4},
+        'LBBB': {'index': 25, 'category': SCPCategory.CONDUCTION, 'severity': 0.6},
+        'RBBB': {'index': 26, 'category': SCPCategory.CONDUCTION, 'severity': 0.5},
+        'IRBBB': {'index': 27, 'category': SCPCategory.CONDUCTION, 'severity': 0.4},
+        'WPW': {'index': 28, 'category': SCPCategory.CONDUCTION, 'severity': 0.7},
+        
+        # Ischemia/Infarction
+        'MI': {'index': 29, 'category': SCPCategory.ISCHEMIA, 'severity': 1.0},
+        'AMI': {'index': 30, 'category': SCPCategory.ISCHEMIA, 'severity': 1.0},
+        'ALMI': {'index': 31, 'category': SCPCategory.ISCHEMIA, 'severity': 0.9},
+        'ILMI': {'index': 32, 'category': SCPCategory.ISCHEMIA, 'severity': 0.9},
+        'IPLMI': {'index': 33, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
+        'IPMI': {'index': 34, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
+        'PMI': {'index': 35, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
+        'IMI': {'index': 36, 'category': SCPCategory.ISCHEMIA, 'severity': 0.9},
+        'INJAL': {'index': 37, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
+        'INJIL': {'index': 38, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
+        'INJIN': {'index': 39, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
+        'INJLA': {'index': 40, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
+        'INJAS': {'index': 41, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
+        
+        # Hypertrophy
+        'LVH': {'index': 42, 'category': SCPCategory.HYPERTROPHY, 'severity': 0.6},
+        'RVH': {'index': 43, 'category': SCPCategory.HYPERTROPHY, 'severity': 0.6},
+        'LAH': {'index': 44, 'category': SCPCategory.HYPERTROPHY, 'severity': 0.5},
+        'RAH': {'index': 45, 'category': SCPCategory.HYPERTROPHY, 'severity': 0.5},
+        
+        # Axis deviations
+        'LAD': {'index': 46, 'category': SCPCategory.AXIS_DEVIATION, 'severity': 0.3},
+        'RAD': {'index': 47, 'category': SCPCategory.AXIS_DEVIATION, 'severity': 0.3},
+        
+        # Other conditions
+        'NDT': {'index': 49, 'category': SCPCategory.OTHER, 'severity': 0.3},
+        'NST': {'index': 50, 'category': SCPCategory.OTHER, 'severity': 0.4},
+        'DIG': {'index': 51, 'category': SCPCategory.OTHER, 'severity': 0.2},
+        'LNGQT': {'index': 52, 'category': SCPCategory.OTHER, 'severity': 0.7},
+        'ABQRS': {'index': 53, 'category': SCPCategory.OTHER, 'severity': 0.5},
+        'PVC': {'index': 54, 'category': SCPCategory.OTHER, 'severity': 0.5},
+        'STD': {'index': 55, 'category': SCPCategory.OTHER, 'severity': 0.6},
+        'STE': {'index': 56, 'category': SCPCategory.OTHER, 'severity': 0.7},
+        'TAB': {'index': 57, 'category': SCPCategory.OTHER, 'severity': 0.4},
+        'INVT': {'index': 58, 'category': SCPCategory.OTHER, 'severity': 0.5},
+        'LPR': {'index': 59, 'category': SCPCategory.OTHER, 'severity': 0.3},
+        'LQT': {'index': 60, 'category': SCPCategory.OTHER, 'severity': 0.6},
+        'QAB': {'index': 61, 'category': SCPCategory.OTHER, 'severity': 0.5},
+        'QWAVE': {'index': 62, 'category': SCPCategory.OTHER, 'severity': 0.6},
+        'SQT': {'index': 63, 'category': SCPCategory.OTHER, 'severity': 0.4},
+        'TAB_': {'index': 64, 'category': SCPCategory.OTHER, 'severity': 0.4},
+        'TIN': {'index': 65, 'category': SCPCategory.OTHER, 'severity': 0.4},
+        'ISC_': {'index': 66, 'category': SCPCategory.OTHER, 'severity': 0.5},
+        'ISCAL': {'index': 67, 'category': SCPCategory.OTHER, 'severity': 0.5},
+        'ISCIN': {'index': 68, 'category': SCPCategory.OTHER, 'severity': 0.5},
+        'ISCLA': {'index': 69, 'category': SCPCategory.OTHER, 'severity': 0.5},
+        'ISCAS': {'index': 70, 'category': SCPCategory.OTHER, 'severity': 0.5},
+    }
+    
+    def __init__(self, ml_service: Optional[MLModelService] = None):
+        self.ml_service = ml_service
+        self.scp_conditions = self.SCP_CONDITIONS.copy()
+        self.condition_categories = self._build_category_mapping()
         self.category_thresholds = {
-            SCPCategory.ARRHYTHMIA: 0.3,
-            SCPCategory.CONDUCTION_DISORDERS: 0.4,
-            SCPCategory.ISCHEMIA: 0.5,
-            SCPCategory.STRUCTURAL: 0.4,
-            SCPCategory.NORMAL: 0.7
+            SCPCategory.NORMAL: 0.99,  # High threshold for normal
+            SCPCategory.ARRHYTHMIA: 0.5,
+            SCPCategory.CONDUCTION: 0.5,
+            SCPCategory.ISCHEMIA: 0.6,
+            SCPCategory.HYPERTROPHY: 0.5,
+            SCPCategory.AXIS_DEVIATION: 0.4,
+            SCPCategory.OTHER: 0.4
         }
-
-        self.condition_models: dict[str, Any] = {}
-        self.condition_thresholds = self._initialize_condition_thresholds()
-
-    def _initialize_scp_conditions(self) -> dict[str, dict[str, Any]]:
-        """Initialize all 71 SCP-ECG conditions"""
-        # Simplified version with key conditions
-        conditions = {}
-
-        condition_list = [
-            'NORM', 'MI', 'STTC', 'ISC_', 'LVH', 'LAFB', 'IRBBB', 'LBBB', 'RBBB',
-            'AFIB', 'AFLT', 'SVTAC', 'PSVT', 'PAC', 'PVC', 'BIGU', 'TRIGU',
-            'IVCD', 'LAD', 'RAD', 'LQRSV', 'LPFB', 'WPW', 'PR', 'SINUS',
-            'SARRH', 'SBRAD', 'STACH', 'PACE', 'FUSION', 'VESC', 'AV1', 'AV2',
-            'AV3', 'AVB', 'ISCHANT', 'ISCHEMIA', 'ISCHLAT', 'ISCHINF', 'INJAL',
-            'INJLA', 'INJIL', 'INJIN', 'LMI', 'LAE', 'RAE', 'RVH', 'ALMI',
-            'ASMI', 'IMI', 'ILMI', 'PMI', 'IPLMI', 'IPMI', 'LVS', 'LVOLT',
-            'HVOLT', 'RAA/RVA', 'LAA/LVA', 'VH', 'SEHYP', 'VCLVH', 'QWAVE',
-            'LOWT', 'INVT', 'NT_', 'PAC_', 'PVC_', 'STD_', 'STE_'
-        ]
-
-        for i, condition in enumerate(condition_list[:71]):  # Ensure 71 conditions
-            conditions[condition] = {
-                'name': condition,
-                'category': self._map_condition_to_category(condition),
-                'severity': self._get_condition_severity(condition),
-                'index': i
-            }
-
-        return conditions
-
-    def _map_condition_to_category(self, condition: str) -> SCPCategory:
-        """Map SCP condition to category"""
-        arrhythmia_conditions = ['AFIB', 'AFLT', 'SVTAC', 'PSVT', 'PAC', 'PVC']
-        conduction_conditions = ['LBBB', 'RBBB', 'IRBBB', 'LAFB', 'LPFB', 'AVB']
-        ischemia_conditions = ['MI', 'STTC', 'ISC_', 'ISCHANT', 'ISCHEMIA']
-        structural_conditions = ['LVH', 'RVH', 'LAE', 'RAE', 'VCLVH']
-
-        if condition in arrhythmia_conditions:
-            return SCPCategory.ARRHYTHMIA
-        elif condition in conduction_conditions:
-            return SCPCategory.CONDUCTION_DISORDERS
-        elif condition in ischemia_conditions:
-            return SCPCategory.ISCHEMIA
-        elif condition in structural_conditions:
-            return SCPCategory.STRUCTURAL
-        else:
-            return SCPCategory.NORMAL
-
-    def _get_condition_severity(self, condition: str) -> float:
-        """Get severity score for condition"""
-        high_severity = ['MI', 'AFIB', 'VT', 'AVB']
-        medium_severity = ['LBBB', 'RBBB', 'SVTAC', 'LVH']
-
-        if condition in high_severity:
-            return 0.9
-        elif condition in medium_severity:
-            return 0.6
-        else:
-            return 0.3
-
-    def _initialize_category_thresholds(self) -> dict[str, float]:
-        """Initialize adaptive thresholds for each category"""
-        return {
-            SCPCategory.NORMAL: 0.99,  # High threshold for normal (NPV > 99%)
-            SCPCategory.ARRHYTHMIA: 0.85,  # Sensitivity > 95% target
-            SCPCategory.CONDUCTION_DISORDERS: 0.90,  # Specificity > 95% target
-            SCPCategory.ISCHEMIA: 0.80,  # High sensitivity for STEMI detection
-            SCPCategory.HYPERTROPHY: 0.85,  # AUC > 0.90 target
-            SCPCategory.AXIS_DEVIATION: 0.80,
-            SCPCategory.REPOLARIZATION: 0.85,
-            SCPCategory.OTHER: 0.75
-        }
-
-    def _initialize_condition_thresholds(self) -> dict[str, float]:
-        """Initialize adaptive thresholds for specific conditions"""
-        thresholds = {}
-
-        for condition in get_critical_conditions():
-            thresholds[condition.code] = 0.70  # Lower threshold = higher sensitivity
-
-        for condition in get_conditions_by_urgency("high"):
-            thresholds[condition.code] = 0.75
-
-        for condition in get_conditions_by_urgency("medium"):
-            thresholds[condition.code] = 0.80
-
-        for condition in get_conditions_by_urgency("low"):
-            thresholds[condition.code] = 0.85
-
-        return thresholds
-
-    async def detect_pathologies_hierarchical(
-        self,
-        signal: np.ndarray,
-        features: dict[str, Any],
-        preprocessing_quality: float
-    ) -> PathologyDetectionResult:
-        """
-        Hierarchical pathology detection
-        Level 1: Normal vs Abnormal (NPV > 99%)
-        Level 2: Category classification
-        Level 3: Specific diagnosis with confidence scores
-        """
-        import time
-        start_time = time.time()
-
-        try:
-            normal_abnormal_result = await self._level1_normal_vs_abnormal(signal, features)
-
-            if (normal_abnormal_result['is_normal'] and
-                normal_abnormal_result['confidence'] > self.category_thresholds[SCPCategory.NORMAL]):
-
-                processing_time = (time.time() - start_time) * 1000
-                return PathologyDetectionResult(
-                    primary_diagnosis='NORM',
-                    confidence=normal_abnormal_result['confidence'],
-                    clinical_urgency=ClinicalUrgency.LOW,
-                    detected_conditions={'NORM': normal_abnormal_result['confidence']},
-                    level_completed=1,
-                    category_probabilities={'normal': normal_abnormal_result['normal_probability']},
-                    abnormal_indicators=normal_abnormal_result['abnormal_indicators'],
-                    processing_time_ms=processing_time
-                )
-
-            category_result = await self._level2_category_classification(signal, features)
-
-            specific_result = await self._level3_specific_diagnosis(
-                signal, features, category_result['predicted_category']
-            )
-
-            final_result = await self._compile_final_diagnosis(
-                normal_abnormal_result, category_result, specific_result
-            )
-
-            processing_time = (time.time() - start_time) * 1000
-            final_result.processing_time_ms = processing_time
-
-            return final_result
-
-        except Exception as e:
-            logger.error(f"Error in hierarchical pathology detection: {e}")
-            processing_time = (time.time() - start_time) * 1000
-
-            return PathologyDetectionResult(
-                primary_diagnosis='NONSPECIFIC',
-                confidence=0.5,
-                clinical_urgency=ClinicalUrgency.LOW,
-                detected_conditions={'NONSPECIFIC': 0.5},
-                level_completed=0,
-                category_probabilities={},
-                abnormal_indicators=[('processing_error', 1.0)],
-                processing_time_ms=processing_time
-            )
-
-    async def _level1_normal_vs_abnormal(
-        self, signal: np.ndarray, features: dict[str, Any]
-    ) -> dict[str, Any]:
-        """Level 1: High-sensitivity normal vs abnormal screening (NPV > 99%)"""
-
-        abnormal_indicators = []
-
-        hr = features.get('heart_rate', 70)
-        if hr < 50:
-            abnormal_indicators.append(('bradycardia', min(0.9, (50 - hr) / 20)))
-        elif hr > 100:
-            abnormal_indicators.append(('tachycardia', min(0.9, (hr - 100) / 50)))
-
-        rr_std = features.get('rr_std', 0)
-        rr_mean = features.get('rr_mean', 1000)
-        if rr_mean > 0:
-            rr_cv = rr_std / rr_mean
-            if rr_cv > 0.15:  # High variability threshold
-                abnormal_indicators.append(('rr_variability', min(0.8, rr_cv * 2)))
-
-        qrs_duration = features.get('qrs_duration', 100)
-        if qrs_duration > 120:
-            abnormal_indicators.append(('wide_qrs', min(0.8, (qrs_duration - 120) / 50)))
-        elif qrs_duration < 80:
-            abnormal_indicators.append(('narrow_qrs', min(0.6, (80 - qrs_duration) / 20)))
-
-        pr_interval = features.get('pr_interval', 160)
-        if pr_interval > 200:
-            abnormal_indicators.append(('long_pr', min(0.7, (pr_interval - 200) / 100)))
-        elif pr_interval < 120:
-            abnormal_indicators.append(('short_pr', min(0.7, (120 - pr_interval) / 40)))
-
-        qtc = features.get('qtc', 420)
-        if qtc > 450:  # Men threshold, more conservative
-            abnormal_indicators.append(('long_qt', min(0.8, (qtc - 450) / 100)))
-        elif qtc < 350:
-            abnormal_indicators.append(('short_qt', min(0.7, (350 - qtc) / 50)))
-
-        st_elevation = features.get('st_elevation_max', 0)
-        st_depression = features.get('st_depression_max', 0)
-        if st_elevation > 1.0:  # >1mm elevation
-            abnormal_indicators.append(('st_elevation', min(0.9, st_elevation / 3)))
-        if st_depression > 1.0:  # >1mm depression
-            abnormal_indicators.append(('st_depression', min(0.8, st_depression / 3)))
-
-        t_wave_inversion = features.get('t_wave_inversion_leads', 0)
-        if t_wave_inversion > 2:  # More than 2 leads
-            abnormal_indicators.append(('t_wave_inversion', min(0.7, t_wave_inversion / 6)))
-
-        qrs_axis = features.get('qrs_axis', 60)
-        if qrs_axis < -30:  # Left axis deviation
-            abnormal_indicators.append(('left_axis', min(0.6, abs(qrs_axis + 30) / 60)))
-        elif qrs_axis > 90:  # Right axis deviation
-            abnormal_indicators.append(('right_axis', min(0.6, (qrs_axis - 90) / 90)))
-
-        if abnormal_indicators:
-            weighted_score = 0
-            total_weight = 0.0
-
-            for indicator, score in abnormal_indicators:
-                weight = 1.0
-                if indicator in ['st_elevation', 'wide_qrs', 'long_qt']:
-                    weight = 2.0  # Critical indicators
-                elif indicator in ['bradycardia', 'tachycardia', 'st_depression']:
-                    weight = 1.5  # Important indicators
-
-                weighted_score += score * weight
-                total_weight += weight
-
-            abnormal_prob = min(weighted_score / total_weight if total_weight > 0 else 0, 0.95)
-            normal_prob = 1.0 - abnormal_prob
-        else:
-            normal_prob = 0.98  # High confidence normal
-            abnormal_prob = 0.02
-
-        return {
-            'is_normal': normal_prob > 0.5,
-            'confidence': max(normal_prob, abnormal_prob),
-            'normal_probability': normal_prob,
-            'abnormal_probability': abnormal_prob,
-            'abnormal_indicators': abnormal_indicators,
-            'npv_score': normal_prob  # Negative Predictive Value for normal classification
-        }
-
-    async def _level2_category_classification(
-        self, signal: np.ndarray, features: dict[str, Any]
-    ) -> dict[str, Any]:
-        """Level 2: Category classification for abnormal ECGs"""
-
-        category_scores = {}
-
-        arrhythmia_score = 0.0
-        hr = features.get('heart_rate', 70)
-        rr_std = features.get('rr_std', 0)
-        rr_mean = features.get('rr_mean', 1000)
-
-        if hr < 50 or hr > 100:
-            arrhythmia_score += 0.3
-        if rr_mean > 0 and (rr_std / rr_mean) > 0.15:
-            arrhythmia_score += 0.4
-        if features.get('premature_beats', 0) > 0:
-            arrhythmia_score += 0.5
-
-        category_scores[SCPCategory.ARRHYTHMIA] = min(arrhythmia_score, 1.0)
-
-        conduction_score = 0.0
-        qrs_duration = features.get('qrs_duration', 100)
-        pr_interval = features.get('pr_interval', 160)
-
-        if qrs_duration > 120:
-            conduction_score += 0.6
-        if pr_interval > 200:
-            conduction_score += 0.4
-        if features.get('av_block_degree', 0) > 0:
-            conduction_score += 0.7
-
-        category_scores[SCPCategory.CONDUCTION_DISORDER] = min(conduction_score, 1.0)
-
-        ischemia_score = 0.0
-        st_elevation = features.get('st_elevation_max', 0)
-        st_depression = features.get('st_depression_max', 0)
-        t_wave_inversion = features.get('t_wave_inversion_leads', 0)
-
-        if st_elevation > 1.0:
-            ischemia_score += 0.8  # High weight for ST elevation
-        if st_depression > 1.0:
-            ischemia_score += 0.6
-        if t_wave_inversion > 2:
-            ischemia_score += 0.4
-        if features.get('q_waves_pathological', False):
-            ischemia_score += 0.5
-
-        category_scores[SCPCategory.ISCHEMIA] = min(ischemia_score, 1.0)
-
-        hypertrophy_score = 0.0
-        r_wave_v5 = features.get('r_wave_v5', 0)
-        s_wave_v1 = features.get('s_wave_v1', 0)
-
-        if r_wave_v5 + s_wave_v1 > 35:  # Sokolow-Lyon criteria
-            hypertrophy_score += 0.6
-        if features.get('left_atrial_abnormality', False):
-            hypertrophy_score += 0.3
-        if features.get('right_atrial_abnormality', False):
-            hypertrophy_score += 0.3
-
-        category_scores[SCPCategory.HYPERTROPHY] = min(hypertrophy_score, 1.0)
-
-        axis_score = 0.0
-        qrs_axis = features.get('qrs_axis', 60)
-
-        if qrs_axis < -30 or qrs_axis > 90:
-            axis_score = 0.8
-        elif qrs_axis < -90 or qrs_axis > 180:
-            axis_score = 0.9  # Extreme axis deviation
-
-        category_scores[SCPCategory.AXIS_DEVIATION] = axis_score
-
-        repol_score = 0.0
-        qtc = features.get('qtc', 420)
-
-        if qtc > 450 or qtc < 350:
-            repol_score += 0.6
-        if features.get('early_repolarization', False):
-            repol_score += 0.4
-        if features.get('brugada_pattern', False):
-            repol_score += 0.8
-
-        category_scores[SCPCategory.REPOLARIZATION] = min(repol_score, 1.0)
-
-        other_indicators = [
-            features.get('low_voltage', False),
-            features.get('paced_rhythm', False),
-            features.get('artifact_present', False)
-        ]
-        other_score = sum(other_indicators) * 0.3
-        category_scores[SCPCategory.OTHER] = min(other_score, 1.0)
-
-        predicted_category = max(category_scores.items(), key=lambda x: x[1])[0]
-
-        return {
-            'predicted_category': predicted_category,
-            'category_probabilities': category_scores,
-            'confidence': category_scores[predicted_category],
-            'detected_categories': [cat for cat, score in category_scores.items() if score > 0.3]
-        }
-
-    async def _level3_specific_diagnosis(
-        self, signal: np.ndarray, features: dict[str, Any], predicted_category: str
-    ) -> dict[str, Any]:
-        """Level 3: Specific diagnosis within predicted category"""
-
-        condition_scores = {}
-
-        if predicted_category == SCPCategory.ARRHYTHMIA:
-            condition_scores = await self._diagnose_arrhythmias(features)
-        elif predicted_category == SCPCategory.CONDUCTION_DISORDER:
-            condition_scores = await self._diagnose_conduction_disorders(features)
-        elif predicted_category == SCPCategory.ISCHEMIA:
-            condition_scores = await self._diagnose_ischemia(features)
-        elif predicted_category == SCPCategory.HYPERTROPHY:
-            condition_scores = await self._diagnose_hypertrophy(features)
-        elif predicted_category == SCPCategory.AXIS_DEVIATION:
-            condition_scores = await self._diagnose_axis_deviation(features)
-        elif predicted_category == SCPCategory.REPOLARIZATION:
-            condition_scores = await self._diagnose_repolarization(features)
-        else:  # OTHER category
-            condition_scores = await self._diagnose_other_conditions(features)
-
-        filtered_conditions = {}
-        for condition_code, score in condition_scores.items():
-            threshold = self.condition_thresholds.get(condition_code, 0.8)
-            if score >= threshold:
-                filtered_conditions[condition_code] = score
-
-        if filtered_conditions:
-            primary_diagnosis = max(filtered_conditions.items(), key=lambda x: x[1])[0]
-            primary_confidence = filtered_conditions[primary_diagnosis]
-        else:
-            if condition_scores:
-                primary_diagnosis = max(condition_scores.items(), key=lambda x: x[1])[0]
-                primary_confidence = condition_scores[primary_diagnosis]
-            else:
-                primary_diagnosis = 'NONSPECIFIC'
-                primary_confidence = 0.5
-
-        return {
-            'primary_diagnosis': primary_diagnosis,
-            'confidence': primary_confidence,
-            'all_conditions': condition_scores,
-            'filtered_conditions': filtered_conditions,
-            'detected_conditions': filtered_conditions
-        }
-
-    async def _diagnose_arrhythmias(self, features: dict[str, Any]) -> dict[str, float]:
-        """Diagnose specific arrhythmias"""
-        scores = {}
-
-        hr = features.get('heart_rate', 70)
-        rr_std = features.get('rr_std', 0)
-        rr_mean = features.get('rr_mean', 1000)
-
-        if hr < 60:
-            scores['BRADY'] = min(0.9, (60 - hr) / 30)
-
-        if hr > 100:
-            scores['TACHY'] = min(0.9, (hr - 100) / 50)
-
-        if rr_mean > 0:
-            rr_cv = rr_std / rr_mean
-            if rr_cv > 0.2 and hr > 90:
-                scores['AFIB'] = min(0.9, rr_cv * 2)
-
-        pvc_count = features.get('pvc_count', 0)
-        pac_count = features.get('pac_count', 0)
-
-        if pvc_count > 0:
-            scores['PVC'] = min(0.9, pvc_count / 10)
-        if pac_count > 0:
-            scores['PAC'] = min(0.8, pac_count / 10)
-
-        qrs_duration = features.get('qrs_duration', 100)
-        if qrs_duration > 120 and hr > 150:
-            scores['VTAC'] = 0.8
-
-        return scores
-
-    async def _diagnose_conduction_disorders(self, features: dict[str, Any]) -> dict[str, float]:
-        """Diagnose specific conduction disorders"""
-        scores = {}
-
-        pr_interval = features.get('pr_interval', 160)
-        qrs_duration = features.get('qrs_duration', 100)
-        av_block_degree = features.get('av_block_degree', 0)
-
-        if pr_interval > 200:
-            scores['AVB1'] = min(0.9, (pr_interval - 200) / 100)
-
-        if av_block_degree == 2:
-            scores['AVB2M1'] = 0.8  # Default to Mobitz I
-
-        if av_block_degree == 3:
-            scores['AVB3'] = 0.9
-
-        if qrs_duration > 120:
-            if features.get('rbbb_pattern', False):
-                scores['RBBB'] = 0.8
-            elif features.get('lbbb_pattern', False):
-                scores['LBBB'] = 0.8
-
-        return scores
-
-    async def _diagnose_ischemia(self, features: dict[str, Any]) -> dict[str, float]:
-        """Diagnose specific ischemic conditions"""
-        scores = {}
-
-        st_elevation = features.get('st_elevation_max', 0)
-        st_depression = features.get('st_depression_max', 0)
-
-        if st_elevation > 2.0:
-            scores['STEMI'] = min(0.95, st_elevation / 5)
-
-        if st_depression > 1.0:
-            scores['NSTEMI'] = min(0.8, st_depression / 3)
-
-        if st_depression > 0.5 or features.get('t_wave_inversion_leads', 0) > 2:
-            scores['ISCHEMIA'] = 0.7
-
-        return scores
-
-    async def _diagnose_hypertrophy(self, features: dict[str, Any]) -> dict[str, float]:
-        """Diagnose specific hypertrophy conditions"""
-        scores = {}
-
-        r_wave_v5 = features.get('r_wave_v5', 0)
-        s_wave_v1 = features.get('s_wave_v1', 0)
-
-        if r_wave_v5 + s_wave_v1 > 35:
-            scores['LVH'] = min(0.9, (r_wave_v5 + s_wave_v1 - 35) / 20)
-
-        if features.get('r_wave_v1', 0) > 7:
-            scores['RVH'] = 0.8
-
-        return scores
-
-    async def _diagnose_axis_deviation(self, features: dict[str, Any]) -> dict[str, float]:
-        """Diagnose axis deviation conditions"""
-        scores = {}
-
-        qrs_axis = features.get('qrs_axis', 60)
-
-        if qrs_axis < -30:
-            scores['LAD'] = min(0.9, abs(qrs_axis + 30) / 60)
-        elif qrs_axis > 90:
-            scores['RAD'] = min(0.9, (qrs_axis - 90) / 90)
-
-        return scores
-
-    async def _diagnose_repolarization(self, features: dict[str, Any]) -> dict[str, float]:
-        """Diagnose repolarization abnormalities"""
-        scores = {}
-
-        qtc = features.get('qtc', 420)
-
-        if qtc > 450:
-            scores['LQTS'] = min(0.9, (qtc - 450) / 100)
-        elif qtc < 350:
-            scores['SQTS'] = min(0.9, (350 - qtc) / 50)
-
-        return scores
-
-    async def _diagnose_other_conditions(self, features: dict[str, Any]) -> dict[str, float]:
-        """Diagnose other conditions"""
-        scores = {}
-
-        if features.get('paced_rhythm', False):
-            scores['PACE'] = 0.9
-
-        if features.get('artifact_present', False):
-            scores['ARTIFACT'] = 0.8
-
-        return scores
-
-    async def _compile_final_diagnosis(
-        self,
-        normal_abnormal_result: dict[str, Any],
-        category_result: dict[str, Any],
-        specific_result: dict[str, Any]
-    ) -> PathologyDetectionResult:
-        """Compile final diagnosis from all levels"""
-
-        primary_diagnosis = specific_result['primary_diagnosis']
-        confidence = specific_result['confidence']
-
-        condition = SCP_ECG_CONDITIONS.get(primary_diagnosis)
-        if condition:
-            clinical_urgency = condition.clinical_urgency
-        else:
-            clinical_urgency = ClinicalUrgency.LOW
-
-        return PathologyDetectionResult(
-            primary_diagnosis=primary_diagnosis,
-            confidence=confidence,
-            clinical_urgency=clinical_urgency,
-            detected_conditions=specific_result['filtered_conditions'],
-            level_completed=3,
-            category_probabilities=category_result['category_probabilities'],
-            abnormal_indicators=normal_abnormal_result['abnormal_indicators'],
-            processing_time_ms=0  # Will be set by caller
-        )
-
-    async def analyze_pathologies(
-        self,
-        signal: np.ndarray,
-        features: dict[str, Any],
-        preprocessing_quality: float
-    ) -> dict[str, Any]:
-        """
-        Analyze pathologies using hierarchical detection system.
-        This is a wrapper method that calls detect_pathologies_hierarchical
-        and returns results in a dictionary format for compatibility.
-        """
-        result = await self.detect_pathologies_hierarchical(signal, features, preprocessing_quality)
-
-        return {
-            'primary_diagnosis': result.primary_diagnosis,
-            'confidence': result.confidence,
-            'clinical_urgency': result.clinical_urgency,
-            'detected_conditions': result.detected_conditions,
-            'level_completed': result.level_completed,
-            'category_probabilities': result.category_probabilities,
-            'abnormal_indicators': result.abnormal_indicators,
-            'processing_time_ms': result.processing_time_ms,
-            'secondary_diagnoses': [],
-            'recommendations': [],
-            'icd10_codes': [],
-            'requires_immediate_attention': result.clinical_urgency == 'CRITICAL'
-        }
-
+    
+    def _build_category_mapping(self) -> Dict[SCPCategory, List[str]]:
+        """Build mapping from categories to conditions"""
+        mapping = {}
+        for condition, info in self.scp_conditions.items():
+            category = info['category']
+            if category not in mapping:
+                mapping[category] = []
+            mapping[category].append(condition)
+        return mapping
+    
     async def analyze_hierarchical(
         self,
         signal: np.ndarray,
-        features: dict[str, float],
-        preprocessing_quality: float
-    ) -> dict[str, Any]:
+        features: Dict[str, float],
+        preprocessing_quality: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Perform hierarchical multi-pathology analysis"""
-
-        # Level 1: Normal vs Abnormal
-        level1_result = await self._level1_normal_vs_abnormal(signal, features)
-
-        if level1_result['is_normal'] and level1_result['confidence'] > 0.8:
+        try:
+            # Level 1: Normal vs Abnormal
+            level1_result = await self._classify_normal_vs_abnormal(signal, features)
+            
+            if level1_result['is_normal']:
+                return {
+                    'diagnosis': 'NORMAL',
+                    'confidence': level1_result['confidence'],
+                    'details': level1_result,
+                    'detected_conditions': [],
+                    'clinical_urgency': ClinicalUrgency.LOW
+                }
+            
+            # Level 2: Category classification
+            level2_result = await self._classify_categories(signal, features)
+            
+            # Level 3: Specific condition detection
+            level3_result = await self._detect_specific_conditions(
+                signal, features, level2_result['predicted_categories']
+            )
+            
+            # Assess clinical urgency
+            urgency = self._assess_clinical_urgency(level3_result['detected_conditions'])
+            
+            # Get primary diagnosis
+            primary = self._get_primary_diagnosis(level3_result['detected_conditions'])
+            
             return {
-                'diagnosis': 'NORMAL',
-                'confidence': level1_result['confidence'],
-                'urgency': ClinicalUrgency.LOW,
-                'details': level1_result,
-                'preprocessing_quality': preprocessing_quality,
-                'level_completed': 1,
-                'clinical_urgency': ClinicalUrgency.LOW
+                'diagnosis': primary['condition'] if primary else 'ABNORMAL',
+                'confidence': primary['confidence'] if primary else level2_result['confidence'],
+                'details': {
+                    'level1': level1_result,
+                    'level2': level2_result,
+                    'level3': level3_result
+                },
+                'detected_conditions': level3_result['detected_conditions'],
+                'clinical_urgency': urgency
             }
-
-        # Level 2: Category classification
-        level2_result = await self._level2_category_classification(signal, features)
-
-        # Level 3: Specific diagnosis
-        target_categories = [level2_result['predicted_category']]
-        level3_result = await self._level3_specific_diagnosis(
-            signal, features, target_categories
-        )
-
-        urgency = self._determine_clinical_urgency(level3_result)
-
-        return {
-            'diagnosis': level3_result['primary_diagnosis'],
-            'confidence': level3_result['confidence'],
-            'urgency': urgency,
-            'level1': level1_result,
-            'level2': level2_result,
-            'level3': level3_result,
-            'preprocessing_quality': preprocessing_quality,
-            'level_completed': 3,
-            'clinical_urgency': urgency
-        }
-
-    def _determine_clinical_urgency(self, level3_result: dict[str, Any]) -> ClinicalUrgency:
-        """Determine clinical urgency based on diagnosis"""
-        critical_conditions = ['MI', 'STEMI', 'VT', 'AVB']
-        high_conditions = ['AFIB', 'LBBB', 'RBBB', 'SVTAC']
-
-        diagnosis = level3_result.get('primary_diagnosis', '')
-
-        if diagnosis in critical_conditions:
-            return ClinicalUrgency.CRITICAL
-        elif diagnosis in high_conditions:
-            return ClinicalUrgency.HIGH
-        elif diagnosis == 'NORMAL':
+            
+        except Exception as e:
+            logger.error(f"Error in hierarchical analysis: {str(e)}")
+            raise MultiPathologyException(f"Hierarchical analysis failed: {str(e)}")
+    
+    async def _classify_normal_vs_abnormal(
+        self, signal: np.ndarray, features: Dict[str, float]
+    ) -> Dict[str, Any]:
+        """Level 1: Classify normal vs abnormal"""
+        try:
+            # Simple rule-based classification
+            abnormal_indicators = []
+            
+            # Check heart rate
+            hr = features.get('heart_rate', 75)
+            if hr < 50 or hr > 120:
+                abnormal_indicators.append('abnormal_heart_rate')
+            
+            # Check intervals
+            pr = features.get('pr_interval', 160)
+            if pr < 120 or pr > 220:
+                abnormal_indicators.append('abnormal_pr_interval')
+            
+            qrs = features.get('qrs_duration', 90)
+            if qrs > 120:
+                abnormal_indicators.append('wide_qrs')
+            
+            qt = features.get('qt_interval', 400)
+            qtc = features.get('qtc', qt)
+            if qtc > 470:
+                abnormal_indicators.append('prolonged_qtc')
+            
+            # Calculate probability
+            is_normal = len(abnormal_indicators) == 0
+            confidence = 0.98 if is_normal else 0.02
+            
+            # Calculate NPV score
+            npv_score = 0.99 if is_normal else 0.01
+            
+            return {
+                'is_normal': is_normal,
+                'confidence': confidence,
+                'abnormal_probability': 1 - confidence,
+                'abnormal_indicators': abnormal_indicators,
+                'npv_score': npv_score
+            }
+            
+        except Exception as e:
+            logger.error(f"Error in normal/abnormal classification: {str(e)}")
+            return {
+                'is_normal': True,
+                'confidence': 0.5,
+                'abnormal_probability': 0.5,
+                'abnormal_indicators': [],
+                'npv_score': 0.5
+            }
+    
+    async def _classify_categories(
+        self, signal: np.ndarray, features: Dict[str, float]
+    ) -> Dict[str, Any]:
+        """Level 2: Classify into diagnostic categories"""
+        try:
+            category_probs = {}
+            
+            # Simple heuristic-based category classification
+            hr = features.get('heart_rate', 75)
+            pr = features.get('pr_interval', 160)
+            qrs = features.get('qrs_duration', 90)
+            
+            # Arrhythmia probability
+            if hr < 50 or hr > 150 or features.get('rr_std', 0) > 50:
+                category_probs[SCPCategory.ARRHYTHMIA] = 0.7
+            else:
+                category_probs[SCPCategory.ARRHYTHMIA] = 0.1
+            
+            # Conduction probability
+            if pr > 200 or qrs > 120:
+                category_probs[SCPCategory.CONDUCTION] = 0.6
+            else:
+                category_probs[SCPCategory.CONDUCTION] = 0.1
+            
+            # Ischemia probability
+            st_elevation = features.get('st_elevation', 0)
+            if st_elevation > 1:
+                category_probs[SCPCategory.ISCHEMIA] = 0.8
+            else:
+                category_probs[SCPCategory.ISCHEMIA] = 0.1
+            
+            # Other categories
+            category_probs[SCPCategory.HYPERTROPHY] = 0.1
+            category_probs[SCPCategory.AXIS_DEVIATION] = 0.1
+            category_probs[SCPCategory.OTHER] = 0.1
+            
+            # Get predicted categories
+            predicted_categories = [
+                cat for cat, prob in category_probs.items()
+                if prob > self.category_thresholds[cat]
+            ]
+            
+            # Get primary category
+            primary_category = max(category_probs.items(), key=lambda x: x[1])[0]
+            
+            return {
+                'category_probabilities': category_probs,
+                'predicted_categories': predicted_categories,
+                'predicted_category': primary_category,
+                'confidence': max(category_probs.values())
+            }
+            
+        except Exception as e:
+            logger.error(f"Error in category classification: {str(e)}")
+            return {
+                'category_probabilities': {},
+                'predicted_categories': [],
+                'predicted_category': SCPCategory.OTHER,
+                'confidence': 0.5
+            }
+    
+    async def _detect_specific_conditions(
+        self, signal: np.ndarray, features: Dict[str, float], categories: List[SCPCategory]
+    ) -> Dict[str, Any]:
+        """Level 3: Detect specific conditions within categories"""
+        try:
+            detected_conditions = []
+            all_conditions = {}
+            
+            # Detect conditions based on features and categories
+            hr = features.get('heart_rate', 75)
+            pr = features.get('pr_interval', 160)
+            qrs = features.get('qrs_duration', 90)
+            
+            # Arrhythmias
+            if SCPCategory.ARRHYTHMIA in categories:
+                if hr > 150 and features.get('rr_std', 0) > 100:
+                    detected_conditions.append({
+                        'condition': 'AFIB',
+                        'confidence': 0.8,
+                        'severity': self.scp_conditions['AFIB']['severity']
+                    })
+                    all_conditions['AFIB'] = 0.8
+                elif hr < 50:
+                    detected_conditions.append({
+                        'condition': 'SBRAD',
+                        'confidence': 0.7,
+                        'severity': self.scp_conditions['SBRAD']['severity']
+                    })
+                    all_conditions['SBRAD'] = 0.7
+            
+            # Conduction disturbances
+            if SCPCategory.CONDUCTION in categories:
+                if pr > 200:
+                    detected_conditions.append({
+                        'condition': 'IAVB',
+                        'confidence': 0.7,
+                        'severity': self.scp_conditions['IAVB']['severity']
+                    })
+                    all_conditions['IAVB'] = 0.7
+                if qrs > 120:
+                    detected_conditions.append({
+                        'condition': 'LBBB',
+                        'confidence': 0.6,
+                        'severity': self.scp_conditions['LBBB']['severity']
+                    })
+                    all_conditions['LBBB'] = 0.6
+            
+            # Sort by severity and confidence
+            detected_conditions.sort(
+                key=lambda x: (x['severity'], x['confidence']),
+                reverse=True
+            )
+            
+            # Calculate confidence scores
+            confidence_scores = {
+                cond['condition']: cond['confidence']
+                for cond in detected_conditions
+            }
+            
+            return {
+                'detected_conditions': detected_conditions,
+                'all_conditions': all_conditions,
+                'filtered_conditions': detected_conditions,
+                'confidence': max([c['confidence'] for c in detected_conditions]) if detected_conditions else 0.5,
+                'confidence_scores': confidence_scores
+            }
+            
+        except Exception as e:
+            logger.error(f"Error detecting specific conditions: {str(e)}")
+            return {
+                'detected_conditions': [],
+                'all_conditions': {},
+                'filtered_conditions': [],
+                'confidence': 0.5,
+                'confidence_scores': {}
+            }
+    
+    def _assess_clinical_urgency(self, conditions: List[Dict[str, Any]]) -> ClinicalUrgency:
+        """Assess clinical urgency based on detected conditions"""
+        if not conditions:
             return ClinicalUrgency.LOW
-        else:
+        
+        # Get highest severity
+        max_severity = max(cond['severity'] for cond in conditions)
+        
+        if max_severity >= 0.9:
+            return ClinicalUrgency.CRITICAL
+        elif max_severity >= 0.7:
+            return ClinicalUrgency.HIGH
+        elif max_severity >= 0.5:
             return ClinicalUrgency.MEDIUM
+        else:
+            return ClinicalUrgency.LOW
+    
+    def _get_primary_diagnosis(self, conditions: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        """Get primary diagnosis from detected conditions"""
+        if not conditions:
+            return None
+        
+        # Return condition with highest severity and confidence
+        return max(
+            conditions,
+            key=lambda x: (x['severity'], x['confidence'])
+        )
+    
+    async def analyze_pathologies(
+        self, signal: np.ndarray, features: Dict[str, float]
+    ) -> Dict[str, Any]:
+        """Analyze signal for multiple pathologies (backward compatibility)"""
+        preprocessing_quality = {'overall_quality': 0.8}
+        return await self.analyze_hierarchical(signal, features, preprocessing_quality)
