@@ -18,7 +18,7 @@ from app.core.exceptions import ECGProcessingException
 from app.core.constants import AnalysisStatus, ClinicalUrgency
 from app.services.multi_pathology_service import MultiPathologyService
 from app.services.interpretability_service import InterpretabilityService
-from app.services.advanced_ml_service import AdvancedMLService
+from app.services.interfaces import IMLService
 from app.utils.ecg_processor import ECGProcessor
 from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
 from app.preprocessing.enhanced_quality_analyzer import EnhancedQualityAnalyzer
