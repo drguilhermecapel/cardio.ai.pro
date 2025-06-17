@@ -12,8 +12,6 @@ from app.core.constants import FileType, AnalysisStatus as ProcessingStatus, Cli
 
 import numpy as np
 
-from pathlib import Path
-import logging
 class ECGAnalysisBase(BaseModel):
     """Schema base para análise de ECG."""
     patient_id: int = Field(..., description="ID do paciente")
@@ -655,47 +653,3 @@ class ECGStatistics(BaseModel):
         features["t_wave_amplitude"] = 0.3
         
         return features
-
-
-class ECGAnalysisService:
-    """ECG Analysis Service for processing and analyzing ECG data."""
-    
-    def __init__(
-        self,
-        db = None,
-        ml_service = None,
-        validation_service = None,
-        ecg_repository = None,
-        patient_service = None,
-        notification_service = None,
-        interpretability_service = None,
-        multi_pathology_service = None,
-        **kwargs
-    ):
-        """Initialize ECG Analysis Service with flexible dependency injection."""
-        self.db = db
-        self.repository = ecg_repository
-        self.ecg_repository = ecg_repository
-        self.ml_service = ml_service
-        self.validation_service = validation_service
-        self.patient_service = patient_service
-        self.notification_service = notification_service
-        self.interpretability_service = interpretability_service
-        self.multi_pathology_service = multi_pathology_service
-        
-        # Store additional kwargs
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-    
-    async def analyze_ecg(self, file_path: str) -> dict:
-        """Analyze ECG file."""
-        # Implementação mínima
-        return {"status": "completed", "results": {}}
-    
-    async def get_analysis_by_id(self, analysis_id: int):
-        """Get analysis by ID."""
-        return None
-    
-    async def create_analysis(self, data: dict, user_id: int):
-        """Create new analysis."""
-        return {"id": 1, "status": "pending"}
