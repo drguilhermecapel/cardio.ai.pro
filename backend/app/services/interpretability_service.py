@@ -1,10 +1,10 @@
 import logging
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, Optional, Tuple
 import numpy as np
 from dataclasses import dataclass
-import shap
-import lime
-import lime.lime_tabular
+import shap  # type: ignore
+import 
+import lime.lime_tabular # type: ignore
 
 # Try relative import if the absolute import fails
 try:
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ExplanationResult:
-    shap_values: Optional[np.ndarray]
+    shap_values: Optional[np.ndarray[Any, Any]]
     lime_explanation: Optional[Dict[str, Any]]
     feature_importance: Dict[str, float]
     clinical_text: str
@@ -26,7 +26,7 @@ class ExplanationResult:
     diagnostic_criteria: Optional[Dict[str, Any]] = None
 
 class InterpretabilityService:
-    def __init__(self, model=None):
+    def __init__(self, model: Optional[Any] = None):
         self.model = model
         self.clinical_generator = ClinicalExplanationGenerator()
         self.explainer = None
@@ -44,7 +44,7 @@ class InterpretabilityService:
 
     async def generate_comprehensive_explanation(
         self,
-        signal: np.ndarray,
+        signal: np.ndarray[Any, np.dtype[np.float_]],
         predictions: Dict[str, Any],
         features: Dict[str, float],
         patient_info: Optional[Dict[str, Any]] = None
@@ -55,17 +55,22 @@ class InterpretabilityService:
             primary_diagnosis = 'UNKNOWN'
 
             # Lida com diferentes formatos de predictions
-            if isinstance(predictions, dict):
-                if predictions and all(isinstance(v, dict) for v in predictions.values()):
-                    for diagnosis, probs in predictions.items():
-                        if isinstance(probs, dict):
-                            for key, prob in probs.items():
-                                if isinstance(prob, (int, float)) and prob > max_prob:
-                                    max_prob = prob
-                                    primary_diagnosis = diagnosis
-                else:
-                    if predictions:
-                        primary_diagnosis, max_prob = max(predictions.items(), key=lambda x: x[1])
+            if predictions and all(isinstance(v, dict) for v in predictions.values()):
+                for diagnosis, probs in predictions.items():
+                    if isinstance(probs, dict):
+                        for key_raw, prob in probs.items():
+                            key_raw: str = str(key_raw)  # Explicit type annotation for clarity
+                            try:
+                                prob_float = float(prob)
+                            except (TypeError, ValueError):
+                                continue
+                            key: str = key_raw
+                            if isinstance(prob_float, (int, float)) and prob_float > max_prob:
+                                max_prob = prob_float
+                                primary_diagnosis = diagnosis
+            else:
+                if predictions:
+                    primary_diagnosis, max_prob = max(predictions.items(), key=lambda x: x[1])
             # Gera explicações SHAP e LIME
             shap_values = None
             try:
