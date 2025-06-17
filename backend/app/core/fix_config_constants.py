@@ -1,10 +1,11 @@
 """
 Fix configuration and constants issues
 """
+
 from pathlib import Path
 
 # Fix config.py to add missing attributes
-CONFIG_ADDITIONS = '''
+CONFIG_ADDITIONS = """
     # CORS Settings
     BACKEND_CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:8000"]
     
@@ -41,7 +42,7 @@ CONFIG_ADDITIONS = '''
     MAX_SIGNAL_LENGTH_MINUTES: int = 60
     DEFAULT_SAMPLING_RATE: int = 500
     ENABLE_GPU: bool = False
-'''
+"""
 
 # Fix constants.py to add missing enums
 CONSTANTS_ADDITIONS = '''
@@ -171,63 +172,67 @@ def get_logger(name: str) -> AuditLogger:
 audit_logger = get_logger("audit")
 '''
 
+
 def fix_config_file():
     """Add missing attributes to config.py"""
     config_path = Path(__file__).parent / "config.py"
-    
+
     # Read existing content
-    with open(config_path, 'r') as f:
+    with open(config_path, "r") as f:
         content = f.read()
-    
+
     # Check if additions are needed
     if "BACKEND_CORS_ORIGINS" not in content:
         # Find the class definition
         class_end = content.find("settings = Settings()")
         if class_end == -1:
             class_end = len(content) - 100  # Near the end
-        
+
         # Insert additions before the end of the class
-        insertion_point = content.rfind('\n', 0, class_end)
+        insertion_point = content.rfind("\n", 0, class_end)
         new_content = (
-            content[:insertion_point] + 
-            "\n" + CONFIG_ADDITIONS + 
-            content[insertion_point:]
+            content[:insertion_point]
+            + "\n"
+            + CONFIG_ADDITIONS
+            + content[insertion_point:]
         )
-        
+
         # Write back
-        with open(config_path, 'w') as f:
+        with open(config_path, "w") as f:
             f.write(new_content)
-        
+
         print("✓ config.py updated with missing attributes")
     else:
         print("✓ config.py already has required attributes")
 
+
 def fix_constants_file():
     """Add missing enums to constants.py"""
     constants_path = Path(__file__).parent / "constants.py"
-    
+
     # Read existing content
-    with open(constants_path, 'r') as f:
+    with open(constants_path, "r") as f:
         content = f.read()
-    
+
     # Check if additions are needed
     if "PATIENT = " not in content:
         # Append additions
-        with open(constants_path, 'a') as f:
+        with open(constants_path, "a") as f:
             f.write("\n" + CONSTANTS_ADDITIONS)
-        
+
         print("✓ constants.py updated with missing enums")
     else:
         print("✓ constants.py already has required enums")
 
+
 def fix_exceptions_file():
     """Add missing exceptions to exceptions.py"""
     exceptions_path = Path(__file__).parent / "exceptions.py"
-    
+
     # Read existing content
-    with open(exceptions_path, 'r') as f:
+    with open(exceptions_path, "r") as f:
         content = f.read()
-    
+
     # Check if additions are needed
     if "AuthorizationException" not in content:
         # Find a good insertion point (after other exception classes)
@@ -237,32 +242,34 @@ def fix_exceptions_file():
             next_class = content.find("\n\nclass", insertion_point + 5)
             if next_class == -1:
                 next_class = len(content)
-            
+
             # Insert after the last class
             new_content = (
-                content[:next_class] + 
-                "\n\n" + EXCEPTIONS_ADDITIONS + 
-                content[next_class:]
+                content[:next_class]
+                + "\n\n"
+                + EXCEPTIONS_ADDITIONS
+                + content[next_class:]
             )
         else:
             new_content = content + "\n\n" + EXCEPTIONS_ADDITIONS
-        
+
         # Write back
-        with open(exceptions_path, 'w') as f:
+        with open(exceptions_path, "w") as f:
             f.write(new_content)
-        
+
         print("✓ exceptions.py updated with missing exceptions")
     else:
         print("✓ exceptions.py already has required exceptions")
 
+
 def fix_logging_file():
     """Add missing audit logger methods to logging.py"""
     logging_path = Path(__file__).parent / "logging.py"
-    
+
     # Read existing content
-    with open(logging_path, 'r') as f:
+    with open(logging_path, "r") as f:
         content = f.read()
-    
+
     # Check if additions are needed
     if "AuditLogger" not in content or "log_medical_action" not in content:
         # Replace or add the audit logger class
@@ -274,30 +281,32 @@ def fix_logging_file():
                 end = content.find("\n\ndef", start)
             if end == -1:
                 end = len(content)
-            
+
             new_content = content[:start] + LOGGING_ADDITIONS.strip() + content[end:]
         else:
             # Add new class
             new_content = content + "\n\n" + LOGGING_ADDITIONS
-        
+
         # Write back
-        with open(logging_path, 'w') as f:
+        with open(logging_path, "w") as f:
             f.write(new_content)
-        
+
         print("✓ logging.py updated with audit logger methods")
     else:
         print("✓ logging.py already has required methods")
 
+
 def main():
     """Run all fixes"""
     print("Fixing core module issues...")
-    
+
     fix_config_file()
     fix_constants_file()
     fix_exceptions_file()
     fix_logging_file()
-    
+
     print("\n✅ All core module fixes completed!")
+
 
 if __name__ == "__main__":
     main()

@@ -44,13 +44,10 @@ class NotificationRepository:
 
     async def mark_notification_read(self, notification_id: int, user_id: int) -> bool:
         """Mark notification as read."""
-        stmt = (
-            select(Notification)
-            .where(
-                and_(
-                    Notification.id == notification_id,
-                    Notification.user_id == user_id,
-                )
+        stmt = select(Notification).where(
+            and_(
+                Notification.id == notification_id,
+                Notification.user_id == user_id,
             )
         )
         result = await self.db.execute(stmt)
@@ -66,13 +63,10 @@ class NotificationRepository:
 
     async def mark_all_read(self, user_id: int) -> int:
         """Mark all notifications as read for a user."""
-        stmt = (
-            select(Notification)
-            .where(
-                and_(
-                    Notification.user_id == user_id,
-                    Notification.is_read.is_(False),
-                )
+        stmt = select(Notification).where(
+            and_(
+                Notification.user_id == user_id,
+                Notification.is_read.is_(False),
             )
         )
         result = await self.db.execute(stmt)
@@ -91,13 +85,10 @@ class NotificationRepository:
 
     async def get_unread_count(self, user_id: int) -> int:
         """Get unread notification count for a user."""
-        stmt = (
-            select(func.count(Notification.id))
-            .where(
-                and_(
-                    Notification.user_id == user_id,
-                    Notification.is_read.is_(False),
-                )
+        stmt = select(func.count(Notification.id)).where(
+            and_(
+                Notification.user_id == user_id,
+                Notification.is_read.is_(False),
             )
         )
         result = await self.db.execute(stmt)
@@ -122,13 +113,10 @@ class NotificationRepository:
         self, user_id: int, notification_type: str
     ) -> NotificationPreference | None:
         """Get user notification preferences."""
-        stmt = (
-            select(NotificationPreference)
-            .where(
-                and_(
-                    NotificationPreference.user_id == user_id,
-                    NotificationPreference.notification_type == notification_type,
-                )
+        stmt = select(NotificationPreference).where(
+            and_(
+                NotificationPreference.user_id == user_id,
+                NotificationPreference.notification_type == notification_type,
             )
         )
         result = await self.db.execute(stmt)
@@ -136,13 +124,10 @@ class NotificationRepository:
 
     async def get_administrators(self) -> list[User]:
         """Get all administrators."""
-        stmt = (
-            select(User)
-            .where(
-                and_(
-                    User.is_active.is_(True),
-                    User.role == UserRoles.ADMIN,
-                )
+        stmt = select(User).where(
+            and_(
+                User.is_active.is_(True),
+                User.role == UserRoles.ADMIN,
             )
         )
         result = await self.db.execute(stmt)
@@ -150,13 +135,10 @@ class NotificationRepository:
 
     async def get_critical_alert_recipients(self) -> list[User]:
         """Get users who should receive critical alerts."""
-        stmt = (
-            select(User)
-            .where(
-                and_(
-                    User.is_active.is_(True),
-                    User.role.in_([UserRoles.ADMIN, UserRoles.CARDIOLOGIST]),
-                )
+        stmt = select(User).where(
+            and_(
+                User.is_active.is_(True),
+                User.role.in_([UserRoles.ADMIN, UserRoles.CARDIOLOGIST]),
             )
         )
         result = await self.db.execute(stmt)

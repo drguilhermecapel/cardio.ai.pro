@@ -12,7 +12,7 @@ if not settings.STANDALONE_MODE:
             "cardioai",
             broker=settings.REDIS_URL,
             backend=settings.REDIS_URL,
-            include=["app.tasks"]
+            include=["app.tasks"],
         )
 
         celery_app.conf.update(

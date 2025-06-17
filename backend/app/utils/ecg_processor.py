@@ -15,6 +15,7 @@ from app.core.exceptions import ECGProcessingException
 
 logger = logging.getLogger(__name__)
 
+
 class ECGProcessor:
     """ECG signal processing and file handling."""
 
@@ -25,11 +26,11 @@ class ECGProcessor:
             if not path.exists():
                 raise ECGProcessingException(f"File not found: {file_path}")
 
-            if path.suffix.lower() == '.csv':
+            if path.suffix.lower() == ".csv":
                 return await self._load_csv(file_path)
-            elif path.suffix.lower() in ['.txt', '.dat']:
+            elif path.suffix.lower() in [".txt", ".dat"]:
                 return await self._load_text(file_path)
-            elif path.suffix.lower() == '.xml':
+            elif path.suffix.lower() == ".xml":
                 return await self._load_xml(file_path)
             else:
                 raise ECGProcessingException(f"Unsupported file format: {path.suffix}")
@@ -41,7 +42,7 @@ class ECGProcessor:
     async def _load_csv(self, file_path: str) -> NDArray[np.float64]:
         """Load ECG data from CSV file."""
         try:
-            data = np.loadtxt(file_path, delimiter=',', skiprows=1)
+            data = np.loadtxt(file_path, delimiter=",", skiprows=1)
             if data.ndim == 1:
                 data = data.reshape(-1, 1)
             return data
@@ -66,7 +67,7 @@ class ECGProcessor:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-            data_elements = root.findall('.//waveform/data')
+            data_elements = root.findall(".//waveform/data")
             if not data_elements:
                 raise ECGProcessingException("No waveform data found in XML")
 
@@ -90,10 +91,23 @@ class ECGProcessor:
                 "sample_rate": 500,  # Default
                 "duration_seconds": 10.0,  # Default
                 "leads_count": 12,  # Default
-                "leads_names": ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+                "leads_names": [
+                    "I",
+                    "II",
+                    "III",
+                    "aVR",
+                    "aVL",
+                    "aVF",
+                    "V1",
+                    "V2",
+                    "V3",
+                    "V4",
+                    "V5",
+                    "V6",
+                ],
             }
 
-            if path.suffix.lower() == '.xml':
+            if path.suffix.lower() == ".xml":
                 xml_metadata = await self._extract_xml_metadata(file_path)
                 metadata.update(xml_metadata)
 
@@ -115,7 +129,20 @@ class ECGProcessor:
                 "sample_rate": 500,
                 "duration_seconds": 10.0,
                 "leads_count": 12,
-                "leads_names": ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+                "leads_names": [
+                    "I",
+                    "II",
+                    "III",
+                    "aVR",
+                    "aVL",
+                    "aVF",
+                    "V1",
+                    "V2",
+                    "V3",
+                    "V4",
+                    "V5",
+                    "V6",
+                ],
             }
 
     async def _extract_xml_metadata(self, file_path: str) -> dict[str, Any]:
@@ -128,29 +155,31 @@ class ECGProcessor:
 
             metadata: dict[str, Any] = {}
 
-            sample_rate_elem = root.find('.//sampleRate')
+            sample_rate_elem = root.find(".//sampleRate")
             if sample_rate_elem is not None and sample_rate_elem.text is not None:
                 metadata["sample_rate"] = int(sample_rate_elem.text)
 
-            date_elem = root.find('.//acquisitionDate')
+            date_elem = root.find(".//acquisitionDate")
             if date_elem is not None:
                 if date_elem.text is not None:
                     try:
-                        metadata["acquisition_date"] = datetime.fromisoformat(date_elem.text)
+                        metadata["acquisition_date"] = datetime.fromisoformat(
+                            date_elem.text
+                        )
                     except Exception:
                         pass
 
-            device_elem = root.find('.//device')
+            device_elem = root.find(".//device")
             if device_elem is not None:
-                manufacturer = device_elem.find('manufacturer')
+                manufacturer = device_elem.find("manufacturer")
                 if manufacturer is not None and manufacturer.text is not None:
                     metadata["device_manufacturer"] = manufacturer.text
 
-                model = device_elem.find('model')
+                model = device_elem.find("model")
                 if model is not None and model.text is not None:
                     metadata["device_model"] = model.text
 
-                serial = device_elem.find('serialNumber')
+                serial = device_elem.find("serialNumber")
                 if serial is not None and serial.text is not None:
                     metadata["device_serial"] = serial.text
 
@@ -160,7 +189,9 @@ class ECGProcessor:
             logger.error("Failed to extract XML metadata: %s", str(e))
             return {}
 
-    async def preprocess_signal(self, ecg_data: NDArray[np.float64]) -> NDArray[np.float64]:
+    async def preprocess_signal(
+        self, ecg_data: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
         """Preprocess ECG signal for analysis."""
         try:
             processed_data = ecg_data.copy()
@@ -177,7 +208,7 @@ class ECGProcessor:
                 high = 40.0 / nyquist
 
                 try:
-                    b, a = butter(4, [low, high], btype='band')
+                    b, a = butter(4, [low, high], btype="band")
                     cleaned_signal = filtfilt(b, a, cleaned_signal)
                 except Exception:
                     pass
@@ -202,7 +233,7 @@ class ECGProcessor:
                 "preprocessed_data": preprocessed_data,
                 "metadata": metadata,
                 "file_path": file_path,
-                "processing_success": True
+                "processing_success": True,
             }
 
         except Exception as e:

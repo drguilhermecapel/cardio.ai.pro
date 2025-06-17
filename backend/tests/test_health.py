@@ -14,7 +14,7 @@ def client():
 def test_health_endpoint(client):
     """Test health endpoint returns correct response."""
     response = client.get("/health")
-    
+
     assert response.status_code == 200
     response_data = response.json()
     assert "status" in response_data

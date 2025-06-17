@@ -10,7 +10,7 @@ from app.services.ml_model_service import MLModelService
 @pytest.fixture
 def ml_model_service():
     """Create ML model service instance."""
-    with patch('app.services.ml_model_service.Path.exists', return_value=False):
+    with patch("app.services.ml_model_service.Path.exists", return_value=False):
         return MLModelService()
 
 
@@ -24,12 +24,27 @@ def sample_ecg_data():
 async def test_analyze_ecg(ml_model_service, sample_ecg_data):
     """Test ECG analysis with actual method."""
     sample_rate = 500
-    leads_names = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
-    
+    leads_names = [
+        "I",
+        "II",
+        "III",
+        "aVR",
+        "aVL",
+        "aVF",
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+    ]
+
     ml_model_service.models = {}
-    
-    result = await ml_model_service.analyze_ecg(sample_ecg_data, sample_rate, leads_names)
-    
+
+    result = await ml_model_service.analyze_ecg(
+        sample_ecg_data, sample_rate, leads_names
+    )
+
     assert "confidence" in result
     assert "predictions" in result
     assert "rhythm" in result
@@ -41,7 +56,7 @@ async def test_analyze_ecg(ml_model_service, sample_ecg_data):
 async def test_get_model_info(ml_model_service):
     """Test getting model information."""
     info = ml_model_service.get_model_info()
-    
+
     assert "loaded_models" in info
     assert "model_metadata" in info
     assert "memory_usage" in info
@@ -53,9 +68,9 @@ async def test_unload_model(ml_model_service):
     """Test unloading a model."""
     ml_model_service.models["test_model"] = Mock()
     ml_model_service.model_metadata["test_model"] = {}
-    
+
     result = ml_model_service.unload_model("test_model")
-    
+
     assert result is True
     assert "test_model" not in ml_model_service.models
 
@@ -64,5 +79,5 @@ async def test_unload_model(ml_model_service):
 async def test_unload_nonexistent_model(ml_model_service):
     """Test unloading a model that doesn't exist."""
     result = ml_model_service.unload_model("nonexistent_model")
-    
+
     assert result is False

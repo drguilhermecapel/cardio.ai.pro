@@ -7,6 +7,7 @@ from enum import Enum
 
 class UserRoles(str, Enum):
     """User roles."""
+
     ADMIN = "admin"
     PHYSICIAN = "physician"
     CARDIOLOGIST = "cardiologist"
@@ -14,23 +15,29 @@ class UserRoles(str, Enum):
     RESEARCHER = "researcher"
     VIEWER = "viewer"
 
+
 class AnalysisStatus(str, Enum):
     """Analysis status."""
+
     PENDING = "pending"
     PROCESSING = "processing"
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
 
+
 class ValidationStatus(str, Enum):
     """Validation status."""
+
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
     REQUIRES_REVIEW = "requires_review"
 
+
 class ECGLeads(str, Enum):
     """ECG leads."""
+
     LEAD_I = "I"
     II = "II"
     III = "III"
@@ -44,8 +51,10 @@ class ECGLeads(str, Enum):
     V5 = "V5"
     V6 = "V6"
 
+
 class DiagnosisCategory(str, Enum):
     """Diagnosis categories."""
+
     NORMAL = "normal"
     ARRHYTHMIA = "arrhythmia"
     CONDUCTION_DISORDER = "conduction_disorder"
@@ -57,15 +66,19 @@ class DiagnosisCategory(str, Enum):
     BUNDLE_BRANCH_BLOCK = "bundle_branch_block"
     OTHER = "other"
 
+
 class ClinicalUrgency(str, Enum):
     """Clinical urgency levels."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
 
+
 class FileType(str, Enum):
     """Supported file types."""
+
     PDF = "application/pdf"
     JPEG = "image/jpeg"
     PNG = "image/png"
@@ -73,10 +86,13 @@ class FileType(str, Enum):
     XML = "application/xml"
     TXT = "text/plain"
 
-ECG_FILE_EXTENSIONS = {'.csv', '.txt', '.xml', '.dat', '.png', '.jpg', '.jpeg'}
+
+ECG_FILE_EXTENSIONS = {".csv", ".txt", ".xml", ".dat", ".png", ".jpg", ".jpeg"}
+
 
 class NotificationChannel(str, Enum):
     """Notification channels."""
+
     EMAIL = "email"
     SMS = "sms"
     PUSH = "push"
@@ -84,16 +100,20 @@ class NotificationChannel(str, Enum):
     WEBHOOK = "webhook"
     PHONE_CALL = "phone_call"
 
+
 class NotificationPriority(str, Enum):
     """Notification priority levels."""
+
     LOW = "low"
     NORMAL = "normal"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
 
+
 class NotificationType(str, Enum):
     """Notification types."""
+
     CRITICAL_FINDING = "critical_finding"
     ANALYSIS_COMPLETE = "analysis_complete"
     VALIDATION_REMINDER = "validation_reminder"
@@ -102,8 +122,10 @@ class NotificationType(str, Enum):
     APPOINTMENT_REMINDER = "appointment_reminder"
     REPORT_READY = "report_ready"
 
+
 class AuditEventType(str, Enum):
     """Audit event types."""
+
     USER_LOGIN = "user_login"
     USER_LOGOUT = "user_logout"
     DATA_ACCESS = "data_access"
@@ -113,23 +135,28 @@ class AuditEventType(str, Enum):
     REPORT_GENERATED = "report_generated"
     SYSTEM_ERROR = "system_error"
 
+
 class ModelType(str, Enum):
     """ML model types."""
+
     CLASSIFICATION = "classification"
     SEGMENTATION = "segmentation"
     DETECTION = "detection"
     REGRESSION = "regression"
 
+
 class ModelStatus(str, Enum):
     """ML model status."""
+
     ACTIVE = "active"
     INACTIVE = "inactive"
     TRAINING = "training"
     DEPRECATED = "deprecated"
 
+
 ECG_SAMPLE_RATES = [250, 500, 1000]
 ECG_STANDARD_DURATION = 10  # seconds
-ECG_MINIMUM_DURATION = 5   # seconds
+ECG_MINIMUM_DURATION = 5  # seconds
 ECG_MAXIMUM_DURATION = 60  # seconds
 
 HEART_RATE_NORMAL_RANGE = (60, 100)  # bpm
@@ -172,14 +199,23 @@ ICD10_CODES = {
 SCP_ECG_CATEGORIES = {
     "NORMAL": ["NORM"],
     "ARRHYTHMIA": ["AFIB", "AFLT", "SVTAC", "VTAC", "BIGU", "TRIGU", "PVC", "PAC"],
-    "CONDUCTION_DISORDER": ["AVB1", "AVB2", "AVB3", "RBBB", "LBBB", "LAFB", "LPFB", "WPW"],
+    "CONDUCTION_DISORDER": [
+        "AVB1",
+        "AVB2",
+        "AVB3",
+        "RBBB",
+        "LBBB",
+        "LAFB",
+        "LPFB",
+        "WPW",
+    ],
     "ISCHEMIA": ["STEMI", "NSTEMI", "UAP", "ISCH", "QWAVE", "TWAVE"],
     "HYPERTROPHY": ["LVH", "RVH", "LAE", "RAE", "BIAE"],
     "AXIS_DEVIATION": ["LAD", "RAD", "EAXIS"],
     "REPOLARIZATION": ["LQTS", "SQTS", "EARLY", "TWAV", "UWAVE"],
     "PACEMAKER": ["PACE", "PACED", "PACEF"],
     "BUNDLE_BRANCH_BLOCK": ["RBBB", "LBBB", "IVCD", "BIFB"],
-    "OTHER": ["LOWV", "ARTIF", "NOISE", "POOR"]
+    "OTHER": ["LOWV", "ARTIF", "NOISE", "POOR"],
 }
 
 SCP_ECG_PERFORMANCE_TARGETS = {
@@ -198,17 +234,21 @@ SCP_ECG_URGENCY_MAPPING = {
     "CRITICAL": ["VTAC", "VFIB", "AVB3", "STEMI", "ASYS", "TORSADES"],
     "HIGH": ["AFIB", "AFLT", "SVTAC", "NSTEMI", "UAP", "AVB2", "WPW"],
     "MEDIUM": ["PVC", "PAC", "AVB1", "RBBB", "LBBB", "LVH", "RVH"],
-    "LOW": ["NORM", "SINUS", "LOWV", "MINOR"]
+    "LOW": ["NORM", "SINUS", "LOWV", "MINOR"],
 }
 
-MEDICAL_DEVICE_STANDARD_IEC_60601_2_47 = "IEC_60601_2_47"  # International standard for ECG equipment
-REGULATORY_COMPLIANCE_ANVISA_RDC_185 = "ANVISA_RDC_185"    # Brazilian regulatory compliance
-DATA_PROTECTION_STANDARD_LGPD = "LGPD"                     # Brazilian data protection law
+MEDICAL_DEVICE_STANDARD_IEC_60601_2_47 = (
+    "IEC_60601_2_47"  # International standard for ECG equipment
+)
+REGULATORY_COMPLIANCE_ANVISA_RDC_185 = (
+    "ANVISA_RDC_185"  # Brazilian regulatory compliance
+)
+DATA_PROTECTION_STANDARD_LGPD = "LGPD"  # Brazilian data protection law
 
 ECG_FILTER_DIAGNOSTIC_HIGHPASS_HZ = 0.05  # CRITICAL for ST segment preservation
 ECG_FILTER_DIAGNOSTIC_LOWPASS_HZ = 150.0  # Diagnostic bandwidth
-ECG_FILTER_MONITORING_HIGHPASS_HZ = 0.5   # For monitoring mode
-ECG_POWER_LINE_FREQUENCY_HZ = 60          # Brazil standard
+ECG_FILTER_MONITORING_HIGHPASS_HZ = 0.5  # For monitoring mode
+ECG_POWER_LINE_FREQUENCY_HZ = 60  # Brazil standard
 
 ECG_MIN_QUALITY_SCORE = 0.7
 ECG_QUALITY_REJECT_THRESHOLD = 0.6
@@ -232,3 +272,7 @@ CACHE_TTL_SECONDS = 3600
 RATE_LIMIT_PER_MINUTE = 100
 RATE_LIMIT_PER_HOUR = 1000
 RATE_LIMIT_PER_DAY = 10000
+
+
+# Alias para compatibilidade
+DiagnosisCode = DiagnosisCategory

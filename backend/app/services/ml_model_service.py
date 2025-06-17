@@ -16,6 +16,7 @@ from app.utils.memory_monitor import MemoryMonitor
 
 logger = logging.getLogger(__name__)
 
+
 class MLModelService:
     """ML Model Service for ECG analysis using ONNX Runtime."""
 
@@ -53,20 +54,20 @@ class MLModelService:
     def _load_model(self, model_name: str, model_path: str) -> None:
         """Load a single ONNX model."""
         try:
-            providers = ['CPUExecutionProvider']
+            providers = ["CPUExecutionProvider"]
 
-            if ort.get_device() == 'GPU':
-                providers.insert(0, 'CUDAExecutionProvider')
+            if ort.get_device() == "GPU":
+                providers.insert(0, "CUDAExecutionProvider")
 
             session_options = ort.SessionOptions()
-            session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            session_options.graph_optimization_level = (
+                ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            )
             session_options.intra_op_num_threads = 4
             session_options.inter_op_num_threads = 2
 
             session = ort.InferenceSession(
-                model_path,
-                sess_options=session_options,
-                providers=providers
+                model_path, sess_options=session_options, providers=providers
             )
 
             self.models[model_name] = session
@@ -88,7 +89,9 @@ class MLModelService:
 
         except Exception as e:
             logger.error(f"Failed to load model {model_name}: {str(e)}")
-            raise MLModelException(f"Failed to load model {model_name}: {str(e)}") from e
+            raise MLModelException(
+                f"Failed to load model {model_name}: {str(e)}"
+            ) from e
 
     async def analyze_ecg(
         self,
@@ -164,7 +167,7 @@ class MLModelService:
         try:
             if ecg_data.shape[1] < 12:
                 padded_data = np.zeros((ecg_data.shape[0], 12), dtype=np.float32)
-                padded_data[:, :ecg_data.shape[1]] = ecg_data
+                padded_data[:, : ecg_data.shape[1]] = ecg_data
                 ecg_data = padded_data
             elif ecg_data.shape[1] > 12:
                 ecg_data = ecg_data[:, :12].astype(np.float32)
@@ -172,17 +175,20 @@ class MLModelService:
             target_sample_rate = 500
             if sample_rate != target_sample_rate:
                 from scipy import signal
+
                 num_samples = int(ecg_data.shape[0] * target_sample_rate / sample_rate)
                 ecg_data = signal.resample(ecg_data, num_samples, axis=0)
 
-            ecg_data = (ecg_data - np.mean(ecg_data, axis=0)) / (np.std(ecg_data, axis=0) + 1e-8)
+            ecg_data = (ecg_data - np.mean(ecg_data, axis=0)) / (
+                np.std(ecg_data, axis=0) + 1e-8
+            )
 
             target_length = 5000
             if ecg_data.shape[0] > target_length:
                 ecg_data = ecg_data[:target_length, :]
             elif ecg_data.shape[0] < target_length:
                 padded_data = np.zeros((target_length, 12), dtype=np.float32)
-                padded_data[:ecg_data.shape[0], :] = ecg_data
+                padded_data[: ecg_data.shape[0], :] = ecg_data
                 ecg_data = padded_data
 
             ecg_data = np.expand_dims(ecg_data.T, axis=0).astype(np.float32)
@@ -193,7 +199,9 @@ class MLModelService:
             logger.error(f"Preprocessing failed: {str(e)}")
             raise MLModelException(f"Preprocessing failed: {str(e)}") from e
 
-    async def _run_classification(self, data: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
+    async def _run_classification(
+        self, data: "np.ndarray[Any, np.dtype[np.float32]]"
+    ) -> dict[str, Any]:
         """Run ECG classification model."""
         try:
             model = self.models["ecg_classifier"]
@@ -236,7 +244,9 @@ class MLModelService:
             logger.error(f"Classification failed: {str(e)}")
             return {"predictions": {}, "confidence": 0.0}
 
-    async def _run_rhythm_detection(self, data: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
+    async def _run_rhythm_detection(
+        self, data: "np.ndarray[Any, np.dtype[np.float32]]"
+    ) -> dict[str, Any]:
         """Run rhythm detection model."""
         try:
             model = self.models["rhythm_detector"]
@@ -256,16 +266,22 @@ class MLModelService:
             ]
 
             rhythm_idx = np.argmax(rhythm_probs)
-            rhythm = rhythm_types[rhythm_idx] if rhythm_idx < len(rhythm_types) else "Unknown"
+            rhythm = (
+                rhythm_types[rhythm_idx]
+                if rhythm_idx < len(rhythm_types)
+                else "Unknown"
+            )
 
             events = []
             if rhythm != "Sinus Rhythm" and rhythm_probs[rhythm_idx] > 0.7:
-                events.append({
-                    "label": f"{rhythm}_detected",
-                    "time_ms": 0.0,
-                    "confidence": float(rhythm_probs[rhythm_idx]),
-                    "properties": {"rhythm_type": rhythm},
-                })
+                events.append(
+                    {
+                        "label": f"{rhythm}_detected",
+                        "time_ms": 0.0,
+                        "confidence": float(rhythm_probs[rhythm_idx]),
+                        "properties": {"rhythm_type": rhythm},
+                    }
+                )
 
             return {
                 "rhythm": rhythm,
@@ -277,7 +293,9 @@ class MLModelService:
             logger.error(f"Rhythm detection failed: {str(e)}")
             return {"rhythm": "Unknown", "events": []}
 
-    async def _run_quality_assessment(self, data: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
+    async def _run_quality_assessment(
+        self, data: "np.ndarray[Any, np.dtype[np.float32]]"
+    ) -> dict[str, Any]:
         """Run signal quality assessment model."""
         try:
             model = self.models["quality_assessor"]
@@ -302,7 +320,9 @@ class MLModelService:
             return {"score": 0.5, "issues": ["Quality assessment unavailable"]}
 
     async def _generate_interpretability(
-        self, data: "np.ndarray[Any, np.dtype[np.float32]]", classification_results: dict[str, Any]
+        self,
+        data: "np.ndarray[Any, np.dtype[np.float32]]",
+        classification_results: dict[str, Any],
     ) -> dict[str, Any]:
         """Generate interpretability maps using SHAP-based explanations."""
         try:
@@ -310,27 +330,32 @@ class MLModelService:
 
             interpretability_service = InterpretabilityService()
 
-            signal = data[0].T  # Remove batch dimension and transpose back to (time, leads)
+            signal = data[
+                0
+            ].T  # Remove batch dimension and transpose back to (time, leads)
 
             features = self._extract_features_for_interpretability(signal)
 
-            explanation_result = await interpretability_service.generate_comprehensive_explanation(
-                signal=signal,
-                features=features,
-                predictions=classification_results["predictions"],
-                model_output=classification_results
+            explanation_result = (
+                await interpretability_service.generate_comprehensive_explanation(
+                    signal=signal,
+                    features=features,
+                    predictions=classification_results["predictions"],
+                    model_output=classification_results,
+                )
             )
 
             interpretability = {
                 "attention_maps": explanation_result.attention_maps,
                 "feature_importance": explanation_result.feature_importance,
-                "explanation": explanation_result.clinical_explanation or "AI detected patterns consistent with the predicted condition",
+                "explanation": explanation_result.clinical_explanation
+                or "AI detected patterns consistent with the predicted condition",
                 "shap_explanation": explanation_result.shap_explanation,
                 "lime_explanation": explanation_result.lime_explanation,
                 "clinical_explanation": explanation_result.clinical_explanation,
                 "diagnostic_criteria": explanation_result.diagnostic_criteria,
                 "risk_factors": explanation_result.risk_factors,
-                "recommendations": explanation_result.recommendations
+                "recommendations": explanation_result.recommendations,
             }
 
             return interpretability
@@ -341,54 +366,81 @@ class MLModelService:
                 "explanation": "Interpretability analysis unavailable",
                 "attention_maps": {},
                 "feature_importance": {},
-                "error": str(e)
+                "error": str(e),
             }
 
-    def _extract_features_for_interpretability(self, signal: "np.ndarray[Any, np.dtype[np.float32]]") -> dict[str, Any]:
+    def _extract_features_for_interpretability(
+        self, signal: "np.ndarray[Any, np.dtype[np.float32]]"
+    ) -> dict[str, Any]:
         """Extract basic features from ECG signal for interpretability analysis."""
         try:
             features: dict[str, Any] = {}
 
-            features['signal_length'] = int(signal.shape[0])
-            features['num_leads'] = int(signal.shape[1])
+            features["signal_length"] = int(signal.shape[0])
+            features["num_leads"] = int(signal.shape[1])
 
             if signal.shape[0] > 0:
                 lead_ii = signal[:, 1] if signal.shape[1] > 1 else signal[:, 0]
                 peaks = np.where(np.diff(np.sign(np.diff(lead_ii))) < 0)[0]
                 if len(peaks) > 1:
-                    rr_intervals = np.diff(peaks) / 500.0  # Assuming 500 Hz sampling rate
-                    features['heart_rate'] = float(60.0 / np.mean(rr_intervals)) if len(rr_intervals) > 0 else 70.0
-                    features['rr_mean'] = float(np.mean(rr_intervals) * 1000)  # Convert to ms
-                    features['rr_std'] = float(np.std(rr_intervals) * 1000)
+                    rr_intervals = (
+                        np.diff(peaks) / 500.0
+                    )  # Assuming 500 Hz sampling rate
+                    features["heart_rate"] = (
+                        float(60.0 / np.mean(rr_intervals))
+                        if len(rr_intervals) > 0
+                        else 70.0
+                    )
+                    features["rr_mean"] = float(
+                        np.mean(rr_intervals) * 1000
+                    )  # Convert to ms
+                    features["rr_std"] = float(np.std(rr_intervals) * 1000)
                 else:
-                    features['heart_rate'] = 70.0
-                    features['rr_mean'] = 857.0  # ~70 bpm
-                    features['rr_std'] = 50.0
+                    features["heart_rate"] = 70.0
+                    features["rr_mean"] = 857.0  # ~70 bpm
+                    features["rr_std"] = 50.0
 
-            for i, lead_name in enumerate(["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]):
+            for i, lead_name in enumerate(
+                [
+                    "I",
+                    "II",
+                    "III",
+                    "aVR",
+                    "aVL",
+                    "aVF",
+                    "V1",
+                    "V2",
+                    "V3",
+                    "V4",
+                    "V5",
+                    "V6",
+                ]
+            ):
                 if i < signal.shape[1]:
                     lead_signal = signal[:, i]
-                    features[f'{lead_name}_amplitude_max'] = float(np.max(lead_signal))
-                    features[f'{lead_name}_amplitude_min'] = float(np.min(lead_signal))
-                    features[f'{lead_name}_std'] = float(np.std(lead_signal))
+                    features[f"{lead_name}_amplitude_max"] = float(np.max(lead_signal))
+                    features[f"{lead_name}_amplitude_min"] = float(np.min(lead_signal))
+                    features[f"{lead_name}_std"] = float(np.std(lead_signal))
 
-            features['qrs_duration'] = 100.0  # Default values - would be calculated from actual signal
-            features['pr_interval'] = 160.0
-            features['qt_interval'] = 400.0
-            features['qtc'] = 420.0
-            features['qrs_axis'] = 60.0
+            features["qrs_duration"] = (
+                100.0  # Default values - would be calculated from actual signal
+            )
+            features["pr_interval"] = 160.0
+            features["qt_interval"] = 400.0
+            features["qtc"] = 420.0
+            features["qrs_axis"] = 60.0
 
-            features['st_elevation_max'] = 0.0
-            features['st_depression_max'] = 0.0
+            features["st_elevation_max"] = 0.0
+            features["st_depression_max"] = 0.0
 
             return features
 
         except Exception as e:
             logger.error(f"Feature extraction failed: {str(e)}")
             return {
-                'heart_rate': 70.0,
-                'signal_length': int(signal.shape[0]) if signal.size > 0 else 0,
-                'num_leads': int(signal.shape[1]) if signal.size > 0 else 0
+                "heart_rate": 70.0,
+                "signal_length": int(signal.shape[0]) if signal.size > 0 else 0,
+                "num_leads": int(signal.shape[1]) if signal.size > 0 else 0,
             }
 
     def get_model_info(self) -> dict[str, Any]:

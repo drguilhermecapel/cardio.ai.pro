@@ -14,14 +14,16 @@ class SignalQualityAssessment:
     def __init__(self, sampling_rate: int = 500):
         self.fs = sampling_rate
         self.quality_thresholds = {
-            'snr': 10,          # dB
-            'baseline_power': 0.1,  # Potência relativa
-            'saturation': 0.05,     # 5% de amostras saturadas
-            'flatline': 0.1,        # 10% de sinal flat
-            'noise_level': 0.2      # mV
+            "snr": 10,  # dB
+            "baseline_power": 0.1,  # Potência relativa
+            "saturation": 0.05,  # 5% de amostras saturadas
+            "flatline": 0.1,  # 10% de sinal flat
+            "noise_level": 0.2,  # mV
         }
 
-    def assess_comprehensive(self, ecg_leads: dict[str, NDArray[np.floating[Any]]]) -> dict[str, Any]:
+    def assess_comprehensive(
+        self, ecg_leads: dict[str, NDArray[np.floating[Any]]]
+    ) -> dict[str, Any]:
         """
         Avaliação completa de qualidade multi-derivação
 
@@ -32,81 +34,90 @@ class SignalQualityAssessment:
             Relatório detalhado de qualidade
         """
         report = {
-            'timestamp': np.datetime64('now'),
-            'overall_quality': 0.0,
-            'lead_quality': {},
-            'issues': [],
-            'recommendations': []
+            "timestamp": np.datetime64("now"),
+            "overall_quality": 0.0,
+            "lead_quality": {},
+            "issues": [],
+            "recommendations": [],
         }
 
         for lead_name, signal_data in ecg_leads.items():
             lead_report = self._assess_single_lead(lead_name, signal_data)
-            lead_quality = report.get('lead_quality')
+            lead_quality = report.get("lead_quality")
             if isinstance(lead_quality, dict):
                 lead_quality[lead_name] = lead_report
 
-            if lead_report['quality_score'] < 0.7:
-                if isinstance(report['issues'], list) and isinstance(lead_report['issues'], list):
-                    report['issues'].extend(lead_report['issues'])
+            if lead_report["quality_score"] < 0.7:
+                if isinstance(report["issues"], list) and isinstance(
+                    lead_report["issues"], list
+                ):
+                    report["issues"].extend(lead_report["issues"])
 
-        if isinstance(report['lead_quality'], dict):
-            quality_scores = [lead_data['quality_score'] for lead_data in report['lead_quality'].values()]
+        if isinstance(report["lead_quality"], dict):
+            quality_scores = [
+                lead_data["quality_score"]
+                for lead_data in report["lead_quality"].values()
+            ]
         else:
             quality_scores = [0.0]
-        report['overall_quality'] = np.mean(quality_scores)
+        report["overall_quality"] = np.mean(quality_scores)
 
-        report['recommendations'] = self._generate_recommendations(report)
+        report["recommendations"] = self._generate_recommendations(report)
 
-        if isinstance(report['overall_quality'], int | float):
-            report['acceptable_for_diagnosis'] = report['overall_quality'] >= 0.7
+        if isinstance(report["overall_quality"], int | float):
+            report["acceptable_for_diagnosis"] = report["overall_quality"] >= 0.7
         else:
-            report['acceptable_for_diagnosis'] = False
+            report["acceptable_for_diagnosis"] = False
 
         return report
 
-    def _assess_single_lead(self, lead_name: str, signal_data: NDArray[np.floating[Any]]) -> dict[str, Any]:
+    def _assess_single_lead(
+        self, lead_name: str, signal_data: NDArray[np.floating[Any]]
+    ) -> dict[str, Any]:
         """Avaliar qualidade de uma derivação"""
         metrics = {}
         issues = []
 
         snr = self._calculate_snr(signal_data)
-        metrics['snr'] = snr
-        if snr < self.quality_thresholds['snr']:
+        metrics["snr"] = snr
+        if snr < self.quality_thresholds["snr"]:
             issues.append(f"SNR baixo em {lead_name}: {snr:.1f} dB")
 
         saturation_ratio = self._detect_saturation(signal_data)
-        metrics['saturation'] = saturation_ratio
-        if saturation_ratio > self.quality_thresholds['saturation']:
-            issues.append(f"Saturação detectada em {lead_name}: {saturation_ratio*100:.1f}%")
+        metrics["saturation"] = saturation_ratio
+        if saturation_ratio > self.quality_thresholds["saturation"]:
+            issues.append(
+                f"Saturação detectada em {lead_name}: {saturation_ratio*100:.1f}%"
+            )
 
         is_flatline = self._detect_flatline(signal_data)
-        metrics['flatline'] = is_flatline
+        metrics["flatline"] = is_flatline
         if is_flatline:
             issues.append(f"Possível eletrodo desconectado em {lead_name}")
 
         noise_level = self._estimate_noise_level(signal_data)
-        metrics['noise_level'] = noise_level
-        if noise_level > self.quality_thresholds['noise_level']:
+        metrics["noise_level"] = noise_level
+        if noise_level > self.quality_thresholds["noise_level"]:
             issues.append(f"Ruído excessivo em {lead_name}: {noise_level:.3f} mV")
 
         baseline_power = self._assess_baseline_wander(signal_data)
-        metrics['baseline_wander'] = baseline_power
-        if baseline_power > self.quality_thresholds['baseline_power']:
+        metrics["baseline_wander"] = baseline_power
+        if baseline_power > self.quality_thresholds["baseline_power"]:
             issues.append(f"Oscilação de linha de base em {lead_name}")
 
         quality_score = self._calculate_quality_score(metrics)
 
         return {
-            'lead_name': lead_name,
-            'quality_score': quality_score,
-            'metrics': metrics,
-            'issues': issues
+            "lead_name": lead_name,
+            "quality_score": quality_score,
+            "metrics": metrics,
+            "issues": issues,
         }
 
     def _calculate_snr(self, signal_data: NDArray[np.floating[Any]]) -> float:
         """Calcular SNR usando método de banda QRS"""
         try:
-            sos = butter(3, [5, 40], 'bandpass', fs=self.fs, output='sos')
+            sos = butter(3, [5, 40], "bandpass", fs=self.fs, output="sos")
             qrs_band = sosfiltfilt(sos, signal_data)
 
             noise = signal_data - qrs_band
@@ -145,7 +156,7 @@ class SignalQualityAssessment:
             variances = []
 
             for i in range(0, len(signal_data) - window_size, window_size // 2):
-                window = signal_data[i:i + window_size]
+                window = signal_data[i : i + window_size]
                 variances.append(np.var(window))
 
             low_variance_threshold = np.var(signal_data) * 0.01
@@ -170,7 +181,7 @@ class SignalQualityAssessment:
     def _assess_baseline_wander(self, signal_data: NDArray[np.floating[Any]]) -> float:
         """Avaliar oscilação de linha de base"""
         try:
-            sos = butter(2, 0.5, 'lp', fs=self.fs, output='sos')
+            sos = butter(2, 0.5, "lp", fs=self.fs, output="sos")
             baseline = sosfiltfilt(sos, signal_data)
 
             baseline_power = np.var(baseline)
@@ -188,19 +199,19 @@ class SignalQualityAssessment:
         try:
             scores = []
 
-            snr_score = min(metrics['snr'] / 20.0, 1.0)  # 20 dB = score 1.0
+            snr_score = min(metrics["snr"] / 20.0, 1.0)  # 20 dB = score 1.0
             scores.append(snr_score)
 
-            saturation_score = 1.0 - min(metrics['saturation'] / 0.1, 1.0)
+            saturation_score = 1.0 - min(metrics["saturation"] / 0.1, 1.0)
             scores.append(saturation_score)
 
-            flatline_score = 0.0 if metrics['flatline'] else 1.0
+            flatline_score = 0.0 if metrics["flatline"] else 1.0
             scores.append(flatline_score)
 
-            noise_score = 1.0 - min(metrics['noise_level'] / 0.5, 1.0)
+            noise_score = 1.0 - min(metrics["noise_level"] / 0.5, 1.0)
             scores.append(noise_score)
 
-            baseline_score = 1.0 - min(metrics['baseline_wander'] / 0.2, 1.0)
+            baseline_score = 1.0 - min(metrics["baseline_wander"] / 0.2, 1.0)
             scores.append(baseline_score)
 
             weights = [0.3, 0.2, 0.2, 0.15, 0.15]
@@ -215,29 +226,38 @@ class SignalQualityAssessment:
         """Gerar recomendações baseadas nos problemas encontrados"""
         recommendations = []
 
-        if report['overall_quality'] < 0.7:
+        if report["overall_quality"] < 0.7:
             recommendations.append("Qualidade geral inadequada para diagnóstico")
 
-        all_issues = report['issues']
+        all_issues = report["issues"]
 
-        if any('SNR baixo' in issue for issue in all_issues):
-            recommendations.append("Verificar conexões dos eletrodos e reduzir interferências")
+        if any("SNR baixo" in issue for issue in all_issues):
+            recommendations.append(
+                "Verificar conexões dos eletrodos e reduzir interferências"
+            )
 
-        if any('Saturação' in issue for issue in all_issues):
-            recommendations.append("Ajustar ganho do amplificador ou verificar eletrodos")
+        if any("Saturação" in issue for issue in all_issues):
+            recommendations.append(
+                "Ajustar ganho do amplificador ou verificar eletrodos"
+            )
 
-        if any('eletrodo desconectado' in issue for issue in all_issues):
+        if any("eletrodo desconectado" in issue for issue in all_issues):
             recommendations.append("Verificar conexão e aderência dos eletrodos")
 
-        if any('Ruído excessivo' in issue for issue in all_issues):
-            recommendations.append("Reduzir fontes de interferência e verificar aterramento")
+        if any("Ruído excessivo" in issue for issue in all_issues):
+            recommendations.append(
+                "Reduzir fontes de interferência e verificar aterramento"
+            )
 
-        if any('linha de base' in issue for issue in all_issues):
-            recommendations.append("Verificar respiração do paciente e posicionamento dos eletrodos")
+        if any("linha de base" in issue for issue in all_issues):
+            recommendations.append(
+                "Verificar respiração do paciente e posicionamento dos eletrodos"
+            )
 
         return recommendations
 
 
 class MedicalGradeSignalQuality(SignalQualityAssessment):
     """Backward compatible alias for SignalQualityAssessment."""
+
     pass

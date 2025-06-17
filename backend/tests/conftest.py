@@ -31,6 +31,7 @@ from app.models import Base
 def event_loop():
     """Create event loop for async tests."""
     import asyncio
+
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
@@ -40,16 +41,14 @@ def event_loop():
 async def async_db_engine():
     """Create async database engine for tests."""
     engine = create_async_engine(
-        "sqlite+aiosqlite:///:memory:",
-        echo=False,
-        future=True
+        "sqlite+aiosqlite:///:memory:", echo=False, future=True
     )
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     yield engine
-    
+
     await engine.dispose()
 
 
@@ -57,11 +56,9 @@ async def async_db_engine():
 async def async_db_session(async_db_engine):
     """Create async database session for tests."""
     async_session = sessionmaker(
-        async_db_engine,
-        class_=AsyncSession,
-        expire_on_commit=False
+        async_db_engine, class_=AsyncSession, expire_on_commit=False
     )
-    
+
     async with async_session() as session:
         yield session
 
@@ -98,15 +95,16 @@ def mock_minio():
 def mock_ml_service():
     """Mock ML model service."""
     ml_mock = MagicMock()
-    ml_mock.predict_arrhythmia = AsyncMock(return_value={
-        "prediction": "normal",
-        "confidence": 0.95,
-        "probabilities": {"normal": 0.95, "afib": 0.05}
-    })
-    ml_mock.predict_pathology = AsyncMock(return_value={
-        "predictions": [],
-        "confidence": 0.90
-    })
+    ml_mock.predict_arrhythmia = AsyncMock(
+        return_value={
+            "prediction": "normal",
+            "confidence": 0.95,
+            "probabilities": {"normal": 0.95, "afib": 0.05},
+        }
+    )
+    ml_mock.predict_pathology = AsyncMock(
+        return_value={"predictions": [], "confidence": 0.90}
+    )
     return ml_mock
 
 
@@ -116,12 +114,14 @@ def mock_ecg_processor():
     processor_mock = MagicMock()
     processor_mock.load_ecg_file = AsyncMock()
     processor_mock.preprocess_signal = AsyncMock()
-    processor_mock.extract_features = AsyncMock(return_value={
-        "heart_rate": 72,
-        "pr_interval": 160,
-        "qrs_duration": 90,
-        "qt_interval": 400
-    })
+    processor_mock.extract_features = AsyncMock(
+        return_value={
+            "heart_rate": 72,
+            "pr_interval": 160,
+            "qrs_duration": 90,
+            "qt_interval": 400,
+        }
+    )
     return processor_mock
 
 
@@ -129,11 +129,25 @@ def mock_ecg_processor():
 def sample_ecg_data():
     """Sample ECG data for testing."""
     import numpy as np
+
     return {
         "signal": np.random.randn(5000, 12),
         "sampling_rate": 500,
         "duration": 10.0,
-        "leads": ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+        "leads": [
+            "I",
+            "II",
+            "III",
+            "aVR",
+            "aVL",
+            "aVF",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "V5",
+            "V6",
+        ],
     }
 
 
@@ -144,7 +158,7 @@ def sample_user_data():
         "email": "test@example.com",
         "password": "testpass123",
         "full_name": "Test User",
-        "role": "physician"
+        "role": "physician",
     }
 
 
@@ -156,30 +170,24 @@ def sample_patient_data():
         "birth_date": "1980-01-01",
         "gender": "M",
         "medical_record_number": "MRN123456",
-        "contact_info": {
-            "phone": "+1234567890",
-            "email": "john.doe@example.com"
-        }
+        "contact_info": {"phone": "+1234567890", "email": "john.doe@example.com"},
     }
 
 
 # Skip markers for different test categories
 skip_db_tests = pytest.mark.skipif(
-    os.getenv("SKIP_DB_TESTS", "").lower() == "true",
-    reason="Database tests skipped"
+    os.getenv("SKIP_DB_TESTS", "").lower() == "true", reason="Database tests skipped"
 )
 
 skip_api_tests = pytest.mark.skipif(
-    os.getenv("SKIP_API_TESTS", "").lower() == "true",
-    reason="API tests skipped"
+    os.getenv("SKIP_API_TESTS", "").lower() == "true", reason="API tests skipped"
 )
 
 skip_slow_tests = pytest.mark.skipif(
-    os.getenv("SKIP_SLOW_TESTS", "").lower() == "true",
-    reason="Slow tests skipped"
+    os.getenv("SKIP_SLOW_TESTS", "").lower() == "true", reason="Slow tests skipped"
 )
 
 skip_integration_tests = pytest.mark.skipif(
     os.getenv("SKIP_INTEGRATION_TESTS", "").lower() == "true",
-    reason="Integration tests skipped"
+    reason="Integration tests skipped",
 )

@@ -21,6 +21,7 @@ from app.services.user_service import UserService
 
 router = APIRouter()
 
+
 @router.post("/", response_model=Patient)
 async def create_patient(
     patient_data: PatientCreate,
@@ -33,12 +34,12 @@ async def create_patient(
     existing = await patient_service.get_patient_by_patient_id(patient_data.patient_id)
     if existing:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Patient ID already exists"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Patient ID already exists"
         )
 
     patient = await patient_service.create_patient(patient_data, current_user.id)
     return patient
+
 
 @router.get("/{patient_id}", response_model=Patient)
 async def get_patient(
@@ -52,11 +53,11 @@ async def get_patient(
     patient = await patient_service.get_patient_by_patient_id(patient_id)
     if not patient:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Patient not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
         )
 
     return patient
+
 
 @router.put("/{patient_id}", response_model=Patient)
 async def update_patient(
@@ -71,14 +72,14 @@ async def update_patient(
     patient = await patient_service.get_patient_by_patient_id(patient_id)
     if not patient:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Patient not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
         )
 
     update_data = patient_update.dict(exclude_unset=True)
     updated_patient = await patient_service.update_patient(patient.id, update_data)
 
     return updated_patient
+
 
 @router.get("/", response_model=PatientList)
 async def list_patients(
@@ -99,6 +100,7 @@ async def list_patients(
         page=offset // limit + 1,
         size=limit,
     )
+
 
 @router.post("/search", response_model=PatientList)
 async def search_patients(
@@ -123,6 +125,7 @@ async def search_patients(
         size=limit,
     )
 
+
 @router.get("/{patient_id}/ecg-analyses")
 async def get_patient_ecg_analyses(
     patient_id: str,
@@ -142,8 +145,7 @@ async def get_patient_ecg_analyses(
     patient = await patient_service.get_patient_by_patient_id(patient_id)
     if not patient:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Patient not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
         )
 
     ml_service = MLModelService()
@@ -157,6 +159,7 @@ async def get_patient_ecg_analyses(
     analyses, total = await ecg_service.search_analyses(filters, limit, offset)
 
     from app.schemas.ecg_analysis import ECGAnalysis, ECGAnalysisList
+
     analyses_schemas = [ECGAnalysis.from_orm(a) for a in analyses]
     return ECGAnalysisList(
         analyses=analyses_schemas,

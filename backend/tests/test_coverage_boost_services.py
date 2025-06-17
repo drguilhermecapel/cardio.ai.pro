@@ -20,11 +20,13 @@ from app.models.validation import Validation
 def mock_ml_service():
     """Mock ML service."""
     service = Mock()
-    service.analyze_ecg = AsyncMock(return_value={
-        "predictions": {"normal": 0.95},
-        "confidence": 0.95,
-        "rhythm": "sinus"
-    })
+    service.analyze_ecg = AsyncMock(
+        return_value={
+            "predictions": {"normal": 0.95},
+            "confidence": 0.95,
+            "rhythm": "sinus",
+        }
+    )
     return service
 
 
@@ -51,48 +53,59 @@ def ecg_service(test_db, mock_ml_service, mock_validation_service):
     return ECGAnalysisService(
         db=test_db,
         ml_service=mock_ml_service,
-        validation_service=mock_validation_service
+        validation_service=mock_validation_service,
     )
 
 
 @pytest.fixture
 def validation_service(test_db, mock_notification_service):
     """Validation service with mocked dependencies."""
-    return ValidationService(
-        db=test_db,
-        notification_service=mock_notification_service
-    )
+    return ValidationService(db=test_db, notification_service=mock_notification_service)
 
 
 @pytest.fixture
 def user_service(test_db):
     """User service."""
     from app.services.user_service import UserService
+
     return UserService(db=test_db)
 
 
 @pytest.mark.asyncio
 async def test_ecg_service_create_analysis_comprehensive(ecg_service, test_db):
     """Test comprehensive ECG analysis creation."""
-    with patch('app.utils.ecg_processor.ECGProcessor') as mock_processor, \
-         patch('app.services.ecg_service.ECGAnalysisService._calculate_file_info') as mock_file_info, \
-         patch('os.path.exists', return_value=True):
-        
+    with patch("app.utils.ecg_processor.ECGProcessor") as mock_processor, patch(
+        "app.services.ecg_service.ECGAnalysisService._calculate_file_info"
+    ) as mock_file_info, patch("os.path.exists", return_value=True):
+
         mock_file_info.return_value = ("test_hash", 1024)
         mock_processor.return_value.extract_metadata.return_value = {
             "sample_rate": 500,
             "duration_seconds": 10.0,
             "leads_count": 12,
-            "leads_names": ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
+            "leads_names": [
+                "I",
+                "II",
+                "III",
+                "aVR",
+                "aVL",
+                "aVF",
+                "V1",
+                "V2",
+                "V3",
+                "V4",
+                "V5",
+                "V6",
+            ],
         }
-        
+
         result = await ecg_service.create_analysis(
             patient_id=1,
             file_path="/tmp/test_ecg.txt",
             original_filename="test_ecg.txt",
-            created_by=1
+            created_by=1,
         )
-        
+
         assert result is not None
         assert result.patient_id == 1
 
@@ -112,23 +125,34 @@ async def test_ecg_service_search_analyses_comprehensive(ecg_service, test_db):
             sample_rate=500,
             duration_seconds=10.0,
             leads_count=12,
-            leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+            leads_names=[
+                "I",
+                "II",
+                "III",
+                "aVR",
+                "aVL",
+                "aVF",
+                "V1",
+                "V2",
+                "V3",
+                "V4",
+                "V5",
+                "V6",
+            ],
             status="completed",
             rhythm="sinus",
             heart_rate_bpm=72,
             signal_quality_score=0.88,
-            created_by=1
+            created_by=1,
         )
         test_db.add(analysis)
-    
+
     await test_db.commit()
-    
+
     results, total = await ecg_service.search_analyses(
-        filters={"status": "completed"},
-        limit=10,
-        offset=0
+        filters={"status": "completed"}, limit=10, offset=0
     )
-    
+
     assert len(results) >= 5
 
 
@@ -148,24 +172,41 @@ async def test_ecg_service_get_analysis_statistics(ecg_service, test_db):
             sample_rate=500,
             duration_seconds=10.0,
             leads_count=12,
-            leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+            leads_names=[
+                "I",
+                "II",
+                "III",
+                "aVR",
+                "aVL",
+                "aVF",
+                "V1",
+                "V2",
+                "V3",
+                "V4",
+                "V5",
+                "V6",
+            ],
             status=status,
             rhythm="sinus",
             heart_rate_bpm=72,
             signal_quality_score=0.88,
-            created_by=1
+            created_by=1,
         )
         test_db.add(analysis)
-    
+
     await test_db.commit()
-    
-    analyses = await ecg_service.get_analyses_by_patient(patient_id=1, limit=10, offset=0)
-    
+
+    analyses = await ecg_service.get_analyses_by_patient(
+        patient_id=1, limit=10, offset=0
+    )
+
     assert len(analyses) >= 3
 
 
 @pytest.mark.asyncio
-async def test_validation_service_create_validation_comprehensive(validation_service, test_db):
+async def test_validation_service_create_validation_comprehensive(
+    validation_service, test_db
+):
     """Test comprehensive validation creation."""
     analysis = ECGAnalysis(
         analysis_id="validation_test_001",
@@ -178,24 +219,37 @@ async def test_validation_service_create_validation_comprehensive(validation_ser
         sample_rate=500,
         duration_seconds=10.0,
         leads_count=12,
-        leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+        leads_names=[
+            "I",
+            "II",
+            "III",
+            "aVR",
+            "aVL",
+            "aVF",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "V5",
+            "V6",
+        ],
         status="completed",
         rhythm="sinus",
         heart_rate_bpm=72,
         signal_quality_score=0.88,
-        created_by=1
+        created_by=1,
     )
     test_db.add(analysis)
     await test_db.commit()
     await test_db.refresh(analysis)
-    
+
     result = await validation_service.create_validation(
         analysis_id=analysis.id,
         validator_id=1,
         validator_role=UserRoles.PHYSICIAN,
-        validator_experience_years=5
+        validator_experience_years=5,
     )
-    
+
     assert result is not None
     assert result.analysis_id == analysis.id
 
@@ -214,26 +268,39 @@ async def test_validation_service_get_pending_validations(validation_service, te
         sample_rate=500,
         duration_seconds=10.0,
         leads_count=12,
-        leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+        leads_names=[
+            "I",
+            "II",
+            "III",
+            "aVR",
+            "aVL",
+            "aVF",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "V5",
+            "V6",
+        ],
         status="completed",
         rhythm="sinus",
         heart_rate_bpm=72,
         signal_quality_score=0.88,
-        created_by=1
+        created_by=1,
     )
     test_db.add(analysis)
     await test_db.commit()
     await test_db.refresh(analysis)
-    
+
     validation = Validation(
         analysis_id=analysis.id,
         validator_id=1,
         status="pending",
-        clinical_notes="Pending validation"
+        clinical_notes="Pending validation",
     )
     test_db.add(validation)
     await test_db.commit()
-    
+
     result = await validation_service.submit_validation(
         validation_id=validation.id,
         validator_id=1,
@@ -241,10 +308,10 @@ async def test_validation_service_get_pending_validations(validation_service, te
             "approved": True,
             "clinical_notes": "Test validation completed",
             "agrees_with_ai": True,
-            "signal_quality_rating": 4
-        }
+            "signal_quality_rating": 4,
+        },
     )
-    
+
     assert result is not None
     assert result.status == "approved"
 
@@ -258,11 +325,11 @@ async def test_user_service_create_user_comprehensive(user_service, test_db):
         first_name="Test",
         last_name="User",
         password="SecurePass123!",
-        role=UserRoles.PHYSICIAN
+        role=UserRoles.PHYSICIAN,
     )
-    
+
     result = await user_service.create_user(user_data)
-    
+
     assert result is not None
     assert result.username == "testuser_comprehensive"
     assert result.email == "test_comprehensive@example.com"
@@ -277,13 +344,13 @@ async def test_user_service_authenticate_user(user_service, test_db):
         first_name="Auth",
         last_name="Test",
         password="Password123!",
-        role=UserRoles.PHYSICIAN
+        role=UserRoles.PHYSICIAN,
     )
-    
+
     created_user = await user_service.create_user(user_data)
-    
+
     authenticated = await user_service.authenticate_user("authtest", "Password123!")
-    
+
     assert authenticated is not None
     assert authenticated.username == "authtest"
 
@@ -297,13 +364,13 @@ async def test_user_service_get_user_by_email(user_service, test_db):
         first_name="Update",
         last_name="Test",
         password="Password123!",
-        role=UserRoles.PHYSICIAN
+        role=UserRoles.PHYSICIAN,
     )
-    
+
     created_user = await user_service.create_user(user_data)
-    
+
     found_user = await user_service.get_user_by_email("updatetest@example.com")
-    
+
     assert found_user is not None
     assert found_user.email == "updatetest@example.com"
 
@@ -318,12 +385,12 @@ async def test_user_service_get_user_by_username(user_service, test_db):
             first_name=f"Stats",
             last_name=f"User{i}",
             password="Password123!",
-            role=UserRoles.PHYSICIAN if i % 2 == 0 else UserRoles.TECHNICIAN
+            role=UserRoles.PHYSICIAN if i % 2 == 0 else UserRoles.TECHNICIAN,
         )
         await user_service.create_user(user_data)
-    
+
     found_user = await user_service.get_user_by_username("statsuser_0")
-    
+
     assert found_user is not None
     assert found_user.username == "statsuser_0"
 
@@ -337,11 +404,11 @@ async def test_user_service_update_last_login(user_service, test_db):
         first_name="Deactivate",
         last_name="Test",
         password="Password123!",
-        role=UserRoles.PHYSICIAN
+        role=UserRoles.PHYSICIAN,
     )
-    
+
     created_user = await user_service.create_user(user_data)
-    
+
     await user_service.update_last_login(created_user.id)
-    
+
     assert True

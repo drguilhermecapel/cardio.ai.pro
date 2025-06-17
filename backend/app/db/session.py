@@ -16,6 +16,7 @@ from sqlalchemy.pool import NullPool
 _engine: AsyncEngine | None = None
 _session_factory: async_sessionmaker[AsyncSession] | None = None
 
+
 @lru_cache(maxsize=1)
 def get_engine() -> AsyncEngine:
     """
@@ -43,7 +44,7 @@ def get_engine() -> AsyncEngine:
             connect_args = {
                 "server_settings": {
                     "application_name": "CardioAI_Pro_v1",
-                    "jit": "off"
+                    "jit": "off",
                 },
                 "command_timeout": 60,
             }
@@ -77,10 +78,11 @@ def get_engine() -> AsyncEngine:
             poolclass=NullPool if settings.ENVIRONMENT == "test" else None,
             pool_pre_ping=True,
             pool_recycle=300,
-            connect_args=connect_args
+            connect_args=connect_args,
         )
 
     return _engine
+
 
 def get_session_factory() -> async_sessionmaker[AsyncSession]:
     """
@@ -101,6 +103,7 @@ def get_session_factory() -> async_sessionmaker[AsyncSession]:
         )
 
     return _session_factory
+
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """

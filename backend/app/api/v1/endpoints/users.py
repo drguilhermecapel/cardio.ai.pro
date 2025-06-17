@@ -16,12 +16,14 @@ from app.services.user_service import UserService
 
 router = APIRouter()
 
+
 @router.get("/me", response_model=UserSchema)
 async def get_current_user_info(
     current_user: User = Depends(UserService.get_current_user),
 ) -> Any:
     """Get current user information."""
     return current_user
+
 
 @router.put("/me", response_model=UserSchema)
 async def update_current_user(
@@ -34,14 +36,17 @@ async def update_current_user(
 
     update_data = user_update.dict(exclude_unset=True)
 
-    updated_user = await user_service.repository.update_user(current_user.id, update_data)
+    updated_user = await user_service.repository.update_user(
+        current_user.id, update_data
+    )
     if not updated_user:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update user"
+            detail="Failed to update user",
         )
 
     return updated_user
+
 
 @router.post("/me/change-password")
 async def change_password(
@@ -53,19 +58,21 @@ async def change_password(
     user_service = UserService(db)
 
     from app.core.security import get_password_hash, verify_password
-    if not verify_password(password_data.current_password, current_user.hashed_password):
+
+    if not verify_password(
+        password_data.current_password, current_user.hashed_password
+    ):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect current password"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect current password"
         )
 
     new_hashed_password = get_password_hash(password_data.new_password)
     await user_service.repository.update_user(
-        current_user.id,
-        {"hashed_password": new_hashed_password}
+        current_user.id, {"hashed_password": new_hashed_password}
     )
 
     return {"message": "Password changed successfully"}
+
 
 @router.get("/", response_model=UserList)
 async def list_users(
@@ -77,8 +84,7 @@ async def list_users(
     """List users (admin only)."""
     if current_user.role != UserRoles.ADMIN:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
         )
 
     user_service = UserService(db)
@@ -92,6 +98,7 @@ async def list_users(
         size=limit,
     )
 
+
 @router.get("/{user_id}", response_model=UserSchema)
 async def get_user(
     user_id: int,
@@ -101,8 +108,7 @@ async def get_user(
     """Get user by ID (admin only or own profile)."""
     if current_user.role != UserRoles.ADMIN and current_user.id != user_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
         )
 
     user_service = UserService(db)
@@ -110,8 +116,7 @@ async def get_user(
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
     return user

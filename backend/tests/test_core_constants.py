@@ -1,7 +1,13 @@
 import pytest
 from app.core.constants import (
-    UserRoles, AnalysisStatus, ClinicalUrgency, DiagnosisCategory,
-    NotificationType, NotificationPriority, ValidationStatus, ECGLeads
+    UserRoles,
+    AnalysisStatus,
+    ClinicalUrgency,
+    DiagnosisCategory,
+    NotificationType,
+    NotificationPriority,
+    ValidationStatus,
+    ECGLeads,
 )
 
 

@@ -18,15 +18,17 @@ logger = logging.getLogger(__name__)
 
 class AlertPriority(Enum):
     """Alert priority levels"""
-    CRITICAL = "critical"      # Life-threatening conditions
-    HIGH = "high"             # Urgent medical attention needed
-    MEDIUM = "medium"         # Important findings
-    LOW = "low"              # Minor abnormalities
-    INFO = "info"            # Informational alerts
+
+    CRITICAL = "critical"  # Life-threatening conditions
+    HIGH = "high"  # Urgent medical attention needed
+    MEDIUM = "medium"  # Important findings
+    LOW = "low"  # Minor abnormalities
+    INFO = "info"  # Informational alerts
 
 
 class AlertCategory(Enum):
     """Categories of ECG alerts"""
+
     ARRHYTHMIA = "arrhythmia"
     ISCHEMIA = "ischemia"
     CONDUCTION = "conduction"
@@ -38,6 +40,7 @@ class AlertCategory(Enum):
 @dataclass
 class AlertRule:
     """Configuration for alert generation rules"""
+
     condition_name: str
     priority: AlertPriority
     category: AlertCategory
@@ -52,6 +55,7 @@ class AlertRule:
 @dataclass
 class ECGAlert:
     """Individual ECG alert with contextual information"""
+
     alert_id: str
     timestamp: datetime
     priority: AlertPriority
@@ -95,12 +99,11 @@ class IntelligentAlertSystem:
                     "Initiate CPR immediately",
                     "Prepare for defibrillation",
                     "Call emergency response team",
-                    "Administer epinephrine as per protocol"
+                    "Administer epinephrine as per protocol",
                 ],
                 suppress_duration_minutes=1,
-                requires_confirmation=True
+                requires_confirmation=True,
             ),
-
             "ventricular_tachycardia": AlertRule(
                 condition_name="Ventricular Tachycardia",
                 priority=AlertPriority.CRITICAL,
@@ -112,11 +115,10 @@ class IntelligentAlertSystem:
                     "Assess patient consciousness and pulse",
                     "Prepare for cardioversion if unstable",
                     "Consider antiarrhythmic medications",
-                    "Continuous cardiac monitoring"
+                    "Continuous cardiac monitoring",
                 ],
-                suppress_duration_minutes=2
+                suppress_duration_minutes=2,
             ),
-
             "stemi": AlertRule(
                 condition_name="ST-Elevation Myocardial Infarction",
                 priority=AlertPriority.CRITICAL,
@@ -128,11 +130,10 @@ class IntelligentAlertSystem:
                     "Activate cardiac catheterization lab",
                     "Administer dual antiplatelet therapy",
                     "Consider thrombolytic therapy if PCI unavailable",
-                    "Serial cardiac enzymes and ECGs"
+                    "Serial cardiac enzymes and ECGs",
                 ],
-                suppress_duration_minutes=10
+                suppress_duration_minutes=10,
             ),
-
             "nstemi": AlertRule(
                 condition_name="Non-ST-Elevation Myocardial Infarction",
                 priority=AlertPriority.HIGH,
@@ -144,11 +145,10 @@ class IntelligentAlertSystem:
                     "Serial cardiac biomarkers",
                     "Risk stratification assessment",
                     "Consider early invasive strategy",
-                    "Anticoagulation therapy"
+                    "Anticoagulation therapy",
                 ],
-                suppress_duration_minutes=15
+                suppress_duration_minutes=15,
             ),
-
             "complete_heart_block": AlertRule(
                 condition_name="Complete Heart Block",
                 priority=AlertPriority.HIGH,
@@ -160,11 +160,10 @@ class IntelligentAlertSystem:
                     "Assess hemodynamic stability",
                     "Prepare for temporary pacing",
                     "Consider permanent pacemaker evaluation",
-                    "Monitor for escape rhythms"
+                    "Monitor for escape rhythms",
                 ],
-                suppress_duration_minutes=5
+                suppress_duration_minutes=5,
             ),
-
             "poor_signal_quality": AlertRule(
                 condition_name="Poor Signal Quality",
                 priority=AlertPriority.MEDIUM,
@@ -176,11 +175,10 @@ class IntelligentAlertSystem:
                     "Check electrode placement and contact",
                     "Reduce patient movement artifacts",
                     "Verify equipment connections",
-                    "Consider lead replacement if needed"
+                    "Consider lead replacement if needed",
                 ],
-                suppress_duration_minutes=3
+                suppress_duration_minutes=3,
             ),
-
             "electrode_disconnection": AlertRule(
                 condition_name="Electrode Disconnection",
                 priority=AlertPriority.HIGH,
@@ -192,16 +190,19 @@ class IntelligentAlertSystem:
                     "Check electrode connections immediately",
                     "Verify lead placement",
                     "Replace electrodes if necessary",
-                    "Resume monitoring once resolved"
+                    "Resume monitoring once resolved",
                 ],
-                suppress_duration_minutes=1
-            )
+                suppress_duration_minutes=1,
+            ),
         }
 
         return rules
 
-    def process_ecg_analysis(self, analysis_results: dict[str, Any],
-                           patient_context: dict[str, Any] | None = None) -> list[ECGAlert]:
+    def process_ecg_analysis(
+        self,
+        analysis_results: dict[str, Any],
+        patient_context: dict[str, Any] | None = None,
+    ) -> list[ECGAlert]:
         """
         Process ECG analysis results and generate intelligent alerts
 
@@ -216,35 +217,42 @@ class IntelligentAlertSystem:
         current_time = datetime.now()
 
         try:
-            ai_predictions = analysis_results.get('ai_results', {})
-            pathology_results = analysis_results.get('pathology_results', {})
-            quality_metrics = analysis_results.get('quality_metrics', {})
-            signal_data = analysis_results.get('preprocessed_signal')
+            ai_predictions = analysis_results.get("ai_results", {})
+            pathology_results = analysis_results.get("pathology_results", {})
+            quality_metrics = analysis_results.get("quality_metrics", {})
+            signal_data = analysis_results.get("preprocessed_signal")
 
             if pathology_results:
                 for condition, details in pathology_results.items():
-                    if isinstance(details, dict) and 'confidence' in details:
-                        confidence = details['confidence']
+                    if isinstance(details, dict) and "confidence" in details:
+                        confidence = details["confidence"]
                         alert = self._evaluate_condition_alert(
-                            condition, confidence, current_time,
-                            patient_context, signal_data, details
+                            condition,
+                            confidence,
+                            current_time,
+                            patient_context,
+                            signal_data,
+                            details,
                         )
                         if alert:
                             generated_alerts.append(alert)
 
-            if ai_predictions and 'predictions' in ai_predictions:
-                predictions = ai_predictions['predictions']
+            if ai_predictions and "predictions" in ai_predictions:
+                predictions = ai_predictions["predictions"]
                 for condition, confidence in predictions.items():
                     if isinstance(confidence, int | float):
                         alert = self._evaluate_condition_alert(
-                            condition, confidence, current_time,
-                            patient_context, signal_data
+                            condition,
+                            confidence,
+                            current_time,
+                            patient_context,
+                            signal_data,
                         )
                         if alert:
                             generated_alerts.append(alert)
 
             if quality_metrics:
-                quality_score = quality_metrics.get('quality_score', 1.0)
+                quality_score = quality_metrics.get("quality_score", 1.0)
                 if quality_score < 0.5:  # Poor quality threshold
                     alert = self._create_quality_alert(
                         quality_score, current_time, quality_metrics
@@ -260,7 +268,9 @@ class IntelligentAlertSystem:
             if filtered_alerts:
                 logger.info(f"Generated {len(filtered_alerts)} intelligent alerts")
                 for alert in filtered_alerts:
-                    logger.info(f"Alert: {alert.priority.value.upper()} - {alert.condition_name}")
+                    logger.info(
+                        f"Alert: {alert.priority.value.upper()} - {alert.condition_name}"
+                    )
 
             return filtered_alerts
 
@@ -268,10 +278,15 @@ class IntelligentAlertSystem:
             logger.error(f"Error processing ECG analysis for alerts: {e}")
             return []
 
-    def _evaluate_condition_alert(self, condition: str, confidence: float,
-                                timestamp: datetime, patient_context: dict[str, Any] | None,
-                                signal_data: npt.NDArray[np.float64] | None,
-                                details: dict[str, Any] | None = None) -> ECGAlert | None:
+    def _evaluate_condition_alert(
+        self,
+        condition: str,
+        confidence: float,
+        timestamp: datetime,
+        patient_context: dict[str, Any] | None,
+        signal_data: npt.NDArray[np.float64] | None,
+        details: dict[str, Any] | None = None,
+    ) -> ECGAlert | None:
         """
         Evaluate whether a condition warrants an alert
 
@@ -286,7 +301,7 @@ class IntelligentAlertSystem:
         Returns:
             ECGAlert if conditions are met, None otherwise
         """
-        condition_key = condition.lower().replace(' ', '_').replace('-', '_')
+        condition_key = condition.lower().replace(" ", "_").replace("-", "_")
 
         if condition_key not in self.alert_rules:
             if confidence > 0.8:
@@ -303,11 +318,11 @@ class IntelligentAlertSystem:
 
         alert_id = f"{condition_key}_{int(timestamp.timestamp())}"
 
-        message_kwargs = {'confidence': confidence}
-        if details and 'leads' in details:
-            message_kwargs['leads'] = ', '.join(details['leads'])
-        if 'quality' in (details or {}):
-            message_kwargs['quality'] = details['quality']
+        message_kwargs = {"confidence": confidence}
+        if details and "leads" in details:
+            message_kwargs["leads"] = ", ".join(details["leads"])
+        if "quality" in (details or {}):
+            message_kwargs["quality"] = details["quality"]
 
         try:
             formatted_message = rule.message_template.format(**message_kwargs)
@@ -326,7 +341,7 @@ class IntelligentAlertSystem:
             recommended_actions=rule.recommended_actions.copy(),
             patient_context=patient_context,
             ecg_segment=signal_data,
-            lead_information=details
+            lead_information=details,
         )
 
         self.suppressed_alerts[condition_key] = timestamp + timedelta(
@@ -335,8 +350,9 @@ class IntelligentAlertSystem:
 
         return alert
 
-    def _create_quality_alert(self, quality_score: float, timestamp: datetime,
-                            quality_metrics: dict[str, Any]) -> ECGAlert | None:
+    def _create_quality_alert(
+        self, quality_score: float, timestamp: datetime, quality_metrics: dict[str, Any]
+    ) -> ECGAlert | None:
         """Create alert for poor signal quality"""
         rule = self.alert_rules["poor_signal_quality"]
 
@@ -355,11 +371,12 @@ class IntelligentAlertSystem:
             priority=rule.priority,
             category=rule.category,
             condition_name=rule.condition_name,
-            confidence_score=1.0 - quality_score,  # Invert for confidence in poor quality
+            confidence_score=1.0
+            - quality_score,  # Invert for confidence in poor quality
             message=message,
             clinical_context=rule.clinical_context,
             recommended_actions=rule.recommended_actions.copy(),
-            lead_information=quality_metrics
+            lead_information=quality_metrics,
         )
 
         self.suppressed_alerts["poor_signal_quality"] = timestamp + timedelta(
@@ -368,8 +385,9 @@ class IntelligentAlertSystem:
 
         return alert
 
-    def _create_generic_alert(self, condition: str, confidence: float,
-                            timestamp: datetime) -> ECGAlert:
+    def _create_generic_alert(
+        self, condition: str, confidence: float, timestamp: datetime
+    ) -> ECGAlert:
         """Create a generic alert for unknown conditions"""
         alert_id = f"generic_{condition.lower()}_{int(timestamp.timestamp())}"
 
@@ -385,8 +403,8 @@ class IntelligentAlertSystem:
             recommended_actions=[
                 "Review ECG manually",
                 "Consider clinical correlation",
-                "Consult cardiology if indicated"
-            ]
+                "Consult cardiology if indicated",
+            ],
         )
 
     def _is_alert_suppressed(self, condition_key: str, current_time: datetime) -> bool:
@@ -415,7 +433,7 @@ class IntelligentAlertSystem:
             AlertPriority.HIGH: 1,
             AlertPriority.MEDIUM: 2,
             AlertPriority.LOW: 3,
-            AlertPriority.INFO: 4
+            AlertPriority.INFO: 4,
         }
 
         sorted_alerts = sorted(alerts, key=lambda x: priority_order[x.priority])
@@ -435,11 +453,15 @@ class IntelligentAlertSystem:
 
         return filtered_alerts
 
-    def _is_duplicate_alert(self, alert: ECGAlert, existing_alerts: list[ECGAlert]) -> bool:
+    def _is_duplicate_alert(
+        self, alert: ECGAlert, existing_alerts: list[ECGAlert]
+    ) -> bool:
         """Check if alert is a duplicate of existing alerts"""
         for existing in existing_alerts:
-            if (existing.condition_name == alert.condition_name and
-                existing.category == alert.category):
+            if (
+                existing.condition_name == alert.condition_name
+                and existing.category == alert.category
+            ):
                 return True
         return False
 
@@ -449,7 +471,7 @@ class IntelligentAlertSystem:
             AlertPriority.HIGH: 0.7,
             AlertPriority.MEDIUM: 0.75,
             AlertPriority.LOW: 0.8,
-            AlertPriority.INFO: 0.85
+            AlertPriority.INFO: 0.85,
         }
 
         threshold = confidence_thresholds.get(alert.priority, 0.5)
@@ -476,7 +498,9 @@ class IntelligentAlertSystem:
 
         return False
 
-    def get_active_alerts(self, priority_filter: AlertPriority | None = None) -> list[ECGAlert]:
+    def get_active_alerts(
+        self, priority_filter: AlertPriority | None = None
+    ) -> list[ECGAlert]:
         """
         Get currently active alerts
 
@@ -504,16 +528,20 @@ class IntelligentAlertSystem:
 
         priority_counts = {}
         for priority in AlertPriority:
-            priority_counts[priority.value] = len([
-                alert for alert in active_alerts if alert.priority == priority
-            ])
+            priority_counts[priority.value] = len(
+                [alert for alert in active_alerts if alert.priority == priority]
+            )
 
         return {
-            'total_active_alerts': len(active_alerts),
-            'priority_breakdown': priority_counts,
-            'total_alerts_generated': len(self.alert_history),
-            'suppressed_conditions': len(self.suppressed_alerts),
-            'last_alert_time': max([alert.timestamp for alert in self.alert_history]) if self.alert_history else None
+            "total_active_alerts": len(active_alerts),
+            "priority_breakdown": priority_counts,
+            "total_alerts_generated": len(self.alert_history),
+            "suppressed_conditions": len(self.suppressed_alerts),
+            "last_alert_time": (
+                max([alert.timestamp for alert in self.alert_history])
+                if self.alert_history
+                else None
+            ),
         }
 
     def clear_old_alerts(self, hours_old: int = 24) -> int:
@@ -528,8 +556,12 @@ class IntelligentAlertSystem:
         """
         cutoff_time = datetime.now() - timedelta(hours=hours_old)
 
-        old_alerts = [alert for alert in self.active_alerts if alert.timestamp < cutoff_time]
-        self.active_alerts = [alert for alert in self.active_alerts if alert.timestamp >= cutoff_time]
+        old_alerts = [
+            alert for alert in self.active_alerts if alert.timestamp < cutoff_time
+        ]
+        self.active_alerts = [
+            alert for alert in self.active_alerts if alert.timestamp >= cutoff_time
+        ]
 
         logger.info(f"Cleared {len(old_alerts)} old alerts")
         return len(old_alerts)
@@ -549,22 +581,16 @@ if __name__ == "__main__":
     alert_system = create_intelligent_alert_system()
 
     test_analysis = {
-        'ai_results': {
-            'predictions': {
-                'ventricular_fibrillation': 0.92,
-                'normal_sinus_rhythm': 0.05
+        "ai_results": {
+            "predictions": {
+                "ventricular_fibrillation": 0.92,
+                "normal_sinus_rhythm": 0.05,
             }
         },
-        'pathology_results': {
-            'stemi': {
-                'confidence': 0.85,
-                'leads': ['V1', 'V2', 'V3']
-            }
+        "pathology_results": {
+            "stemi": {"confidence": 0.85, "leads": ["V1", "V2", "V3"]}
         },
-        'quality_metrics': {
-            'quality_score': 0.25,
-            'meets_quality_threshold': False
-        }
+        "quality_metrics": {"quality_score": 0.25, "meets_quality_threshold": False},
     }
 
     alerts = alert_system.process_ecg_analysis(test_analysis)

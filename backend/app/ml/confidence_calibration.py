@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CalibrationMetrics:
     """Metrics for evaluating calibration quality"""
+
     expected_calibration_error: float
     maximum_calibration_error: float
     average_calibration_error: float
@@ -30,6 +31,7 @@ class CalibrationMetrics:
 @dataclass
 class CalibrationConfig:
     """Configuration for confidence calibration"""
+
     method: str = "platt"  # "platt", "isotonic", "temperature", "ensemble"
     n_bins: int = 10
     temperature_init: float = 1.0
@@ -48,7 +50,9 @@ class TemperatureScaling:
         self.temperature = temperature_init
         self.is_fitted = False
 
-    def fit(self, logits: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]) -> None:
+    def fit(
+        self, logits: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]
+    ) -> None:
         """
         Fit temperature scaling parameter
 
@@ -66,11 +70,13 @@ class TemperatureScaling:
             loss = -np.mean(labels * np.log(probs) + (1 - labels) * np.log(1 - probs))
             return loss
 
-        result = minimize_scalar(temperature_loss, bounds=(0.1, 10.0), method='bounded')
+        result = minimize_scalar(temperature_loss, bounds=(0.1, 10.0), method="bounded")
         self.temperature = result.x
         self.is_fitted = True
 
-        logger.info(f"Temperature scaling fitted with temperature: {self.temperature:.3f}")
+        logger.info(
+            f"Temperature scaling fitted with temperature: {self.temperature:.3f}"
+        )
 
     def predict_proba(self, logits: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """
@@ -101,7 +107,9 @@ class PlattScaling:
         self.calibrator = LogisticRegression()
         self.is_fitted = False
 
-    def fit(self, scores: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]) -> None:
+    def fit(
+        self, scores: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]
+    ) -> None:
         """
         Fit Platt scaling calibrator
 
@@ -142,10 +150,12 @@ class IsotonicCalibration:
     """
 
     def __init__(self):
-        self.calibrator = IsotonicRegression(out_of_bounds='clip')
+        self.calibrator = IsotonicRegression(out_of_bounds="clip")
         self.is_fitted = False
 
-    def fit(self, scores: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]) -> None:
+    def fit(
+        self, scores: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]
+    ) -> None:
         """
         Fit isotonic regression calibrator
 
@@ -188,13 +198,15 @@ class CalibratedPrediction:
 
     def calibrate(self, val_data: dict[str, Any]) -> None:
         """Calibra probabilidades usando validação"""
-        raw_probs = self.model.predict_proba(val_data['X'])
-        self.calibrator.fit(raw_probs, val_data['y'])
+        raw_probs = self.model.predict_proba(val_data["X"])
+        self.calibrator.fit(raw_probs, val_data["y"])
         self.is_calibrated = True
 
         logger.info("Model calibration completed using validation data")
 
-    def predict_with_confidence(self, ecg_signal: npt.NDArray[np.float64]) -> dict[str, Any]:
+    def predict_with_confidence(
+        self, ecg_signal: npt.NDArray[np.float64]
+    ) -> dict[str, Any]:
         """
         Predict with calibrated confidence as specified in the guide
 
@@ -219,11 +231,11 @@ class CalibratedPrediction:
         confidence_level = self._get_confidence_level(calibrated_prob, uncertainty)
 
         return {
-            'prediction': int(np.argmax(calibrated_prob)),
-            'probability': calibrated_prob.tolist(),
-            'uncertainty': float(uncertainty),
-            'confidence_level': confidence_level,
-            'requires_review': confidence_level != 'HIGH'
+            "prediction": int(np.argmax(calibrated_prob)),
+            "probability": calibrated_prob.tolist(),
+            "uncertainty": float(uncertainty),
+            "confidence_level": confidence_level,
+            "requires_review": confidence_level != "HIGH",
         }
 
     def _calculate_uncertainty(self, probabilities: npt.NDArray[np.float64]) -> float:
@@ -236,17 +248,18 @@ class CalibratedPrediction:
 
         return float(normalized_entropy)
 
-    def _get_confidence_level(self, probabilities: npt.NDArray[np.float64],
-                            uncertainty: float) -> str:
+    def _get_confidence_level(
+        self, probabilities: npt.NDArray[np.float64], uncertainty: float
+    ) -> str:
         """Determine confidence level based on probability and uncertainty"""
         max_prob = np.max(probabilities)
 
         if max_prob > 0.9 and uncertainty < 0.1:
-            return 'HIGH'
+            return "HIGH"
         elif max_prob > 0.7 and uncertainty < 0.3:
-            return 'MEDIUM'
+            return "MEDIUM"
         else:
-            return 'LOW'
+            return "LOW"
 
 
 class ConfidenceCalibrationSystem:
@@ -260,8 +273,11 @@ class ConfidenceCalibrationSystem:
         self.calibration_metrics: dict[str, CalibrationMetrics] = {}
         self.is_fitted = False
 
-    def fit_calibration(self, predictions: dict[str, npt.NDArray[np.float64]],
-                       labels: dict[str, npt.NDArray[np.int32]]) -> None:
+    def fit_calibration(
+        self,
+        predictions: dict[str, npt.NDArray[np.float64]],
+        labels: dict[str, npt.NDArray[np.int32]],
+    ) -> None:
         """
         Fit calibration models for multiple conditions
 
@@ -311,7 +327,9 @@ class ConfidenceCalibrationSystem:
             Dictionary with calibrated confidence scores
         """
         if not self.is_fitted:
-            logger.warning("Calibration system not fitted, returning original predictions")
+            logger.warning(
+                "Calibration system not fitted, returning original predictions"
+            )
             return predictions
 
         calibrated_predictions = {}
@@ -320,21 +338,32 @@ class ConfidenceCalibrationSystem:
             if condition in self.calibrators:
                 try:
                     score_array = np.array([score])
-                    calibrated_score = self.calibrators[condition].predict_proba(score_array)[0]
+                    calibrated_score = self.calibrators[condition].predict_proba(
+                        score_array
+                    )[0]
                     calibrated_predictions[condition] = float(calibrated_score)
 
-                    logger.debug(f"Calibrated {condition}: {score:.3f} -> {calibrated_score:.3f}")
+                    logger.debug(
+                        f"Calibrated {condition}: {score:.3f} -> {calibrated_score:.3f}"
+                    )
                 except Exception as e:
-                    logger.warning(f"Failed to calibrate {condition}: {e}, using original score")
+                    logger.warning(
+                        f"Failed to calibrate {condition}: {e}, using original score"
+                    )
                     calibrated_predictions[condition] = score
             else:
-                logger.debug(f"No calibrator found for {condition}, using original score")
+                logger.debug(
+                    f"No calibrator found for {condition}, using original score"
+                )
                 calibrated_predictions[condition] = score
 
         return calibrated_predictions
 
-    def evaluate_calibration(self, predictions: dict[str, npt.NDArray[np.float64]],
-                           labels: dict[str, npt.NDArray[np.int32]]) -> dict[str, CalibrationMetrics]:
+    def evaluate_calibration(
+        self,
+        predictions: dict[str, npt.NDArray[np.float64]],
+        labels: dict[str, npt.NDArray[np.int32]],
+    ) -> dict[str, CalibrationMetrics]:
         """
         Evaluate calibration quality using multiple metrics
 
@@ -369,16 +398,19 @@ class ConfidenceCalibrationSystem:
                 average_calibration_error=ace,
                 brier_score=brier,
                 reliability_diagram_data=reliability_data,
-                confidence_histogram=confidence_hist
+                confidence_histogram=confidence_hist,
             )
 
-            logger.info(f"Calibration metrics for {condition}: ECE={ece:.3f}, MCE={mce:.3f}, Brier={brier:.3f}")
+            logger.info(
+                f"Calibration metrics for {condition}: ECE={ece:.3f}, MCE={mce:.3f}, Brier={brier:.3f}"
+            )
 
         self.calibration_metrics = metrics
         return metrics
 
-    def _expected_calibration_error(self, scores: npt.NDArray[np.float64],
-                                  labels: npt.NDArray[np.int32]) -> float:
+    def _expected_calibration_error(
+        self, scores: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]
+    ) -> float:
         """Calculate Expected Calibration Error (ECE)"""
         bin_boundaries = np.linspace(0, 1, self.config.n_bins + 1)
         bin_lowers = bin_boundaries[:-1]
@@ -396,8 +428,9 @@ class ConfidenceCalibrationSystem:
 
         return float(ece)
 
-    def _maximum_calibration_error(self, scores: npt.NDArray[np.float64],
-                                 labels: npt.NDArray[np.int32]) -> float:
+    def _maximum_calibration_error(
+        self, scores: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]
+    ) -> float:
         """Calculate Maximum Calibration Error (MCE)"""
         bin_boundaries = np.linspace(0, 1, self.config.n_bins + 1)
         bin_lowers = bin_boundaries[:-1]
@@ -414,8 +447,9 @@ class ConfidenceCalibrationSystem:
 
         return float(mce)
 
-    def _average_calibration_error(self, scores: npt.NDArray[np.float64],
-                                 labels: npt.NDArray[np.int32]) -> float:
+    def _average_calibration_error(
+        self, scores: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]
+    ) -> float:
         """Calculate Average Calibration Error (ACE)"""
         bin_boundaries = np.linspace(0, 1, self.config.n_bins + 1)
         bin_lowers = bin_boundaries[:-1]
@@ -428,17 +462,21 @@ class ConfidenceCalibrationSystem:
             if in_bin.sum() > 0:
                 accuracy_in_bin = labels[in_bin].mean()
                 avg_confidence_in_bin = scores[in_bin].mean()
-                calibration_errors.append(np.abs(avg_confidence_in_bin - accuracy_in_bin))
+                calibration_errors.append(
+                    np.abs(avg_confidence_in_bin - accuracy_in_bin)
+                )
 
         return float(np.mean(calibration_errors)) if calibration_errors else 0.0
 
-    def _brier_score(self, scores: npt.NDArray[np.float64],
-                    labels: npt.NDArray[np.int32]) -> float:
+    def _brier_score(
+        self, scores: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]
+    ) -> float:
         """Calculate Brier Score"""
         return float(np.mean((scores - labels) ** 2))
 
-    def _reliability_diagram_data(self, scores: npt.NDArray[np.float64],
-                                labels: npt.NDArray[np.int32]) -> dict[str, list[float]]:
+    def _reliability_diagram_data(
+        self, scores: npt.NDArray[np.float64], labels: npt.NDArray[np.int32]
+    ) -> dict[str, list[float]]:
         """Generate data for reliability diagram"""
         bin_boundaries = np.linspace(0, 1, self.config.n_bins + 1)
         bin_lowers = bin_boundaries[:-1]
@@ -459,25 +497,29 @@ class ConfidenceCalibrationSystem:
                 counts.append(int(in_bin.sum()))
 
         return {
-            'bin_centers': bin_centers,
-            'accuracies': accuracies,
-            'confidences': confidences,
-            'counts': counts
+            "bin_centers": bin_centers,
+            "accuracies": accuracies,
+            "confidences": confidences,
+            "counts": counts,
         }
 
-    def _confidence_histogram(self, scores: npt.NDArray[np.float64]) -> dict[str, list[float]]:
+    def _confidence_histogram(
+        self, scores: npt.NDArray[np.float64]
+    ) -> dict[str, list[float]]:
         """Generate confidence histogram data"""
         hist, bin_edges = np.histogram(scores, bins=self.config.n_bins, range=(0, 1))
         bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
         return {
-            'bin_centers': bin_centers.tolist(),
-            'counts': hist.tolist(),
-            'frequencies': (hist / len(scores)).tolist()
+            "bin_centers": bin_centers.tolist(),
+            "counts": hist.tolist(),
+            "frequencies": (hist / len(scores)).tolist(),
         }
 
 
-def create_confidence_calibration_system(method: str = "isotonic", **kwargs) -> ConfidenceCalibrationSystem:
+def create_confidence_calibration_system(
+    method: str = "isotonic", **kwargs
+) -> ConfidenceCalibrationSystem:
     """
     Factory function to create confidence calibration system
 
@@ -511,7 +553,11 @@ if __name__ == "__main__":
     np.random.seed(42)
     n_samples = 1000
 
-    conditions = ['atrial_fibrillation', 'ventricular_tachycardia', 'normal_sinus_rhythm']
+    conditions = [
+        "atrial_fibrillation",
+        "ventricular_tachycardia",
+        "normal_sinus_rhythm",
+    ]
 
     predictions = {}
     labels = {}
@@ -529,9 +575,9 @@ if __name__ == "__main__":
     calibration_system.fit_calibration(predictions, labels)
 
     test_predictions = {
-        'atrial_fibrillation': 0.85,
-        'ventricular_tachycardia': 0.92,
-        'normal_sinus_rhythm': 0.15
+        "atrial_fibrillation": 0.85,
+        "ventricular_tachycardia": 0.92,
+        "normal_sinus_rhythm": 0.15,
     }
 
     calibrated = calibration_system.calibrate_predictions(test_predictions)

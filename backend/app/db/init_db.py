@@ -17,6 +17,7 @@ from app.models.user import User
 
 logger = logging.getLogger(__name__)
 
+
 async def init_db() -> None:
     """Initialize database with tables and default data."""
     try:
@@ -38,6 +39,7 @@ async def init_db() -> None:
         logger.error(f"Database initialization failed: {str(e)}")
         raise
 
+
 async def create_admin_user(session: AsyncSession) -> User | None:
     """Create default admin user if it doesn't exist."""
     try:
@@ -56,13 +58,20 @@ async def create_admin_user(session: AsyncSession) -> User | None:
         admin_user.username = "admin"
         admin_user.email = admin_email
         default_password = settings.FIRST_SUPERUSER_PASSWORD
-        if default_password in ("CHANGE_ME_SECURE_PASSWORD_REQUIRED", "changeme123", ""):
+        if default_password in (
+            "CHANGE_ME_SECURE_PASSWORD_REQUIRED",
+            "changeme123",
+            "",
+        ):
             import secrets
             import string
+
             alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
-            default_password = ''.join(secrets.choice(alphabet) for _ in range(16))
+            default_password = "".join(secrets.choice(alphabet) for _ in range(16))
             logger.warning(f"Generated secure admin password: {default_password}")
-            logger.warning("IMPORTANT: Save this password and change it after first login!")
+            logger.warning(
+                "IMPORTANT: Save this password and change it after first login!"
+            )
 
         admin_user.hashed_password = get_password_hash(default_password)
         admin_user.first_name = "CardioAI"
@@ -83,6 +92,7 @@ async def create_admin_user(session: AsyncSession) -> User | None:
         await session.rollback()
         return None
 
+
 async def check_database_exists() -> bool:
     """Check if database file exists and is accessible."""
     try:
@@ -101,6 +111,7 @@ async def check_database_exists() -> bool:
     except Exception as e:
         logger.error(f"Error checking database existence: {str(e)}")
         return False
+
 
 async def ensure_database_ready() -> None:
     """Ensure database is ready for use, initialize if needed."""
@@ -125,6 +136,7 @@ async def ensure_database_ready() -> None:
     except Exception as e:
         logger.error(f"Database preparation failed: {str(e)}")
         raise
+
 
 if __name__ == "__main__":
     asyncio.run(init_db())

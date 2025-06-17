@@ -7,9 +7,9 @@ import logging
 import sys
 from pathlib import Path
 
-if getattr(sys, 'frozen', False):
-    bundle_dir = Path(getattr(sys, '_MEIPASS', ''))
-    app_dir = bundle_dir / 'app'
+if getattr(sys, "frozen", False):
+    bundle_dir = Path(getattr(sys, "_MEIPASS", ""))
+    app_dir = bundle_dir / "app"
     if app_dir.exists():
         sys.path.insert(0, str(app_dir))
 
@@ -20,6 +20,7 @@ from app.api.v1.api import api_router
 from app.db.init_db import ensure_database_ready
 
 logger = logging.getLogger(__name__)
+
 
 # Simplified startup for standalone version
 def create_app() -> FastAPI:
@@ -61,12 +62,15 @@ def create_app() -> FastAPI:
 
     return app
 
+
 app = create_app()
+
 
 @app.get("/health")
 async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "healthy", "service": "cardioai-pro-standalone"}
+
 
 @app.get("/")
 async def root() -> dict[str, str]:
@@ -75,8 +79,9 @@ async def root() -> dict[str, str]:
         "message": "CardioAI Pro Standalone API",
         "version": "1.0.0",
         "docs": "/docs",
-        "status": "running"
+        "status": "running",
     }
+
 
 if __name__ == "__main__":
     import uvicorn

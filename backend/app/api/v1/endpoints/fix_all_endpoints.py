@@ -2,6 +2,7 @@
 Script to fix all API endpoint issues
 Run this to update all endpoint files with correct imports and dependencies
 """
+
 import os
 from pathlib import Path
 
@@ -25,7 +26,9 @@ from app.core.exceptions import (
 """
 
 # Fix auth.py
-AUTH_CONTENT = COMMON_IMPORTS + """
+AUTH_CONTENT = (
+    COMMON_IMPORTS
+    + """
 from app.schemas.user import UserCreate, UserResponse, Token
 from app.services.user_service import UserService
 from app.repositories.user_repository import UserRepository
@@ -95,9 +98,12 @@ async def refresh_token(
         "token_type": "bearer"
     }
 """
+)
 
 # Fix users.py
-USERS_CONTENT = COMMON_IMPORTS + """
+USERS_CONTENT = (
+    COMMON_IMPORTS
+    + """
 from app.schemas.user import UserResponse, UserUpdate
 from app.services.user_service import UserService
 from app.repositories.user_repository import UserRepository
@@ -163,9 +169,12 @@ async def delete_user(
     await user_repo.delete_user(user_id)
     return {"message": "User deleted successfully"}
 """
+)
 
 # Fix patients.py
-PATIENTS_CONTENT = COMMON_IMPORTS + """
+PATIENTS_CONTENT = (
+    COMMON_IMPORTS
+    + """
 from app.schemas.patient import PatientCreate, PatientResponse, PatientUpdate
 from app.services.patient_service import PatientService
 from app.repositories.patient_repository import PatientRepository
@@ -243,9 +252,12 @@ async def delete_patient(
     await patient_repo.delete_patient(patient_id)
     return {"message": "Patient deleted successfully"}
 """
+)
 
 # Fix ecg_analysis.py
-ECG_ANALYSIS_CONTENT = COMMON_IMPORTS + """
+ECG_ANALYSIS_CONTENT = (
+    COMMON_IMPORTS
+    + """
 from app.schemas.ecg_analysis import (
     ECGAnalysisCreate, 
     ECGAnalysisResponse, 
@@ -406,9 +418,12 @@ async def delete_analysis(
     await ecg_repo.delete_analysis(analysis_id)
     return {"message": "Analysis deleted successfully"}
 """
+)
 
 # Fix validations.py
-VALIDATIONS_CONTENT = COMMON_IMPORTS + """
+VALIDATIONS_CONTENT = (
+    COMMON_IMPORTS
+    + """
 from app.schemas.validation import (
     ValidationCreate,
     ValidationResponse,
@@ -509,9 +524,12 @@ async def submit_validation(
     )
     return validation
 """
+)
 
 # Fix notifications.py
-NOTIFICATIONS_CONTENT = COMMON_IMPORTS + """
+NOTIFICATIONS_CONTENT = (
+    COMMON_IMPORTS
+    + """
 from app.schemas.notification import NotificationResponse
 from app.services.notification_service import NotificationService
 from app.repositories.notification_repository import NotificationRepository
@@ -575,28 +593,31 @@ async def get_unread_count(
     count = await notification_service.get_unread_count(current_user.id)
     return {"count": count}
 """
+)
+
 
 def fix_all_endpoints():
     """Fix all endpoint files"""
     files_to_fix = {
-        'auth.py': AUTH_CONTENT,
-        'users.py': USERS_CONTENT,
-        'patients.py': PATIENTS_CONTENT,
-        'ecg_analysis.py': ECG_ANALYSIS_CONTENT,
-        'validations.py': VALIDATIONS_CONTENT,
-        'notifications.py': NOTIFICATIONS_CONTENT
+        "auth.py": AUTH_CONTENT,
+        "users.py": USERS_CONTENT,
+        "patients.py": PATIENTS_CONTENT,
+        "ecg_analysis.py": ECG_ANALYSIS_CONTENT,
+        "validations.py": VALIDATIONS_CONTENT,
+        "notifications.py": NOTIFICATIONS_CONTENT,
     }
-    
+
     for filename, content in files_to_fix.items():
         file_path = ENDPOINTS_DIR / filename
         print(f"Fixing {filename}...")
-        
-        with open(file_path, 'w', encoding='utf-8') as f:
+
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
-        
+
         print(f"✓ {filename} fixed successfully")
-    
+
     print("\nAll endpoints fixed!")
+
 
 if __name__ == "__main__":
     fix_all_endpoints()

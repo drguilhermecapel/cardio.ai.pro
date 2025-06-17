@@ -16,6 +16,7 @@ from app.preprocessing.adaptive_filters import create_adaptive_filter
 
 logger = logging.getLogger(__name__)
 
+
 class AdvancedECGPreprocessor:
     """
     Advanced ECG preprocessing pipeline implementing state-of-the-art techniques
@@ -34,13 +35,11 @@ class AdvancedECGPreprocessor:
         self.adaptive_filter = create_adaptive_filter(
             adaptation_mode="rls",  # Use RLS for better performance with non-stationary noise
             filter_order=32,
-            rls_forgetting_factor=0.99
+            rls_forgetting_factor=0.99,
         )
 
     def advanced_preprocessing_pipeline(
-        self,
-        ecg_signal: npt.NDArray[np.float64],
-        clinical_mode: bool = True
+        self, ecg_signal: npt.NDArray[np.float64], clinical_mode: bool = True
     ) -> tuple[npt.NDArray[np.float64], dict[str, Any]]:
         """
         Complete advanced preprocessing pipeline as specified in Phase 1.
@@ -54,40 +53,52 @@ class AdvancedECGPreprocessor:
         """
         start_time = time.time()
 
-        filtered_signal = self._butterworth_bandpass_filter(ecg_signal, 0.05, 150, self.fs)
+        filtered_signal = self._butterworth_bandpass_filter(
+            ecg_signal, 0.05, 150, self.fs
+        )
 
         denoised_signal = self._wavelet_artifact_removal(filtered_signal)
 
         try:
-            adaptive_filtered_signal = self.adaptive_filter.multi_channel_adaptive_filtering(denoised_signal)
+            adaptive_filtered_signal = (
+                self.adaptive_filter.multi_channel_adaptive_filtering(denoised_signal)
+            )
             logger.info("Applied adaptive filtering for non-stationary noise removal")
             denoised_signal = adaptive_filtered_signal
         except Exception as e:
-            logger.warning(f"Adaptive filtering failed: {e}, using standard denoised signal")
+            logger.warning(
+                f"Adaptive filtering failed: {e}, using standard denoised signal"
+            )
 
         r_peaks = self._pan_tompkins_detector(denoised_signal, self.fs)
 
         if clinical_mode:
-            segments = self._fixed_window_segmentation(denoised_signal, window_seconds=10)
+            segments = self._fixed_window_segmentation(
+                denoised_signal, window_seconds=10
+            )
         else:
-            segments = self._beat_by_beat_segmentation(denoised_signal, r_peaks, samples_per_beat=400)
+            segments = self._beat_by_beat_segmentation(
+                denoised_signal, r_peaks, samples_per_beat=400
+            )
 
-        normalized_signal = self._robust_normalize(segments, method='median_iqr')
+        normalized_signal = self._robust_normalize(segments, method="median_iqr")
 
         quality_score = self._assess_signal_quality_realtime(normalized_signal)
 
         processing_time = time.time() - start_time
 
         quality_metrics = {
-            'quality_score': quality_score,
-            'r_peaks_detected': len(r_peaks),
-            'processing_time_ms': processing_time * 1000,
-            'segments_created': len(segments) if isinstance(segments, list) else 1,
-            'meets_quality_threshold': quality_score >= self.quality_threshold
+            "quality_score": quality_score,
+            "r_peaks_detected": len(r_peaks),
+            "processing_time_ms": processing_time * 1000,
+            "segments_created": len(segments) if isinstance(segments, list) else 1,
+            "meets_quality_threshold": quality_score >= self.quality_threshold,
         }
 
-        logger.info(f"Advanced preprocessing completed: quality={quality_score:.3f}, "
-                   f"r_peaks={len(r_peaks)}, time={processing_time*1000:.1f}ms")
+        logger.info(
+            f"Advanced preprocessing completed: quality={quality_score:.3f}, "
+            f"r_peaks={len(r_peaks)}, time={processing_time*1000:.1f}ms"
+        )
 
         return normalized_signal, quality_metrics
 
@@ -96,7 +107,7 @@ class AdvancedECGPreprocessor:
         signal_data: npt.NDArray[np.float64],
         low_freq: float,
         high_freq: float,
-        fs: int
+        fs: int,
     ) -> npt.NDArray[np.float64]:
         """
         Apply Butterworth bandpass filter (0.05-150 Hz) for diagnostic mode.
@@ -107,7 +118,7 @@ class AdvancedECGPreprocessor:
             low = low_freq / nyquist
             high = high_freq / nyquist
 
-            b, a = signal.butter(4, [low, high], btype='band')
+            b, a = signal.butter(4, [low, high], btype="band")
 
             if signal_data.ndim == 1:
                 return np.array(signal.filtfilt(b, a, signal_data), dtype=np.float64)
@@ -121,13 +132,15 @@ class AdvancedECGPreprocessor:
             logger.warning(f"Butterworth filter failed: {e}")
             return signal_data
 
-    def _wavelet_artifact_removal(self, signal_data: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    def _wavelet_artifact_removal(
+        self, signal_data: npt.NDArray[np.float64]
+    ) -> npt.NDArray[np.float64]:
         """
         Remove artifacts using Wavelet Daubechies db6 with adaptive thresholding.
         """
         try:
             if signal_data.ndim == 1:
-                coeffs = pywt.wavedec(signal_data, 'db6', level=9)
+                coeffs = pywt.wavedec(signal_data, "db6", level=9)
 
                 coeffs_thresh = []
                 for i, c in enumerate(coeffs):
@@ -136,9 +149,12 @@ class AdvancedECGPreprocessor:
                     else:
                         sigma = np.median(np.abs(c)) / 0.6745
                         threshold = sigma * np.sqrt(2 * np.log(len(c)))
-                        coeffs_thresh.append(pywt.threshold(c, threshold, mode='soft'))
+                        coeffs_thresh.append(pywt.threshold(c, threshold, mode="soft"))
 
-                return np.array(pywt.waverec(coeffs_thresh, 'db6')[:len(signal_data)], dtype=np.float64)
+                return np.array(
+                    pywt.waverec(coeffs_thresh, "db6")[: len(signal_data)],
+                    dtype=np.float64,
+                )
 
             else:
                 processed = np.zeros_like(signal_data)
@@ -150,7 +166,9 @@ class AdvancedECGPreprocessor:
             logger.warning(f"Wavelet denoising failed: {e}")
             return signal_data
 
-    def _pan_tompkins_detector(self, signal_data: npt.NDArray[np.float64], fs: int) -> list[int]:
+    def _pan_tompkins_detector(
+        self, signal_data: npt.NDArray[np.float64], fs: int
+    ) -> list[int]:
         """
         Enhanced Pan-Tompkins algorithm for R-peak detection with >99.5% accuracy target.
         """
@@ -164,24 +182,33 @@ class AdvancedECGPreprocessor:
             nyquist = fs / 2
             low = 5 / nyquist
             high = 15 / nyquist
-            b, a = signal.butter(2, [low, high], btype='band')
+            b, a = signal.butter(2, [low, high], btype="band")
             filtered = signal.filtfilt(b, a, signal_1d)
 
             derivative = np.zeros_like(filtered)
             for i in range(2, len(filtered) - 2):
-                derivative[i] = (2 * filtered[i+1] + filtered[i+2] - filtered[i-1] - 2 * filtered[i-2]) / 8
+                derivative[i] = (
+                    2 * filtered[i + 1]
+                    + filtered[i + 2]
+                    - filtered[i - 1]
+                    - 2 * filtered[i - 2]
+                ) / 8
 
-            squared = derivative ** 2
+            squared = derivative**2
 
             window_size = int(0.15 * fs)
-            integrated = np.convolve(squared, np.ones(window_size)/window_size, mode='same')
+            integrated = np.convolve(
+                squared, np.ones(window_size) / window_size, mode="same"
+            )
 
-            initial_threshold = np.percentile(integrated, 75)  # Use 75th percentile instead of mean
+            initial_threshold = np.percentile(
+                integrated, 75
+            )  # Use 75th percentile instead of mean
             initial_peaks, properties = signal.find_peaks(
                 integrated,
                 height=initial_threshold,
                 distance=int(0.2 * fs),  # 200ms minimum distance
-                prominence=initial_threshold * 0.3
+                prominence=initial_threshold * 0.3,
             )
 
             if len(initial_peaks) < 3:
@@ -190,7 +217,7 @@ class AdvancedECGPreprocessor:
                     integrated,
                     height=initial_threshold,
                     distance=int(0.15 * fs),  # 150ms minimum distance
-                    prominence=initial_threshold * 0.2
+                    prominence=initial_threshold * 0.2,
                 )
 
             r_peaks = []
@@ -235,7 +262,9 @@ class AdvancedECGPreprocessor:
                         if abs(filtered[peak]) >= amplitude_threshold:
                             quality_peaks.append(peak)
 
-                    if len(quality_peaks) >= len(final_peaks) * 0.7:  # Keep if at least 70% pass
+                    if (
+                        len(quality_peaks) >= len(final_peaks) * 0.7
+                    ):  # Keep if at least 70% pass
                         final_peaks = quality_peaks
 
                 return final_peaks
@@ -247,9 +276,7 @@ class AdvancedECGPreprocessor:
             return []
 
     def _fixed_window_segmentation(
-        self,
-        signal_data: npt.NDArray[np.float64],
-        window_seconds: int = 10
+        self, signal_data: npt.NDArray[np.float64], window_seconds: int = 10
     ) -> list[npt.NDArray[np.float64]]:
         """
         Fixed window segmentation for clinical mode.
@@ -261,7 +288,9 @@ class AdvancedECGPreprocessor:
             for start in range(0, len(signal_data), window_samples):
                 end = min(start + window_samples, len(signal_data))
                 segment = signal_data[start:end]
-                if len(segment) >= window_samples // 2:  # Keep segments with at least 50% data
+                if (
+                    len(segment) >= window_samples // 2
+                ):  # Keep segments with at least 50% data
                     segments.append(segment)
 
             return segments
@@ -274,7 +303,7 @@ class AdvancedECGPreprocessor:
         self,
         signal_data: npt.NDArray[np.float64],
         r_peaks: list[int],
-        samples_per_beat: int = 400
+        samples_per_beat: int = 400,
     ) -> list[npt.NDArray[np.float64]]:
         """
         Beat-by-beat segmentation based on R-peak locations.
@@ -294,7 +323,7 @@ class AdvancedECGPreprocessor:
                 if len(segment) >= samples_per_beat // 2:
                     if len(segment) < samples_per_beat:
                         padded = np.zeros((samples_per_beat,) + segment.shape[1:])
-                        padded[:len(segment)] = segment
+                        padded[: len(segment)] = segment
                         segments.append(padded)
                     else:
                         segments.append(segment[:samples_per_beat])
@@ -306,9 +335,7 @@ class AdvancedECGPreprocessor:
             return [signal_data]
 
     def _robust_normalize(
-        self,
-        segments: list[npt.NDArray[np.float64]],
-        method: str = 'median_iqr'
+        self, segments: list[npt.NDArray[np.float64]], method: str = "median_iqr"
     ) -> npt.NDArray[np.float64]:
         """
         Robust normalization using median and IQR for outlier resistance.
@@ -322,7 +349,7 @@ class AdvancedECGPreprocessor:
             else:
                 combined_signal = np.concatenate(segments, axis=0)
 
-            if method == 'median_iqr':
+            if method == "median_iqr":
                 if combined_signal.ndim == 1:
                     median_val = np.median(combined_signal)
                     q75, q25 = np.percentile(combined_signal, [75, 25])
@@ -349,8 +376,12 @@ class AdvancedECGPreprocessor:
                 return result_multi
 
             else:
-                normalized_signal = (combined_signal - np.mean(combined_signal)) / (np.std(combined_signal) + 1e-10)
-                result_single: npt.NDArray[np.float64] = normalized_signal.astype(np.float64)
+                normalized_signal = (combined_signal - np.mean(combined_signal)) / (
+                    np.std(combined_signal) + 1e-10
+                )
+                result_single: npt.NDArray[np.float64] = normalized_signal.astype(
+                    np.float64
+                )
                 return result_single
 
         except Exception as e:
@@ -360,7 +391,9 @@ class AdvancedECGPreprocessor:
             else:
                 return np.array([], dtype=np.float64)
 
-    def _assess_signal_quality_realtime(self, signal_data: npt.NDArray[np.float64]) -> float:
+    def _assess_signal_quality_realtime(
+        self, signal_data: npt.NDArray[np.float64]
+    ) -> float:
         """
         Real-time signal quality assessment with 95% efficiency target.
         """
@@ -374,8 +407,12 @@ class AdvancedECGPreprocessor:
             if signal_data.ndim == 1:
                 noise_estimate = np.var(np.diff(signal_data))
             else:
-                noise_estimate = np.mean([np.var(np.diff(signal_data[:, i]))
-                                        for i in range(signal_data.shape[1])])
+                noise_estimate = np.mean(
+                    [
+                        np.var(np.diff(signal_data[:, i]))
+                        for i in range(signal_data.shape[1])
+                    ]
+                )
 
             snr = signal_power / (noise_estimate + 1e-10)
             snr_score = min(float(snr / 100), 1.0)  # Normalize to 0-1
@@ -384,8 +421,9 @@ class AdvancedECGPreprocessor:
             if signal_data.ndim == 1:
                 baseline_var = np.var(signal_data)
             else:
-                baseline_var = np.mean([np.var(signal_data[:, i])
-                                      for i in range(signal_data.shape[1])])
+                baseline_var = np.mean(
+                    [np.var(signal_data[:, i]) for i in range(signal_data.shape[1])]
+                )
 
             baseline_score = 1.0 / (1.0 + baseline_var)
             quality_factors.append(baseline_score)
@@ -394,19 +432,35 @@ class AdvancedECGPreprocessor:
                 amplitude_std = np.std(np.abs(signal_data))
                 amplitude_mean = np.mean(np.abs(signal_data))
             else:
-                amplitude_std = np.mean([np.std(np.abs(signal_data[:, i]))
-                                       for i in range(signal_data.shape[1])])
-                amplitude_mean = np.mean([np.mean(np.abs(signal_data[:, i]))
-                                        for i in range(signal_data.shape[1])])
+                amplitude_std = np.mean(
+                    [
+                        np.std(np.abs(signal_data[:, i]))
+                        for i in range(signal_data.shape[1])
+                    ]
+                )
+                amplitude_mean = np.mean(
+                    [
+                        np.mean(np.abs(signal_data[:, i]))
+                        for i in range(signal_data.shape[1])
+                    ]
+                )
 
-            amplitude_consistency = 1.0 - min(float(amplitude_std / (amplitude_mean + 1e-10)), 1.0)
+            amplitude_consistency = 1.0 - min(
+                float(amplitude_std / (amplitude_mean + 1e-10)), 1.0
+            )
             quality_factors.append(amplitude_consistency)
 
             if len(signal_data) >= 256:  # Minimum for meaningful FFT
                 if signal_data.ndim == 1:
-                    freqs, psd = signal.welch(signal_data, fs=self.fs, nperseg=min(256, len(signal_data)//4))
+                    freqs, psd = signal.welch(
+                        signal_data, fs=self.fs, nperseg=min(256, len(signal_data) // 4)
+                    )
                 else:
-                    freqs, psd = signal.welch(signal_data[:, 0], fs=self.fs, nperseg=min(256, len(signal_data)//4))
+                    freqs, psd = signal.welch(
+                        signal_data[:, 0],
+                        fs=self.fs,
+                        nperseg=min(256, len(signal_data) // 4),
+                    )
 
                 ecg_band_mask = (freqs >= 0.5) & (freqs <= 40)
                 ecg_power = np.sum(psd[ecg_band_mask])
@@ -415,8 +469,14 @@ class AdvancedECGPreprocessor:
                 freq_quality = ecg_power / (total_power + 1e-10)
                 quality_factors.append(freq_quality)
 
-            weights = [0.3, 0.25, 0.25, 0.2] if len(quality_factors) == 4 else [1/len(quality_factors)] * len(quality_factors)
-            overall_quality = sum(w * f for w, f in zip(weights, quality_factors, strict=False))
+            weights = (
+                [0.3, 0.25, 0.25, 0.2]
+                if len(quality_factors) == 4
+                else [1 / len(quality_factors)] * len(quality_factors)
+            )
+            overall_quality = sum(
+                w * f for w, f in zip(weights, quality_factors, strict=False)
+            )
 
             return float(min(max(overall_quality, 0.0), 1.0))
 

@@ -13,6 +13,7 @@ from app.models.base import Base
 if TYPE_CHECKING:
     from app.models.ecg_analysis import ECGAnalysis
 
+
 class Patient(Base):
     """Patient model."""
 
@@ -20,8 +21,12 @@ class Patient(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-    patient_id: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
-    mrn: Mapped[str | None] = mapped_column(String(50), index=True)  # Medical Record Number
+    patient_id: Mapped[str] = mapped_column(
+        String(50), unique=True, index=True, nullable=False
+    )
+    mrn: Mapped[str | None] = mapped_column(
+        String(50), index=True
+    )  # Medical Record Number
 
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -50,9 +55,13 @@ class Patient(Base):
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    consent_for_research: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    consent_for_research: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
     consent_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    data_retention_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    data_retention_until: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
 
     created_by: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
 
@@ -72,8 +81,13 @@ class Patient(Base):
     def age(self) -> int:
         """Calculate age."""
         today = date.today()
-        return today.year - self.date_of_birth.year - (
-            (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
+        return (
+            today.year
+            - self.date_of_birth.year
+            - (
+                (today.month, today.day)
+                < (self.date_of_birth.month, self.date_of_birth.day)
+            )
         )
 
     @property
@@ -81,8 +95,9 @@ class Patient(Base):
         """Calculate BMI."""
         if self.height_cm and self.weight_kg:
             height_m = self.height_cm / 100
-            return round(self.weight_kg / (height_m ** 2), 1)
+            return round(self.weight_kg / (height_m**2), 1)
         return None
+
 
 class PatientNote(Base):
     """Patient note model."""
@@ -95,9 +110,13 @@ class PatientNote(Base):
 
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    note_type: Mapped[str] = mapped_column(String(50), nullable=False)  # clinical, administrative, etc.
+    note_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # clinical, administrative, etc.
 
-    is_confidential: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_confidential: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
 
     def __repr__(self) -> str:
         return f"<PatientNote(id={self.id}, patient_id={self.patient_id}, type='{self.note_type}')>"

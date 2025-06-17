@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class FeedbackEntry:
     """Individual feedback entry from expert diagnosis"""
+
     ecg_id: str
     ai_prediction: dict[str, float]
     expert_diagnosis: dict[str, Any]
@@ -39,6 +40,7 @@ class FeedbackEntry:
 @dataclass
 class ErrorPattern:
     """Identified error pattern in AI predictions"""
+
     pattern_type: str
     frequency: int
     conditions: list[str]
@@ -52,6 +54,7 @@ class ErrorPattern:
 @dataclass
 class PerformanceMetrics:
     """Comprehensive performance metrics"""
+
     overall_accuracy: float
     per_class_sensitivity: dict[str, float]
     per_class_specificity: dict[str, float]
@@ -69,6 +72,7 @@ class PerformanceMetrics:
 @dataclass
 class RetrainingTrigger:
     """Conditions that trigger model retraining"""
+
     accuracy_threshold: float = 0.85
     critical_miss_threshold: int = 5
     feedback_buffer_size: int = 100
@@ -88,10 +92,13 @@ class PerformanceTracker:
         self.baseline_metrics: PerformanceMetrics | None = None
         self.current_metrics: PerformanceMetrics | None = None
 
-    def update_performance(self, predictions: list[dict[str, float]],
-                          ground_truth: list[dict[str, Any]],
-                          processing_times: list[float],
-                          confidence_scores: list[float]) -> PerformanceMetrics:
+    def update_performance(
+        self,
+        predictions: list[dict[str, float]],
+        ground_truth: list[dict[str, Any]],
+        processing_times: list[float],
+        confidence_scores: list[float],
+    ) -> PerformanceMetrics:
         """
         Update performance metrics with new predictions
 
@@ -108,11 +115,13 @@ class PerformanceTracker:
             predictions, ground_truth, processing_times, confidence_scores
         )
 
-        self.performance_history.append({
-            'timestamp': datetime.now(),
-            'metrics': metrics,
-            'sample_count': len(predictions)
-        })
+        self.performance_history.append(
+            {
+                "timestamp": datetime.now(),
+                "metrics": metrics,
+                "sample_count": len(predictions),
+            }
+        )
 
         self.current_metrics = metrics
 
@@ -122,18 +131,21 @@ class PerformanceTracker:
 
         return metrics
 
-    def _calculate_comprehensive_metrics(self, predictions: list[dict[str, float]],
-                                       ground_truth: list[dict[str, Any]],
-                                       processing_times: list[float],
-                                       confidence_scores: list[float]) -> PerformanceMetrics:
+    def _calculate_comprehensive_metrics(
+        self,
+        predictions: list[dict[str, float]],
+        ground_truth: list[dict[str, Any]],
+        processing_times: list[float],
+        confidence_scores: list[float],
+    ) -> PerformanceMetrics:
         """Calculate comprehensive performance metrics"""
 
         all_conditions = set()
         for pred in predictions:
             all_conditions.update(pred.keys())
         for gt in ground_truth:
-            if 'conditions' in gt:
-                all_conditions.update(gt['conditions'].keys())
+            if "conditions" in gt:
+                all_conditions.update(gt["conditions"].keys())
 
         all_conditions = list(all_conditions)
 
@@ -148,9 +160,13 @@ class PerformanceTracker:
             y_pred = []
             y_scores = []
 
-            for _i, (pred, gt) in enumerate(zip(predictions, ground_truth, strict=False)):
-                if 'conditions' in gt and condition in gt['conditions']:
-                    true_label = 1 if gt['conditions'][condition].get('detected', False) else 0
+            for _i, (pred, gt) in enumerate(
+                zip(predictions, ground_truth, strict=False)
+            ):
+                if "conditions" in gt and condition in gt["conditions"]:
+                    true_label = (
+                        1 if gt["conditions"][condition].get("detected", False) else 0
+                    )
                 else:
                     true_label = 0
 
@@ -163,19 +179,45 @@ class PerformanceTracker:
 
             if sum(y_true) > 0 and sum(y_pred) > 0:
                 try:
-                    tp = sum(1 for t, p in zip(y_true, y_pred, strict=False) if t == 1 and p == 1)
-                    fn = sum(1 for t, p in zip(y_true, y_pred, strict=False) if t == 1 and p == 0)
-                    per_class_sensitivity[condition] = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+                    tp = sum(
+                        1
+                        for t, p in zip(y_true, y_pred, strict=False)
+                        if t == 1 and p == 1
+                    )
+                    fn = sum(
+                        1
+                        for t, p in zip(y_true, y_pred, strict=False)
+                        if t == 1 and p == 0
+                    )
+                    per_class_sensitivity[condition] = (
+                        tp / (tp + fn) if (tp + fn) > 0 else 0.0
+                    )
 
-                    tn = sum(1 for t, p in zip(y_true, y_pred, strict=False) if t == 0 and p == 0)
-                    fp = sum(1 for t, p in zip(y_true, y_pred, strict=False) if t == 0 and p == 1)
-                    per_class_specificity[condition] = tn / (tn + fp) if (tn + fp) > 0 else 0.0
+                    tn = sum(
+                        1
+                        for t, p in zip(y_true, y_pred, strict=False)
+                        if t == 0 and p == 0
+                    )
+                    fp = sum(
+                        1
+                        for t, p in zip(y_true, y_pred, strict=False)
+                        if t == 0 and p == 1
+                    )
+                    per_class_specificity[condition] = (
+                        tn / (tn + fp) if (tn + fp) > 0 else 0.0
+                    )
 
-                    per_class_precision[condition] = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+                    per_class_precision[condition] = (
+                        tp / (tp + fp) if (tp + fp) > 0 else 0.0
+                    )
 
                     precision = per_class_precision[condition]
                     sensitivity = per_class_sensitivity[condition]
-                    per_class_f1[condition] = (2 * precision * sensitivity) / (precision + sensitivity) if (precision + sensitivity) > 0 else 0.0
+                    per_class_f1[condition] = (
+                        (2 * precision * sensitivity) / (precision + sensitivity)
+                        if (precision + sensitivity) > 0
+                        else 0.0
+                    )
 
                     if len(set(y_true)) > 1:  # Need both classes for AUC
                         roc_auc_scores[condition] = roc_auc_score(y_true, y_scores)
@@ -189,8 +231,10 @@ class PerformanceTracker:
         for pred, gt in zip(predictions, ground_truth, strict=False):
             for condition in all_conditions:
                 true_label = 0
-                if 'conditions' in gt and condition in gt['conditions']:
-                    true_label = 1 if gt['conditions'][condition].get('detected', False) else 0
+                if "conditions" in gt and condition in gt["conditions"]:
+                    true_label = (
+                        1 if gt["conditions"][condition].get("detected", False) else 0
+                    )
 
                 pred_label = 1 if pred.get(condition, 0.0) > 0.5 else 0
 
@@ -198,33 +242,42 @@ class PerformanceTracker:
                     total_correct += 1
                 total_predictions += 1
 
-        overall_accuracy = total_correct / total_predictions if total_predictions > 0 else 0.0
+        overall_accuracy = (
+            total_correct / total_predictions if total_predictions > 0 else 0.0
+        )
 
         processing_time_stats = {
-            'mean': float(np.mean(processing_times)),
-            'std': float(np.std(processing_times)),
-            'min': float(np.min(processing_times)),
-            'max': float(np.max(processing_times)),
-            'p95': float(np.percentile(processing_times, 95))
+            "mean": float(np.mean(processing_times)),
+            "std": float(np.std(processing_times)),
+            "min": float(np.min(processing_times)),
+            "max": float(np.max(processing_times)),
+            "p95": float(np.percentile(processing_times, 95)),
         }
 
         confidence_calibration_error = self._calculate_calibration_error(
-            confidence_scores, [1 if any(pred.values()) > 0.5 else 0 for pred in predictions]
+            confidence_scores,
+            [1 if any(pred.values()) > 0.5 else 0 for pred in predictions],
         )
 
-        critical_conditions = ['ventricular_fibrillation', 'ventricular_tachycardia', 'complete_heart_block']
+        critical_conditions = [
+            "ventricular_fibrillation",
+            "ventricular_tachycardia",
+            "complete_heart_block",
+        ]
         critical_misses = 0
         critical_cases = 0
 
         for pred, gt in zip(predictions, ground_truth, strict=False):
             for condition in critical_conditions:
-                if 'conditions' in gt and condition in gt['conditions']:
-                    if gt['conditions'][condition].get('detected', False):
+                if "conditions" in gt and condition in gt["conditions"]:
+                    if gt["conditions"][condition].get("detected", False):
                         critical_cases += 1
                         if pred.get(condition, 0.0) < 0.5:  # Missed critical condition
                             critical_misses += 1
 
-        critical_miss_rate = critical_misses / critical_cases if critical_cases > 0 else 0.0
+        critical_miss_rate = (
+            critical_misses / critical_cases if critical_cases > 0 else 0.0
+        )
 
         return PerformanceMetrics(
             overall_accuracy=overall_accuracy,
@@ -238,11 +291,12 @@ class PerformanceTracker:
             confidence_calibration_error=confidence_calibration_error,
             false_positive_rate=0.0,  # Calculate if needed
             false_negative_rate=0.0,  # Calculate if needed
-            critical_miss_rate=critical_miss_rate
+            critical_miss_rate=critical_miss_rate,
         )
 
-    def _calculate_calibration_error(self, confidence_scores: list[float],
-                                   correct_predictions: list[int]) -> float:
+    def _calculate_calibration_error(
+        self, confidence_scores: list[float], correct_predictions: list[int]
+    ) -> float:
         """Calculate expected calibration error"""
         if len(confidence_scores) == 0:
             return 0.0
@@ -254,13 +308,18 @@ class PerformanceTracker:
 
         ece = 0.0
         for bin_lower, bin_upper in zip(bin_lowers, bin_uppers, strict=False):
-            in_bin = [(conf > bin_lower) and (conf <= bin_upper)
-                     for conf in confidence_scores]
+            in_bin = [
+                (conf > bin_lower) and (conf <= bin_upper) for conf in confidence_scores
+            ]
             prop_in_bin = sum(in_bin) / len(in_bin)
 
             if prop_in_bin > 0:
-                accuracy_in_bin = sum(correct_predictions[i] for i, in_b in enumerate(in_bin) if in_b) / sum(in_bin)
-                avg_confidence_in_bin = sum(confidence_scores[i] for i, in_b in enumerate(in_bin) if in_b) / sum(in_bin)
+                accuracy_in_bin = sum(
+                    correct_predictions[i] for i, in_b in enumerate(in_bin) if in_b
+                ) / sum(in_bin)
+                avg_confidence_in_bin = sum(
+                    confidence_scores[i] for i, in_b in enumerate(in_bin) if in_b
+                ) / sum(in_bin)
                 ece += abs(avg_confidence_in_bin - accuracy_in_bin) * prop_in_bin
 
         return float(ece)
@@ -268,26 +327,43 @@ class PerformanceTracker:
     def detect_performance_degradation(self) -> dict[str, Any]:
         """Detect if model performance has degraded"""
         if not self.baseline_metrics or not self.current_metrics:
-            return {'degradation_detected': False, 'reason': 'Insufficient data'}
+            return {"degradation_detected": False, "reason": "Insufficient data"}
 
         degradation_issues = []
 
-        accuracy_drop = self.baseline_metrics.overall_accuracy - self.current_metrics.overall_accuracy
+        accuracy_drop = (
+            self.baseline_metrics.overall_accuracy
+            - self.current_metrics.overall_accuracy
+        )
         if accuracy_drop > 0.05:  # 5% drop threshold
-            degradation_issues.append(f"Overall accuracy dropped by {accuracy_drop:.3f}")
+            degradation_issues.append(
+                f"Overall accuracy dropped by {accuracy_drop:.3f}"
+            )
 
-        if self.current_metrics.critical_miss_rate > 0.02:  # 2% threshold for critical conditions
-            degradation_issues.append(f"Critical miss rate too high: {self.current_metrics.critical_miss_rate:.3f}")
+        if (
+            self.current_metrics.critical_miss_rate > 0.02
+        ):  # 2% threshold for critical conditions
+            degradation_issues.append(
+                f"Critical miss rate too high: {self.current_metrics.critical_miss_rate:.3f}"
+            )
 
-        calibration_degradation = (self.current_metrics.confidence_calibration_error -
-                                 self.baseline_metrics.confidence_calibration_error)
+        calibration_degradation = (
+            self.current_metrics.confidence_calibration_error
+            - self.baseline_metrics.confidence_calibration_error
+        )
         if calibration_degradation > 0.1:
-            degradation_issues.append(f"Confidence calibration degraded by {calibration_degradation:.3f}")
+            degradation_issues.append(
+                f"Confidence calibration degraded by {calibration_degradation:.3f}"
+            )
 
         return {
-            'degradation_detected': len(degradation_issues) > 0,
-            'issues': degradation_issues,
-            'severity': 'HIGH' if any('critical' in issue.lower() for issue in degradation_issues) else 'MEDIUM'
+            "degradation_detected": len(degradation_issues) > 0,
+            "issues": degradation_issues,
+            "severity": (
+                "HIGH"
+                if any("critical" in issue.lower() for issue in degradation_issues)
+                else "MEDIUM"
+            ),
         }
 
 
@@ -300,7 +376,9 @@ class ErrorPatternAnalyzer:
         self.identified_patterns: list[ErrorPattern] = []
         self.pattern_history: list[dict[str, Any]] = []
 
-    def analyze_error_patterns(self, feedback_entries: list[FeedbackEntry]) -> list[ErrorPattern]:
+    def analyze_error_patterns(
+        self, feedback_entries: list[FeedbackEntry]
+    ) -> list[ErrorPattern]:
         """
         Analyze feedback entries to identify error patterns
 
@@ -317,39 +395,61 @@ class ErrorPatternAnalyzer:
 
         patterns = []
 
-        low_quality_errors = [entry for entry in discrepancies if entry.signal_quality < 0.7]
+        low_quality_errors = [
+            entry for entry in discrepancies if entry.signal_quality < 0.7
+        ]
         if len(low_quality_errors) >= 3:
-            patterns.append(ErrorPattern(
-                pattern_type="LOW_SIGNAL_QUALITY",
-                frequency=len(low_quality_errors),
-                conditions=list({list(entry.ai_prediction.keys())[0] for entry in low_quality_errors}),
-                common_features={'signal_quality_threshold': 0.7},
-                severity="MEDIUM",
-                recommendations=[
-                    "Improve signal quality assessment",
-                    "Add quality-based confidence adjustment",
-                    "Implement better preprocessing for low-quality signals"
-                ],
-                first_observed=min(entry.timestamp for entry in low_quality_errors),
-                last_observed=max(entry.timestamp for entry in low_quality_errors)
-            ))
+            patterns.append(
+                ErrorPattern(
+                    pattern_type="LOW_SIGNAL_QUALITY",
+                    frequency=len(low_quality_errors),
+                    conditions=list(
+                        {
+                            list(entry.ai_prediction.keys())[0]
+                            for entry in low_quality_errors
+                        }
+                    ),
+                    common_features={"signal_quality_threshold": 0.7},
+                    severity="MEDIUM",
+                    recommendations=[
+                        "Improve signal quality assessment",
+                        "Add quality-based confidence adjustment",
+                        "Implement better preprocessing for low-quality signals",
+                    ],
+                    first_observed=min(entry.timestamp for entry in low_quality_errors),
+                    last_observed=max(entry.timestamp for entry in low_quality_errors),
+                )
+            )
 
-        overconfident_errors = [entry for entry in discrepancies if entry.confidence_score > 0.8]
+        overconfident_errors = [
+            entry for entry in discrepancies if entry.confidence_score > 0.8
+        ]
         if len(overconfident_errors) >= 3:
-            patterns.append(ErrorPattern(
-                pattern_type="OVERCONFIDENT_PREDICTIONS",
-                frequency=len(overconfident_errors),
-                conditions=list({list(entry.ai_prediction.keys())[0] for entry in overconfident_errors}),
-                common_features={'confidence_threshold': 0.8},
-                severity="HIGH",
-                recommendations=[
-                    "Improve confidence calibration",
-                    "Add uncertainty quantification",
-                    "Implement ensemble methods for better confidence estimation"
-                ],
-                first_observed=min(entry.timestamp for entry in overconfident_errors),
-                last_observed=max(entry.timestamp for entry in overconfident_errors)
-            ))
+            patterns.append(
+                ErrorPattern(
+                    pattern_type="OVERCONFIDENT_PREDICTIONS",
+                    frequency=len(overconfident_errors),
+                    conditions=list(
+                        {
+                            list(entry.ai_prediction.keys())[0]
+                            for entry in overconfident_errors
+                        }
+                    ),
+                    common_features={"confidence_threshold": 0.8},
+                    severity="HIGH",
+                    recommendations=[
+                        "Improve confidence calibration",
+                        "Add uncertainty quantification",
+                        "Implement ensemble methods for better confidence estimation",
+                    ],
+                    first_observed=min(
+                        entry.timestamp for entry in overconfident_errors
+                    ),
+                    last_observed=max(
+                        entry.timestamp for entry in overconfident_errors
+                    ),
+                )
+            )
 
         condition_errors = defaultdict(list)
         for entry in discrepancies:
@@ -358,26 +458,35 @@ class ErrorPatternAnalyzer:
 
         for condition, errors in condition_errors.items():
             if len(errors) >= 5:  # Frequent errors for specific condition
-                patterns.append(ErrorPattern(
-                    pattern_type="CONDITION_SPECIFIC_ERROR",
-                    frequency=len(errors),
-                    conditions=[condition],
-                    common_features={'condition': condition},
-                    severity="HIGH" if condition in ['ventricular_fibrillation', 'ventricular_tachycardia'] else "MEDIUM",
-                    recommendations=[
-                        f"Retrain model specifically for {condition}",
-                        f"Collect more training data for {condition}",
-                        f"Review feature extraction for {condition}"
-                    ],
-                    first_observed=min(entry.timestamp for entry in errors),
-                    last_observed=max(entry.timestamp for entry in errors)
-                ))
+                patterns.append(
+                    ErrorPattern(
+                        pattern_type="CONDITION_SPECIFIC_ERROR",
+                        frequency=len(errors),
+                        conditions=[condition],
+                        common_features={"condition": condition},
+                        severity=(
+                            "HIGH"
+                            if condition
+                            in ["ventricular_fibrillation", "ventricular_tachycardia"]
+                            else "MEDIUM"
+                        ),
+                        recommendations=[
+                            f"Retrain model specifically for {condition}",
+                            f"Collect more training data for {condition}",
+                            f"Review feature extraction for {condition}",
+                        ],
+                        first_observed=min(entry.timestamp for entry in errors),
+                        last_observed=max(entry.timestamp for entry in errors),
+                    )
+                )
 
         self.identified_patterns.extend(patterns)
 
         for pattern in patterns:
-            logger.warning(f"Identified error pattern: {pattern.pattern_type} "
-                         f"(frequency: {pattern.frequency}, severity: {pattern.severity})")
+            logger.warning(
+                f"Identified error pattern: {pattern.pattern_type} "
+                f"(frequency: {pattern.frequency}, severity: {pattern.severity})"
+            )
 
         return patterns
 
@@ -389,17 +498,25 @@ class ErrorPatternAnalyzer:
         high_patterns = [p for p in patterns if p.severity == "HIGH"]
 
         if critical_patterns:
-            recommendations.append("URGENT: Critical error patterns detected - immediate model review required")
+            recommendations.append(
+                "URGENT: Critical error patterns detected - immediate model review required"
+            )
             for pattern in critical_patterns:
                 recommendations.extend(pattern.recommendations)
 
         if high_patterns:
-            recommendations.append("HIGH PRIORITY: Significant error patterns require attention")
+            recommendations.append(
+                "HIGH PRIORITY: Significant error patterns require attention"
+            )
             for pattern in high_patterns:
-                recommendations.extend(pattern.recommendations[:2])  # Top 2 recommendations
+                recommendations.extend(
+                    pattern.recommendations[:2]
+                )  # Top 2 recommendations
 
         if len(patterns) > 5:
-            recommendations.append("Consider comprehensive model retraining due to multiple error patterns")
+            recommendations.append(
+                "Consider comprehensive model retraining due to multiple error patterns"
+            )
 
         return list(set(recommendations))  # Remove duplicates
 
@@ -421,13 +538,17 @@ class ContinuousLearningSystem:
         self.retraining_in_progress = False
         self.retraining_history: list[dict[str, Any]] = []
 
-    def collect_feedback(self, ecg_id: str, ai_prediction: dict[str, float],
-                        expert_diagnosis: dict[str, Any],
-                        confidence_score: float = 0.0,
-                        processing_time: float = 0.0,
-                        signal_quality: float = 1.0,
-                        expert_confidence: float | None = None,
-                        clinical_context: str | None = None) -> None:
+    def collect_feedback(
+        self,
+        ecg_id: str,
+        ai_prediction: dict[str, float],
+        expert_diagnosis: dict[str, Any],
+        confidence_score: float = 0.0,
+        processing_time: float = 0.0,
+        signal_quality: float = 1.0,
+        expert_confidence: float | None = None,
+        clinical_context: str | None = None,
+    ) -> None:
         """
         Collect feedback from expert diagnosis
 
@@ -453,7 +574,7 @@ class ContinuousLearningSystem:
             processing_time=processing_time,
             signal_quality=signal_quality,
             expert_confidence=expert_confidence,
-            clinical_context=clinical_context
+            clinical_context=clinical_context,
         )
 
         self.feedback_buffer.append(feedback_entry)
@@ -463,17 +584,20 @@ class ContinuousLearningSystem:
         if len(self.feedback_buffer) >= self.config.feedback_buffer_size:
             self._analyze_performance()
 
-    def _check_discrepancy(self, ai_prediction: dict[str, float],
-                          expert_diagnosis: dict[str, Any]) -> bool:
+    def _check_discrepancy(
+        self, ai_prediction: dict[str, float], expert_diagnosis: dict[str, Any]
+    ) -> bool:
         """Check if there's a significant discrepancy between AI and expert"""
-        if 'conditions' not in expert_diagnosis:
+        if "conditions" not in expert_diagnosis:
             return False
 
         for condition, ai_score in ai_prediction.items():
             ai_detected = ai_score > 0.5
 
-            if condition in expert_diagnosis['conditions']:
-                expert_detected = expert_diagnosis['conditions'][condition].get('detected', False)
+            if condition in expert_diagnosis["conditions"]:
+                expert_detected = expert_diagnosis["conditions"][condition].get(
+                    "detected", False
+                )
 
                 if ai_detected != expert_detected:
                     return True
@@ -487,7 +611,9 @@ class ContinuousLearningSystem:
         Returns:
             Analysis report with recommendations
         """
-        logger.info(f"Analyzing performance with {len(self.feedback_buffer)} feedback entries")
+        logger.info(
+            f"Analyzing performance with {len(self.feedback_buffer)} feedback entries"
+        )
 
         predictions = [entry.ai_prediction for entry in self.feedback_buffer]
         ground_truth = [entry.expert_diagnosis for entry in self.feedback_buffer]
@@ -500,7 +626,9 @@ class ContinuousLearningSystem:
 
         degradation_analysis = self.performance_tracker.detect_performance_degradation()
 
-        error_patterns = self.error_analyzer.analyze_error_patterns(self.feedback_buffer)
+        error_patterns = self.error_analyzer.analyze_error_patterns(
+            self.feedback_buffer
+        )
 
         recommendations = self.error_analyzer.generate_recommendations(error_patterns)
 
@@ -509,22 +637,24 @@ class ContinuousLearningSystem:
         )
 
         analysis_report = {
-            'timestamp': datetime.now(),
-            'sample_count': len(self.feedback_buffer),
-            'current_metrics': current_metrics,
-            'degradation_analysis': degradation_analysis,
-            'error_patterns': error_patterns,
-            'recommendations': recommendations,
-            'retraining_needed': retraining_needed,
-            'retraining_reasons': self._get_retraining_reasons(
+            "timestamp": datetime.now(),
+            "sample_count": len(self.feedback_buffer),
+            "current_metrics": current_metrics,
+            "degradation_analysis": degradation_analysis,
+            "error_patterns": error_patterns,
+            "recommendations": recommendations,
+            "retraining_needed": retraining_needed,
+            "retraining_reasons": self._get_retraining_reasons(
                 current_metrics, degradation_analysis, error_patterns
-            )
+            ),
         }
 
-        logger.info(f"Performance analysis completed: "
-                   f"accuracy={current_metrics.overall_accuracy:.3f}, "
-                   f"critical_miss_rate={current_metrics.critical_miss_rate:.3f}, "
-                   f"retraining_needed={retraining_needed}")
+        logger.info(
+            f"Performance analysis completed: "
+            f"accuracy={current_metrics.overall_accuracy:.3f}, "
+            f"critical_miss_rate={current_metrics.critical_miss_rate:.3f}, "
+            f"retraining_needed={retraining_needed}"
+        )
 
         if retraining_needed and not self.retraining_in_progress:
             self._trigger_retraining(analysis_report)
@@ -533,9 +663,12 @@ class ContinuousLearningSystem:
 
         return analysis_report
 
-    def _should_trigger_retraining(self, metrics: PerformanceMetrics,
-                                 degradation: dict[str, Any],
-                                 patterns: list[ErrorPattern]) -> bool:
+    def _should_trigger_retraining(
+        self,
+        metrics: PerformanceMetrics,
+        degradation: dict[str, Any],
+        patterns: list[ErrorPattern],
+    ) -> bool:
         """Determine if retraining should be triggered"""
         if metrics.overall_accuracy < self.config.accuracy_threshold:
             return True
@@ -543,7 +676,10 @@ class ContinuousLearningSystem:
         if metrics.critical_miss_rate > (self.config.critical_miss_threshold / 100):
             return True
 
-        if degradation['degradation_detected'] and degradation.get('severity') == 'HIGH':
+        if (
+            degradation["degradation_detected"]
+            and degradation.get("severity") == "HIGH"
+        ):
             return True
 
         critical_patterns = [p for p in patterns if p.severity == "CRITICAL"]
@@ -560,24 +696,33 @@ class ContinuousLearningSystem:
 
         return False
 
-    def _get_retraining_reasons(self, metrics: PerformanceMetrics,
-                              degradation: dict[str, Any],
-                              patterns: list[ErrorPattern]) -> list[str]:
+    def _get_retraining_reasons(
+        self,
+        metrics: PerformanceMetrics,
+        degradation: dict[str, Any],
+        patterns: list[ErrorPattern],
+    ) -> list[str]:
         """Get specific reasons for retraining recommendation"""
         reasons = []
 
         if metrics.overall_accuracy < self.config.accuracy_threshold:
-            reasons.append(f"Overall accuracy below threshold: {metrics.overall_accuracy:.3f}")
+            reasons.append(
+                f"Overall accuracy below threshold: {metrics.overall_accuracy:.3f}"
+            )
 
         if metrics.critical_miss_rate > (self.config.critical_miss_threshold / 100):
-            reasons.append(f"Critical miss rate too high: {metrics.critical_miss_rate:.3f}")
+            reasons.append(
+                f"Critical miss rate too high: {metrics.critical_miss_rate:.3f}"
+            )
 
-        if degradation['degradation_detected']:
-            reasons.extend(degradation['issues'])
+        if degradation["degradation_detected"]:
+            reasons.extend(degradation["issues"])
 
         critical_patterns = [p for p in patterns if p.severity in ["CRITICAL", "HIGH"]]
         if critical_patterns:
-            reasons.append(f"Identified {len(critical_patterns)} high-severity error patterns")
+            reasons.append(
+                f"Identified {len(critical_patterns)} high-severity error patterns"
+            )
 
         return reasons
 
@@ -588,11 +733,11 @@ class ContinuousLearningSystem:
         self.retraining_in_progress = True
 
         retraining_record = {
-            'timestamp': datetime.now(),
-            'trigger_reasons': analysis_report['retraining_reasons'],
-            'performance_before': analysis_report['current_metrics'],
-            'error_patterns': analysis_report['error_patterns'],
-            'status': 'INITIATED'
+            "timestamp": datetime.now(),
+            "trigger_reasons": analysis_report["retraining_reasons"],
+            "performance_before": analysis_report["current_metrics"],
+            "error_patterns": analysis_report["error_patterns"],
+            "status": "INITIATED",
         }
 
         self.retraining_history.append(retraining_record)
@@ -605,71 +750,79 @@ class ContinuousLearningSystem:
     def get_performance_summary(self) -> dict[str, Any]:
         """Get current performance summary"""
         if not self.performance_tracker.current_metrics:
-            return {'status': 'No performance data available'}
+            return {"status": "No performance data available"}
 
         metrics = self.performance_tracker.current_metrics
 
         return {
-            'overall_accuracy': metrics.overall_accuracy,
-            'critical_miss_rate': metrics.critical_miss_rate,
-            'confidence_calibration_error': metrics.confidence_calibration_error,
-            'processing_time_mean': metrics.processing_time_stats['mean'],
-            'feedback_entries_collected': len(self.feedback_buffer),
-            'last_analysis': self.performance_tracker.performance_history[-1]['timestamp'] if self.performance_tracker.performance_history else None,
-            'retraining_status': 'IN_PROGRESS' if self.retraining_in_progress else 'IDLE',
-            'days_since_last_retraining': (datetime.now() - self.last_retraining).days
+            "overall_accuracy": metrics.overall_accuracy,
+            "critical_miss_rate": metrics.critical_miss_rate,
+            "confidence_calibration_error": metrics.confidence_calibration_error,
+            "processing_time_mean": metrics.processing_time_stats["mean"],
+            "feedback_entries_collected": len(self.feedback_buffer),
+            "last_analysis": (
+                self.performance_tracker.performance_history[-1]["timestamp"]
+                if self.performance_tracker.performance_history
+                else None
+            ),
+            "retraining_status": (
+                "IN_PROGRESS" if self.retraining_in_progress else "IDLE"
+            ),
+            "days_since_last_retraining": (datetime.now() - self.last_retraining).days,
         }
 
     def export_performance_data(self, filepath: str) -> None:
         """Export performance data for external analysis"""
         export_data = {
-            'feedback_buffer': [
+            "feedback_buffer": [
                 {
-                    'ecg_id': entry.ecg_id,
-                    'ai_prediction': entry.ai_prediction,
-                    'expert_diagnosis': entry.expert_diagnosis,
-                    'timestamp': entry.timestamp.isoformat(),
-                    'discrepancy': entry.discrepancy,
-                    'confidence_score': entry.confidence_score,
-                    'signal_quality': entry.signal_quality
+                    "ecg_id": entry.ecg_id,
+                    "ai_prediction": entry.ai_prediction,
+                    "expert_diagnosis": entry.expert_diagnosis,
+                    "timestamp": entry.timestamp.isoformat(),
+                    "discrepancy": entry.discrepancy,
+                    "confidence_score": entry.confidence_score,
+                    "signal_quality": entry.signal_quality,
                 }
                 for entry in self.feedback_buffer
             ],
-            'performance_history': [
+            "performance_history": [
                 {
-                    'timestamp': record['timestamp'].isoformat(),
-                    'metrics': {
-                        'overall_accuracy': record['metrics'].overall_accuracy,
-                        'critical_miss_rate': record['metrics'].critical_miss_rate,
-                        'confidence_calibration_error': record['metrics'].confidence_calibration_error
+                    "timestamp": record["timestamp"].isoformat(),
+                    "metrics": {
+                        "overall_accuracy": record["metrics"].overall_accuracy,
+                        "critical_miss_rate": record["metrics"].critical_miss_rate,
+                        "confidence_calibration_error": record[
+                            "metrics"
+                        ].confidence_calibration_error,
                     },
-                    'sample_count': record['sample_count']
+                    "sample_count": record["sample_count"],
                 }
                 for record in self.performance_tracker.performance_history
             ],
-            'error_patterns': [
+            "error_patterns": [
                 {
-                    'pattern_type': pattern.pattern_type,
-                    'frequency': pattern.frequency,
-                    'conditions': pattern.conditions,
-                    'severity': pattern.severity,
-                    'recommendations': pattern.recommendations,
-                    'first_observed': pattern.first_observed.isoformat(),
-                    'last_observed': pattern.last_observed.isoformat()
+                    "pattern_type": pattern.pattern_type,
+                    "frequency": pattern.frequency,
+                    "conditions": pattern.conditions,
+                    "severity": pattern.severity,
+                    "recommendations": pattern.recommendations,
+                    "first_observed": pattern.first_observed.isoformat(),
+                    "last_observed": pattern.last_observed.isoformat(),
                 }
                 for pattern in self.error_analyzer.identified_patterns
             ],
-            'retraining_history': [
+            "retraining_history": [
                 {
-                    'timestamp': record['timestamp'].isoformat(),
-                    'trigger_reasons': record['trigger_reasons'],
-                    'status': record['status']
+                    "timestamp": record["timestamp"].isoformat(),
+                    "trigger_reasons": record["trigger_reasons"],
+                    "status": record["status"],
                 }
                 for record in self.retraining_history
-            ]
+            ],
         }
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(export_data, f, indent=2)
 
         logger.info(f"Performance data exported to {filepath}")
@@ -692,31 +845,31 @@ def create_continuous_learning_system(model: Any, **kwargs) -> ContinuousLearnin
 
 class ContinuousLearningService(ContinuousLearningSystem):
     """Backward compatible alias for ContinuousLearningSystem."""
+
     pass
 
 
 if __name__ == "__main__":
+
     class MockModel:
         def predict_proba(self, X):
             return np.random.random((len(X), 2))
 
     mock_model = MockModel()
     learning_system = create_continuous_learning_system(
-        model=mock_model,
-        accuracy_threshold=0.85,
-        critical_miss_threshold=5
+        model=mock_model, accuracy_threshold=0.85, critical_miss_threshold=5
     )
 
     for i in range(50):
         ai_prediction = {
-            'atrial_fibrillation': np.random.random(),
-            'normal_sinus_rhythm': np.random.random()
+            "atrial_fibrillation": np.random.random(),
+            "normal_sinus_rhythm": np.random.random(),
         }
 
         expert_diagnosis = {
-            'conditions': {
-                'atrial_fibrillation': {'detected': np.random.choice([True, False])},
-                'normal_sinus_rhythm': {'detected': np.random.choice([True, False])}
+            "conditions": {
+                "atrial_fibrillation": {"detected": np.random.choice([True, False])},
+                "normal_sinus_rhythm": {"detected": np.random.choice([True, False])},
             }
         }
 
@@ -726,7 +879,7 @@ if __name__ == "__main__":
             expert_diagnosis=expert_diagnosis,
             confidence_score=np.random.random(),
             processing_time=np.random.uniform(1.0, 5.0),
-            signal_quality=np.random.uniform(0.5, 1.0)
+            signal_quality=np.random.uniform(0.5, 1.0),
         )
 
     summary = learning_system.get_performance_summary()

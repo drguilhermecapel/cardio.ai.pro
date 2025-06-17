@@ -3,17 +3,19 @@ import sqlite3
 import hashlib
 from pathlib import Path
 
+
 def create_admin_user():
     """Create admin user directly in SQLite database"""
     try:
-        os.environ['STANDALONE_MODE'] = 'true'
-        
+        os.environ["STANDALONE_MODE"] = "true"
+
         db_path = Path(__file__).parent / "cardioai.db"
-        
+
         conn = sqlite3.connect(str(db_path))
         cursor = conn.cursor()
-        
-        cursor.execute('''
+
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username VARCHAR(50) UNIQUE NOT NULL,
@@ -40,40 +42,53 @@ def create_admin_user():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        ''')
-        
+        """
+        )
+
         cursor.execute("SELECT id FROM users WHERE username = ?", ("admin",))
         if cursor.fetchone():
             print("Admin user already exists")
             conn.close()
             return True
-        
+
         import sys
+
         sys.path.insert(0, str(Path(__file__).parent))
         from app.core.security import get_password_hash
-        
+
         password = "admin"
         hashed_password = get_password_hash(password)
-        
-        cursor.execute('''
+
+        cursor.execute(
+            """
             INSERT INTO users (
                 username, email, hashed_password, first_name, last_name,
                 is_active, is_verified, is_superuser, role
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            "admin", "admin@cardioai.pro", hashed_password,
-            "Administrator", "System", 1, 1, 1, "ADMIN"
-        ))
-        
+        """,
+            (
+                "admin",
+                "admin@cardioai.pro",
+                hashed_password,
+                "Administrator",
+                "System",
+                1,
+                1,
+                1,
+                "ADMIN",
+            ),
+        )
+
         conn.commit()
         conn.close()
-        
+
         print("✅ Admin user created successfully")
         return True
-        
+
     except Exception as e:
         print(f"❌ Error creating admin user: {e}")
         return False
+
 
 if __name__ == "__main__":
     success = create_admin_user()

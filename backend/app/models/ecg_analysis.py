@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from app.models.user import User
     from app.models.validation import Validation
 
+
 class ECGAnalysis(Base):
     """ECG Analysis model."""
 
@@ -23,7 +24,9 @@ class ECGAnalysis(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-    analysis_id: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
+    analysis_id: Mapped[str] = mapped_column(
+        String(50), unique=True, index=True, nullable=False
+    )
 
     patient_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("patients.id"), nullable=False, index=True
@@ -37,7 +40,9 @@ class ECGAnalysis(Base):
     file_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     file_size: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    acquisition_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    acquisition_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
     sample_rate: Mapped[int] = mapped_column(Integer, nullable=False)
     duration_seconds: Mapped[float] = mapped_column(Float, nullable=False)
     leads_count: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -50,8 +55,12 @@ class ECGAnalysis(Base):
     status: Mapped[AnalysisStatus] = mapped_column(
         String(20), nullable=False, default=AnalysisStatus.PENDING
     )
-    processing_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    processing_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    processing_started_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
+    processing_completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
     processing_duration_ms: Mapped[int | None] = mapped_column(Integer)
 
     ai_confidence: Mapped[float | None] = mapped_column(Float)
@@ -84,7 +93,9 @@ class ECGAnalysis(Base):
     baseline_wander: Mapped[float | None] = mapped_column(Float)
 
     is_validated: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    validation_required: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    validation_required: Mapped[bool] = mapped_column(
+        Boolean, default=True, nullable=False
+    )
 
     error_message: Mapped[str | None] = mapped_column(Text)
     retry_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -107,8 +118,8 @@ class ECGAnalysis(Base):
     def is_critical(self) -> bool:
         """Check if analysis indicates critical condition."""
         return (
-            self.clinical_urgency == ClinicalUrgency.CRITICAL or
-            self.requires_immediate_attention
+            self.clinical_urgency == ClinicalUrgency.CRITICAL
+            or self.requires_immediate_attention
         )
 
     @property
@@ -117,6 +128,7 @@ class ECGAnalysis(Base):
         if self.processing_duration_ms:
             return self.processing_duration_ms / 1000
         return None
+
 
 class ECGMeasurement(Base):
     """ECG measurement model for storing detailed measurements."""
@@ -144,10 +156,13 @@ class ECGMeasurement(Base):
 
     source: Mapped[str] = mapped_column(String(20), nullable=False, default="algorithm")
 
-    analysis: Mapped["ECGAnalysis"] = relationship("ECGAnalysis", back_populates="measurements")
+    analysis: Mapped["ECGAnalysis"] = relationship(
+        "ECGAnalysis", back_populates="measurements"
+    )
 
     def __repr__(self) -> str:
         return f"<ECGMeasurement(id={self.id}, type='{self.measurement_type}', value={self.value})>"
+
 
 class ECGAnnotation(Base):
     """ECG annotation model for storing beat annotations and events."""
@@ -159,7 +174,9 @@ class ECGAnnotation(Base):
         Integer, ForeignKey("ecg_analyses.id"), nullable=False, index=True
     )
 
-    annotation_type: Mapped[str] = mapped_column(String(50), nullable=False)  # beat, event, artifact
+    annotation_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # beat, event, artifact
     label: Mapped[str] = mapped_column(String(100), nullable=False)
 
     time_ms: Mapped[float] = mapped_column(Float, nullable=False)
@@ -168,7 +185,9 @@ class ECGAnnotation(Base):
     confidence: Mapped[float | None] = mapped_column(Float)
     properties: Mapped[dict[str, Any] | None] = mapped_column(JSON)
 
-    source: Mapped[str] = mapped_column(String(20), nullable=False)  # ai, manual, algorithm
+    source: Mapped[str] = mapped_column(
+        String(20), nullable=False
+    )  # ai, manual, algorithm
     created_by: Mapped[int | None] = mapped_column(Integer, ForeignKey("users.id"))
 
     def __repr__(self) -> str:

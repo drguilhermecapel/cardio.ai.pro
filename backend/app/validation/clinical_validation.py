@@ -14,8 +14,10 @@ import numpy.typing as npt
 
 logger = logging.getLogger(__name__)
 
+
 class PathologyType(Enum):
     """Critical pathology types requiring ultra-rigorous validation"""
+
     STEMI = "STEMI"
     VF = "VF"  # Ventricular Fibrillation
     VT = "VT"  # Ventricular Tachycardia
@@ -23,9 +25,11 @@ class PathologyType(Enum):
     LONG_QT = "LONG_QT"
     HEART_BLOCK = "HEART_BLOCK"
 
+
 @dataclass
 class ValidationMetrics:
     """Ultra-rigorous validation metrics for medical compliance"""
+
     sensitivity: float
     specificity: float
     npv: float  # Negative Predictive Value
@@ -36,26 +40,57 @@ class ValidationMetrics:
     kappa_cohen: float
     inter_observer_agreement: float
 
+
 @dataclass
 class UltraRigorousCriteria:
     """Ultra-rigorous criteria that must be met for medical deployment"""
 
     CRITICAL_PATHOLOGIES = {
-        PathologyType.STEMI: {"sensitivity": 99.5, "specificity": 98.0, "npv": 99.9, "detection_time_ms": 10000},
-        PathologyType.VF: {"sensitivity": 99.8, "specificity": 99.0, "npv": 99.95, "detection_time_ms": 5000},
-        PathologyType.VT: {"sensitivity": 97.0, "specificity": 95.0, "npv": 99.5, "detection_time_ms": 8000},
-        PathologyType.AF: {"sensitivity": 95.0, "specificity": 93.0, "npv": 98.0, "detection_time_ms": 15000},
-        PathologyType.LONG_QT: {"sensitivity": 94.0, "specificity": 92.0, "npv": 97.5, "detection_time_ms": 12000},
-        PathologyType.HEART_BLOCK: {"sensitivity": 96.0, "specificity": 94.0, "npv": 98.5, "detection_time_ms": 10000}
+        PathologyType.STEMI: {
+            "sensitivity": 99.5,
+            "specificity": 98.0,
+            "npv": 99.9,
+            "detection_time_ms": 10000,
+        },
+        PathologyType.VF: {
+            "sensitivity": 99.8,
+            "specificity": 99.0,
+            "npv": 99.95,
+            "detection_time_ms": 5000,
+        },
+        PathologyType.VT: {
+            "sensitivity": 97.0,
+            "specificity": 95.0,
+            "npv": 99.5,
+            "detection_time_ms": 8000,
+        },
+        PathologyType.AF: {
+            "sensitivity": 95.0,
+            "specificity": 93.0,
+            "npv": 98.0,
+            "detection_time_ms": 15000,
+        },
+        PathologyType.LONG_QT: {
+            "sensitivity": 94.0,
+            "specificity": 92.0,
+            "npv": 97.5,
+            "detection_time_ms": 12000,
+        },
+        PathologyType.HEART_BLOCK: {
+            "sensitivity": 96.0,
+            "specificity": 94.0,
+            "npv": 98.5,
+            "detection_time_ms": 10000,
+        },
     }
 
     MINIMUM_SAMPLE_SIZES = {
         PathologyType.STEMI: 10000,  # Critical for life
-        PathologyType.VF: 5000,     # Emergency absolute
-        PathologyType.VT: 8000,     # High priority
-        PathologyType.AF: 15000,    # Common but important
+        PathologyType.VF: 5000,  # Emergency absolute
+        PathologyType.VT: 8000,  # High priority
+        PathologyType.AF: 15000,  # Common but important
         PathologyType.LONG_QT: 6000,
-        PathologyType.HEART_BLOCK: 7000
+        PathologyType.HEART_BLOCK: 7000,
     }
 
     STATISTICAL_REQUIREMENTS = {
@@ -63,15 +98,16 @@ class UltraRigorousCriteria:
         "cross_validation_folds": 10,
         "inter_observer_agreement": 0.9,
         "kappa_cohen": 0.8,
-        "bootstrap_iterations": 1000
+        "bootstrap_iterations": 1000,
     }
 
     OPERATIONAL_REQUIREMENTS = {
         "uptime": 99.99,  # <4h downtime/year
         "response_time_ms": 10000,  # <10s for emergencies
         "throughput_per_hour": 500,  # ECGs/hour minimum
-        "security_vulnerabilities": 0  # Zero critical/high
+        "security_vulnerabilities": 0,  # Zero critical/high
     }
+
 
 class ClinicalValidationFramework:
     """
@@ -89,7 +125,7 @@ class ClinicalValidationFramework:
         pathology: PathologyType,
         predictions: npt.NDArray[np.float64],
         ground_truth: npt.NDArray[np.int64],
-        detection_times_ms: npt.NDArray[np.float64]
+        detection_times_ms: npt.NDArray[np.float64],
     ) -> ValidationMetrics:
         """
         Validate pathology detection with ultra-rigorous statistical analysis
@@ -125,7 +161,7 @@ class ClinicalValidationFramework:
         ppv = tp / (tp + fp) if (tp + fp) > 0 else 0.0
 
         ci_lower, ci_upper = self._bootstrap_confidence_interval(
-            predictions, ground_truth, metric='sensitivity'
+            predictions, ground_truth, metric="sensitivity"
         )
 
         positive_indices = ground_truth == 1
@@ -143,7 +179,7 @@ class ClinicalValidationFramework:
             confidence_interval=(ci_lower * 100, ci_upper * 100),
             sample_size=len(predictions),
             kappa_cohen=kappa_cohen,
-            inter_observer_agreement=inter_observer
+            inter_observer_agreement=inter_observer,
         )
 
         self._validate_against_criteria(pathology, metrics)
@@ -155,7 +191,7 @@ class ClinicalValidationFramework:
         self,
         predictions: npt.NDArray[np.float64],
         ground_truth: npt.NDArray[np.int64],
-        pathology: PathologyType
+        pathology: PathologyType,
     ) -> float:
         """Find optimal threshold maximizing sensitivity while meeting specificity requirements"""
 
@@ -190,8 +226,8 @@ class ClinicalValidationFramework:
         self,
         predictions: npt.NDArray[np.float64],
         ground_truth: npt.NDArray[np.int64],
-        metric: str = 'sensitivity',
-        n_bootstrap: int = 1000
+        metric: str = "sensitivity",
+        n_bootstrap: int = 1000,
     ) -> tuple[float, float]:
         """Calculate bootstrap confidence intervals"""
 
@@ -209,7 +245,7 @@ class ClinicalValidationFramework:
             tp = np.sum((binary_pred == 1) & (boot_truth == 1))
             fn = np.sum((binary_pred == 0) & (boot_truth == 1))
 
-            if metric == 'sensitivity':
+            if metric == "sensitivity":
                 metric_value = tp / (tp + fn) if (tp + fn) > 0 else 0.0
             else:
                 metric_value = 0.0  # Placeholder for other metrics
@@ -222,9 +258,7 @@ class ClinicalValidationFramework:
         return ci_lower, ci_upper
 
     def _calculate_kappa_cohen(
-        self,
-        predictions: npt.NDArray[np.int64],
-        ground_truth: npt.NDArray[np.int64]
+        self, predictions: npt.NDArray[np.int64], ground_truth: npt.NDArray[np.int64]
     ) -> float:
         """Calculate Cohen's Kappa for inter-rater agreement"""
 
@@ -247,15 +281,13 @@ class ClinicalValidationFramework:
             PathologyType.VT: 0.92,
             PathologyType.AF: 0.88,
             PathologyType.LONG_QT: 0.85,
-            PathologyType.HEART_BLOCK: 0.90
+            PathologyType.HEART_BLOCK: 0.90,
         }
 
         return base_agreement.get(pathology, 0.85)
 
     def _validate_against_criteria(
-        self,
-        pathology: PathologyType,
-        metrics: ValidationMetrics
+        self, pathology: PathologyType, metrics: ValidationMetrics
     ) -> None:
         """Validate metrics against ultra-rigorous criteria"""
 
@@ -299,7 +331,9 @@ class ClinicalValidationFramework:
                 f"below required {stat_req['inter_observer_agreement']}"
             )
 
-        logger.info(f"✅ {pathology.value} validation PASSED all ultra-rigorous criteria")
+        logger.info(
+            f"✅ {pathology.value} validation PASSED all ultra-rigorous criteria"
+        )
 
     def generate_validation_report(self) -> dict[str, Any]:
         """Generate comprehensive validation report"""
@@ -310,7 +344,7 @@ class ClinicalValidationFramework:
             "validation_date": "2025-06-03",
             "pathology_results": {},
             "overall_compliance": True,
-            "recommendations": []
+            "recommendations": [],
         }
 
         for pathology, metrics in self.validation_results.items():
@@ -324,7 +358,7 @@ class ClinicalValidationFramework:
                 "sample_size": metrics.sample_size,
                 "kappa_cohen": f"{metrics.kappa_cohen:.3f}",
                 "inter_observer_agreement": f"{metrics.inter_observer_agreement:.3f}",
-                "status": "PASSED"
+                "status": "PASSED",
             }
 
         report["recommendations"] = [
@@ -332,10 +366,11 @@ class ClinicalValidationFramework:
             "Establish partnership with cardiology centers",
             "Implement real-time monitoring of clinical performance",
             "Schedule quarterly validation reviews",
-            "Maintain ISO 13485 quality management system"
+            "Maintain ISO 13485 quality management system",
         ]
 
         return report
+
 
 class FailSafeValidator:
     """
@@ -357,7 +392,7 @@ class FailSafeValidator:
         pathology: PathologyType,
         predictions_list: list[npt.NDArray[np.float64]],
         ground_truth: npt.NDArray[np.int64],
-        detection_times_ms: npt.NDArray[np.float64]
+        detection_times_ms: npt.NDArray[np.float64],
     ) -> ValidationMetrics:
         """
         Perform ensemble validation with multiple validators
@@ -374,9 +409,11 @@ class FailSafeValidator:
         )
         validation_results.append(primary_result)
 
-        for i, validator in enumerate(self.secondary_validators[:len(predictions_list)-1]):
+        for i, validator in enumerate(
+            self.secondary_validators[: len(predictions_list) - 1]
+        ):
             result = validator.validate_pathology_detection(
-                pathology, predictions_list[i+1], ground_truth, detection_times_ms
+                pathology, predictions_list[i + 1], ground_truth, detection_times_ms
             )
             validation_results.append(result)
 
@@ -387,8 +424,7 @@ class FailSafeValidator:
         return ensemble_metrics
 
     def _calculate_ensemble_metrics(
-        self,
-        results: list[ValidationMetrics]
+        self, results: list[ValidationMetrics]
     ) -> ValidationMetrics:
         """Calculate ensemble metrics from multiple validation results"""
 
@@ -399,7 +435,9 @@ class FailSafeValidator:
 
         avg_ppv = statistics.mean(r.ppv for r in results)
         avg_kappa = statistics.mean(r.kappa_cohen for r in results)
-        avg_inter_observer = statistics.mean(r.inter_observer_agreement for r in results)
+        avg_inter_observer = statistics.mean(
+            r.inter_observer_agreement for r in results
+        )
         total_sample_size = sum(r.sample_size for r in results)
 
         ci_lower = min(r.confidence_interval[0] for r in results)
@@ -414,13 +452,11 @@ class FailSafeValidator:
             confidence_interval=(ci_lower, ci_upper),
             sample_size=total_sample_size,
             kappa_cohen=avg_kappa,
-            inter_observer_agreement=avg_inter_observer
+            inter_observer_agreement=avg_inter_observer,
         )
 
     def _verify_consensus(
-        self,
-        pathology: PathologyType,
-        results: list[ValidationMetrics]
+        self, pathology: PathologyType, results: list[ValidationMetrics]
     ) -> None:
         """Verify consensus across validators"""
 
@@ -428,9 +464,11 @@ class FailSafeValidator:
 
         passing_validators = 0
         for result in results:
-            if (result.sensitivity >= criteria["sensitivity"] and
-                result.specificity >= criteria["specificity"] and
-                result.npv >= criteria["npv"]):
+            if (
+                result.sensitivity >= criteria["sensitivity"]
+                and result.specificity >= criteria["specificity"]
+                and result.npv >= criteria["npv"]
+            ):
                 passing_validators += 1
 
         consensus_ratio = passing_validators / len(results)
@@ -441,4 +479,6 @@ class FailSafeValidator:
                 f"{consensus_ratio:.2f} < {self.consensus_threshold}"
             )
 
-        logger.info(f"✅ Ensemble consensus achieved for {pathology.value}: {consensus_ratio:.2f}")
+        logger.info(
+            f"✅ Ensemble consensus achieved for {pathology.value}: {consensus_ratio:.2f}"
+        )

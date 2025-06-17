@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Optional, Tuple
 import numpy as np
 from dataclasses import dataclass
 import shap
-import 
+import lime
 import lime.lime_tabular
 
 # Try relative import if the absolute import fails

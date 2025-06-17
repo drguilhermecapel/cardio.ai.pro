@@ -16,6 +16,7 @@ from app.api.v1.endpoints import (
 
 api_router = APIRouter()
 
+
 @api_router.get("/health")
 async def health_check() -> JSONResponse:
     """Health check endpoint for API v1."""
@@ -23,13 +24,18 @@ async def health_check() -> JSONResponse:
         content={
             "status": "healthy",
             "service": "cardioai-pro-standalone",
-            "version": "1.0.0"
+            "version": "1.0.0",
         }
     )
+
 
 api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
 api_router.include_router(ecg_analysis.router, prefix="/ecg", tags=["ecg-analysis"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])
 api_router.include_router(patients.router, prefix="/patients", tags=["patients"])
-api_router.include_router(validations.router, prefix="/validations", tags=["validations"])
-api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
+api_router.include_router(
+    validations.router, prefix="/validations", tags=["validations"]
+)
+api_router.include_router(
+    notifications.router, prefix="/notifications", tags=["notifications"]
+)

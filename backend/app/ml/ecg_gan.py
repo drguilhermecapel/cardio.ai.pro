@@ -19,13 +19,15 @@ from tqdm import tqdm
 
 from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class TimeGANConfig:
     """Configuration for TimeGAN model"""
+
     sequence_length: int = 5000
     num_features: int = 12  # 12-lead ECG
 
@@ -37,11 +39,12 @@ class TimeGANConfig:
     num_epochs: int = 1000
 
     gamma: float = 1.0  # Supervised loss weight
-    eta: float = 1.0    # Generator loss weight
+    eta: float = 1.0  # Generator loss weight
 
     realism_threshold: float = 0.7  # Target >70% realism
 
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
+
 
 class ECGTimeSeriesDataset(Dataset):
     """Dataset for ECG time series data"""
@@ -51,7 +54,7 @@ class ECGTimeSeriesDataset(Dataset):
         signals: list[np.ndarray],
         condition_codes: list[str],
         sequence_length: int = 5000,
-        preprocessor: AdvancedECGPreprocessor | None = None
+        preprocessor: AdvancedECGPreprocessor | None = None,
     ):
         self.signals = signals
         self.condition_codes = condition_codes
@@ -75,9 +78,14 @@ class ECGTimeSeriesDataset(Dataset):
                     processed_signal = result.clean_signal
 
                     if len(processed_signal) > self.sequence_length:
-                        processed_signal = processed_signal[:self.sequence_length]
+                        processed_signal = processed_signal[: self.sequence_length]
                     elif len(processed_signal) < self.sequence_length:
-                        padding = np.zeros((self.sequence_length - len(processed_signal), processed_signal.shape[1]))
+                        padding = np.zeros(
+                            (
+                                self.sequence_length - len(processed_signal),
+                                processed_signal.shape[1],
+                            )
+                        )
                         processed_signal = np.vstack([processed_signal, padding])
 
                     scaler = MinMaxScaler(feature_range=(-1, 1))
@@ -86,7 +94,9 @@ class ECGTimeSeriesDataset(Dataset):
                     self.processed_signals.append(normalized_signal)
                     self.scalers.append(scaler)
                 else:
-                    logger.debug(f"Rejected signal with quality {result.quality_metrics.overall_score}")
+                    logger.debug(
+                        f"Rejected signal with quality {result.quality_metrics.overall_score}"
+                    )
 
             except Exception as e:
                 logger.warning(f"Failed to preprocess signal: {e}")
@@ -101,14 +111,19 @@ class ECGTimeSeriesDataset(Dataset):
         signal = torch.from_numpy(self.processed_signals[idx]).float()
 
         return {
-            'signal': signal,
-            'condition_code': self.condition_codes[idx] if idx < len(self.condition_codes) else 'NORM'
+            "signal": signal,
+            "condition_code": (
+                self.condition_codes[idx] if idx < len(self.condition_codes) else "NORM"
+            ),
         }
+
 
 class LSTMGenerator(nn.Module):
     """LSTM-based generator for TimeGAN"""
 
-    def __init__(self, input_dim: int, hidden_dim: int, output_dim: int, num_layers: int = 3):
+    def __init__(
+        self, input_dim: int, hidden_dim: int, output_dim: int, num_layers: int = 3
+    ):
         super().__init__()
 
         self.input_dim = input_dim
@@ -121,7 +136,7 @@ class LSTMGenerator(nn.Module):
             hidden_size=hidden_dim,
             num_layers=num_layers,
             batch_first=True,
-            dropout=0.2 if num_layers > 1 else 0
+            dropout=0.2 if num_layers > 1 else 0,
         )
 
         self.output_projection = nn.Sequential(
@@ -129,7 +144,7 @@ class LSTMGenerator(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.2),
             nn.Linear(hidden_dim, output_dim),
-            nn.Tanh()  # Output in [-1, 1] range
+            nn.Tanh(),  # Output in [-1, 1] range
         )
 
     def forward(self, x, hidden=None):
@@ -138,6 +153,7 @@ class LSTMGenerator(nn.Module):
         output = self.output_projection(lstm_out)
 
         return output, hidden
+
 
 class LSTMDiscriminator(nn.Module):
     """LSTM-based discriminator for TimeGAN"""
@@ -154,7 +170,7 @@ class LSTMDiscriminator(nn.Module):
             hidden_size=hidden_dim,
             num_layers=num_layers,
             batch_first=True,
-            dropout=0.2 if num_layers > 1 else 0
+            dropout=0.2 if num_layers > 1 else 0,
         )
 
         self.classifier = nn.Sequential(
@@ -162,7 +178,7 @@ class LSTMDiscriminator(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.3),
             nn.Linear(hidden_dim // 2, 1),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -173,6 +189,7 @@ class LSTMDiscriminator(nn.Module):
         output = self.classifier(last_output)
 
         return output
+
 
 class LSTMEmbedder(nn.Module):
     """LSTM-based embedder for TimeGAN (maps real data to latent space)"""
@@ -189,7 +206,7 @@ class LSTMEmbedder(nn.Module):
             hidden_size=hidden_dim,
             num_layers=num_layers,
             batch_first=True,
-            dropout=0.2 if num_layers > 1 else 0
+            dropout=0.2 if num_layers > 1 else 0,
         )
 
         self.output_projection = nn.Sequential(
@@ -197,7 +214,7 @@ class LSTMEmbedder(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.2),
             nn.Linear(hidden_dim, hidden_dim),
-            nn.Sigmoid()  # Latent representation in [0, 1]
+            nn.Sigmoid(),  # Latent representation in [0, 1]
         )
 
     def forward(self, x):
@@ -207,10 +224,13 @@ class LSTMEmbedder(nn.Module):
 
         return latent
 
+
 class LSTMRecovery(nn.Module):
     """LSTM-based recovery network for TimeGAN (maps latent space back to data space)"""
 
-    def __init__(self, input_dim: int, hidden_dim: int, output_dim: int, num_layers: int = 3):
+    def __init__(
+        self, input_dim: int, hidden_dim: int, output_dim: int, num_layers: int = 3
+    ):
         super().__init__()
 
         self.input_dim = input_dim
@@ -223,7 +243,7 @@ class LSTMRecovery(nn.Module):
             hidden_size=hidden_dim,
             num_layers=num_layers,
             batch_first=True,
-            dropout=0.2 if num_layers > 1 else 0
+            dropout=0.2 if num_layers > 1 else 0,
         )
 
         self.output_projection = nn.Sequential(
@@ -231,7 +251,7 @@ class LSTMRecovery(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.2),
             nn.Linear(hidden_dim, output_dim),
-            nn.Tanh()  # Output in [-1, 1] range
+            nn.Tanh(),  # Output in [-1, 1] range
         )
 
     def forward(self, x):
@@ -240,6 +260,7 @@ class LSTMRecovery(nn.Module):
         output = self.output_projection(lstm_out)
 
         return output
+
 
 class TimeGAN(nn.Module):
     """
@@ -255,27 +276,27 @@ class TimeGAN(nn.Module):
         self.embedder = LSTMEmbedder(
             input_dim=config.num_features,
             hidden_dim=config.hidden_dim,
-            num_layers=config.num_layers
+            num_layers=config.num_layers,
         )
 
         self.recovery = LSTMRecovery(
             input_dim=config.hidden_dim,
             hidden_dim=config.hidden_dim,
             output_dim=config.num_features,
-            num_layers=config.num_layers
+            num_layers=config.num_layers,
         )
 
         self.generator = LSTMGenerator(
             input_dim=config.hidden_dim,  # Takes noise in latent space
             hidden_dim=config.hidden_dim,
             output_dim=config.hidden_dim,
-            num_layers=config.num_layers
+            num_layers=config.num_layers,
         )
 
         self.discriminator = LSTMDiscriminator(
             input_dim=config.hidden_dim,
             hidden_dim=config.hidden_dim,
-            num_layers=config.num_layers
+            num_layers=config.num_layers,
         )
 
         self.mse_loss = nn.MSELoss()
@@ -290,7 +311,9 @@ class TimeGAN(nn.Module):
         X_tilde = self.recovery(H)
 
         if z is None:
-            z = torch.randn(batch_size, seq_len, self.config.hidden_dim, device=x.device)
+            z = torch.randn(
+                batch_size, seq_len, self.config.hidden_dim, device=x.device
+            )
         E, _ = self.generator(z)
 
         X_hat = self.recovery(E)
@@ -299,15 +322,17 @@ class TimeGAN(nn.Module):
         Y_fake = self.discriminator(E)
 
         return {
-            'H': H,
-            'X_tilde': X_tilde,
-            'E': E,
-            'X_hat': X_hat,
-            'Y_real': Y_real,
-            'Y_fake': Y_fake
+            "H": H,
+            "X_tilde": X_tilde,
+            "E": E,
+            "X_hat": X_hat,
+            "Y_real": Y_real,
+            "Y_fake": Y_fake,
         }
 
-    def generate(self, num_samples: int, condition_code: str | None = None) -> np.ndarray:
+    def generate(
+        self, num_samples: int, condition_code: str | None = None
+    ) -> np.ndarray:
         """Generate synthetic ECG signals"""
         self.eval()
 
@@ -316,7 +341,7 @@ class TimeGAN(nn.Module):
                 num_samples,
                 self.config.sequence_length,
                 self.config.hidden_dim,
-                device=next(self.parameters()).device
+                device=next(self.parameters()).device,
             )
 
             E, _ = self.generator(z)
@@ -327,6 +352,7 @@ class TimeGAN(nn.Module):
 
         self.train()
         return synthetic_signals
+
 
 class ECGQualityValidator:
     """Validates the quality and realism of synthetic ECG signals"""
@@ -340,19 +366,19 @@ class ECGQualityValidator:
             result = self.preprocessor.process(signal)
 
             quality_metrics = {
-                'overall_score': result.quality_metrics.overall_score,
-                'snr': result.quality_metrics.snr,
-                'baseline_wander': result.quality_metrics.baseline_wander,
-                'powerline_interference': result.quality_metrics.powerline_interference,
-                'muscle_artifacts': result.quality_metrics.muscle_artifacts,
-                'electrode_artifacts': result.quality_metrics.electrode_artifacts
+                "overall_score": result.quality_metrics.overall_score,
+                "snr": result.quality_metrics.snr,
+                "baseline_wander": result.quality_metrics.baseline_wander,
+                "powerline_interference": result.quality_metrics.powerline_interference,
+                "muscle_artifacts": result.quality_metrics.muscle_artifacts,
+                "electrode_artifacts": result.quality_metrics.electrode_artifacts,
             }
 
             return quality_metrics
 
         except Exception as e:
             logger.warning(f"Quality validation failed: {e}")
-            return {'overall_score': 0.0}
+            return {"overall_score": 0.0}
 
     def validate_morphological_features(self, signal: np.ndarray) -> dict[str, float]:
         """Validate ECG morphological features"""
@@ -365,24 +391,28 @@ class ECGQualityValidator:
             if len(peaks) > 1:
                 rr_intervals = np.diff(peaks) / 500.0  # Assuming 500 Hz
                 heart_rate = 60.0 / np.mean(rr_intervals)
-                features['heart_rate'] = heart_rate
-                features['heart_rate_valid'] = 1.0 if 40 <= heart_rate <= 200 else 0.0
+                features["heart_rate"] = heart_rate
+                features["heart_rate_valid"] = 1.0 if 40 <= heart_rate <= 200 else 0.0
             else:
-                features['heart_rate'] = 0.0
-                features['heart_rate_valid'] = 0.0
+                features["heart_rate"] = 0.0
+                features["heart_rate_valid"] = 0.0
 
             amplitude_range = np.max(lead_ii) - np.min(lead_ii)
-            features['amplitude_range'] = amplitude_range
-            features['amplitude_valid'] = 1.0 if 0.5 <= amplitude_range <= 5.0 else 0.0
+            features["amplitude_range"] = amplitude_range
+            features["amplitude_valid"] = 1.0 if 0.5 <= amplitude_range <= 5.0 else 0.0
 
             baseline_std = np.std(lead_ii[:500])  # First 1 second
-            features['baseline_stability'] = 1.0 / (1.0 + baseline_std)
+            features["baseline_stability"] = 1.0 / (1.0 + baseline_std)
 
             return features
 
         except Exception as e:
             logger.warning(f"Morphological validation failed: {e}")
-            return {'heart_rate_valid': 0.0, 'amplitude_valid': 0.0, 'baseline_stability': 0.0}
+            return {
+                "heart_rate_valid": 0.0,
+                "amplitude_valid": 0.0,
+                "baseline_stability": 0.0,
+            }
 
     def _detect_r_peaks(self, signal: np.ndarray, fs: int = 500) -> np.ndarray:
         """Simple R-peak detection"""
@@ -392,9 +422,11 @@ class ECGQualityValidator:
 
             peaks = []
             for i in range(1, len(diff_signal) - 1):
-                if (diff_signal[i] > threshold and
-                    diff_signal[i] > diff_signal[i-1] and
-                    diff_signal[i] > diff_signal[i+1]):
+                if (
+                    diff_signal[i] > threshold
+                    and diff_signal[i] > diff_signal[i - 1]
+                    and diff_signal[i] > diff_signal[i + 1]
+                ):
                     peaks.append(i)
 
             return np.array(peaks)
@@ -410,16 +442,18 @@ class ECGQualityValidator:
         for signal in synthetic_signals:
             try:
                 quality_metrics = self.validate_signal_quality(signal)
-                quality_score = quality_metrics.get('overall_score', 0.0)
+                quality_score = quality_metrics.get("overall_score", 0.0)
 
                 morph_metrics = self.validate_morphological_features(signal)
-                morph_score = np.mean([
-                    morph_metrics.get('heart_rate_valid', 0.0),
-                    morph_metrics.get('amplitude_valid', 0.0),
-                    morph_metrics.get('baseline_stability', 0.0)
-                ])
+                morph_score = np.mean(
+                    [
+                        morph_metrics.get("heart_rate_valid", 0.0),
+                        morph_metrics.get("amplitude_valid", 0.0),
+                        morph_metrics.get("baseline_stability", 0.0),
+                    ]
+                )
 
-                combined_score = (quality_score * 0.6 + morph_score * 0.4)
+                combined_score = quality_score * 0.6 + morph_score * 0.4
                 total_score += combined_score
                 valid_signals += 1
 
@@ -433,6 +467,7 @@ class ECGQualityValidator:
         average_realism = total_score / valid_signals
         return average_realism
 
+
 class TimeGANTrainer:
     """Training pipeline for TimeGAN"""
 
@@ -443,29 +478,25 @@ class TimeGANTrainer:
         self.model = TimeGAN(config).to(self.device)
 
         self.optimizer_embedder = optim.Adam(
-            self.model.embedder.parameters(),
-            lr=config.learning_rate
+            self.model.embedder.parameters(), lr=config.learning_rate
         )
         self.optimizer_recovery = optim.Adam(
-            self.model.recovery.parameters(),
-            lr=config.learning_rate
+            self.model.recovery.parameters(), lr=config.learning_rate
         )
         self.optimizer_generator = optim.Adam(
-            self.model.generator.parameters(),
-            lr=config.learning_rate
+            self.model.generator.parameters(), lr=config.learning_rate
         )
         self.optimizer_discriminator = optim.Adam(
-            self.model.discriminator.parameters(),
-            lr=config.learning_rate
+            self.model.discriminator.parameters(), lr=config.learning_rate
         )
 
         self.quality_validator = ECGQualityValidator()
 
         self.training_history = {
-            'embedder_loss': [],
-            'generator_loss': [],
-            'discriminator_loss': [],
-            'realism_score': []
+            "embedder_loss": [],
+            "generator_loss": [],
+            "discriminator_loss": [],
+            "realism_score": [],
         }
 
     def train_embedder_recovery(self, data_loader: DataLoader, num_epochs: int = 100):
@@ -477,7 +508,7 @@ class TimeGANTrainer:
             num_batches = 0
 
             for batch in tqdm(data_loader, desc=f"Embedder Epoch {epoch+1}"):
-                signals = batch['signal'].to(self.device)
+                signals = batch["signal"].to(self.device)
 
                 self.optimizer_embedder.zero_grad()
                 self.optimizer_recovery.zero_grad()
@@ -495,12 +526,14 @@ class TimeGANTrainer:
                 num_batches += 1
 
             avg_loss = total_loss / num_batches
-            self.training_history['embedder_loss'].append(avg_loss)
+            self.training_history["embedder_loss"].append(avg_loss)
 
             if (epoch + 1) % 10 == 0:
                 logger.info(f"Embedder Epoch {epoch+1}: Loss = {avg_loss:.6f}")
 
-    def train_generator_discriminator(self, data_loader: DataLoader, num_epochs: int = 500):
+    def train_generator_discriminator(
+        self, data_loader: DataLoader, num_epochs: int = 500
+    ):
         """Phase 2: Train generator and discriminator"""
         logger.info("Phase 2: Training generator and discriminator...")
 
@@ -510,10 +543,12 @@ class TimeGANTrainer:
             num_batches = 0
 
             for batch in tqdm(data_loader, desc=f"GAN Epoch {epoch+1}"):
-                signals = batch['signal'].to(self.device)
+                signals = batch["signal"].to(self.device)
                 batch_size, seq_len, num_features = signals.shape
 
-                z = torch.randn(batch_size, seq_len, self.config.hidden_dim, device=self.device)
+                z = torch.randn(
+                    batch_size, seq_len, self.config.hidden_dim, device=self.device
+                )
 
                 with torch.no_grad():
                     H = self.model.embedder(signals)
@@ -543,11 +578,9 @@ class TimeGANTrainer:
 
                 X_hat = self.model.recovery(E)
                 gen_loss_supervised = self.model.mse_loss(
-                    torch.mean(X_hat, dim=1),
-                    torch.mean(signals, dim=1)
+                    torch.mean(X_hat, dim=1), torch.mean(signals, dim=1)
                 ) + self.model.mse_loss(
-                    torch.var(X_hat, dim=1),
-                    torch.var(signals, dim=1)
+                    torch.var(X_hat, dim=1), torch.var(signals, dim=1)
                 )
 
                 gen_loss = gen_loss_adv + self.config.gamma * gen_loss_supervised
@@ -562,12 +595,12 @@ class TimeGANTrainer:
             avg_gen_loss = total_gen_loss / num_batches
             avg_disc_loss = total_disc_loss / num_batches
 
-            self.training_history['generator_loss'].append(avg_gen_loss)
-            self.training_history['discriminator_loss'].append(avg_disc_loss)
+            self.training_history["generator_loss"].append(avg_gen_loss)
+            self.training_history["discriminator_loss"].append(avg_disc_loss)
 
             if (epoch + 1) % 50 == 0:
                 realism_score = self._validate_generation_quality()
-                self.training_history['realism_score'].append(realism_score)
+                self.training_history["realism_score"].append(realism_score)
 
                 logger.info(
                     f"GAN Epoch {epoch+1}: "
@@ -577,7 +610,9 @@ class TimeGANTrainer:
                 )
 
                 if realism_score >= self.config.realism_threshold:
-                    logger.info(f"Target realism {self.config.realism_threshold} achieved!")
+                    logger.info(
+                        f"Target realism {self.config.realism_threshold} achieved!"
+                    )
                     break
 
     def _validate_generation_quality(self, num_samples: int = 100) -> float:
@@ -609,30 +644,38 @@ class TimeGANTrainer:
         if final_realism >= self.config.realism_threshold:
             logger.info("✅ TimeGAN training successful - target realism achieved!")
         else:
-            logger.warning(f"⚠️ TimeGAN training completed but realism {final_realism:.3f} < target {self.config.realism_threshold}")
+            logger.warning(
+                f"⚠️ TimeGAN training completed but realism {final_realism:.3f} < target {self.config.realism_threshold}"
+            )
 
         return final_realism
 
     def save_model(self, path: str):
         """Save trained model"""
-        torch.save({
-            'model_state_dict': self.model.state_dict(),
-            'config': self.config,
-            'training_history': self.training_history
-        }, path)
+        torch.save(
+            {
+                "model_state_dict": self.model.state_dict(),
+                "config": self.config,
+                "training_history": self.training_history,
+            },
+            path,
+        )
         logger.info(f"Model saved to {path}")
 
     def load_model(self, path: str):
         """Load trained model"""
         checkpoint = torch.load(path, map_location=self.device)
-        self.model.load_state_dict(checkpoint['model_state_dict'])
-        self.training_history = checkpoint.get('training_history', {})
+        self.model.load_state_dict(checkpoint["model_state_dict"])
+        self.training_history = checkpoint.get("training_history", {})
         logger.info(f"Model loaded from {path}")
+
 
 class ECGSynthesizer:
     """High-level interface for ECG synthesis using TimeGAN"""
 
-    def __init__(self, model_path: str | None = None, config: TimeGANConfig | None = None):
+    def __init__(
+        self, model_path: str | None = None, config: TimeGANConfig | None = None
+    ):
         self.config = config or TimeGANConfig()
         self.trainer = TimeGANTrainer(self.config)
 
@@ -646,7 +689,7 @@ class ECGSynthesizer:
         self,
         signals: list[np.ndarray],
         condition_codes: list[str],
-        save_path: str | None = None
+        save_path: str | None = None,
     ) -> float:
         """Train TimeGAN on provided ECG data"""
         logger.info(f"Training TimeGAN on {len(signals)} ECG signals...")
@@ -654,14 +697,11 @@ class ECGSynthesizer:
         dataset = ECGTimeSeriesDataset(
             signals=signals,
             condition_codes=condition_codes,
-            sequence_length=self.config.sequence_length
+            sequence_length=self.config.sequence_length,
         )
 
         data_loader = DataLoader(
-            dataset,
-            batch_size=self.config.batch_size,
-            shuffle=True,
-            drop_last=True
+            dataset, batch_size=self.config.batch_size, shuffle=True, drop_last=True
         )
 
         final_realism = self.trainer.train(data_loader)
@@ -673,9 +713,7 @@ class ECGSynthesizer:
         return final_realism
 
     def generate_synthetic_ecgs(
-        self,
-        num_samples: int,
-        condition_code: str | None = None
+        self, num_samples: int, condition_code: str | None = None
     ) -> list[np.ndarray]:
         """Generate synthetic ECG signals"""
         if not self.is_trained:
@@ -687,7 +725,9 @@ class ECGSynthesizer:
 
         signal_list = [synthetic_signals[i] for i in range(num_samples)]
 
-        realism_score = self.trainer.quality_validator.compute_realism_score(signal_list)
+        realism_score = self.trainer.quality_validator.compute_realism_score(
+            signal_list
+        )
         logger.info(f"Generated signals realism score: {realism_score:.3f}")
 
         return signal_list
@@ -696,7 +736,7 @@ class ECGSynthesizer:
         self,
         original_signals: list[np.ndarray],
         original_conditions: list[str],
-        target_balance: dict[str, int]
+        target_balance: dict[str, int],
     ) -> tuple[list[np.ndarray], list[str]]:
         """Balance rare conditions by generating synthetic samples"""
         logger.info("Balancing rare conditions with synthetic data...")
@@ -713,11 +753,12 @@ class ECGSynthesizer:
 
             if current_count < target_count:
                 needed_samples = target_count - current_count
-                logger.info(f"Generating {needed_samples} synthetic samples for {condition_code}")
+                logger.info(
+                    f"Generating {needed_samples} synthetic samples for {condition_code}"
+                )
 
                 synthetic_samples = self.generate_synthetic_ecgs(
-                    num_samples=needed_samples,
-                    condition_code=condition_code
+                    num_samples=needed_samples, condition_code=condition_code
                 )
 
                 balanced_signals.extend(synthetic_samples)
@@ -726,15 +767,17 @@ class ECGSynthesizer:
         logger.info(f"Balanced dataset: {len(balanced_signals)} total samples")
         return balanced_signals, balanced_conditions
 
+
 def create_timegan_config(**kwargs) -> TimeGANConfig:
     """Factory function to create TimeGAN configuration"""
     return TimeGANConfig(**kwargs)
+
 
 def train_ecg_timegan(
     signals: list[np.ndarray],
     condition_codes: list[str],
     config: TimeGANConfig | None = None,
-    save_path: str | None = None
+    save_path: str | None = None,
 ) -> ECGSynthesizer:
     """Train TimeGAN on ECG data"""
 
@@ -748,37 +791,37 @@ def train_ecg_timegan(
 
     return synthesizer
 
+
 def balance_stemi_condition(
     original_signals: list[np.ndarray],
     original_conditions: list[str],
-    synthesizer: ECGSynthesizer
+    synthesizer: ECGSynthesizer,
 ) -> tuple[list[np.ndarray], list[str]]:
     """
     Example: Balance STEMI condition from 0.4% to 5% as specified in requirements
     """
 
     total_samples = len(original_signals)
-    current_stemi_count = original_conditions.count('STEMI')
+    current_stemi_count = original_conditions.count("STEMI")
     current_stemi_percentage = (current_stemi_count / total_samples) * 100
 
     logger.info(f"Current STEMI percentage: {current_stemi_percentage:.2f}%")
 
     target_stemi_count = int(total_samples * 0.05)
 
-    target_balance = {
-        'STEMI': target_stemi_count
-    }
+    target_balance = {"STEMI": target_stemi_count}
 
     balanced_signals, balanced_conditions = synthesizer.balance_rare_conditions(
         original_signals, original_conditions, target_balance
     )
 
-    new_stemi_count = balanced_conditions.count('STEMI')
+    new_stemi_count = balanced_conditions.count("STEMI")
     new_stemi_percentage = (new_stemi_count / len(balanced_signals)) * 100
 
     logger.info(f"Balanced STEMI percentage: {new_stemi_percentage:.2f}%")
 
     return balanced_signals, balanced_conditions
+
 
 if __name__ == "__main__":
     config = create_timegan_config(
@@ -788,7 +831,7 @@ if __name__ == "__main__":
         batch_size=16,  # Smaller batch for memory efficiency
         learning_rate=1e-4,
         realism_threshold=0.7,
-        device="cuda" if torch.cuda.is_available() else "cpu"
+        device="cuda" if torch.cuda.is_available() else "cpu",
     )
 
     logger.info("TimeGAN ECG Synthesizer initialized")

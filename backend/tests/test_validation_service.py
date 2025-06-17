@@ -34,11 +34,24 @@ async def sample_ecg_analysis(test_db):
         sample_rate=500,
         duration_seconds=10.0,
         leads_count=12,
-        leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+        leads_names=[
+            "I",
+            "II",
+            "III",
+            "aVR",
+            "aVL",
+            "aVF",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "V5",
+            "V6",
+        ],
         status="completed",
         rhythm="atrial_fibrillation",
         heart_rate_bpm=95,
-        signal_quality_score=0.88
+        signal_quality_score=0.88,
     )
     test_db.add(analysis)
     await test_db.commit()
@@ -52,29 +65,31 @@ def sample_validation_data():
     return {
         "analysis_id": 1,
         "validator_id": 1,
-        "notes": "Requires immediate attention"
+        "notes": "Requires immediate attention",
     }
 
 
 @pytest.mark.asyncio
-async def test_create_validation_success(validation_service, sample_validation_data, test_db):
+async def test_create_validation_success(
+    validation_service, sample_validation_data, test_db
+):
     """Test successful validation creation."""
     from app.models.ecg_analysis import ECGAnalysis
     from app.models.patient import Patient
     from app.models.user import User
     from datetime import datetime
-    
+
     patient = Patient(
         patient_id="TEST001",
         first_name="Test",
         last_name="Patient",
         date_of_birth=datetime(1990, 1, 1).date(),
         gender="M",
-        created_by=1
+        created_by=1,
     )
     test_db.add(patient)
     await test_db.flush()
-    
+
     user = User(
         username="test_doctor",
         email="doctor@test.com",
@@ -82,11 +97,11 @@ async def test_create_validation_success(validation_service, sample_validation_d
         last_name="Doctor",
         hashed_password="test_hash",
         role=UserRoles.PHYSICIAN,
-        experience_years=5
+        experience_years=5,
     )
     test_db.add(user)
     await test_db.flush()
-    
+
     analysis = ECGAnalysis(
         analysis_id="test_analysis_validation_unique_001",
         patient_id=patient.id,
@@ -99,20 +114,33 @@ async def test_create_validation_success(validation_service, sample_validation_d
         sample_rate=500,
         duration_seconds=10.0,
         leads_count=12,
-        leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
-        status="completed"
+        leads_names=[
+            "I",
+            "II",
+            "III",
+            "aVR",
+            "aVL",
+            "aVF",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "V5",
+            "V6",
+        ],
+        status="completed",
     )
     test_db.add(analysis)
     await test_db.commit()
     await test_db.refresh(analysis)
-    
+
     result = await validation_service.create_validation(
         analysis_id=analysis.id,
         validator_id=user.id,
         validator_role=UserRoles.PHYSICIAN,
-        validator_experience_years=5
+        validator_experience_years=5,
     )
-    
+
     assert result is not None
     assert result.analysis_id == analysis.id
     assert result.validator_id == user.id
@@ -126,18 +154,18 @@ async def test_submit_validation(validation_service, test_db):
     from app.models.patient import Patient
     from app.models.user import User
     from datetime import datetime
-    
+
     patient = Patient(
         patient_id="TEST002",
         first_name="Test",
         last_name="Patient",
         date_of_birth=datetime(1990, 1, 1).date(),
         gender="M",
-        created_by=1
+        created_by=1,
     )
     test_db.add(patient)
     await test_db.flush()
-    
+
     user = User(
         username="test_validator",
         email="validator@test.com",
@@ -145,11 +173,11 @@ async def test_submit_validation(validation_service, test_db):
         last_name="Validator",
         hashed_password="test_hash",
         role=UserRoles.PHYSICIAN,
-        experience_years=5
+        experience_years=5,
     )
     test_db.add(user)
     await test_db.flush()
-    
+
     analysis = ECGAnalysis(
         analysis_id="test_analysis_submit_unique_001",
         patient_id=patient.id,
@@ -162,34 +190,47 @@ async def test_submit_validation(validation_service, test_db):
         sample_rate=500,
         duration_seconds=10.0,
         leads_count=12,
-        leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
-        status="completed"
+        leads_names=[
+            "I",
+            "II",
+            "III",
+            "aVR",
+            "aVL",
+            "aVF",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "V5",
+            "V6",
+        ],
+        status="completed",
     )
     test_db.add(analysis)
     await test_db.commit()
     await test_db.refresh(analysis)
-    
+
     validation = await validation_service.create_validation(
         analysis_id=analysis.id,
         validator_id=user.id,
         validator_role=UserRoles.PHYSICIAN,
-        validator_experience_years=5
+        validator_experience_years=5,
     )
-    
+
     validation_data = {
         "approved": True,
         "clinical_notes": "Normal ECG findings",
         "signal_quality_rating": 4,
         "ai_confidence_rating": 5,
-        "overall_quality_score": 0.95
+        "overall_quality_score": 0.95,
     }
-    
+
     result = await validation_service.submit_validation(
         validation_id=validation.id,
         validator_id=user.id,
-        validation_data=validation_data
+        validation_data=validation_data,
     )
-    
+
     assert result is not None
     assert result.status == ValidationStatus.APPROVED
     assert result.clinical_notes == "Normal ECG findings"
@@ -202,18 +243,18 @@ async def test_create_urgent_validation(validation_service, test_db):
     from app.models.patient import Patient
     from app.models.user import User
     from datetime import datetime
-    
+
     patient = Patient(
         patient_id="TEST003",
         first_name="Test",
         last_name="Patient",
         date_of_birth=datetime(1990, 1, 1).date(),
         gender="M",
-        created_by=1
+        created_by=1,
     )
     test_db.add(patient)
     await test_db.flush()
-    
+
     user = User(
         username="test_urgent_validator",
         email="urgent@test.com",
@@ -221,11 +262,11 @@ async def test_create_urgent_validation(validation_service, test_db):
         last_name="Urgent",
         hashed_password="test_hash",
         role=UserRoles.PHYSICIAN,
-        experience_years=10
+        experience_years=10,
     )
     test_db.add(user)
     await test_db.flush()
-    
+
     analysis = ECGAnalysis(
         analysis_id="test_analysis_urgent_unique_001",
         patient_id=patient.id,
@@ -238,15 +279,27 @@ async def test_create_urgent_validation(validation_service, test_db):
         sample_rate=500,
         duration_seconds=10.0,
         leads_count=12,
-        leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
-        status="completed"
+        leads_names=[
+            "I",
+            "II",
+            "III",
+            "aVR",
+            "aVL",
+            "aVF",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "V5",
+            "V6",
+        ],
+        status="completed",
     )
     test_db.add(analysis)
     await test_db.commit()
     await test_db.refresh(analysis)
-    
+
     await validation_service.create_urgent_validation(analysis_id=analysis.id)
-    
 
 
 @pytest.mark.asyncio
@@ -255,18 +308,18 @@ async def test_run_automated_validation_rules(validation_service, test_db):
     from app.models.ecg_analysis import ECGAnalysis
     from app.models.patient import Patient
     from datetime import datetime
-    
+
     patient = Patient(
         patient_id="TEST004",
         first_name="Test",
         last_name="Patient",
         date_of_birth=datetime(1990, 1, 1).date(),
         gender="M",
-        created_by=1
+        created_by=1,
     )
     test_db.add(patient)
     await test_db.flush()
-    
+
     analysis = ECGAnalysis(
         analysis_id="test_analysis_rules_unique_001",
         patient_id=patient.id,
@@ -279,16 +332,29 @@ async def test_run_automated_validation_rules(validation_service, test_db):
         sample_rate=500,
         duration_seconds=10.0,
         leads_count=12,
-        leads_names=["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"],
+        leads_names=[
+            "I",
+            "II",
+            "III",
+            "aVR",
+            "aVL",
+            "aVF",
+            "V1",
+            "V2",
+            "V3",
+            "V4",
+            "V5",
+            "V6",
+        ],
         status="completed",
         heart_rate_bpm=180,  # High heart rate for testing
-        signal_quality_score=0.95
+        signal_quality_score=0.95,
     )
     test_db.add(analysis)
     await test_db.commit()
     await test_db.refresh(analysis)
-    
+
     results = await validation_service.run_automated_validation_rules(analysis.id)
-    
+
     assert results is not None
     assert isinstance(results, list)

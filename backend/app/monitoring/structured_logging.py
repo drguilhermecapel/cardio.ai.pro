@@ -16,7 +16,7 @@ def setup_structured_logging(log_level: str = "INFO") -> None:
     logging.basicConfig(
         format="%(message)s",
         stream=sys.stdout,
-        level=getattr(logging, log_level.upper())
+        level=getattr(logging, log_level.upper()),
     )
 
     structlog.configure(
@@ -30,12 +30,13 @@ def setup_structured_logging(log_level: str = "INFO") -> None:
             structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
             structlog.processors.dict_tracebacks,
-            structlog.processors.JSONRenderer()
+            structlog.processors.JSONRenderer(),
         ],
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
+
 
 class ECGLogger:
     """Structured logger for ECG analysis operations"""
@@ -49,7 +50,7 @@ class ECGLogger:
         format: str,
         lead_count: int,
         sampling_rate: int,
-        analysis_id: str
+        analysis_id: str,
     ) -> None:
         """Log start of ECG analysis"""
         self.logger.info(
@@ -60,7 +61,7 @@ class ECGLogger:
             ecg_format=format,
             lead_count=lead_count,
             sampling_rate=sampling_rate,
-            timestamp=datetime.now(UTC).isoformat()
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     def log_analysis_complete(
@@ -70,7 +71,7 @@ class ECGLogger:
         pathologies_detected: int,
         confidence_mean: float,
         processing_time: float,
-        regulatory_compliant: bool
+        regulatory_compliant: bool,
     ) -> None:
         """Log completion of ECG analysis"""
         self.logger.info(
@@ -82,7 +83,7 @@ class ECGLogger:
             confidence_mean=confidence_mean,
             processing_time_seconds=processing_time,
             regulatory_compliant=regulatory_compliant,
-            timestamp=datetime.now(UTC).isoformat()
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     def log_analysis_error(
@@ -92,7 +93,7 @@ class ECGLogger:
         error_type: str,
         error_message: str,
         step: str,
-        exc_info: bool = True
+        exc_info: bool = True,
     ) -> None:
         """Log ECG analysis error"""
         self.logger.error(
@@ -104,7 +105,7 @@ class ECGLogger:
             error_message=error_message,
             failed_step=step,
             timestamp=datetime.now(UTC).isoformat(),
-            exc_info=exc_info
+            exc_info=exc_info,
         )
 
     def log_pathology_detection(
@@ -114,7 +115,7 @@ class ECGLogger:
         pathology_type: str,
         confidence: float,
         model_name: str,
-        clinical_significance: str
+        clinical_significance: str,
     ) -> None:
         """Log pathology detection"""
         self.logger.info(
@@ -126,7 +127,7 @@ class ECGLogger:
             confidence=confidence,
             model_name=model_name,
             clinical_significance=clinical_significance,
-            timestamp=datetime.now(UTC).isoformat()
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     def log_regulatory_validation(
@@ -134,7 +135,7 @@ class ECGLogger:
         analysis_id: str,
         standard: str,
         compliant: bool,
-        validation_details: dict[str, Any]
+        validation_details: dict[str, Any],
     ) -> None:
         """Log regulatory validation result"""
         self.logger.info(
@@ -144,7 +145,7 @@ class ECGLogger:
             regulatory_standard=standard,
             compliant=compliant,
             validation_details=validation_details,
-            timestamp=datetime.now(UTC).isoformat()
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     def log_model_performance(
@@ -153,7 +154,7 @@ class ECGLogger:
         model_version: str,
         inference_time: float,
         memory_usage_mb: float,
-        batch_size: int
+        batch_size: int,
     ) -> None:
         """Log model performance metrics"""
         self.logger.info(
@@ -164,7 +165,7 @@ class ECGLogger:
             inference_time_seconds=inference_time,
             memory_usage_mb=memory_usage_mb,
             batch_size=batch_size,
-            timestamp=datetime.now(UTC).isoformat()
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     def log_signal_quality(
@@ -173,7 +174,7 @@ class ECGLogger:
         analysis_id: str,
         lead_qualities: dict[str, float],
         overall_quality: float,
-        quality_issues: list[str]
+        quality_issues: list[str],
     ) -> None:
         """Log signal quality assessment"""
         self.logger.info(
@@ -184,7 +185,7 @@ class ECGLogger:
             lead_qualities=lead_qualities,
             overall_quality=overall_quality,
             quality_issues=quality_issues,
-            timestamp=datetime.now(UTC).isoformat()
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     def log_preprocessing_step(
@@ -194,7 +195,7 @@ class ECGLogger:
         input_shape: tuple[int, ...],
         output_shape: tuple[int, ...],
         parameters: dict[str, Any],
-        duration: float
+        duration: float,
     ) -> None:
         """Log preprocessing step details"""
         self.logger.debug(
@@ -206,7 +207,7 @@ class ECGLogger:
             output_shape=output_shape,
             parameters=parameters,
             duration_seconds=duration,
-            timestamp=datetime.now(UTC).isoformat()
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     def log_feature_extraction(
@@ -214,7 +215,7 @@ class ECGLogger:
         analysis_id: str,
         feature_types: list[str],
         feature_count: int,
-        extraction_time: float
+        extraction_time: float,
     ) -> None:
         """Log feature extraction results"""
         self.logger.info(
@@ -224,8 +225,9 @@ class ECGLogger:
             feature_types=feature_types,
             feature_count=feature_count,
             extraction_time_seconds=extraction_time,
-            timestamp=datetime.now(UTC).isoformat()
+            timestamp=datetime.now(UTC).isoformat(),
         )
+
 
 def get_ecg_logger(name: str) -> ECGLogger:
     """Get a structured ECG logger instance"""

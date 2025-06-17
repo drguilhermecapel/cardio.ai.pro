@@ -21,6 +21,7 @@ class CardioAIException(Exception):
         self.details = details or {}
         super().__init__(self.message)
 
+
 class ValidationException(CardioAIException):
     """Validation error exception."""
 
@@ -37,6 +38,7 @@ class ValidationException(CardioAIException):
             details={"errors": self.errors},
         )
 
+
 class AuthenticationException(CardioAIException):
     """Authentication error exception."""
 
@@ -46,6 +48,7 @@ class AuthenticationException(CardioAIException):
             error_code="AUTHENTICATION_ERROR",
             status_code=401,
         )
+
 
 class PermissionDeniedException(CardioAIException):
     """Permission denied exception."""
@@ -57,6 +60,7 @@ class PermissionDeniedException(CardioAIException):
             status_code=403,
         )
 
+
 class NotFoundException(CardioAIException):
     """Resource not found exception."""
 
@@ -66,6 +70,7 @@ class NotFoundException(CardioAIException):
             error_code="NOT_FOUND",
             status_code=404,
         )
+
 
 class ConflictException(CardioAIException):
     """Resource conflict exception."""
@@ -77,6 +82,7 @@ class ConflictException(CardioAIException):
             status_code=409,
         )
 
+
 class ECGProcessingException(CardioAIException):
     """ECG processing error exception."""
 
@@ -87,6 +93,7 @@ class ECGProcessingException(CardioAIException):
             status_code=422,
             details=details,
         )
+
 
 class MLModelException(CardioAIException):
     """ML model error exception."""
@@ -100,11 +107,13 @@ class MLModelException(CardioAIException):
             details=details,
         )
 
+
 class ValidationNotFoundException(NotFoundException):
     """Validation not found exception."""
 
     def __init__(self, validation_id: str) -> None:
         super().__init__(f"Validation {validation_id} not found")
+
 
 class AnalysisNotFoundException(NotFoundException):
     """Analysis not found exception."""
@@ -112,17 +121,20 @@ class AnalysisNotFoundException(NotFoundException):
     def __init__(self, analysis_id: str) -> None:
         super().__init__(f"Analysis {analysis_id} not found")
 
+
 class ValidationAlreadyExistsException(ConflictException):
     """Validation already exists exception."""
 
     def __init__(self, analysis_id: str) -> None:
         super().__init__(f"Validation for analysis {analysis_id} already exists")
 
+
 class InsufficientPermissionsException(PermissionDeniedException):
     """Insufficient permissions exception."""
 
     def __init__(self, required_permission: str) -> None:
         super().__init__(f"Insufficient permissions. Required: {required_permission}")
+
 
 class RateLimitExceededException(CardioAIException):
     """Rate limit exceeded exception."""
@@ -133,6 +145,7 @@ class RateLimitExceededException(CardioAIException):
             error_code="RATE_LIMIT_EXCEEDED",
             status_code=429,
         )
+
 
 class FileProcessingException(CardioAIException):
     """File processing error exception."""
@@ -146,6 +159,7 @@ class FileProcessingException(CardioAIException):
             details=details,
         )
 
+
 class DatabaseException(CardioAIException):
     """Database error exception."""
 
@@ -155,6 +169,7 @@ class DatabaseException(CardioAIException):
             error_code="DATABASE_ERROR",
             status_code=500,
         )
+
 
 class ExternalServiceException(CardioAIException):
     """External service error exception."""
@@ -168,6 +183,7 @@ class ExternalServiceException(CardioAIException):
             details=details,
         )
 
+
 class NonECGImageException(CardioAIException):
     """Non-ECG image detected exception with contextual response."""
 
@@ -176,7 +192,7 @@ class NonECGImageException(CardioAIException):
         message: str,
         category: str,
         contextual_response: dict[str, Any],
-        confidence: float = 0.0
+        confidence: float = 0.0,
     ) -> None:
         super().__init__(
             message=message,
@@ -185,6 +201,6 @@ class NonECGImageException(CardioAIException):
             details={
                 "category": category,
                 "confidence": confidence,
-                "contextual_response": contextual_response
+                "contextual_response": contextual_response,
             },
         )

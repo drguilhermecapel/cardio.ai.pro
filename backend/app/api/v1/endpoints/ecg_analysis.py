@@ -29,6 +29,7 @@ from app.tasks.ecg_tasks import process_ecg_analysis_sync
 
 router = APIRouter()
 
+
 @router.post("/upload", response_model=ECGUploadResponse)
 async def upload_ecg(
     patient_id: int = Form(...),
@@ -37,31 +38,32 @@ async def upload_ecg(
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """Upload ECG file for analysis."""
-    allowed_extensions = {'.csv', '.txt', '.xml', '.dat', '.png', '.jpg', '.jpeg'}
+    allowed_extensions = {".csv", ".txt", ".xml", ".dat", ".png", ".jpg", ".jpeg"}
     file_extension = os.path.splitext(file.filename or "")[1].lower()
 
     if file_extension not in allowed_extensions:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unsupported file type. Allowed: {', '.join(allowed_extensions)}"
+            detail=f"Unsupported file type. Allowed: {', '.join(allowed_extensions)}",
         )
 
-    if file_extension in {'.png', '.jpg', '.jpeg'}:
+    if file_extension in {".png", ".jpg", ".jpeg"}:
         try:
             from PIL import Image
+
             with Image.open(file.file) as img:
                 img.verify()
             await file.seek(0)
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Invalid image file: {str(e)}"
+                detail=f"Invalid image file: {str(e)}",
             ) from e
 
     if file.size and file.size > settings.MAX_ECG_FILE_SIZE:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File too large. Maximum size: {settings.MAX_ECG_FILE_SIZE} bytes"
+            detail=f"File too large. Maximum size: {settings.MAX_ECG_FILE_SIZE} bytes",
         )
 
     file_id = str(uuid.uuid4())
@@ -97,6 +99,7 @@ async def upload_ecg(
         estimated_processing_time_seconds=0,
     )
 
+
 @router.get("/{analysis_id}", response_model=ECGAnalysis)
 async def get_analysis(
     analysis_id: str,
@@ -111,17 +114,17 @@ async def get_analysis(
     analysis = await ecg_service.repository.get_analysis_by_analysis_id(analysis_id)
     if not analysis:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Analysis not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found"
         )
 
     if not current_user.is_superuser and analysis.created_by != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view this analysis"
+            detail="Not authorized to view this analysis",
         )
 
     return analysis
+
 
 @router.get("/", response_model=ECGAnalysisList)
 async def list_analyses(
@@ -155,6 +158,7 @@ async def list_analyses(
         page=offset // limit + 1,
         size=limit,
     )
+
 
 @router.post("/search", response_model=ECGAnalysisList)
 async def search_analyses(
@@ -200,6 +204,7 @@ async def search_analyses(
         size=limit,
     )
 
+
 @router.get("/{analysis_id}/measurements", response_model=list[ECGMeasurement])
 async def get_measurements(
     analysis_id: str,
@@ -214,18 +219,20 @@ async def get_measurements(
     analysis = await ecg_service.repository.get_analysis_by_analysis_id(analysis_id)
     if not analysis:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Analysis not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found"
         )
 
     if not current_user.is_superuser and analysis.created_by != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view this analysis"
+            detail="Not authorized to view this analysis",
         )
 
-    measurements = await ecg_service.repository.get_measurements_by_analysis(analysis.id)
+    measurements = await ecg_service.repository.get_measurements_by_analysis(
+        analysis.id
+    )
     return measurements
+
 
 @router.get("/{analysis_id}/annotations", response_model=list[ECGAnnotation])
 async def get_annotations(
@@ -241,18 +248,18 @@ async def get_annotations(
     analysis = await ecg_service.repository.get_analysis_by_analysis_id(analysis_id)
     if not analysis:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Analysis not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found"
         )
 
     if not current_user.is_superuser and analysis.created_by != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view this analysis"
+            detail="Not authorized to view this analysis",
         )
 
     annotations = await ecg_service.repository.get_annotations_by_analysis(analysis.id)
     return annotations
+
 
 @router.delete("/{analysis_id}")
 async def delete_analysis(
@@ -268,24 +275,24 @@ async def delete_analysis(
     analysis = await ecg_service.repository.get_analysis_by_analysis_id(analysis_id)
     if not analysis:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Analysis not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found"
         )
 
     if not current_user.is_superuser and analysis.created_by != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to delete this analysis"
+            detail="Not authorized to delete this analysis",
         )
 
     success = await ecg_service.delete_analysis(analysis.id)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to delete analysis"
+            detail="Failed to delete analysis",
         )
 
     return {"message": "Analysis deleted successfully"}
+
 
 @router.post("/{analysis_id}/generate-report")
 async def generate_report(
@@ -301,14 +308,13 @@ async def generate_report(
     analysis = await ecg_service.repository.get_analysis_by_analysis_id(analysis_id)
     if not analysis:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Analysis not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found"
         )
 
     if not current_user.is_superuser and analysis.created_by != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to generate report for this analysis"
+            detail="Not authorized to generate report for this analysis",
         )
 
     try:
@@ -317,13 +323,14 @@ async def generate_report(
             "message": "Report generated successfully",
             "report_id": report.get("report_id"),
             "analysis_id": analysis_id,
-            "status": "completed"
+            "status": "completed",
         }
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate report: {str(e)}"
+            detail=f"Failed to generate report: {str(e)}",
         ) from e
+
 
 @router.get("/critical/pending", response_model=list[ECGAnalysis])
 async def get_critical_pending(
@@ -334,8 +341,7 @@ async def get_critical_pending(
     """Get critical analyses pending validation."""
     if not current_user.is_physician:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
         )
 
     ml_service = MLModelService()

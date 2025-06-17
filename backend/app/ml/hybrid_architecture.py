@@ -13,9 +13,11 @@ import torch.nn as nn
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class ModelConfig:
     """Configuration for the hybrid model"""
+
     input_channels: int = 12
     sequence_length: int = 5000
     num_classes: int = 71
@@ -25,6 +27,7 @@ class ModelConfig:
     transformer_layers: int = 4
     dropout_rate: float = 0.2
     ensemble_weights: list[float] | None = None
+
 
 class FrequencyChannelAttention(nn.Module):
     """
@@ -40,7 +43,7 @@ class FrequencyChannelAttention(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(channels, channels // reduction, bias=False),
             nn.ReLU(inplace=True),
-            nn.Linear(channels // reduction, channels, bias=False)
+            nn.Linear(channels // reduction, channels, bias=False),
         )
 
         self.sigmoid = nn.Sigmoid()
@@ -54,6 +57,7 @@ class FrequencyChannelAttention(nn.Module):
         attention = self.sigmoid(avg_out + max_out).unsqueeze(2)
         return x * attention.expand_as(x)
 
+
 class DenseLayer(nn.Module):
     """Dense layer for DenseNet architecture"""
 
@@ -65,7 +69,9 @@ class DenseLayer(nn.Module):
 
         self.bn2 = nn.BatchNorm1d(4 * growth_rate)
         self.relu2 = nn.ReLU(inplace=True)
-        self.conv2 = nn.Conv1d(4 * growth_rate, growth_rate, kernel_size=3, padding=1, bias=False)
+        self.conv2 = nn.Conv1d(
+            4 * growth_rate, growth_rate, kernel_size=3, padding=1, bias=False
+        )
 
         self.dropout = nn.Dropout(dropout_rate)
 
@@ -75,10 +81,17 @@ class DenseLayer(nn.Module):
         new_features = self.dropout(new_features)
         return torch.cat([x, new_features], 1)
 
+
 class DenseBlock(nn.Module):
     """Dense block containing multiple dense layers"""
 
-    def __init__(self, in_channels: int, growth_rate: int, num_layers: int, dropout_rate: float = 0.2):
+    def __init__(
+        self,
+        in_channels: int,
+        growth_rate: int,
+        num_layers: int,
+        dropout_rate: float = 0.2,
+    ):
         super().__init__()
         self.layers = nn.ModuleList()
 
@@ -90,6 +103,7 @@ class DenseBlock(nn.Module):
         for layer in self.layers:
             x = layer(x)
         return x
+
 
 class TransitionLayer(nn.Module):
     """Transition layer between dense blocks"""
@@ -105,6 +119,7 @@ class TransitionLayer(nn.Module):
         x = self.conv(self.relu(self.bn(x)))
         return self.pool(x)
 
+
 class DenseNetCNN(nn.Module):
     """
     DenseNet-based CNN for ECG feature extraction
@@ -118,7 +133,9 @@ class DenseNetCNN(nn.Module):
         input_channels = config.input_channels
         dropout_rate = config.dropout_rate
 
-        self.conv1 = nn.Conv1d(input_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.conv1 = nn.Conv1d(
+            input_channels, 64, kernel_size=7, stride=2, padding=3, bias=False
+        )
         self.bn1 = nn.BatchNorm1d(64)
         self.relu = nn.ReLU(inplace=True)
         self.pool1 = nn.MaxPool1d(kernel_size=3, stride=2, padding=1)
@@ -170,13 +187,20 @@ class DenseNetCNN(nn.Module):
 
         return x  # (batch, output_channels, reduced_sequence_length)
 
+
 class BiLSTMTemporalAnalyzer(nn.Module):
     """
     Bidirectional LSTM for capturing temporal dependencies in ECG signals
     Processes CNN features to understand temporal patterns
     """
 
-    def __init__(self, input_dim: int, hidden_dim: int, num_layers: int = 2, dropout_rate: float = 0.2):
+    def __init__(
+        self,
+        input_dim: int,
+        hidden_dim: int,
+        num_layers: int = 2,
+        dropout_rate: float = 0.2,
+    ):
         super().__init__()
 
         self.hidden_dim = hidden_dim
@@ -188,7 +212,7 @@ class BiLSTMTemporalAnalyzer(nn.Module):
             num_layers=num_layers,
             batch_first=True,
             bidirectional=True,
-            dropout=dropout_rate if num_layers > 1 else 0
+            dropout=dropout_rate if num_layers > 1 else 0,
         )
 
         self.dropout = nn.Dropout(dropout_rate)
@@ -202,13 +226,20 @@ class BiLSTMTemporalAnalyzer(nn.Module):
 
         return lstm_out, (hidden, cell)
 
+
 class MultiHeadTransformerEncoder(nn.Module):
     """
     Multi-head Transformer encoder for spatial-temporal correlation
     8 attention heads as specified in recommendations
     """
 
-    def __init__(self, d_model: int, num_heads: int = 8, num_layers: int = 4, dropout_rate: float = 0.1):
+    def __init__(
+        self,
+        d_model: int,
+        num_heads: int = 8,
+        num_layers: int = 4,
+        dropout_rate: float = 0.1,
+    ):
         super().__init__()
 
         self.d_model = d_model
@@ -221,15 +252,13 @@ class MultiHeadTransformerEncoder(nn.Module):
             nhead=num_heads,
             dim_feedforward=d_model * 4,
             dropout=dropout_rate,
-            activation='gelu',
+            activation="gelu",
             batch_first=True,
-            norm_first=True
+            norm_first=True,
         )
 
         self.transformer = nn.TransformerEncoder(
-            encoder_layer,
-            num_layers=num_layers,
-            norm=nn.LayerNorm(d_model)
+            encoder_layer, num_layers=num_layers, norm=nn.LayerNorm(d_model)
         )
 
         self.dropout = nn.Dropout(dropout_rate)
@@ -242,6 +271,7 @@ class MultiHeadTransformerEncoder(nn.Module):
 
         return self.dropout(transformer_out)
 
+
 class PositionalEncoding(nn.Module):
     """Positional encoding for transformer"""
 
@@ -251,17 +281,20 @@ class PositionalEncoding(nn.Module):
 
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-np.log(10000.0) / d_model))
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2).float() * (-np.log(10000.0) / d_model)
+        )
 
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
         pe = pe.unsqueeze(0).transpose(0, 1)
 
-        self.register_buffer('pe', pe)
+        self.register_buffer("pe", pe)
 
     def forward(self, x):
-        x = x + self.pe[:x.size(1), :].transpose(0, 1)
+        x = x + self.pe[: x.size(1), :].transpose(0, 1)
         return self.dropout(x)
+
 
 class EnsembleVotingSystem(nn.Module):
     """
@@ -269,7 +302,12 @@ class EnsembleVotingSystem(nn.Module):
     Combines predictions from CNN, BiLSTM, and Transformer
     """
 
-    def __init__(self, input_dim: int, num_classes: int, ensemble_weights: list[float] | None = None):
+    def __init__(
+        self,
+        input_dim: int,
+        num_classes: int,
+        ensemble_weights: list[float] | None = None,
+    ):
         super().__init__()
 
         self.num_classes = num_classes
@@ -278,33 +316,33 @@ class EnsembleVotingSystem(nn.Module):
             nn.Linear(input_dim, input_dim // 2),
             nn.ReLU(),
             nn.Dropout(0.3),
-            nn.Linear(input_dim // 2, num_classes)
+            nn.Linear(input_dim // 2, num_classes),
         )
 
         self.lstm_classifier = nn.Sequential(
             nn.Linear(input_dim, input_dim // 2),
             nn.ReLU(),
             nn.Dropout(0.3),
-            nn.Linear(input_dim // 2, num_classes)
+            nn.Linear(input_dim // 2, num_classes),
         )
 
         self.transformer_classifier = nn.Sequential(
             nn.Linear(input_dim, input_dim // 2),
             nn.ReLU(),
             nn.Dropout(0.3),
-            nn.Linear(input_dim // 2, num_classes)
+            nn.Linear(input_dim // 2, num_classes),
         )
 
         if ensemble_weights is None:
             self.ensemble_weights = nn.Parameter(torch.ones(3) / 3)
         else:
-            self.register_buffer('ensemble_weights', torch.tensor(ensemble_weights))
+            self.register_buffer("ensemble_weights", torch.tensor(ensemble_weights))
 
         self.meta_classifier = nn.Sequential(
             nn.Linear(num_classes * 3, num_classes * 2),
             nn.ReLU(),
             nn.Dropout(0.2),
-            nn.Linear(num_classes * 2, num_classes)
+            nn.Linear(num_classes * 2, num_classes),
         )
 
     def forward(self, cnn_features, lstm_features, transformer_features):
@@ -313,22 +351,23 @@ class EnsembleVotingSystem(nn.Module):
         transformer_logits = self.transformer_classifier(transformer_features)
 
         weighted_logits = (
-            self.ensemble_weights[0] * cnn_logits +
-            self.ensemble_weights[1] * lstm_logits +
-            self.ensemble_weights[2] * transformer_logits
+            self.ensemble_weights[0] * cnn_logits
+            + self.ensemble_weights[1] * lstm_logits
+            + self.ensemble_weights[2] * transformer_logits
         )
 
         concatenated = torch.cat([cnn_logits, lstm_logits, transformer_logits], dim=1)
         meta_logits = self.meta_classifier(concatenated)
 
         return {
-            'cnn_logits': cnn_logits,
-            'lstm_logits': lstm_logits,
-            'transformer_logits': transformer_logits,
-            'weighted_logits': weighted_logits,
-            'meta_logits': meta_logits,
-            'ensemble_weights': self.ensemble_weights
+            "cnn_logits": cnn_logits,
+            "lstm_logits": lstm_logits,
+            "transformer_logits": transformer_logits,
+            "weighted_logits": weighted_logits,
+            "meta_logits": meta_logits,
+            "ensemble_weights": self.ensemble_weights,
         }
+
 
 class MultimodalFusion(nn.Module):
     """
@@ -336,39 +375,35 @@ class MultimodalFusion(nn.Module):
     Processes 1D signals + 2D spectrograms + wavelet representations
     """
 
-    def __init__(self, signal_dim: int, spectrogram_dim: int, wavelet_dim: int, output_dim: int):
+    def __init__(
+        self, signal_dim: int, spectrogram_dim: int, wavelet_dim: int, output_dim: int
+    ):
         super().__init__()
 
         self.signal_processor = nn.Sequential(
-            nn.Linear(signal_dim, output_dim),
-            nn.ReLU(),
-            nn.Dropout(0.2)
+            nn.Linear(signal_dim, output_dim), nn.ReLU(), nn.Dropout(0.2)
         )
 
         self.spectrogram_processor = nn.Sequential(
-            nn.Linear(spectrogram_dim, output_dim),
-            nn.ReLU(),
-            nn.Dropout(0.2)
+            nn.Linear(spectrogram_dim, output_dim), nn.ReLU(), nn.Dropout(0.2)
         )
 
         self.wavelet_processor = nn.Sequential(
-            nn.Linear(wavelet_dim, output_dim),
-            nn.ReLU(),
-            nn.Dropout(0.2)
+            nn.Linear(wavelet_dim, output_dim), nn.ReLU(), nn.Dropout(0.2)
         )
 
         self.fusion = nn.Sequential(
             nn.Linear(output_dim * 3, output_dim * 2),
             nn.ReLU(),
             nn.Dropout(0.3),
-            nn.Linear(output_dim * 2, output_dim)
+            nn.Linear(output_dim * 2, output_dim),
         )
 
         self.attention = nn.Sequential(
             nn.Linear(output_dim * 3, output_dim),
             nn.ReLU(),
             nn.Linear(output_dim, 3),
-            nn.Softmax(dim=1)
+            nn.Softmax(dim=1),
         )
 
     def forward(self, signal_features, spectrogram_features, wavelet_features):
@@ -384,10 +419,13 @@ class MultimodalFusion(nn.Module):
         weighted_spectrogram = attention_weights[:, 1:2] * spectrogram_out
         weighted_wavelet = attention_weights[:, 2:3] * wavelet_out
 
-        fused = torch.cat([weighted_signal, weighted_spectrogram, weighted_wavelet], dim=1)
+        fused = torch.cat(
+            [weighted_signal, weighted_spectrogram, weighted_wavelet], dim=1
+        )
         output = self.fusion(fused)
 
         return output, attention_weights
+
 
 class HybridECGModel(nn.Module):
     """
@@ -406,27 +444,27 @@ class HybridECGModel(nn.Module):
             input_dim=self.cnn.output_channels,
             hidden_dim=config.lstm_hidden_dim,
             num_layers=2,
-            dropout_rate=config.dropout_rate
+            dropout_rate=config.dropout_rate,
         )
 
         self.transformer = MultiHeadTransformerEncoder(
             d_model=config.lstm_hidden_dim * 2,  # BiLSTM output is bidirectional
             num_heads=config.transformer_heads,
             num_layers=config.transformer_layers,
-            dropout_rate=config.dropout_rate
+            dropout_rate=config.dropout_rate,
         )
 
         self.multimodal_fusion = MultimodalFusion(
             signal_dim=config.lstm_hidden_dim * 2,
             spectrogram_dim=config.lstm_hidden_dim * 2,
             wavelet_dim=config.lstm_hidden_dim * 2,
-            output_dim=config.lstm_hidden_dim * 2
+            output_dim=config.lstm_hidden_dim * 2,
         )
 
         self.ensemble = EnsembleVotingSystem(
             input_dim=config.lstm_hidden_dim * 2,
             num_classes=config.num_classes,
-            ensemble_weights=config.ensemble_weights
+            ensemble_weights=config.ensemble_weights,
         )
 
         self.global_avg_pool = nn.AdaptiveAvgPool1d(1)
@@ -439,7 +477,9 @@ class HybridECGModel(nn.Module):
 
         cnn_features = self.cnn(x)  # (batch, channels, seq_len)
 
-        cnn_features_transposed = cnn_features.transpose(1, 2)  # (batch, seq_len, channels)
+        cnn_features_transposed = cnn_features.transpose(
+            1, 2
+        )  # (batch, seq_len, channels)
 
         lstm_out, (hidden, cell) = self.bilstm(cnn_features_transposed)
 
@@ -457,28 +497,30 @@ class HybridECGModel(nn.Module):
             transformer_features, transformer_features, transformer_features
         )
 
-        ensemble_results = self.ensemble(cnn_pooled, lstm_features, transformer_features)
+        ensemble_results = self.ensemble(
+            cnn_pooled, lstm_features, transformer_features
+        )
 
-        final_logits = self.final_classifier(ensemble_results['meta_logits'])
+        final_logits = self.final_classifier(ensemble_results["meta_logits"])
 
         if return_features:
             return {
-                'logits': final_logits,
-                'cnn_logits': ensemble_results['cnn_logits'],
-                'lstm_logits': ensemble_results['lstm_logits'],
-                'transformer_logits': ensemble_results['transformer_logits'],
-                'weighted_logits': ensemble_results['weighted_logits'],
-                'meta_logits': ensemble_results['meta_logits'],
-                'features': {
-                    'cnn': cnn_pooled,
-                    'lstm': lstm_features,
-                    'transformer': transformer_features,
-                    'fused': fused_features
+                "logits": final_logits,
+                "cnn_logits": ensemble_results["cnn_logits"],
+                "lstm_logits": ensemble_results["lstm_logits"],
+                "transformer_logits": ensemble_results["transformer_logits"],
+                "weighted_logits": ensemble_results["weighted_logits"],
+                "meta_logits": ensemble_results["meta_logits"],
+                "features": {
+                    "cnn": cnn_pooled,
+                    "lstm": lstm_features,
+                    "transformer": transformer_features,
+                    "fused": fused_features,
                 },
-                'attention_weights': {
-                    'ensemble': ensemble_results['ensemble_weights'],
-                    'modality': modality_weights
-                }
+                "attention_weights": {
+                    "ensemble": ensemble_results["ensemble_weights"],
+                    "modality": modality_weights,
+                },
             }
         else:
             return final_logits
@@ -499,10 +541,12 @@ class HybridECGModel(nn.Module):
             max_out = cnn_attention.fc(cnn_attention.max_pool(cnn_features).view(b, c))
             channel_attention = torch.sigmoid(avg_out + max_out)
 
-            attention_maps['cnn_channel_attention'] = channel_attention.cpu().numpy()
+            attention_maps["cnn_channel_attention"] = channel_attention.cpu().numpy()
 
             transformer_attention = torch.mean(torch.abs(transformer_out), dim=-1)
-            attention_maps['transformer_temporal_attention'] = transformer_attention.cpu().numpy()
+            attention_maps["transformer_temporal_attention"] = (
+                transformer_attention.cpu().numpy()
+            )
 
             return attention_maps
 
@@ -515,21 +559,30 @@ class HybridECGModel(nn.Module):
         total_params = self.count_parameters()
 
         summary = {
-            'total_parameters': total_params,
-            'cnn_parameters': sum(p.numel() for p in self.cnn.parameters() if p.requires_grad),
-            'lstm_parameters': sum(p.numel() for p in self.bilstm.parameters() if p.requires_grad),
-            'transformer_parameters': sum(p.numel() for p in self.transformer.parameters() if p.requires_grad),
-            'ensemble_parameters': sum(p.numel() for p in self.ensemble.parameters() if p.requires_grad),
-            'config': self.config
+            "total_parameters": total_params,
+            "cnn_parameters": sum(
+                p.numel() for p in self.cnn.parameters() if p.requires_grad
+            ),
+            "lstm_parameters": sum(
+                p.numel() for p in self.bilstm.parameters() if p.requires_grad
+            ),
+            "transformer_parameters": sum(
+                p.numel() for p in self.transformer.parameters() if p.requires_grad
+            ),
+            "ensemble_parameters": sum(
+                p.numel() for p in self.ensemble.parameters() if p.requires_grad
+            ),
+            "config": self.config,
         }
 
         return summary
+
 
 def create_hybrid_model(
     num_classes: int = 71,
     input_channels: int = 12,
     sequence_length: int = 5000,
-    **kwargs
+    **kwargs,
 ) -> HybridECGModel:
     """
     Factory function to create a hybrid ECG model
@@ -548,17 +601,22 @@ def create_hybrid_model(
         input_channels=input_channels,
         sequence_length=sequence_length,
         num_classes=num_classes,
-        **kwargs
+        **kwargs,
     )
 
     model = HybridECGModel(config)
 
-    logger.info(f"Created hybrid ECG model with {model.count_parameters():,} parameters")
+    logger.info(
+        f"Created hybrid ECG model with {model.count_parameters():,} parameters"
+    )
     logger.info(f"Model configuration: {config}")
 
     return model
 
-def load_pretrained_model(checkpoint_path: str, config: ModelConfig | None = None) -> HybridECGModel:
+
+def load_pretrained_model(
+    checkpoint_path: str, config: ModelConfig | None = None
+) -> HybridECGModel:
     """
     Load a pretrained hybrid model
 
@@ -570,20 +628,21 @@ def load_pretrained_model(checkpoint_path: str, config: ModelConfig | None = Non
         HybridECGModel: Loaded model
     """
 
-    checkpoint = torch.load(checkpoint_path, map_location='cpu')
+    checkpoint = torch.load(checkpoint_path, map_location="cpu")
 
     if config is None:
-        config = checkpoint.get('config', ModelConfig())
+        config = checkpoint.get("config", ModelConfig())
 
     if not isinstance(config, ModelConfig):
         config = ModelConfig()
 
     model = HybridECGModel(config)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    model.load_state_dict(checkpoint["model_state_dict"])
 
     logger.info(f"Loaded pretrained model from {checkpoint_path}")
 
     return model
+
 
 if __name__ == "__main__":
     model = create_hybrid_model()
@@ -611,5 +670,9 @@ if __name__ == "__main__":
     print(f"Transformer features shape: {output['features']['transformer'].shape}")
 
     attention_maps = model.get_attention_maps(x)
-    print(f"CNN channel attention shape: {attention_maps['cnn_channel_attention'].shape}")
-    print(f"Transformer temporal attention shape: {attention_maps['transformer_temporal_attention'].shape}")
+    print(
+        f"CNN channel attention shape: {attention_maps['cnn_channel_attention'].shape}"
+    )
+    print(
+        f"Transformer temporal attention shape: {attention_maps['transformer_temporal_attention'].shape}"
+    )

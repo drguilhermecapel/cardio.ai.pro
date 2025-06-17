@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AdaptiveFilterConfig:
     """Configuration for adaptive filters"""
+
     lms_step_size: float = 0.01  # Learning rate for LMS
     rls_forgetting_factor: float = 0.99  # Forgetting factor for RLS
     filter_order: int = 32  # Filter order
@@ -35,8 +36,11 @@ class LMSAdaptiveFilter:
         self.weights = np.zeros(filter_order)
         self.input_buffer = np.zeros(filter_order)
 
-    def filter_signal(self, signal: npt.NDArray[np.float64],
-                     reference_noise: npt.NDArray[np.float64] | None = None) -> npt.NDArray[np.float64]:
+    def filter_signal(
+        self,
+        signal: npt.NDArray[np.float64],
+        reference_noise: npt.NDArray[np.float64] | None = None,
+    ) -> npt.NDArray[np.float64]:
         """
         Apply LMS adaptive filtering to remove non-stationary noise
 
@@ -54,11 +58,13 @@ class LMSAdaptiveFilter:
 
         for i in range(len(signal)):
             if i < self.filter_order:
-                self.input_buffer[i:] = reference_noise[:self.filter_order-i]
+                self.input_buffer[i:] = reference_noise[: self.filter_order - i]
                 if i > 0:
-                    self.input_buffer[:i] = reference_noise[max(0, i-self.filter_order):i]
+                    self.input_buffer[:i] = reference_noise[
+                        max(0, i - self.filter_order) : i
+                    ]
             else:
-                self.input_buffer = reference_noise[i-self.filter_order:i]
+                self.input_buffer = reference_noise[i - self.filter_order : i]
 
             filter_output = np.dot(self.weights, self.input_buffer)
 
@@ -81,8 +87,12 @@ class RLSAdaptiveFilter:
     Superior performance for rapidly changing non-stationary environments
     """
 
-    def __init__(self, filter_order: int = 32, forgetting_factor: float = 0.99,
-                 regularization: float = 1e-6):
+    def __init__(
+        self,
+        filter_order: int = 32,
+        forgetting_factor: float = 0.99,
+        regularization: float = 1e-6,
+    ):
         self.filter_order = filter_order
         self.forgetting_factor = forgetting_factor
         self.regularization = regularization
@@ -91,8 +101,11 @@ class RLSAdaptiveFilter:
         self.P = np.eye(filter_order) / regularization  # Inverse correlation matrix
         self.input_buffer = np.zeros(filter_order)
 
-    def filter_signal(self, signal: npt.NDArray[np.float64],
-                     reference_noise: npt.NDArray[np.float64] | None = None) -> npt.NDArray[np.float64]:
+    def filter_signal(
+        self,
+        signal: npt.NDArray[np.float64],
+        reference_noise: npt.NDArray[np.float64] | None = None,
+    ) -> npt.NDArray[np.float64]:
         """
         Apply RLS adaptive filtering to remove non-stationary noise
 
@@ -110,11 +123,13 @@ class RLSAdaptiveFilter:
 
         for i in range(len(signal)):
             if i < self.filter_order:
-                self.input_buffer[i:] = reference_noise[:self.filter_order-i]
+                self.input_buffer[i:] = reference_noise[: self.filter_order - i]
                 if i > 0:
-                    self.input_buffer[:i] = reference_noise[max(0, i-self.filter_order):i]
+                    self.input_buffer[:i] = reference_noise[
+                        max(0, i - self.filter_order) : i
+                    ]
             else:
-                self.input_buffer = reference_noise[i-self.filter_order:i]
+                self.input_buffer = reference_noise[i - self.filter_order : i]
 
             filter_output = np.dot(self.weights, self.input_buffer)
 
@@ -148,17 +163,18 @@ class AdaptiveECGFilter:
         self.config = config or AdaptiveFilterConfig()
 
         self.lms_filter = LMSAdaptiveFilter(
-            filter_order=self.config.filter_order,
-            step_size=self.config.lms_step_size
+            filter_order=self.config.filter_order, step_size=self.config.lms_step_size
         )
 
         self.rls_filter = RLSAdaptiveFilter(
             filter_order=self.config.filter_order,
             forgetting_factor=self.config.rls_forgetting_factor,
-            regularization=self.config.regularization
+            regularization=self.config.regularization,
         )
 
-    def adaptive_filtering(self, signal: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    def adaptive_filtering(
+        self, signal: npt.NDArray[np.float64]
+    ) -> npt.NDArray[np.float64]:
         """
         Apply adaptive filtering for non-stationary noise removal
 
@@ -171,15 +187,22 @@ class AdaptiveECGFilter:
         try:
             noise_characteristics = self._assess_noise_characteristics(signal)
 
-            if self.config.adaptation_mode == "rls" or noise_characteristics["rapidly_changing"]:
+            if (
+                self.config.adaptation_mode == "rls"
+                or noise_characteristics["rapidly_changing"]
+            ):
                 logger.info("Using RLS adaptive filter for rapidly changing noise")
                 filtered_signal = self.rls_filter.filter_signal(signal)
             else:
-                logger.info("Using LMS adaptive filter for stationary/slowly varying noise")
+                logger.info(
+                    "Using LMS adaptive filter for stationary/slowly varying noise"
+                )
                 filtered_signal = self.lms_filter.filter_signal(signal)
 
             improvement_ratio = self._assess_filtering_quality(signal, filtered_signal)
-            logger.info(f"Adaptive filtering improvement ratio: {improvement_ratio:.3f}")
+            logger.info(
+                f"Adaptive filtering improvement ratio: {improvement_ratio:.3f}"
+            )
 
             return filtered_signal
 
@@ -187,7 +210,9 @@ class AdaptiveECGFilter:
             logger.warning(f"Adaptive filtering failed: {e}, returning original signal")
             return signal
 
-    def multi_channel_adaptive_filtering(self, signal: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    def multi_channel_adaptive_filtering(
+        self, signal: npt.NDArray[np.float64]
+    ) -> npt.NDArray[np.float64]:
         """
         Apply adaptive filtering to multi-channel ECG signals
 
@@ -242,11 +267,12 @@ class AdaptiveECGFilter:
         return {
             "rapidly_changing": rapidly_changing,
             "variance_ratio": variance_ratio,
-            "mean_variance": variance_mean
+            "mean_variance": variance_mean,
         }
 
-    def _assess_filtering_quality(self, original: npt.NDArray[np.float64],
-                                 filtered: npt.NDArray[np.float64]) -> float:
+    def _assess_filtering_quality(
+        self, original: npt.NDArray[np.float64], filtered: npt.NDArray[np.float64]
+    ) -> float:
         """
         Assess the quality improvement from adaptive filtering
 
@@ -258,8 +284,8 @@ class AdaptiveECGFilter:
             Quality improvement ratio
         """
         try:
-            original_hf_power = np.mean(np.abs(np.diff(original, n=2))**2)
-            filtered_hf_power = np.mean(np.abs(np.diff(filtered, n=2))**2)
+            original_hf_power = np.mean(np.abs(np.diff(original, n=2)) ** 2)
+            filtered_hf_power = np.mean(np.abs(np.diff(filtered, n=2)) ** 2)
 
             if original_hf_power > 0:
                 noise_reduction = filtered_hf_power / original_hf_power
@@ -290,7 +316,7 @@ def create_adaptive_filter(adaptation_mode: str = "lms", **kwargs) -> AdaptiveEC
 
 if __name__ == "__main__":
     fs = 500  # Sampling frequency
-    t = np.arange(0, 10, 1/fs)  # 10 seconds
+    t = np.arange(0, 10, 1 / fs)  # 10 seconds
 
     ecg_signal = np.sin(2 * np.pi * 1.2 * t) + 0.5 * np.sin(2 * np.pi * 2.4 * t)
 
@@ -305,4 +331,6 @@ if __name__ == "__main__":
     print(f"Original signal power: {np.mean(ecg_signal**2):.4f}")
     print(f"Noise power: {np.mean(noise**2):.4f}")
     print(f"Filtered signal power: {np.mean(filtered_signal**2):.4f}")
-    print(f"SNR improvement: {10*np.log10(np.mean((ecg_signal - filtered_signal)**2) / np.mean((ecg_signal - noisy_signal)**2)):.2f} dB")
+    print(
+        f"SNR improvement: {10*np.log10(np.mean((ecg_signal - filtered_signal)**2) / np.mean((ecg_signal - noisy_signal)**2)):.2f} dB"
+    )

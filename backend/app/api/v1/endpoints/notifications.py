@@ -15,6 +15,7 @@ from app.services.user_service import UserService
 
 router = APIRouter()
 
+
 @router.get("/", response_model=NotificationList)
 async def get_notifications(
     limit: int = 50,
@@ -38,6 +39,7 @@ async def get_notifications(
         size=limit,
     )
 
+
 @router.post("/{notification_id}/read")
 async def mark_notification_read(
     notification_id: int,
@@ -53,11 +55,11 @@ async def mark_notification_read(
 
     if not success:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Notification not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found"
         )
 
     return {"message": "Notification marked as read"}
+
 
 @router.post("/mark-all-read")
 async def mark_all_read(
@@ -70,6 +72,7 @@ async def mark_all_read(
     count = await notification_service.mark_all_read(current_user.id)
 
     return {"message": f"Marked {count} notifications as read"}
+
 
 @router.get("/unread-count")
 async def get_unread_count(

@@ -95,10 +95,14 @@ class ECGRepository:
             conditions.append(ECGAnalysis.status == filters["status"])
 
         if "clinical_urgency" in filters and filters["clinical_urgency"]:
-            conditions.append(ECGAnalysis.clinical_urgency == filters["clinical_urgency"])
+            conditions.append(
+                ECGAnalysis.clinical_urgency == filters["clinical_urgency"]
+            )
 
         if "diagnosis_category" in filters and filters["diagnosis_category"]:
-            conditions.append(ECGAnalysis.diagnosis_category == filters["diagnosis_category"])
+            conditions.append(
+                ECGAnalysis.diagnosis_category == filters["diagnosis_category"]
+            )
 
         if "date_from" in filters and filters["date_from"]:
             conditions.append(ECGAnalysis.created_at >= filters["date_from"])
@@ -109,8 +113,13 @@ class ECGRepository:
         if "is_validated" in filters and filters["is_validated"] is not None:
             conditions.append(ECGAnalysis.is_validated == filters["is_validated"])
 
-        if "requires_validation" in filters and filters["requires_validation"] is not None:
-            conditions.append(ECGAnalysis.validation_required == filters["requires_validation"])
+        if (
+            "requires_validation" in filters
+            and filters["requires_validation"] is not None
+        ):
+            conditions.append(
+                ECGAnalysis.validation_required == filters["requires_validation"]
+            )
 
         if "created_by" in filters and filters["created_by"]:
             conditions.append(ECGAnalysis.created_by == filters["created_by"])
@@ -125,11 +134,7 @@ class ECGRepository:
         count_result = await self.db.execute(count_stmt)
         total = count_result.scalar()
 
-        stmt = (
-            stmt.order_by(desc(ECGAnalysis.created_at))
-            .limit(limit)
-            .offset(offset)
-        )
+        stmt = stmt.order_by(desc(ECGAnalysis.created_at)).limit(limit).offset(offset)
 
         result = await self.db.execute(stmt)
         analyses = list(result.scalars().all())
@@ -171,9 +176,12 @@ class ECGRepository:
 
     async def delete_analysis(self, analysis_id: int) -> bool:
         """Delete analysis (soft delete)."""
-        return await self.update_analysis(
-            analysis_id, {"is_active": False, "deleted_at": func.now()}
-        ) is not None
+        return (
+            await self.update_analysis(
+                analysis_id, {"is_active": False, "deleted_at": func.now()}
+            )
+            is not None
+        )
 
     async def create_measurement(self, measurement: ECGMeasurement) -> ECGMeasurement:
         """Create ECG measurement."""
@@ -272,9 +280,8 @@ class ECGRepository:
         total_result = await self.db.execute(total_stmt)
         total_analyses = total_result.scalar()
 
-        status_stmt = (
-            select(ECGAnalysis.status, func.count(ECGAnalysis.id))
-            .group_by(ECGAnalysis.status)
+        status_stmt = select(ECGAnalysis.status, func.count(ECGAnalysis.id)).group_by(
+            ECGAnalysis.status
         )
         if date_from:
             status_stmt = status_stmt.where(ECGAnalysis.created_at >= date_from)
@@ -282,7 +289,9 @@ class ECGRepository:
             status_stmt = status_stmt.where(ECGAnalysis.created_at <= date_to)
 
         status_result = await self.db.execute(status_stmt)
-        status_counts: dict[str, int] = {str(status): count for status, count in status_result.all()}
+        status_counts: dict[str, int] = {
+            str(status): count for status, count in status_result.all()
+        }
 
         critical_stmt = select(func.count(ECGAnalysis.id)).where(
             ECGAnalysis.requires_immediate_attention.is_(True)
@@ -300,7 +309,9 @@ class ECGRepository:
             "status_distribution": status_counts,
             "critical_analyses": critical_count,
             "validation_rate": (
-                status_counts.get("completed", 0) -
-                ((total_analyses or 0) - sum(status_counts.values()))
-            ) / max(total_analyses or 1, 1) * 100,
+                status_counts.get("completed", 0)
+                - ((total_analyses or 0) - sum(status_counts.values()))
+            )
+            / max(total_analyses or 1, 1)
+            * 100,
         }

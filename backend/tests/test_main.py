@@ -7,7 +7,7 @@ def test_health_endpoint():
     """Test health check endpoint."""
     client = TestClient(app)
     response = client.get("/health")
-    
+
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
@@ -18,7 +18,7 @@ def test_root_endpoint():
     """Test root endpoint."""
     client = TestClient(app)
     response = client.get("/")
-    
+
     assert response.status_code == 200
 
 
@@ -26,7 +26,7 @@ def test_api_v1_prefix():
     """Test API v1 prefix is included."""
     client = TestClient(app)
     response = client.get("/api/v1/health")
-    
+
     assert response.status_code == 200
 
 
@@ -34,7 +34,7 @@ def test_cors_middleware():
     """Test CORS middleware is configured."""
     client = TestClient(app)
     response = client.get("/health")
-    
+
     assert response.status_code == 200
 
 
@@ -48,7 +48,7 @@ def test_openapi_schema():
     """Test OpenAPI schema generation."""
     client = TestClient(app)
     response = client.get("/api/v1/openapi.json")
-    
+
     assert response.status_code == 200
     schema = response.json()
     assert "openapi" in schema
@@ -59,7 +59,7 @@ def test_docs_endpoint():
     """Test API documentation endpoint."""
     client = TestClient(app)
     response = client.get("/api/v1/docs")
-    
+
     assert response.status_code == 200
 
 
@@ -67,7 +67,7 @@ def test_redoc_endpoint():
     """Test ReDoc documentation endpoint."""
     client = TestClient(app)
     response = client.get("/api/v1/redoc")
-    
+
     assert response.status_code == 200
 
 

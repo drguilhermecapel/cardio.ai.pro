@@ -32,18 +32,18 @@ async def test_search_analyses_with_all_filters(ecg_repository):
         "date_to": "2024-12-31",
         "is_validated": True,
         "requires_validation": False,
-        "created_by": 1
+        "created_by": 1,
     }
-    
+
     mock_count_result = Mock()
     mock_count_result.scalar.return_value = 5
     mock_result = Mock()
     mock_result.scalars.return_value.all.return_value = []
-    
+
     ecg_repository.db.execute = AsyncMock(side_effect=[mock_count_result, mock_result])
-    
+
     analyses, total = await ecg_repository.search_analyses(filters, limit=10, offset=0)
-    
+
     assert total == 5
     assert analyses == []
 
@@ -52,16 +52,16 @@ async def test_search_analyses_with_all_filters(ecg_repository):
 async def test_search_analyses_empty_filters(ecg_repository):
     """Test search analyses with empty filters - covers lines 118-137."""
     filters = {}
-    
+
     mock_count_result = Mock()
     mock_count_result.scalar.return_value = 10
     mock_result = Mock()
     mock_result.scalars.return_value.all.return_value = []
-    
+
     ecg_repository.db.execute = AsyncMock(side_effect=[mock_count_result, mock_result])
-    
+
     analyses, total = await ecg_repository.search_analyses(filters, limit=10, offset=0)
-    
+
     assert total == 10
     assert analyses == []
 
@@ -74,9 +74,9 @@ async def test_update_analysis_status_success(ecg_repository):
     mock_result.scalar_one_or_none.return_value = mock_analysis
     ecg_repository.db.execute = AsyncMock(return_value=mock_result)
     ecg_repository.db.commit = AsyncMock()
-    
+
     success = await ecg_repository.update_analysis_status(1, AnalysisStatus.COMPLETED)
-    
+
     assert success is True
     assert mock_analysis.status == AnalysisStatus.COMPLETED
 
@@ -87,20 +87,20 @@ async def test_update_analysis_status_not_found(ecg_repository):
     mock_result = Mock()
     mock_result.scalar_one_or_none.return_value = None
     ecg_repository.db.execute = AsyncMock(return_value=mock_result)
-    
+
     success = await ecg_repository.update_analysis_status(1, AnalysisStatus.COMPLETED)
-    
+
     assert success is False
 
 
 @pytest.mark.asyncio
 async def test_delete_analysis(ecg_repository):
     """Test delete analysis - covers lines 172-176."""
-    with patch.object(ecg_repository, 'update_analysis') as mock_update:
+    with patch.object(ecg_repository, "update_analysis") as mock_update:
         mock_update.return_value = Mock()
-        
+
         result = await ecg_repository.delete_analysis(1)
-        
+
         assert result is True
 
 
@@ -111,9 +111,9 @@ async def test_create_measurement(ecg_repository):
     ecg_repository.db.add = Mock()
     ecg_repository.db.commit = AsyncMock()
     ecg_repository.db.refresh = AsyncMock()
-    
+
     result = await ecg_repository.create_measurement(mock_measurement)
-    
+
     assert result == mock_measurement
     ecg_repository.db.add.assert_called_once_with(mock_measurement)
 
@@ -124,9 +124,9 @@ async def test_get_measurements_by_analysis(ecg_repository):
     mock_result = Mock()
     mock_result.scalars.return_value.all.return_value = []
     ecg_repository.db.execute = AsyncMock(return_value=mock_result)
-    
+
     measurements = await ecg_repository.get_measurements_by_analysis(1)
-    
+
     assert measurements == []
 
 
@@ -137,9 +137,9 @@ async def test_create_annotation(ecg_repository):
     ecg_repository.db.add = Mock()
     ecg_repository.db.commit = AsyncMock()
     ecg_repository.db.refresh = AsyncMock()
-    
+
     result = await ecg_repository.create_annotation(mock_annotation)
-    
+
     assert result == mock_annotation
     ecg_repository.db.add.assert_called_once_with(mock_annotation)
 
@@ -150,9 +150,9 @@ async def test_get_annotations_by_analysis(ecg_repository):
     mock_result = Mock()
     mock_result.scalars.return_value.all.return_value = []
     ecg_repository.db.execute = AsyncMock(return_value=mock_result)
-    
+
     annotations = await ecg_repository.get_annotations_by_analysis(1)
-    
+
     assert annotations == []
 
 
@@ -162,9 +162,9 @@ async def test_get_critical_analyses(ecg_repository):
     mock_result = Mock()
     mock_result.scalars.return_value.all.return_value = []
     ecg_repository.db.execute = AsyncMock(return_value=mock_result)
-    
+
     analyses = await ecg_repository.get_critical_analyses(limit=20)
-    
+
     assert analyses == []
 
 
@@ -174,9 +174,9 @@ async def test_get_pending_validations(ecg_repository):
     mock_result = Mock()
     mock_result.scalars.return_value.all.return_value = []
     ecg_repository.db.execute = AsyncMock(return_value=mock_result)
-    
+
     analyses = await ecg_repository.get_pending_validations(limit=50)
-    
+
     assert analyses == []
 
 
@@ -189,15 +189,15 @@ async def test_get_analysis_statistics_with_dates(ecg_repository):
     mock_status_result.all.return_value = [("completed", 80), ("pending", 20)]
     mock_critical_result = Mock()
     mock_critical_result.scalar.return_value = 5
-    
-    ecg_repository.db.execute = AsyncMock(side_effect=[
-        mock_total_result, mock_status_result, mock_critical_result
-    ])
-    
+
+    ecg_repository.db.execute = AsyncMock(
+        side_effect=[mock_total_result, mock_status_result, mock_critical_result]
+    )
+
     stats = await ecg_repository.get_analysis_statistics(
         date_from="2024-01-01", date_to="2024-12-31"
     )
-    
+
     assert stats["total_analyses"] == 100
     assert stats["status_distribution"]["completed"] == 80
     assert stats["critical_analyses"] == 5
@@ -213,13 +213,13 @@ async def test_get_analysis_statistics_no_dates(ecg_repository):
     mock_status_result.all.return_value = [("completed", 40), ("failed", 10)]
     mock_critical_result = Mock()
     mock_critical_result.scalar.return_value = 2
-    
-    ecg_repository.db.execute = AsyncMock(side_effect=[
-        mock_total_result, mock_status_result, mock_critical_result
-    ])
-    
+
+    ecg_repository.db.execute = AsyncMock(
+        side_effect=[mock_total_result, mock_status_result, mock_critical_result]
+    )
+
     stats = await ecg_repository.get_analysis_statistics()
-    
+
     assert stats["total_analyses"] == 50
     assert stats["status_distribution"]["completed"] == 40
     assert stats["critical_analyses"] == 2
@@ -235,12 +235,15 @@ async def test_update_analysis_with_attributes(ecg_repository):
     ecg_repository.db.execute = AsyncMock(return_value=mock_result)
     ecg_repository.db.commit = AsyncMock()
     ecg_repository.db.refresh = AsyncMock()
-    
+
     update_data = {"status": "completed", "confidence": 0.95}
-    
-    with patch('builtins.hasattr', side_effect=lambda obj, attr: attr in ["status", "confidence"]):
+
+    with patch(
+        "builtins.hasattr",
+        side_effect=lambda obj, attr: attr in ["status", "confidence"],
+    ):
         result = await ecg_repository.update_analysis(1, update_data)
-        
+
         assert result == mock_analysis
         ecg_repository.db.commit.assert_called_once()
 
@@ -251,7 +254,7 @@ async def test_update_analysis_not_found(ecg_repository):
     mock_result = Mock()
     mock_result.scalar_one_or_none.return_value = None
     ecg_repository.db.execute = AsyncMock(return_value=mock_result)
-    
+
     result = await ecg_repository.update_analysis(1, {"status": "completed"})
-    
+
     assert result is None

@@ -17,11 +17,13 @@ class PatientAwareValidator:
         self.random_state = random_state
         self.validation_history: list[dict[str, Any]] = []
 
-    def create_patient_aware_splits(self,
-                                  X: NDArray[np.floating[Any]],
-                                  y: NDArray[np.integer[Any]],
-                                  patient_ids: list[str],
-                                  stratify: bool = True) -> list[tuple[NDArray[np.integer[Any]], NDArray[np.integer[Any]]]]:
+    def create_patient_aware_splits(
+        self,
+        X: NDArray[np.floating[Any]],
+        y: NDArray[np.integer[Any]],
+        patient_ids: list[str],
+        stratify: bool = True,
+    ) -> list[tuple[NDArray[np.integer[Any]], NDArray[np.integer[Any]]]]:
         """
         Criar splits de validação que garantem que ECGs do mesmo paciente
         não apareçam em treino e teste simultaneamente
@@ -44,9 +46,7 @@ class PatientAwareValidator:
 
             if stratify:
                 splitter = StratifiedGroupKFold(
-                    n_splits=self.n_splits,
-                    shuffle=True,
-                    random_state=self.random_state
+                    n_splits=self.n_splits, shuffle=True, random_state=self.random_state
                 )
                 splits = list(splitter.split(X, y_array, groups=patient_ids_array))
             else:
@@ -63,9 +63,11 @@ class PatientAwareValidator:
             logger.error(f"Erro ao criar splits patient-aware: {e}")
             raise
 
-    def _validate_no_patient_leakage(self,
-                                   splits: list[tuple[NDArray[np.integer[Any]], NDArray[np.integer[Any]]]],
-                                   patient_ids: NDArray[np.str_]) -> None:
+    def _validate_no_patient_leakage(
+        self,
+        splits: list[tuple[NDArray[np.integer[Any]], NDArray[np.integer[Any]]]],
+        patient_ids: NDArray[np.str_],
+    ) -> None:
         """Validar que não há pacientes compartilhados entre treino e teste"""
         for fold_idx, (train_idx, val_idx) in enumerate(splits):
             train_patients = set(patient_ids[train_idx])
@@ -83,30 +85,32 @@ class PatientAwareValidator:
                 f"{len(val_patients)} pacientes validação"
             )
 
-    def _log_split_statistics(self,
-                            splits: list[tuple[NDArray[np.integer[Any]], NDArray[np.integer[Any]]]],
-                            y: NDArray[np.integer[Any]],
-                            patient_ids: NDArray[np.str_]) -> None:
+    def _log_split_statistics(
+        self,
+        splits: list[tuple[NDArray[np.integer[Any]], NDArray[np.integer[Any]]]],
+        y: NDArray[np.integer[Any]],
+        patient_ids: NDArray[np.str_],
+    ) -> None:
         """Registrar estatísticas dos splits"""
         stats = {
-            'total_samples': len(y),
-            'total_patients': len(np.unique(patient_ids)),
-            'class_distribution': self._get_class_distribution(y),
-            'fold_stats': []
+            "total_samples": len(y),
+            "total_patients": len(np.unique(patient_ids)),
+            "class_distribution": self._get_class_distribution(y),
+            "fold_stats": [],
         }
 
         for fold_idx, (train_idx, val_idx) in enumerate(splits):
             fold_stats = {
-                'fold': fold_idx,
-                'train_samples': len(train_idx),
-                'val_samples': len(val_idx),
-                'train_patients': len(np.unique(patient_ids[train_idx])),
-                'val_patients': len(np.unique(patient_ids[val_idx])),
-                'train_class_dist': self._get_class_distribution(y[train_idx]),
-                'val_class_dist': self._get_class_distribution(y[val_idx])
+                "fold": fold_idx,
+                "train_samples": len(train_idx),
+                "val_samples": len(val_idx),
+                "train_patients": len(np.unique(patient_ids[train_idx])),
+                "val_patients": len(np.unique(patient_ids[val_idx])),
+                "train_class_dist": self._get_class_distribution(y[train_idx]),
+                "val_class_dist": self._get_class_distribution(y[val_idx]),
             }
-            if isinstance(stats['fold_stats'], list):
-                stats['fold_stats'].append(fold_stats)
+            if isinstance(stats["fold_stats"], list):
+                stats["fold_stats"].append(fold_stats)
 
         self.validation_history.append(stats)
         logger.info(f"Estatísticas de validação: {stats}")
@@ -116,9 +120,9 @@ class PatientAwareValidator:
         unique, counts = np.unique(y, return_counts=True)
         return dict(zip(unique.astype(str), counts.astype(int), strict=False))
 
-    def analyze_patient_distribution(self,
-                                   patient_ids: list[str],
-                                   diagnoses: list[str]) -> dict[str, Any]:
+    def analyze_patient_distribution(
+        self, patient_ids: list[str], diagnoses: list[str]
+    ) -> dict[str, Any]:
         """
         Analisar distribuição de pacientes e diagnósticos para detectar
         possíveis problemas de balanceamento
@@ -143,27 +147,27 @@ class PatientAwareValidator:
                 if len(set(diags)) > 1
             }
 
-            all_diagnoses = [diag for diags in patient_diagnoses.values() for diag in diags]
+            all_diagnoses = [
+                diag for diags in patient_diagnoses.values() for diag in diags
+            ]
             diagnosis_counts = self._get_class_distribution(np.array(all_diagnoses))
 
             report = {
-                'total_patients': len(patient_diagnoses),
-                'total_samples': len(patient_ids),
-                'samples_per_patient': {
-                    'mean': np.mean(samples_per_patient),
-                    'median': np.median(samples_per_patient),
-                    'min': np.min(samples_per_patient),
-                    'max': np.max(samples_per_patient),
-                    'std': np.std(samples_per_patient)
+                "total_patients": len(patient_diagnoses),
+                "total_samples": len(patient_ids),
+                "samples_per_patient": {
+                    "mean": np.mean(samples_per_patient),
+                    "median": np.median(samples_per_patient),
+                    "min": np.min(samples_per_patient),
+                    "max": np.max(samples_per_patient),
+                    "std": np.std(samples_per_patient),
                 },
-                'diagnosis_distribution': diagnosis_counts,
-                'multi_diagnosis_patients': len(multi_diagnosis_patients),
-                'multi_diagnosis_details': multi_diagnosis_patients,
-                'recommendations': self._generate_validation_recommendations(
-                    len(patient_diagnoses),
-                    samples_per_patient,
-                    diagnosis_counts
-                )
+                "diagnosis_distribution": diagnosis_counts,
+                "multi_diagnosis_patients": len(multi_diagnosis_patients),
+                "multi_diagnosis_details": multi_diagnosis_patients,
+                "recommendations": self._generate_validation_recommendations(
+                    len(patient_diagnoses), samples_per_patient, diagnosis_counts
+                ),
             }
 
             return report
@@ -172,10 +176,12 @@ class PatientAwareValidator:
             logger.error(f"Erro na análise de distribuição de pacientes: {e}")
             raise
 
-    def _generate_validation_recommendations(self,
-                                           n_patients: int,
-                                           samples_per_patient: list[int],
-                                           diagnosis_counts: dict[str, int]) -> list[str]:
+    def _generate_validation_recommendations(
+        self,
+        n_patients: int,
+        samples_per_patient: list[int],
+        diagnosis_counts: dict[str, int],
+    ) -> list[str]:
         """Gerar recomendações para validação"""
         recommendations = []
 
@@ -194,7 +200,7 @@ class PatientAwareValidator:
             )
 
         total_samples = sum(diagnosis_counts.values())
-        class_ratios = {k: v/total_samples for k, v in diagnosis_counts.items()}
+        class_ratios = {k: v / total_samples for k, v in diagnosis_counts.items()}
         min_class_ratio = min(class_ratios.values())
 
         if min_class_ratio < 0.05:  # Menos de 5%
@@ -218,10 +224,9 @@ class PatientAwareValidator:
 
         return recommendations
 
-    def create_temporal_splits(self,
-                             timestamps: list[str],
-                             patient_ids: list[str],
-                             test_ratio: float = 0.2) -> tuple[NDArray[np.integer[Any]], NDArray[np.integer[Any]]]:
+    def create_temporal_splits(
+        self, timestamps: list[str], patient_ids: list[str], test_ratio: float = 0.2
+    ) -> tuple[NDArray[np.integer[Any]], NDArray[np.integer[Any]]]:
         """
         Criar split temporal para simular cenário de produção
         (treinar em dados antigos, testar em dados recentes)
@@ -274,26 +279,28 @@ class PatientAwareValidator:
 
         latest_validation = self.validation_history[-1]
 
-        fold_train_sizes = [f['train_samples'] for f in latest_validation['fold_stats']]
-        fold_val_sizes = [f['val_samples'] for f in latest_validation['fold_stats']]
+        fold_train_sizes = [f["train_samples"] for f in latest_validation["fold_stats"]]
+        fold_val_sizes = [f["val_samples"] for f in latest_validation["fold_stats"]]
 
         report = {
-            'total_validations': len(self.validation_history),
-            'latest_validation': latest_validation,
-            'fold_size_consistency': {
-                'train_std': np.std(fold_train_sizes),
-                'val_std': np.std(fold_val_sizes),
-                'train_cv': np.std(fold_train_sizes) / np.mean(fold_train_sizes),
-                'val_cv': np.std(fold_val_sizes) / np.mean(fold_val_sizes)
+            "total_validations": len(self.validation_history),
+            "latest_validation": latest_validation,
+            "fold_size_consistency": {
+                "train_std": np.std(fold_train_sizes),
+                "val_std": np.std(fold_val_sizes),
+                "train_cv": np.std(fold_train_sizes) / np.mean(fold_train_sizes),
+                "val_cv": np.std(fold_val_sizes) / np.mean(fold_val_sizes),
             },
-            'recommendations': []
+            "recommendations": [],
         }
 
-        recommendations = report.get('recommendations')
-        fold_consistency = report.get('fold_size_consistency')
-        if (isinstance(recommendations, list) and
-            isinstance(fold_consistency, dict) and
-            fold_consistency.get('train_cv', 0) > 0.1):
+        recommendations = report.get("recommendations")
+        fold_consistency = report.get("fold_size_consistency")
+        if (
+            isinstance(recommendations, list)
+            and isinstance(fold_consistency, dict)
+            and fold_consistency.get("train_cv", 0) > 0.1
+        ):
             recommendations.append(
                 "ATENÇÃO: Grande variação no tamanho dos folds de treino. "
                 "Verifique a distribuição de pacientes."

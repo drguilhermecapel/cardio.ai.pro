@@ -10,6 +10,7 @@ from numpy.typing import NDArray
 
 logger = logging.getLogger(__name__)
 
+
 class SignalQualityAnalyzer:
     """Analyzer for ECG signal quality assessment."""
 
@@ -46,8 +47,12 @@ class SignalQualityAnalyzer:
 
             quality_metrics["overall_score"] = np.mean(lead_scores)
             quality_metrics["noise_level"] = await self._calculate_noise_level(ecg_data)
-            quality_metrics["baseline_wander"] = await self._calculate_baseline_wander(ecg_data)
-            quality_metrics["signal_to_noise_ratio"] = await self._calculate_snr(ecg_data)
+            quality_metrics["baseline_wander"] = await self._calculate_baseline_wander(
+                ecg_data
+            )
+            quality_metrics["signal_to_noise_ratio"] = await self._calculate_snr(
+                ecg_data
+            )
 
             overall_score = quality_metrics["overall_score"]
             if isinstance(overall_score, int | float) and overall_score < 0.5:
@@ -86,7 +91,9 @@ class SignalQualityAnalyzer:
                 "quality_issues": ["Quality analysis failed"],
             }
 
-    async def _analyze_lead_quality(self, lead_data: NDArray[np.float64]) -> dict[str, Any]:
+    async def _analyze_lead_quality(
+        self, lead_data: NDArray[np.float64]
+    ) -> dict[str, Any]:
         """Analyze quality of a single ECG lead."""
         try:
             quality = {
@@ -151,6 +158,7 @@ class SignalQualityAnalyzer:
                 lead_data = ecg_data[:, i]
 
                 from scipy import signal
+
                 frequencies, power = signal.welch(lead_data, fs=500, nperseg=1024)
 
                 high_freq_mask = frequencies > 50
@@ -175,6 +183,7 @@ class SignalQualityAnalyzer:
                 lead_data = ecg_data[:, i]
 
                 from scipy import signal
+
                 frequencies, power = signal.welch(lead_data, fs=500, nperseg=1024)
 
                 low_freq_mask = frequencies < 1
@@ -201,7 +210,8 @@ class SignalQualityAnalyzer:
                 signal_power = np.var(lead_data)
 
                 from scipy import signal
-                b, a = signal.butter(4, 0.1, btype='high', fs=500)
+
+                b, a = signal.butter(4, 0.1, btype="high", fs=500)
                 noise_estimate = signal.filtfilt(b, a, lead_data)
                 noise_power = np.var(noise_estimate)
 

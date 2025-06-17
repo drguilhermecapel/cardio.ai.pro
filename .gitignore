@@ -261,3 +261,4 @@ secrets/
 *.key
 *.pem
 *.crt
+.aider*

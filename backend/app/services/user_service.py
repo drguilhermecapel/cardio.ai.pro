@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
+
 class UserService:
     """Service for user management and authentication."""
 
@@ -122,6 +123,8 @@ class UserService:
 
         return user
 
-    async def update_user(self, user_id: int, update_data: dict[str, Any]) -> User | None:
+    async def update_user(
+        self, user_id: int, update_data: dict[str, Any]
+    ) -> User | None:
         """Update user with provided data."""
         return await self.repository.update_user(user_id, update_data)

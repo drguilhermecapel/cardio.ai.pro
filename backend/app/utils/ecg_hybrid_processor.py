@@ -12,6 +12,7 @@ from app.services.hybrid_ecg_service import HybridECGAnalysisService
 
 logger = logging.getLogger(__name__)
 
+
 class ECGHybridProcessor:
     """
     Processor for integrating hybrid ECG analysis with existing infrastructure
@@ -19,14 +20,16 @@ class ECGHybridProcessor:
 
     def __init__(self, db: Any, validation_service: Any) -> None:
         self.hybrid_service = HybridECGAnalysisService(db, validation_service)
-        self.regulatory_service: Any = None  # Will be implemented in PR-003 (Regulatory Compliance)
+        self.regulatory_service: Any = (
+            None  # Will be implemented in PR-003 (Regulatory Compliance)
+        )
 
     async def process_ecg_with_validation(
         self,
         file_path: str,
         patient_id: int,
         analysis_id: str,
-        require_regulatory_compliance: bool = True
+        require_regulatory_compliance: bool = True,
     ) -> dict[str, Any]:
         """
         Process ECG with comprehensive analysis and regulatory validation
@@ -42,39 +45,48 @@ class ECGHybridProcessor:
         """
         try:
             analysis_results = await self.hybrid_service.analyze_ecg_comprehensive(
-                file_path=file_path,
-                patient_id=patient_id,
-                analysis_id=analysis_id
+                file_path=file_path, patient_id=patient_id, analysis_id=analysis_id
             )
 
             if self.regulatory_service is None:
-                logger.warning("Regulatory service not configured - using placeholder validation")
+                logger.warning(
+                    "Regulatory service not configured - using placeholder validation"
+                )
                 validation_results = {"status": "pending_regulatory_implementation"}
                 validation_report = {"overall_compliance": True, "recommendations": []}
             else:
-                validation_results = await self.regulatory_service.validate_analysis_comprehensive(
-                    analysis_results
+                validation_results = (
+                    await self.regulatory_service.validate_analysis_comprehensive(
+                        analysis_results
+                    )
                 )
 
-                validation_report = await self.regulatory_service.generate_validation_report(
-                    validation_results
+                validation_report = (
+                    await self.regulatory_service.generate_validation_report(
+                        validation_results
+                    )
                 )
 
-            if require_regulatory_compliance and not validation_report['overall_compliance']:
+            if (
+                require_regulatory_compliance
+                and not validation_report["overall_compliance"]
+            ):
                 logger.warning(
                     f"Analysis {analysis_id} failed regulatory compliance: "
                     f"{validation_report['recommendations']}"
                 )
 
-                analysis_results['regulatory_compliant'] = False
-                analysis_results['compliance_issues'] = validation_report['recommendations']
+                analysis_results["regulatory_compliant"] = False
+                analysis_results["compliance_issues"] = validation_report[
+                    "recommendations"
+                ]
             else:
-                analysis_results['regulatory_compliant'] = True
-                analysis_results['compliance_issues'] = []
+                analysis_results["regulatory_compliant"] = True
+                analysis_results["compliance_issues"] = []
 
-            analysis_results['regulatory_validation'] = {
-                'validation_results': validation_results,
-                'validation_report': validation_report
+            analysis_results["regulatory_validation"] = {
+                "validation_results": validation_results,
+                "validation_report": validation_report,
             }
 
             return analysis_results
@@ -84,8 +96,7 @@ class ECGHybridProcessor:
             raise ECGProcessingException(f"Hybrid processing failed: {str(e)}") from e
 
     async def validate_existing_analysis(
-        self,
-        analysis_results: dict[str, Any]
+        self, analysis_results: dict[str, Any]
     ) -> dict[str, Any]:
         """
         Validate existing analysis results against regulatory standards
@@ -102,9 +113,9 @@ class ECGHybridProcessor:
             validation_report = {"overall_compliance": True, "recommendations": []}
 
             return {
-                'validation_results': validation_results,
-                'validation_report': validation_report,
-                'overall_compliance': validation_report['overall_compliance']
+                "validation_results": validation_results,
+                "validation_report": validation_report,
+                "overall_compliance": validation_report["overall_compliance"],
             }
 
         except Exception as e:
@@ -123,9 +134,9 @@ class ECGHybridProcessor:
     async def get_system_status(self) -> dict[str, Any]:
         """Get hybrid ECG analysis system status"""
         return {
-            'hybrid_service_initialized': self.hybrid_service is not None,
-            'regulatory_service_initialized': self.regulatory_service is not None,
-            'supported_formats': self.get_supported_formats(),
-            'regulatory_standards': self.get_regulatory_standards(),
-            'system_version': '1.0.0'
+            "hybrid_service_initialized": self.hybrid_service is not None,
+            "regulatory_service_initialized": self.regulatory_service is not None,
+            "supported_formats": self.get_supported_formats(),
+            "regulatory_standards": self.get_regulatory_standards(),
+            "system_version": "1.0.0",
         }

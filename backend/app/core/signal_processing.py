@@ -13,12 +13,12 @@ class ECGSignalProcessor:
     """Processador de sinais ECG com padrões médicos corretos"""
 
     DIAGNOSTIC_HIGHPASS = 0.05  # Hz - Padrão AHA/ACC (NÃO usar 0.5!)
-    DIAGNOSTIC_LOWPASS = 150    # Hz - Preserva morfologia QRS
-    MONITORING_HIGHPASS = 0.5   # Hz - Apenas para monitoramento
-    MIN_SAMPLING_RATE = 500     # Hz - Mínimo absoluto
+    DIAGNOSTIC_LOWPASS = 150  # Hz - Preserva morfologia QRS
+    MONITORING_HIGHPASS = 0.5  # Hz - Apenas para monitoramento
+    MIN_SAMPLING_RATE = 500  # Hz - Mínimo absoluto
     RECOMMENDED_SAMPLING_RATE = 1000  # Hz - Recomendado
 
-    def __init__(self, sampling_rate: int = 500, mode: str = 'diagnostic'):
+    def __init__(self, sampling_rate: int = 500, mode: str = "diagnostic"):
         """
         Args:
             sampling_rate: Taxa de amostragem em Hz (mínimo 500)
@@ -39,24 +39,23 @@ class ECGSignalProcessor:
 
     def _setup_filters(self) -> None:
         """Configurar filtros conforme padrões médicos"""
-        if self.mode == 'diagnostic':
+        if self.mode == "diagnostic":
             hp_freq = self.DIAGNOSTIC_HIGHPASS
         else:
             hp_freq = self.MONITORING_HIGHPASS
 
-        self.sos_highpass = butter(
-            2, hp_freq, 'hp', fs=self.fs, output='sos'
-        )
+        self.sos_highpass = butter(2, hp_freq, "hp", fs=self.fs, output="sos")
 
         self.sos_lowpass = butter(
-            4, self.DIAGNOSTIC_LOWPASS, 'lp', fs=self.fs, output='sos'
+            4, self.DIAGNOSTIC_LOWPASS, "lp", fs=self.fs, output="sos"
         )
 
         self.notch_60 = iirnotch(60, 30, self.fs)
         self.notch_50 = iirnotch(50, 30, self.fs)
 
-    def process_diagnostic(self, ecg_signal: NDArray[np.floating[Any]],
-                         power_line_freq: int = 60) -> NDArray[np.floating[Any]]:
+    def process_diagnostic(
+        self, ecg_signal: NDArray[np.floating[Any]], power_line_freq: int = 60
+    ) -> NDArray[np.floating[Any]]:
         """
         Processamento para análise diagnóstica (máxima fidelidade)
 
@@ -80,15 +79,17 @@ class ECGSignalProcessor:
 
         return filtered
 
-    def remove_baseline_wander(self, ecg_signal: NDArray[np.floating[Any]]) -> NDArray[np.floating[Any]]:
+    def remove_baseline_wander(
+        self, ecg_signal: NDArray[np.floating[Any]]
+    ) -> NDArray[np.floating[Any]]:
         """Remover oscilação de linha de base usando Wavelet"""
         try:
-            coeffs = pywt.wavedec(ecg_signal, 'db4', level=9)
+            coeffs = pywt.wavedec(ecg_signal, "db4", level=9)
 
             coeffs[0] = np.zeros_like(coeffs[0])
             coeffs[1] = np.zeros_like(coeffs[1])
 
-            result = pywt.waverec(coeffs, 'db4')
+            result = pywt.waverec(coeffs, "db4")
             return np.asarray(result, dtype=np.float64)
         except Exception as e:
             logger.warning(f"Wavelet baseline removal failed: {e}")
@@ -97,4 +98,5 @@ class ECGSignalProcessor:
 
 class MedicalGradeECGProcessor(ECGSignalProcessor):
     """Backward compatible alias for ECGSignalProcessor."""
+
     pass

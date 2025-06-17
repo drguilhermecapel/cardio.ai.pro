@@ -25,6 +25,7 @@ from app.utils.signal_quality import SignalQualityAnalyzer
 
 logger = logging.getLogger(__name__)
 
+
 class ECGAnalysisService:
     """ECG Analysis Service for processing and analyzing ECG data."""
 
@@ -65,8 +66,12 @@ class ECGAnalysisService:
             analysis.file_path = file_path
             analysis.file_hash = file_hash
             analysis.file_size = file_size
-            analysis.acquisition_date = ecg_metadata.get("acquisition_date", datetime.utcnow())
-            analysis.sample_rate = ecg_metadata.get("sample_rate", settings.ECG_SAMPLE_RATE)
+            analysis.acquisition_date = ecg_metadata.get(
+                "acquisition_date", datetime.utcnow()
+            )
+            analysis.sample_rate = ecg_metadata.get(
+                "sample_rate", settings.ECG_SAMPLE_RATE
+            )
             analysis.duration_seconds = ecg_metadata.get("duration_seconds", 10.0)
             analysis.leads_count = ecg_metadata.get("leads_count", 12)
             analysis.leads_names = ecg_metadata.get("leads_names", settings.ECG_LEADS)
@@ -148,11 +153,17 @@ class ECGAnalysisService:
                 "qt_interval_ms": measurements.get("qt_interval"),
                 "qtc_interval_ms": measurements.get("qtc_interval"),
                 "primary_diagnosis": clinical_assessment.get("primary_diagnosis"),
-                "secondary_diagnoses": clinical_assessment.get("secondary_diagnoses", []),
+                "secondary_diagnoses": clinical_assessment.get(
+                    "secondary_diagnoses", []
+                ),
                 "diagnosis_category": clinical_assessment.get("category"),
                 "icd10_codes": clinical_assessment.get("icd10_codes", []),
-                "clinical_urgency": clinical_assessment.get("urgency", ClinicalUrgency.LOW),
-                "requires_immediate_attention": clinical_assessment.get("critical", False),
+                "clinical_urgency": clinical_assessment.get(
+                    "urgency", ClinicalUrgency.LOW
+                ),
+                "requires_immediate_attention": clinical_assessment.get(
+                    "critical", False
+                ),
                 "recommendations": clinical_assessment.get("recommendations", []),
                 "signal_quality_score": quality_metrics.get("overall_score", 0.0),
                 "noise_level": quality_metrics.get("noise_level", 0.0),
@@ -193,11 +204,13 @@ class ECGAnalysisService:
                     "status": AnalysisStatus.FAILED,
                     "error_message": str(e),
                     "retry_count": analysis.retry_count + 1 if analysis else 1,
-                }
+                },
             )
 
             if analysis and analysis.retry_count < 3:
-                logger.info(f"Analysis {analysis_id} failed, retry would be handled by caller")
+                logger.info(
+                    f"Analysis {analysis_id} failed, retry would be handled by caller"
+                )
 
     async def _calculate_file_info(self, file_path: str) -> tuple[str, int]:
         """Calculate file hash and size."""
@@ -227,18 +240,25 @@ class ECGAnalysisService:
                 lead_ii = ecg_data[:, 1] if ecg_data.shape[1] > 1 else ecg_data[:, 0]
 
                 from scipy.signal import find_peaks
-                peaks, _ = find_peaks(lead_ii, height=np.std(lead_ii), distance=sample_rate//3)
+
+                peaks, _ = find_peaks(
+                    lead_ii, height=np.std(lead_ii), distance=sample_rate // 3
+                )
 
                 if len(peaks) > 1:
                     rr_intervals = np.diff(peaks) / sample_rate * 1000  # ms
                     heart_rate = 60000 / np.mean(rr_intervals)  # bpm
-                    measurements["heart_rate"] = int(heart_rate) if not np.isnan(heart_rate) else 75
+                    measurements["heart_rate"] = (
+                        int(heart_rate) if not np.isnan(heart_rate) else 75
+                    )
 
                     avg_rr = np.mean(rr_intervals)
                     measurements["pr_interval"] = int(avg_rr * 0.16)
                     measurements["qrs_duration"] = 100
                     measurements["qt_interval"] = int(avg_rr * 0.4)
-                    measurements["qtc_interval"] = int(measurements["qt_interval"] / np.sqrt(avg_rr / 1000))
+                    measurements["qtc_interval"] = int(
+                        measurements["qt_interval"] / np.sqrt(avg_rr / 1000)
+                    )
                 else:
                     measurements["heart_rate"] = 75  # Default
                     measurements["pr_interval"] = 160
@@ -246,18 +266,35 @@ class ECGAnalysisService:
                     measurements["qt_interval"] = 400
                     measurements["qtc_interval"] = 420
 
-            for i, lead_name in enumerate(["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]):
+            for i, lead_name in enumerate(
+                [
+                    "I",
+                    "II",
+                    "III",
+                    "aVR",
+                    "aVL",
+                    "aVF",
+                    "V1",
+                    "V2",
+                    "V3",
+                    "V4",
+                    "V5",
+                    "V6",
+                ]
+            ):
                 if i < ecg_data.shape[1]:
                     lead_data = ecg_data[:, i]
 
-                    detailed_measurements.append({
-                        "measurement_type": "amplitude",
-                        "lead_name": lead_name,
-                        "value": float(np.max(lead_data) - np.min(lead_data)),
-                        "unit": "mV",
-                        "confidence": 0.9,
-                        "source": "algorithm",
-                    })
+                    detailed_measurements.append(
+                        {
+                            "measurement_type": "amplitude",
+                            "lead_name": lead_name,
+                            "value": float(np.max(lead_data) - np.min(lead_data)),
+                            "unit": "mV",
+                            "confidence": 0.9,
+                            "source": "algorithm",
+                        }
+                    )
 
             measurements["detailed_measurements"] = detailed_measurements
 
@@ -281,30 +318,37 @@ class ECGAnalysisService:
                 lead_ii = ecg_data[:, 1] if ecg_data.shape[1] > 1 else ecg_data[:, 0]
 
                 from scipy.signal import find_peaks
-                peaks, _ = find_peaks(lead_ii, height=np.std(lead_ii), distance=sample_rate//3)
+
+                peaks, _ = find_peaks(
+                    lead_ii, height=np.std(lead_ii), distance=sample_rate // 3
+                )
 
                 for peak_idx in peaks:
                     time_ms = (peak_idx / sample_rate) * 1000
 
-                    annotations.append({
-                        "annotation_type": "beat",
-                        "label": "R_peak",
-                        "time_ms": float(time_ms),
-                        "confidence": 0.85,
-                        "source": "algorithm",
-                        "properties": {"peak_amplitude": float(lead_ii[peak_idx])},
-                    })
+                    annotations.append(
+                        {
+                            "annotation_type": "beat",
+                            "label": "R_peak",
+                            "time_ms": float(time_ms),
+                            "confidence": 0.85,
+                            "source": "algorithm",
+                            "properties": {"peak_amplitude": float(lead_ii[peak_idx])},
+                        }
+                    )
 
             if "events" in ai_results:
                 for event in ai_results["events"]:
-                    annotations.append({
-                        "annotation_type": "event",
-                        "label": event.get("label", "unknown"),
-                        "time_ms": float(event.get("time_ms", 0)),
-                        "confidence": float(event.get("confidence", 0.5)),
-                        "source": "ai",
-                        "properties": event.get("properties", {}),
-                    })
+                    annotations.append(
+                        {
+                            "annotation_type": "event",
+                            "label": event.get("label", "unknown"),
+                            "time_ms": float(event.get("time_ms", 0)),
+                            "confidence": float(event.get("confidence", 0.5)),
+                            "source": "ai",
+                            "properties": event.get("properties", {}),
+                        }
+                    )
 
             return annotations
 
@@ -312,9 +356,7 @@ class ECGAnalysisService:
             logger.error(f"Failed to generate annotations: {str(e)}")
             return []
 
-    def _assess_clinical_urgency(
-        self, ai_results: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _assess_clinical_urgency(self, ai_results: dict[str, Any]) -> dict[str, Any]:
         """Assess clinical urgency based on AI results."""
         assessment = {
             "urgency": ClinicalUrgency.LOW,
@@ -342,7 +384,9 @@ class ECGAnalysisService:
                 if predictions.get(condition, 0.0) > 0.7:
                     assessment["urgency"] = ClinicalUrgency.CRITICAL
                     assessment["critical"] = True
-                    assessment["primary_diagnosis"] = condition.replace("_", " ").title()
+                    assessment["primary_diagnosis"] = condition.replace(
+                        "_", " "
+                    ).title()
                     assessment["category"] = DiagnosisCategory.ARRHYTHMIA
                     recommendations = assessment["recommendations"]
                     if isinstance(recommendations, list):
@@ -359,17 +403,23 @@ class ECGAnalysisService:
                 for condition in high_priority_conditions:
                     if predictions.get(condition, 0.0) > 0.6:
                         assessment["urgency"] = ClinicalUrgency.HIGH
-                        assessment["primary_diagnosis"] = condition.replace("_", " ").title()
+                        assessment["primary_diagnosis"] = condition.replace(
+                            "_", " "
+                        ).title()
                         assessment["category"] = DiagnosisCategory.ARRHYTHMIA
                         recommendations = assessment["recommendations"]
                         if isinstance(recommendations, list):
-                            recommendations.append("Cardiology consultation recommended")
+                            recommendations.append(
+                                "Cardiology consultation recommended"
+                            )
                         break
 
             if confidence < 0.7:
                 recommendations = assessment["recommendations"]
                 if isinstance(recommendations, list):
-                    recommendations.append("Manual review recommended due to low AI confidence")
+                    recommendations.append(
+                        "Manual review recommended due to low AI confidence"
+                    )
 
             return assessment
 
@@ -407,7 +457,9 @@ class ECGAnalysisService:
             if not analysis:
                 raise ECGProcessingException(f"Analysis {analysis_id} not found")
 
-            measurements = await self.repository.get_measurements_by_analysis(analysis_id)
+            measurements = await self.repository.get_measurements_by_analysis(
+                analysis_id
+            )
             annotations = await self.repository.get_annotations_by_analysis(analysis_id)
 
             report = {
@@ -415,16 +467,18 @@ class ECGAnalysisService:
                 "generated_at": datetime.utcnow().isoformat(),
                 "analysis_id": analysis.analysis_id,
                 "patient_id": analysis.patient_id,
-
                 "patient_info": {
-                    "analysis_date": analysis.acquisition_date.isoformat() if analysis.acquisition_date else None,
+                    "analysis_date": (
+                        analysis.acquisition_date.isoformat()
+                        if analysis.acquisition_date
+                        else None
+                    ),
                     "device_info": {
                         "manufacturer": analysis.device_manufacturer,
                         "model": analysis.device_model,
-                        "serial": analysis.device_serial
-                    }
+                        "serial": analysis.device_serial,
+                    },
                 },
-
                 "technical_parameters": {
                     "sample_rate_hz": analysis.sample_rate,
                     "duration_seconds": analysis.duration_seconds,
@@ -432,9 +486,8 @@ class ECGAnalysisService:
                     "leads_names": analysis.leads_names,
                     "signal_quality_score": analysis.signal_quality_score,
                     "noise_level": analysis.noise_level,
-                    "baseline_wander": analysis.baseline_wander
+                    "baseline_wander": analysis.baseline_wander,
                 },
-
                 # Clinical Measurements
                 "clinical_measurements": {
                     "heart_rate_bpm": analysis.heart_rate_bpm,
@@ -443,16 +496,14 @@ class ECGAnalysisService:
                         "pr_interval_ms": analysis.pr_interval_ms,
                         "qrs_duration_ms": analysis.qrs_duration_ms,
                         "qt_interval_ms": analysis.qt_interval_ms,
-                        "qtc_interval_ms": analysis.qtc_interval_ms
-                    }
+                        "qtc_interval_ms": analysis.qtc_interval_ms,
+                    },
                 },
-
                 "ai_analysis": {
                     "confidence": analysis.ai_confidence,
                     "predictions": analysis.ai_predictions or {},
-                    "interpretability": analysis.ai_interpretability or {}
+                    "interpretability": analysis.ai_interpretability or {},
                 },
-
                 "clinical_assessment": {
                     "primary_diagnosis": analysis.primary_diagnosis,
                     "secondary_diagnoses": analysis.secondary_diagnoses or [],
@@ -460,9 +511,8 @@ class ECGAnalysisService:
                     "icd10_codes": analysis.icd10_codes or [],
                     "clinical_urgency": analysis.clinical_urgency,
                     "requires_immediate_attention": analysis.requires_immediate_attention,
-                    "recommendations": analysis.recommendations or []
+                    "recommendations": analysis.recommendations or [],
                 },
-
                 # Detailed Measurements
                 "detailed_measurements": [
                     {
@@ -472,11 +522,12 @@ class ECGAnalysisService:
                         "unit": m.unit,
                         "confidence": m.confidence,
                         "source": m.source,
-                        "normal_range": self._get_normal_range(m.measurement_type, m.lead_name)
+                        "normal_range": self._get_normal_range(
+                            m.measurement_type, m.lead_name
+                        ),
                     }
                     for m in measurements
                 ],
-
                 "annotations": [
                     {
                         "type": a.annotation_type,
@@ -484,60 +535,89 @@ class ECGAnalysisService:
                         "time_ms": a.time_ms,
                         "confidence": a.confidence,
                         "source": a.source,
-                        "properties": a.properties or {}
+                        "properties": a.properties or {},
                     }
                     for a in annotations
                 ],
-
                 "quality_assessment": {
-                    "overall_quality": "excellent" if analysis.signal_quality_score and analysis.signal_quality_score > 0.9
-                                     else "good" if analysis.signal_quality_score and analysis.signal_quality_score > 0.7
-                                     else "fair" if analysis.signal_quality_score and analysis.signal_quality_score > 0.5
-                                     else "poor",
+                    "overall_quality": (
+                        "excellent"
+                        if analysis.signal_quality_score
+                        and analysis.signal_quality_score > 0.9
+                        else (
+                            "good"
+                            if analysis.signal_quality_score
+                            and analysis.signal_quality_score > 0.7
+                            else (
+                                "fair"
+                                if analysis.signal_quality_score
+                                and analysis.signal_quality_score > 0.5
+                                else "poor"
+                            )
+                        )
+                    ),
                     "quality_score": analysis.signal_quality_score,
-                    "quality_issues": self._assess_quality_issues(analysis)
+                    "quality_issues": self._assess_quality_issues(analysis),
                 },
-
                 "processing_info": {
-                    "processing_started_at": analysis.processing_started_at.isoformat() if analysis.processing_started_at else None,
-                    "processing_completed_at": analysis.processing_completed_at.isoformat() if analysis.processing_completed_at else None,
+                    "processing_started_at": (
+                        analysis.processing_started_at.isoformat()
+                        if analysis.processing_started_at
+                        else None
+                    ),
+                    "processing_completed_at": (
+                        analysis.processing_completed_at.isoformat()
+                        if analysis.processing_completed_at
+                        else None
+                    ),
                     "processing_duration_ms": analysis.processing_duration_ms,
                     "ai_model_version": "1.0.0",
-                    "analysis_version": "2.0.0"
+                    "analysis_version": "2.0.0",
                 },
-
                 "compliance": {
                     "validated": analysis.is_validated,
                     "validation_required": analysis.validation_required,
                     "created_by": analysis.created_by,
-                    "created_at": analysis.created_at.isoformat() if analysis.created_at else None
-                }
+                    "created_at": (
+                        analysis.created_at.isoformat() if analysis.created_at else None
+                    ),
+                },
             }
 
-            report["clinical_interpretation"] = self._generate_clinical_interpretation(analysis)
+            report["clinical_interpretation"] = self._generate_clinical_interpretation(
+                analysis
+            )
 
-            report["medical_recommendations"] = self._generate_medical_recommendations(analysis)
+            report["medical_recommendations"] = self._generate_medical_recommendations(
+                analysis
+            )
 
-            logger.info(f"Medical report generated successfully: analysis_id={analysis.analysis_id}, report_id={report['report_id']}")
+            logger.info(
+                f"Medical report generated successfully: analysis_id={analysis.analysis_id}, report_id={report['report_id']}"
+            )
 
             return report
 
         except Exception as e:
-            logger.error(f"Failed to generate medical report: analysis_id={analysis_id}, error={str(e)}")
+            logger.error(
+                f"Failed to generate medical report: analysis_id={analysis_id}, error={str(e)}"
+            )
             raise ECGProcessingException(f"Failed to generate report: {str(e)}") from e
 
-    def _get_normal_range(self, measurement_type: str, lead_name: str) -> dict[str, float | str]:
+    def _get_normal_range(
+        self, measurement_type: str, lead_name: str
+    ) -> dict[str, float | str]:
         """Get normal range for a measurement type and lead."""
         normal_ranges: dict[str, dict[str, object]] = {
             "amplitude": {
                 "default": {"min": -5.0, "max": 5.0, "unit": "mV"},
                 "V1": {"min": -1.0, "max": 3.0, "unit": "mV"},
-                "V5": {"min": 0.5, "max": 2.5, "unit": "mV"}
+                "V5": {"min": 0.5, "max": 2.5, "unit": "mV"},
             },
             "heart_rate": {"min": 60.0, "max": 100.0, "unit": "bpm"},
             "pr_interval": {"min": 120.0, "max": 200.0, "unit": "ms"},
             "qrs_duration": {"min": 80.0, "max": 120.0, "unit": "ms"},
-            "qt_interval": {"min": 350.0, "max": 450.0, "unit": "ms"}
+            "qt_interval": {"min": 350.0, "max": 450.0, "unit": "ms"},
         }
 
         if measurement_type in normal_ranges:
@@ -546,14 +626,28 @@ class ECGAnalysisService:
                 if lead_name in range_data:
                     lead_data = range_data[lead_name]
                     if isinstance(lead_data, dict):
-                        return {k: v for k, v in lead_data.items() if isinstance(v, int | float | str)}
+                        return {
+                            k: v
+                            for k, v in lead_data.items()
+                            if isinstance(v, int | float | str)
+                        }
                 elif "default" in range_data:
                     default_data = range_data["default"]
                     if isinstance(default_data, dict):
-                        return {k: v for k, v in default_data.items() if isinstance(v, int | float | str)}
+                        return {
+                            k: v
+                            for k, v in default_data.items()
+                            if isinstance(v, int | float | str)
+                        }
                 else:
-                    if isinstance(range_data, dict) and all(isinstance(v, int | float | str) for v in range_data.values()):
-                        return {k: v for k, v in range_data.items() if isinstance(v, int | float | str)}
+                    if isinstance(range_data, dict) and all(
+                        isinstance(v, int | float | str) for v in range_data.values()
+                    ):
+                        return {
+                            k: v
+                            for k, v in range_data.items()
+                            if isinstance(v, int | float | str)
+                        }
                     return {"min": 0.0, "max": 0.0, "unit": "unknown"}
 
         return {"min": 0.0, "max": 0.0, "unit": "unknown"}
@@ -580,11 +674,17 @@ class ECGAnalysisService:
         # Heart rate assessment
         if analysis.heart_rate_bpm:
             if analysis.heart_rate_bpm < 60:
-                interpretation_parts.append(f"Bradycardia present with heart rate of {analysis.heart_rate_bpm} bpm.")
+                interpretation_parts.append(
+                    f"Bradycardia present with heart rate of {analysis.heart_rate_bpm} bpm."
+                )
             elif analysis.heart_rate_bpm > 100:
-                interpretation_parts.append(f"Tachycardia present with heart rate of {analysis.heart_rate_bpm} bpm.")
+                interpretation_parts.append(
+                    f"Tachycardia present with heart rate of {analysis.heart_rate_bpm} bpm."
+                )
             else:
-                interpretation_parts.append(f"Normal heart rate of {analysis.heart_rate_bpm} bpm.")
+                interpretation_parts.append(
+                    f"Normal heart rate of {analysis.heart_rate_bpm} bpm."
+                )
 
         # Rhythm assessment
         if analysis.rhythm:
@@ -595,20 +695,34 @@ class ECGAnalysisService:
 
         # Interval assessment
         if analysis.pr_interval_ms and analysis.pr_interval_ms > 200:
-            interpretation_parts.append("Prolonged PR interval suggesting first-degree AV block.")
+            interpretation_parts.append(
+                "Prolonged PR interval suggesting first-degree AV block."
+            )
 
         if analysis.qtc_interval_ms and analysis.qtc_interval_ms > 450:
-            interpretation_parts.append("Prolonged QTc interval - consider medication review and electrolyte assessment.")
+            interpretation_parts.append(
+                "Prolonged QTc interval - consider medication review and electrolyte assessment."
+            )
 
         if analysis.primary_diagnosis and analysis.primary_diagnosis != "Normal ECG":
-            interpretation_parts.append(f"Primary finding: {analysis.primary_diagnosis}.")
+            interpretation_parts.append(
+                f"Primary finding: {analysis.primary_diagnosis}."
+            )
 
         if analysis.clinical_urgency == ClinicalUrgency.CRITICAL:
-            interpretation_parts.append("CRITICAL: Immediate medical attention required.")
+            interpretation_parts.append(
+                "CRITICAL: Immediate medical attention required."
+            )
         elif analysis.clinical_urgency == ClinicalUrgency.HIGH:
-            interpretation_parts.append("HIGH PRIORITY: Prompt medical evaluation recommended.")
+            interpretation_parts.append(
+                "HIGH PRIORITY: Prompt medical evaluation recommended."
+            )
 
-        return " ".join(interpretation_parts) if interpretation_parts else "Normal ECG within normal limits."
+        return (
+            " ".join(interpretation_parts)
+            if interpretation_parts
+            else "Normal ECG within normal limits."
+        )
 
     def _generate_medical_recommendations(self, analysis: ECGAnalysis) -> list[str]:
         """Generate medical recommendations based on findings."""
@@ -619,7 +733,9 @@ class ECGAnalysisService:
 
         if analysis.heart_rate_bpm:
             if analysis.heart_rate_bpm < 50:
-                recommendations.append("Consider pacemaker evaluation for severe bradycardia")
+                recommendations.append(
+                    "Consider pacemaker evaluation for severe bradycardia"
+                )
             elif analysis.heart_rate_bpm > 150:
                 recommendations.append("Evaluate for underlying causes of tachycardia")
 
@@ -658,7 +774,7 @@ class ECGAnalysisService:
                 file_path=file_path,
                 original_filename=original_filename,
                 created_by=created_by,
-                metadata=metadata
+                metadata=metadata,
             )
 
             logger.info(

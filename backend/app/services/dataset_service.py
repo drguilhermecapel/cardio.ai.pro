@@ -48,11 +48,11 @@ class DatasetService:
         self.logger.info(f"Iniciando download do dataset: {dataset_name}")
 
         try:
-            if dataset_name == 'mit-bih':
+            if dataset_name == "mit-bih":
                 return self.downloader.download_mit_bih(**kwargs)
-            elif dataset_name == 'ptb-xl':
+            elif dataset_name == "ptb-xl":
                 return self.downloader.download_ptb_xl(**kwargs)
-            elif dataset_name == 'cpsc2018':
+            elif dataset_name == "cpsc2018":
                 return self.downloader.download_cpsc2018(**kwargs)
             else:
                 self.logger.error(f"Dataset não suportado: {dataset_name}")
@@ -62,11 +62,13 @@ class DatasetService:
             self.logger.error(f"Erro ao baixar {dataset_name}: {e}")
             return None
 
-    def load_dataset(self,
-                    dataset_name: str,
-                    dataset_path: str,
-                    preprocess: bool = True,
-                    max_records: int | None = None) -> list[ECGRecord]:
+    def load_dataset(
+        self,
+        dataset_name: str,
+        dataset_path: str,
+        preprocess: bool = True,
+        max_records: int | None = None,
+    ) -> list[ECGRecord]:
         """
         Carrega um dataset com pré-processamento opcional
 
@@ -82,17 +84,13 @@ class DatasetService:
         self.logger.info(f"Carregando dataset: {dataset_name}")
 
         try:
-            if dataset_name == 'mit-bih':
+            if dataset_name == "mit-bih":
                 return self.loader.load_mit_bih(
-                    dataset_path,
-                    preprocess=preprocess,
-                    max_records=max_records
+                    dataset_path, preprocess=preprocess, max_records=max_records
                 )
-            elif dataset_name == 'ptb-xl':
+            elif dataset_name == "ptb-xl":
                 return self.loader.load_ptb_xl(
-                    dataset_path,
-                    max_records=max_records,
-                    preprocess=preprocess
+                    dataset_path, max_records=max_records, preprocess=preprocess
                 )
             else:
                 self.logger.error(f"Loader não implementado para: {dataset_name}")
@@ -102,7 +100,9 @@ class DatasetService:
             self.logger.error(f"Erro ao carregar {dataset_name}: {e}")
             return []
 
-    def analyze_dataset(self, records: list[ECGRecord], dataset_name: str) -> dict[str, Any]:
+    def analyze_dataset(
+        self, records: list[ECGRecord], dataset_name: str
+    ) -> dict[str, Any]:
         """
         Analisa estatísticas de um dataset
 
@@ -115,10 +115,12 @@ class DatasetService:
         """
         return self.analyzer.analyze_dataset(records, dataset_name)
 
-    def prepare_for_ml(self,
-                      records: list[ECGRecord],
-                      window_size: int = 3600,
-                      target_labels: list[str] | None = None) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.int32]]:
+    def prepare_for_ml(
+        self,
+        records: list[ECGRecord],
+        window_size: int = 3600,
+        target_labels: list[str] | None = None,
+    ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.int32]]:
         """
         Prepara dataset para machine learning
 
@@ -132,7 +134,9 @@ class DatasetService:
         """
         return prepare_ml_dataset(records, window_size, target_labels)
 
-    def quick_setup_mit_bih(self, num_records: int = 10) -> tuple[list[ECGRecord] | None, dict[str, Any] | None]:
+    def quick_setup_mit_bih(
+        self, num_records: int = 10
+    ) -> tuple[list[ECGRecord] | None, dict[str, Any] | None]:
         """
         Setup rápido do MIT-BIH para testes
 
@@ -146,14 +150,13 @@ class DatasetService:
             record_names = [f"{i:03d}" for i in range(100, 100 + num_records)]
 
             dataset_path = self.download_dataset(
-                'mit-bih',
-                records_to_download=record_names
+                "mit-bih", records_to_download=record_names
             )
 
             if not dataset_path:
                 return None, None
 
-            records = self.load_dataset('mit-bih', dataset_path, preprocess=True)
+            records = self.load_dataset("mit-bih", dataset_path, preprocess=True)
 
             if not records:
                 return None, None
@@ -171,9 +174,11 @@ class DatasetService:
         """Retorna informações sobre datasets disponíveis"""
         return self.downloader.DATASETS_INFO
 
-    def create_unified_dataset(self,
-                             datasets: dict[str, list[ECGRecord]],
-                             output_path: str = "unified_ecg_dataset.h5") -> str:
+    def create_unified_dataset(
+        self,
+        datasets: dict[str, list[ECGRecord]],
+        output_path: str = "unified_ecg_dataset.h5",
+    ) -> str:
         """
         Cria dataset unificado em formato HDF5
 
@@ -197,26 +202,30 @@ class DatasetService:
 
         try:
             import wfdb  # noqa: F401
-            dependencies['wfdb'] = True
+
+            dependencies["wfdb"] = True
         except ImportError:
-            dependencies['wfdb'] = False
+            dependencies["wfdb"] = False
 
         try:
             import h5py  # type: ignore # noqa: F401
-            dependencies['h5py'] = True
+
+            dependencies["h5py"] = True
         except ImportError:
-            dependencies['h5py'] = False
+            dependencies["h5py"] = False
 
         try:
             import pandas  # noqa: F401
-            dependencies['pandas'] = True
+
+            dependencies["pandas"] = True
         except ImportError:
-            dependencies['pandas'] = False
+            dependencies["pandas"] = False
 
         try:
             from ..preprocessing import AdvancedECGPreprocessor  # noqa: F401
-            dependencies['advanced_preprocessor'] = True
+
+            dependencies["advanced_preprocessor"] = True
         except ImportError:
-            dependencies['advanced_preprocessor'] = False
+            dependencies["advanced_preprocessor"] = False
 
         return dependencies

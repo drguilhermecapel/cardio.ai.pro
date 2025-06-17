@@ -11,4 +11,4 @@ mock_pyedflib.highlevel = MagicMock()
 mock_pyedflib.highlevel.read_edf = MagicMock(return_value=([], None, None))
 
 # Insert mock into sys.modules before any imports
-sys.modules['pyedflib'] = mock_pyedflib
+sys.modules["pyedflib"] = mock_pyedflib
