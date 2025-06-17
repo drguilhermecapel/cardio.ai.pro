@@ -6,6 +6,7 @@ import logging
 from typing import Dict, Any, List, Optional, Set, Tuple
 import numpy as np
 from enum import Enum
+import copy
 
 from app.core.constants import ClinicalUrgency, DiagnosisCode
 from app.core.exceptions import MultiPathologyException
@@ -27,7 +28,7 @@ class SCPCategory(Enum):
 
 class MultiPathologyService:
     """Service for multi-pathology ECG analysis"""
-    
+
     # Complete SCP conditions mapping (71 conditions)
     SCP_CONDITIONS = {
         # Normal
@@ -36,7 +37,7 @@ class MultiPathologyService:
         'ISCA': {'index': 2, 'category': SCPCategory.NORMAL, 'severity': 0.1},
         'ISCI': {'index': 3, 'category': SCPCategory.NORMAL, 'severity': 0.2},
         'ASMI': {'index': 48, 'category': SCPCategory.NORMAL, 'severity': 0.3},
-        
+
         # Arrhythmias
         'AFIB': {'index': 9, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.9},
         'AFLT': {'index': 10, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.8},
@@ -54,7 +55,7 @@ class MultiPathologyService:
         'BIGU': {'index': 22, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.4},
         'VEB': {'index': 23, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.5},
         'SVEB': {'index': 24, 'category': SCPCategory.ARRHYTHMIA, 'severity': 0.4},
-        
+
         # Conduction disturbances
         'IAVB': {'index': 4, 'category': SCPCategory.CONDUCTION, 'severity': 0.6},
         'AVB2': {'index': 5, 'category': SCPCategory.CONDUCTION, 'severity': 0.7},
@@ -65,7 +66,7 @@ class MultiPathologyService:
         'RBBB': {'index': 26, 'category': SCPCategory.CONDUCTION, 'severity': 0.5},
         'IRBBB': {'index': 27, 'category': SCPCategory.CONDUCTION, 'severity': 0.4},
         'WPW': {'index': 28, 'category': SCPCategory.CONDUCTION, 'severity': 0.7},
-        
+
         # Ischemia/Infarction
         'MI': {'index': 29, 'category': SCPCategory.ISCHEMIA, 'severity': 1.0},
         'AMI': {'index': 30, 'category': SCPCategory.ISCHEMIA, 'severity': 1.0},
@@ -80,17 +81,17 @@ class MultiPathologyService:
         'INJIN': {'index': 39, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
         'INJLA': {'index': 40, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
         'INJAS': {'index': 41, 'category': SCPCategory.ISCHEMIA, 'severity': 0.8},
-        
+
         # Hypertrophy
         'LVH': {'index': 42, 'category': SCPCategory.HYPERTROPHY, 'severity': 0.6},
         'RVH': {'index': 43, 'category': SCPCategory.HYPERTROPHY, 'severity': 0.6},
         'LAH': {'index': 44, 'category': SCPCategory.HYPERTROPHY, 'severity': 0.5},
         'RAH': {'index': 45, 'category': SCPCategory.HYPERTROPHY, 'severity': 0.5},
-        
+
         # Axis deviations
         'LAD': {'index': 46, 'category': SCPCategory.AXIS_DEVIATION, 'severity': 0.3},
         'RAD': {'index': 47, 'category': SCPCategory.AXIS_DEVIATION, 'severity': 0.3},
-        
+
         # Other conditions
         'NDT': {'index': 49, 'category': SCPCategory.OTHER, 'severity': 0.3},
         'NST': {'index': 50, 'category': SCPCategory.OTHER, 'severity': 0.4},
@@ -115,10 +116,10 @@ class MultiPathologyService:
         'ISCLA': {'index': 69, 'category': SCPCategory.OTHER, 'severity': 0.5},
         'ISCAS': {'index': 70, 'category': SCPCategory.OTHER, 'severity': 0.5},
     }
-    
+
     def __init__(self, ml_service: Optional[MLModelService] = None):
         self.ml_service = ml_service
-        self.scp_conditions = self.SCP_CONDITIONS.copy()
+        self.scp_conditions = copy.deepcopy(self.SCP_CONDITIONS)
         self.condition_categories = self._build_category_mapping()
         self.category_thresholds = {
             SCPCategory.NORMAL: 0.99,  # High threshold for normal
@@ -129,17 +130,17 @@ class MultiPathologyService:
             SCPCategory.AXIS_DEVIATION: 0.4,
             SCPCategory.OTHER: 0.4
         }
-    
+
     def _build_category_mapping(self) -> Dict[SCPCategory, List[str]]:
         """Build mapping from categories to conditions"""
         mapping = {}
-        for condition, info in self.scp_conditions.items():
+        for condition, info in self.SCP_CONDITIONS.items():
             category = info['category']
             if category not in mapping:
                 mapping[category] = []
             mapping[category].append(condition)
         return mapping
-    
+
     async def analyze_hierarchical(
         self,
         signal: np.ndarray,
@@ -150,7 +151,6 @@ class MultiPathologyService:
         try:
             # Level 1: Normal vs Abnormal
             level1_result = await self._classify_normal_vs_abnormal(signal, features)
-            
             if level1_result['is_normal']:
                 return {
                     'diagnosis': 'NORMAL',
@@ -159,21 +159,21 @@ class MultiPathologyService:
                     'detected_conditions': [],
                     'clinical_urgency': ClinicalUrgency.LOW
                 }
-            
+
             # Level 2: Category classification
             level2_result = await self._classify_categories(signal, features)
-            
+
             # Level 3: Specific condition detection
             level3_result = await self._detect_specific_conditions(
                 signal, features, level2_result['predicted_categories']
             )
-            
+
             # Assess clinical urgency
             urgency = self._assess_clinical_urgency(level3_result['detected_conditions'])
-            
+
             # Get primary diagnosis
             primary = self._get_primary_diagnosis(level3_result['detected_conditions'])
-            
+
             return {
                 'diagnosis': primary['condition'] if primary else 'ABNORMAL',
                 'confidence': primary['confidence'] if primary else level2_result['confidence'],
@@ -185,45 +185,44 @@ class MultiPathologyService:
                 'detected_conditions': level3_result['detected_conditions'],
                 'clinical_urgency': urgency
             }
-            
+
         except Exception as e:
-            logger.error(f"Error in hierarchical analysis: {str(e)}")
+            logger.error(f"Error in hierarchical analysis: {str(e)}", exc_info=True)
             raise MultiPathologyException(f"Hierarchical analysis failed: {str(e)}")
-    
+
     async def _classify_normal_vs_abnormal(
         self, signal: np.ndarray, features: Dict[str, float]
     ) -> Dict[str, Any]:
         """Level 1: Classify normal vs abnormal"""
         try:
-            # Simple rule-based classification
             abnormal_indicators = []
-            
+
             # Check heart rate
             hr = features.get('heart_rate', 75)
             if hr < 50 or hr > 120:
                 abnormal_indicators.append('abnormal_heart_rate')
-            
+
             # Check intervals
             pr = features.get('pr_interval', 160)
             if pr < 120 or pr > 220:
                 abnormal_indicators.append('abnormal_pr_interval')
-            
+
             qrs = features.get('qrs_duration', 90)
             if qrs > 120:
                 abnormal_indicators.append('wide_qrs')
-            
+
             qt = features.get('qt_interval', 400)
             qtc = features.get('qtc', qt)
             if qtc > 470:
                 abnormal_indicators.append('prolonged_qtc')
-            
+
             # Calculate probability
             is_normal = len(abnormal_indicators) == 0
             confidence = 0.98 if is_normal else 0.02
-            
+
             # Calculate NPV score
             npv_score = 0.99 if is_normal else 0.01
-            
+
             return {
                 'is_normal': is_normal,
                 'confidence': confidence,
@@ -231,9 +230,9 @@ class MultiPathologyService:
                 'abnormal_indicators': abnormal_indicators,
                 'npv_score': npv_score
             }
-            
+
         except Exception as e:
-            logger.error(f"Error in normal/abnormal classification: {str(e)}")
+            logger.error(f"Error in normal/abnormal classification: {str(e)}", exc_info=True)
             return {
                 'is_normal': True,
                 'confidence': 0.5,
@@ -241,81 +240,87 @@ class MultiPathologyService:
                 'abnormal_indicators': [],
                 'npv_score': 0.5
             }
-    
+
     async def _classify_categories(
         self, signal: np.ndarray, features: Dict[str, float]
     ) -> Dict[str, Any]:
         """Level 2: Classify into diagnostic categories"""
         try:
             category_probs = {}
-            
+
             # Simple heuristic-based category classification
             hr = features.get('heart_rate', 75)
             pr = features.get('pr_interval', 160)
             qrs = features.get('qrs_duration', 90)
-            
+
             # Arrhythmia probability
             if hr < 50 or hr > 150 or features.get('rr_std', 0) > 50:
                 category_probs[SCPCategory.ARRHYTHMIA] = 0.7
             else:
                 category_probs[SCPCategory.ARRHYTHMIA] = 0.1
-            
+
             # Conduction probability
             if pr > 200 or qrs > 120:
                 category_probs[SCPCategory.CONDUCTION] = 0.6
             else:
                 category_probs[SCPCategory.CONDUCTION] = 0.1
-            
+
             # Ischemia probability
             st_elevation = features.get('st_elevation', 0)
             if st_elevation > 1:
                 category_probs[SCPCategory.ISCHEMIA] = 0.8
             else:
                 category_probs[SCPCategory.ISCHEMIA] = 0.1
-            
+
             # Other categories
             category_probs[SCPCategory.HYPERTROPHY] = 0.1
             category_probs[SCPCategory.AXIS_DEVIATION] = 0.1
             category_probs[SCPCategory.OTHER] = 0.1
-            
+
             # Get predicted categories
             predicted_categories = [
                 cat for cat, prob in category_probs.items()
-                if prob > self.category_thresholds[cat]
+                if cat in self.category_thresholds and prob > self.category_thresholds[cat]
             ]
-            
+
             # Get primary category
             primary_category = max(category_probs.items(), key=lambda x: x[1])[0]
-            
+
             return {
                 'category_probabilities': category_probs,
                 'predicted_categories': predicted_categories,
                 'predicted_category': primary_category,
                 'confidence': max(category_probs.values())
             }
-            
+
         except Exception as e:
-            logger.error(f"Error in category classification: {str(e)}")
+            logger.error(f"Error in category classification: {str(e)}", exc_info=True)
             return {
                 'category_probabilities': {},
                 'predicted_categories': [],
                 'predicted_category': SCPCategory.OTHER,
                 'confidence': 0.5
             }
-    
+
     async def _detect_specific_conditions(
         self, signal: np.ndarray, features: Dict[str, float], categories: List[SCPCategory]
     ) -> Dict[str, Any]:
         """Level 3: Detect specific conditions within categories"""
         try:
+            # Garantir que todos os itens são SCPCategory (enum)
+            categories = [
+                SCPCategory(cat) if not isinstance(cat, SCPCategory) else cat
+                for cat in categories
+            ]
+
             detected_conditions = []
             all_conditions = {}
-            
+
             # Detect conditions based on features and categories
             hr = features.get('heart_rate', 75)
             pr = features.get('pr_interval', 160)
             qrs = features.get('qrs_duration', 90)
-            
+
             # Arrhythmias
             if SCPCategory.ARRHYTHMIA in categories:
                 if hr > 150 and features.get('rr_std', 0) > 100:
@@ -332,7 +337,7 @@ class MultiPathologyService:
                         'severity': self.scp_conditions['SBRAD']['severity']
                     })
                     all_conditions['SBRAD'] = 0.7
-            
+
             # Conduction disturbances
             if SCPCategory.CONDUCTION in categories:
                 if pr > 200:
@@ -349,19 +354,19 @@ class MultiPathologyService:
                         'severity': self.scp_conditions['LBBB']['severity']
                     })
                     all_conditions['LBBB'] = 0.6
-            
+
             # Sort by severity and confidence
             detected_conditions.sort(
                 key=lambda x: (x['severity'], x['confidence']),
                 reverse=True
             )
-            
+
             # Calculate confidence scores
             confidence_scores = {
                 cond['condition']: cond['confidence']
                 for cond in detected_conditions
             }
-            
+
             return {
                 'detected_conditions': detected_conditions,
                 'all_conditions': all_conditions,
@@ -369,9 +374,9 @@ class MultiPathologyService:
                 'confidence': max([c['confidence'] for c in detected_conditions]) if detected_conditions else 0.5,
                 'confidence_scores': confidence_scores
             }
-            
+
         except Exception as e:
-            logger.error(f"Error detecting specific conditions: {str(e)}")
+            logger.error(f"Error detecting specific conditions: {str(e)}", exc_info=True)
             return {
                 'detected_conditions': [],
                 'all_conditions': {},
@@ -379,15 +384,15 @@ class MultiPathologyService:
                 'confidence': 0.5,
                 'confidence_scores': {}
             }
-    
+
     def _assess_clinical_urgency(self, conditions: List[Dict[str, Any]]) -> ClinicalUrgency:
         """Assess clinical urgency based on detected conditions"""
         if not conditions:
             return ClinicalUrgency.LOW
-        
+
         # Get highest severity
         max_severity = max(cond['severity'] for cond in conditions)
-        
+
         if max_severity >= 0.9:
             return ClinicalUrgency.CRITICAL
         elif max_severity >= 0.7:
@@ -396,18 +401,18 @@ class MultiPathologyService:
             return ClinicalUrgency.MEDIUM
         else:
             return ClinicalUrgency.LOW
-    
+
     def _get_primary_diagnosis(self, conditions: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         """Get primary diagnosis from detected conditions"""
         if not conditions:
             return None
-        
+
         # Return condition with highest severity and confidence
         return max(
             conditions,
             key=lambda x: (x['severity'], x['confidence'])
         )
-    
+
     async def analyze_pathologies(
         self, signal: np.ndarray, features: Dict[str, float]
     ) -> Dict[str, Any]:
