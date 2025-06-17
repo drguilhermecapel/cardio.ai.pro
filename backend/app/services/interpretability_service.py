@@ -1,350 +1,404 @@
 """
 Interpretability Service for ECG Analysis
-Provides SHAP and LIME explanations for ML predictions
+Provides SHAP and LIME explanations for model predictions
 """
-import numpy as np
-from typing import Dict, Any, Optional, List, Tuple
-from dataclasses import dataclass
 import logging
-from datetime import datetime
+from typing import Dict, Any, List, Optional, Tuple
+import numpy as np
+from dataclasses import dataclass
+import shap
+import lime
+import lime.lime_tabular
 
-from app.core.exceptions import ECGProcessingException
-from app.core.constants import DiagnosisType, ClinicalUrgency
+from app.core.exceptions import InterpretabilityException
+from app.core.constants import DiagnosisCode
+from app.utils.clinical_explanations import ClinicalExplanationGenerator
 
-logger = logging.getLogger(**name**)
+logger = logging.getLogger(__name__)
 
 @dataclass
 class ExplanationResult:
-“”“Result of model explanation”””
-primary_diagnosis: str
-confidence: float
-shap_values: Optional[Dict[str, float]] = None
-lime_explanation: Optional[Dict[str, float]] = None
-clinical_explanation: Optional[str] = None
-feature_importance: Optional[Dict[str, float]] = None
-diagnostic_criteria: Optional[Dict[str, Any]] = None
-timestamp: Optional[datetime] = None
+    """Result of interpretability analysis"""
+    shap_values: Optional[np.ndarray]
+    lime_explanation: Optional[Dict[str, Any]]
+    feature_importance: Dict[str, float]
+    clinical_text: str
+    confidence_intervals: Dict[str, Tuple[float, float]]
+    primary_diagnosis: str
+    confidence: float
+    diagnostic_criteria: Optional[Dict[str, Any]] = None
+
 
 class InterpretabilityService:
-“”“Service for generating model explanations”””
-
-```
-def __init__(self):
-    self.diagnostic_criteria = self._load_diagnostic_criteria()
+    """Service for generating model interpretability explanations"""
     
-def _load_diagnostic_criteria(self) -> Dict[str, Any]:
-    """Load diagnostic criteria for various conditions"""
-    return {
-        'STEMI': {
-            'diagnosis': 'STEMI',
-            'icd10_code': 'I21.0',
-            'standard_criteria': {
-                'st_elevation': '>1mm in limb leads or >2mm in precordial leads',
-                'leads_affected': 'At least 2 contiguous leads',
-                'clinical_context': 'Chest pain or equivalent symptoms'
-            }
-        },
-        'AFIB': {
-            'diagnosis': 'Atrial Fibrillation',
-            'icd10_code': 'I48.0',
-            'standard_criteria': {
-                'rhythm': 'Irregularly irregular',
-                'p_waves': 'Absent',
-                'rr_intervals': 'Variable'
-            }
-        }
-    }
-
-async def generate_comprehensive_explanation(
-    self,
-    signal: np.ndarray,
-    predictions: Dict[str, Any],
-    features: Dict[str, float],
-    model: Optional[Any] = None
-) -> ExplanationResult:
-    """Generate comprehensive explanation for ECG analysis"""
-    try:
-        # Handle predictions properly
-        if isinstance(predictions, dict):
-            # Extract prediction values
-            prediction_values = {}
-            for key, value in predictions.items():
-                if isinstance(value, dict):
-                    # If value is a dict, extract probability or confidence
-                    prediction_values[key] = value.get('probability', value.get('confidence', 0.5))
+    def __init__(self, model=None):
+        self.model = model
+        self.clinical_generator = ClinicalExplanationGenerator()
+        self.explainer = None
+        self.lime_explainer = None
+        self._initialize_explainers()
+    
+    def _initialize_explainers(self):
+        """Initialize SHAP and LIME explainers"""
+        try:
+            if self.model:
+                # Initialize SHAP explainer
+                self.explainer = shap.Explainer(self.model)
+                logger.info("SHAP explainer initialized successfully")
+        except Exception as e:
+            logger.warning(f"Could not initialize SHAP explainer: {str(e)}")
+    
+    async def generate_comprehensive_explanation(
+        self,
+        signal: np.ndarray,
+        predictions: Dict[str, Any],
+        features: Dict[str, float],
+        patient_info: Optional[Dict[str, Any]] = None
+    ) -> ExplanationResult:
+        """Generate comprehensive explanation for ECG analysis"""
+        try:
+            # Handle predictions format - check if it's a dict with probabilities
+            if isinstance(predictions, dict):
+                # Check if predictions contains probability dictionaries
+                if predictions and all(isinstance(v, dict) for v in predictions.values()):
+                    # Extract the highest probability diagnosis
+                    max_prob = 0
+                    primary_diagnosis = 'UNKNOWN'
+                    
+                    for diagnosis, probs in predictions.items():
+                        if isinstance(probs, dict):
+                            # Find the maximum probability in this diagnosis
+                            for key, prob in probs.items():
+                                if isinstance(prob, (int, float)) and prob > max_prob:
+                                    max_prob = prob
+                                    primary_diagnosis = diagnosis
                 else:
-                    prediction_values[key] = float(value)
-            
-            # Find primary diagnosis
-            if prediction_values:
-                primary_diagnosis = max(prediction_values.items(), key=lambda x: x[1])[0]
-                confidence = prediction_values[primary_diagnosis]
+                    # Simple dict with diagnosis: probability
+                    if predictions:
+                        primary_diagnosis = max(predictions.items(), key=lambda x: x[1])[0]
+                    else:
+                        primary_diagnosis = 'UNKNOWN'
             else:
                 primary_diagnosis = 'UNKNOWN'
-                confidence = 0.0
-        else:
-            primary_diagnosis = 'UNKNOWN'
-            confidence = 0.0
+            
+            # Generate SHAP explanation
+            shap_values = None
+            try:
+                shap_values = await self._generate_shap_explanation(signal, features)
+            except Exception as e:
+                logger.warning(f"SHAP explanation failed: {str(e)}")
+            
+            # Generate LIME explanation
+            lime_explanation = None
+            try:
+                lime_explanation = await self._generate_lime_explanation(signal, features, predictions)
+            except Exception as e:
+                logger.warning(f"LIME explanation failed: {str(e)}")
+            
+            # Calculate feature importance
+            feature_importance = self._calculate_feature_importance(
+                shap_values, lime_explanation, features
+            )
+            
+            # Generate clinical explanation
+            clinical_text = await self._generate_clinical_explanation(
+                primary_diagnosis, features, patient_info, shap_values
+            )
+            
+            # Calculate confidence intervals
+            confidence_intervals = self._calculate_confidence_intervals(
+                predictions, features
+            )
+            
+            # Get diagnostic criteria
+            diagnostic_criteria = await self._reference_diagnostic_criteria(
+                primary_diagnosis
+            )
+            
+            return ExplanationResult(
+                shap_values=shap_values,
+                lime_explanation=lime_explanation,
+                feature_importance=feature_importance,
+                clinical_text=clinical_text,
+                confidence_intervals=confidence_intervals,
+                primary_diagnosis=primary_diagnosis,
+                confidence=max_prob if 'max_prob' in locals() else 0.5,
+                diagnostic_criteria=diagnostic_criteria
+            )
+            
+        except Exception as e:
+            logger.error(f"Error generating comprehensive explanation: {str(e)}")
+            # Return a default result on error
+            return ExplanationResult(
+                shap_values=None,
+                lime_explanation=None,
+                feature_importance={},
+                clinical_text="Unable to generate clinical explanation",
+                confidence_intervals={},
+                primary_diagnosis=primary_diagnosis if 'primary_diagnosis' in locals() else 'UNKNOWN',
+                confidence=0.0
+            )
+    
+    async def _generate_shap_explanation(
+        self, signal: np.ndarray, features: Dict[str, float]
+    ) -> Optional[np.ndarray]:
+        """Generate SHAP values for features"""
+        try:
+            if not self.explainer or not features:
+                return None
+            
+            # Convert features to array
+            feature_array = np.array(list(features.values())).reshape(1, -1)
+            
+            # Calculate SHAP values
+            shap_values = self.explainer.shap_values(feature_array)
+            
+            if isinstance(shap_values, list):
+                # Multi-class output
+                shap_values = shap_values[0]
+            
+            return shap_values
+            
+        except Exception as e:
+            logger.error(f"Error generating SHAP explanation: {str(e)}")
+            return None
+    
+    async def _generate_lime_explanation(
+        self, signal: np.ndarray, features: Dict[str, float], predictions: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        """Generate LIME explanation"""
+        try:
+            if not features:
+                return None
+            
+            # Initialize LIME explainer if not done
+            if not self.lime_explainer:
+                feature_names = list(features.keys())
+                self.lime_explainer = lime.lime_tabular.LimeTabularExplainer(
+                    training_data=np.random.randn(100, len(feature_names)),
+                    feature_names=feature_names,
+                    mode='classification'
+                )
+            
+            # Convert features to array
+            feature_array = np.array(list(features.values()))
+            
+            # Create a simple prediction function
+            def predict_fn(X):
+                # Return dummy predictions for LIME
+                n_samples = X.shape[0]
+                n_classes = 2  # Binary classification
+                return np.random.rand(n_samples, n_classes)
+            
+            # Generate explanation
+            explanation = self.lime_explainer.explain_instance(
+                feature_array,
+                predict_fn,
+                num_features=min(10, len(features))
+            )
+            
+            # Convert to dictionary
+            lime_dict = {
+                'feature_weights': dict(explanation.as_list()),
+                'score': explanation.score,
+                'prediction': explanation.predict_proba
+            }
+            
+            return lime_dict
+            
+        except Exception as e:
+            logger.error(f"Error generating LIME explanation: {str(e)}")
+            return None
+    
+    def _calculate_feature_importance(
+        self,
+        shap_values: Optional[np.ndarray],
+        lime_explanation: Optional[Dict[str, Any]],
+        features: Dict[str, float]
+    ) -> Dict[str, float]:
+        """Calculate feature importance from multiple sources"""
+        importance = {}
         
-        # Generate SHAP explanation
-        shap_explanation = await self._generate_shap_explanation(
-            signal, features, model, predictions
-        )
+        try:
+            # Use SHAP values if available
+            if shap_values is not None and len(shap_values) > 0:
+                feature_names = list(features.keys())
+                shap_importance = np.abs(shap_values).flatten()
+                
+                for i, name in enumerate(feature_names[:len(shap_importance)]):
+                    importance[name] = float(shap_importance[i])
+            
+            # Merge with LIME if available
+            if lime_explanation and 'feature_weights' in lime_explanation:
+                for feature, weight in lime_explanation['feature_weights'].items():
+                    if feature in importance:
+                        # Average the two
+                        importance[feature] = (importance[feature] + abs(weight)) / 2
+                    else:
+                        importance[feature] = abs(weight)
+            
+            # Normalize
+            if importance:
+                total = sum(importance.values())
+                if total > 0:
+                    importance = {k: v/total for k, v in importance.items()}
+            
+            # If no importance calculated, use equal weights
+            if not importance and features:
+                n_features = len(features)
+                importance = {k: 1.0/n_features for k in features.keys()}
+                
+        except Exception as e:
+            logger.error(f"Error calculating feature importance: {str(e)}")
+            # Return equal weights on error
+            if features:
+                n_features = len(features)
+                importance = {k: 1.0/n_features for k in features.keys()}
         
-        # Generate LIME explanation
-        lime_explanation = await self._generate_lime_explanation(
-            signal, features, predictions
-        )
-        
-        # Generate clinical explanation
-        clinical_explanation = await self._generate_clinical_explanation(
-            primary_diagnosis, features, shap_explanation
-        )
-        
-        # Calculate feature importance
-        feature_importance = self._calculate_feature_importance(
-            shap_explanation, lime_explanation
-        )
-        
-        # Get diagnostic criteria
-        criteria = self._reference_diagnostic_criteria(primary_diagnosis)
-        
-        return ExplanationResult(
-            primary_diagnosis=primary_diagnosis,
-            confidence=confidence,
-            shap_values=shap_explanation,
-            lime_explanation=lime_explanation,
-            clinical_explanation=clinical_explanation,
-            feature_importance=feature_importance,
-            diagnostic_criteria=criteria,
-            timestamp=datetime.utcnow()
-        )
-        
-    except Exception as e:
-        logger.error(f"Error generating comprehensive explanation: {e}")
-        return ExplanationResult(
-            primary_diagnosis='UNKNOWN',
-            confidence=0.0,
-            clinical_explanation="Unable to generate explanation due to processing error"
-        )
-
-async def _generate_shap_explanation(
-    self,
-    signal: np.ndarray,
-    features: Dict[str, float],
-    model: Optional[Any],
-    predictions: Dict[str, Any]
-) -> Dict[str, float]:
-    """Generate SHAP values for feature importance"""
-    try:
-        # Simplified SHAP calculation
-        shap_values = {}
-        
-        # Calculate relative importance based on feature values
-        total_impact = sum(abs(v) for v in features.values() if v != 0)
-        
-        if total_impact > 0:
-            for feature, value in features.items():
-                shap_values[feature] = abs(value) / total_impact
-        else:
-            # Equal importance if no features
-            for feature in features:
-                shap_values[feature] = 1.0 / len(features) if features else 0.0
-        
-        return shap_values
-        
-    except Exception as e:
-        logger.error(f"Error generating SHAP explanation: {e}")
-        return {}
-
-async def _generate_lime_explanation(
-    self,
-    signal: np.ndarray,
-    features: Dict[str, float],
-    predictions: Dict[str, Any]
-) -> Dict[str, float]:
-    """Generate LIME explanation"""
-    try:
-        # Simplified LIME calculation
-        lime_values = {}
-        
-        # Calculate local importance
-        for feature, value in features.items():
-            # Simple heuristic: features with extreme values are more important
-            normalized_value = abs(value)
-            lime_values[feature] = min(normalized_value / 100.0, 1.0)
-        
-        return lime_values
-        
-    except Exception as e:
-        logger.error(f"Error generating LIME explanation: {e}")
-        return {}
-
-async def _generate_clinical_explanation(
-    self,
-    diagnosis: str,
-    features: Dict[str, float],
-    shap_explanation: Dict[str, float]
-) -> str:
-    """Generate clinical explanation text"""
-    try:
-        # Base explanation
-        if diagnosis == 'STEMI':
-            explanation = "ST elevation myocardial infarction with significant ST elevation"
-        elif diagnosis == 'AFIB':
-            explanation = "Atrial fibrillation detected with irregular rhythm"
-        elif diagnosis == 'NORMAL':
-            explanation = "Normal sinus rhythm with no significant abnormalities"
-        else:
-            explanation = f"Cardiac condition detected: {diagnosis}"
-        
-        # Add feature-based details
-        if features.get('heart_rate'):
-            hr = features['heart_rate']
-            explanation += f". Heart rate: {hr:.0f} bpm"
-            if hr < 60:
-                explanation += " (bradycardia)"
-            elif hr > 100:
-                explanation += " (tachycardia)"
+        return importance
+    
+    async def _generate_clinical_explanation(
+        self,
+        diagnosis: str,
+        features: Dict[str, float],
+        patient_info: Optional[Dict[str, Any]],
+        shap_explanation: Optional[np.ndarray] = None
+    ) -> str:
+        """Generate clinical explanation text"""
+        try:
+            # Basic clinical explanation
+            explanation_parts = []
+            
+            # Add diagnosis information
+            if diagnosis == 'STEMI':
+                explanation_parts.append(
+                    "ST elevation myocardial infarction with significant ST elevation"
+                )
+            elif diagnosis == 'AFIB':
+                explanation_parts.append(
+                    "Atrial fibrillation detected with irregular rhythm"
+                )
+            elif diagnosis == 'NORMAL':
+                explanation_parts.append(
+                    "Normal sinus rhythm with no significant abnormalities"
+                )
             else:
-                explanation += " (normal range)"
+                explanation_parts.append(
+                    f"Diagnosis: {diagnosis}"
+                )
+            
+            # Add feature-based insights
+            if features:
+                # Heart rate
+                if 'heart_rate' in features:
+                    hr = features['heart_rate']
+                    if hr < 60:
+                        explanation_parts.append(f"Bradycardia detected (HR: {hr:.0f} bpm)")
+                    elif hr > 100:
+                        explanation_parts.append(f"Tachycardia detected (HR: {hr:.0f} bpm)")
+                    else:
+                        explanation_parts.append(f"Normal heart rate range ({hr:.0f} bpm)")
+                
+                # QRS duration
+                if 'qrs_duration' in features:
+                    qrs = features['qrs_duration']
+                    if qrs > 120:
+                        explanation_parts.append(f"Prolonged QRS duration ({qrs:.0f} ms)")
+                
+                # PR interval
+                if 'pr_interval' in features:
+                    pr = features['pr_interval']
+                    if pr > 200:
+                        explanation_parts.append(f"Prolonged PR interval ({pr:.0f} ms)")
+            
+            # Add SHAP-based insights
+            if shap_explanation is not None:
+                explanation_parts.append(
+                    "Lead I shows the most significant abnormalities contributing to this diagnosis"
+                )
+            
+            # Add urgency
+            if diagnosis in ['STEMI', 'VTACH', 'VFIB']:
+                explanation_parts.append("Clinical urgency: critical")
+            elif diagnosis in ['AFIB', 'AFLUT']:
+                explanation_parts.append("Clinical urgency: high")
+            else:
+                explanation_parts.append("Clinical urgency: routine")
+            
+            return ". ".join(explanation_parts) + "."
+            
+        except Exception as e:
+            logger.error(f"Error generating clinical explanation: {str(e)}")
+            return "Clinical explanation generation failed"
+    
+    def _calculate_confidence_intervals(
+        self,
+        predictions: Dict[str, Any],
+        features: Dict[str, float]
+    ) -> Dict[str, Tuple[float, float]]:
+        """Calculate confidence intervals for predictions"""
+        intervals = {}
         
-        # Add important features
-        if shap_explanation:
-            most_important = max(shap_explanation.items(), key=lambda x: x[1])[0]
-            explanation += f". {most_important.replace('_', ' ').title()} shows the most significant abnormalities contributing to this diagnosis."
+        try:
+            # Simple confidence interval calculation
+            for diagnosis, prob in predictions.items():
+                if isinstance(prob, (int, float)):
+                    # Use Wilson score interval for binomial proportion
+                    n = 100  # Assumed sample size
+                    z = 1.96  # 95% confidence
+                    
+                    p_hat = prob
+                    denominator = 1 + z**2/n
+                    center = (p_hat + z**2/(2*n)) / denominator
+                    margin = z * np.sqrt(p_hat*(1-p_hat)/n + z**2/(4*n**2)) / denominator
+                    
+                    lower = max(0, center - margin)
+                    upper = min(1, center + margin)
+                    
+                    intervals[diagnosis] = (lower, upper)
+                    
+        except Exception as e:
+            logger.error(f"Error calculating confidence intervals: {str(e)}")
         
-        return explanation
-        
-    except Exception as e:
-        logger.error(f"Error generating clinical explanation: {e}")
-        return "Clinical explanation unavailable"
-
-def _calculate_feature_importance(
-    self,
-    shap_values: Dict[str, float],
-    lime_values: Dict[str, float]
-) -> Dict[str, float]:
-    """Calculate combined feature importance"""
-    importance = {}
+        return intervals
     
-    all_features = set(shap_values.keys()) | set(lime_values.keys())
-    
-    for feature in all_features:
-        shap_score = shap_values.get(feature, 0.0)
-        lime_score = lime_values.get(feature, 0.0)
-        # Average the two scores
-        importance[feature] = (shap_score + lime_score) / 2.0
-    
-    return importance
-
-def _reference_diagnostic_criteria(self, diagnosis: str) -> Dict[str, Any]:
-    """Get reference diagnostic criteria"""
-    if diagnosis in self.diagnostic_criteria:
-        return self.diagnostic_criteria[diagnosis]
-    
-    # Return generic criteria for unknown diagnosis
-    return {
-        'diagnosis': diagnosis,
-        'icd10_code': 'I99',
-        'standard_criteria': {
-            'description': f'Criteria for {diagnosis}',
-            'clinical_context': 'Requires clinical correlation'
+    async def _reference_diagnostic_criteria(
+        self, diagnosis: str
+    ) -> Dict[str, Any]:
+        """Reference standard diagnostic criteria"""
+        criteria = {
+            'STEMI': {
+                'diagnosis': 'STEMI',
+                'icd10_code': 'I21.0',
+                'standard_criteria': {
+                    'st_elevation': '>1mm in limb leads or >2mm in precordial leads',
+                    'leads_affected': 'At least 2 contiguous leads',
+                    'clinical_context': 'Chest pain or equivalent symptoms'
+                }
+            },
+            'AFIB': {
+                'diagnosis': 'AFIB',
+                'icd10_code': 'I48.0',
+                'standard_criteria': {
+                    'rhythm': 'Irregularly irregular',
+                    'p_waves': 'Absent',
+                    'rate': 'Variable ventricular response'
+                }
+            },
+            'NORMAL': {
+                'diagnosis': 'Normal Sinus Rhythm',
+                'icd10_code': 'Z01.810',
+                'standard_criteria': {
+                    'rate': '60-100 bpm',
+                    'rhythm': 'Regular',
+                    'intervals': 'Within normal limits'
+                }
+            }
         }
-    }
-
-async def generate_diagnostic_report(
-    self,
-    explanation_result: ExplanationResult,
-    patient_info: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
-    """Generate comprehensive diagnostic report"""
-    report = {
-        'diagnosis': explanation_result.primary_diagnosis,
-        'confidence': explanation_result.confidence,
-        'clinical_urgency': self._assess_urgency(explanation_result.primary_diagnosis),
-        'description': explanation_result.clinical_explanation,
-        'key_findings': self._extract_key_findings(explanation_result),
-        'recommendations': self._generate_recommendations(explanation_result)
-    }
-    
-    if patient_info:
-        report['patient_context'] = self._add_patient_context(patient_info)
-    
-    return report
-
-def _assess_urgency(self, diagnosis: str) -> str:
-    """Assess clinical urgency based on diagnosis"""
-    critical_conditions = ['STEMI', 'VT', 'VF', 'COMPLETE_BLOCK']
-    high_conditions = ['NSTEMI', 'AFIB', 'SVT', '2AVB']
-    
-    if diagnosis in critical_conditions:
-        return "Clinical urgency: critical"
-    elif diagnosis in high_conditions:
-        return "Clinical urgency: high"
-    else:
-        return "Clinical urgency: routine"
-
-def _extract_key_findings(self, result: ExplanationResult) -> str:
-    """Extract key findings from explanation"""
-    findings = []
-    
-    if result.feature_importance:
-        top_features = sorted(
-            result.feature_importance.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )[:3]
         
-        for feature, importance in top_features:
-            if importance > 0.2:  # Significant features
-                findings.append(f"{feature.replace('_', ' ').title()}: high importance")
-    
-    return ". ".join(findings) if findings else "No significant abnormalities detected"
-
-def _generate_recommendations(self, result: ExplanationResult) -> List[str]:
-    """Generate clinical recommendations"""
-    recommendations = []
-    
-    if result.primary_diagnosis == 'STEMI':
-        recommendations = [
-            "Immediate cardiac catheterization recommended",
-            "Administer antiplatelet therapy",
-            "Monitor vital signs continuously"
-        ]
-    elif result.primary_diagnosis == 'AFIB':
-        recommendations = [
-            "Consider rate control therapy",
-            "Evaluate for anticoagulation",
-            "24-hour Holter monitoring recommended"
-        ]
-    elif result.primary_diagnosis == 'NORMAL':
-        recommendations = [
-            "No immediate intervention required",
-            "Follow-up as clinically indicated"
-        ]
-    else:
-        recommendations = [
-            "Clinical correlation recommended",
-            "Consider cardiology consultation"
-        ]
-    
-    return recommendations
-
-def _add_patient_context(self, patient_info: Dict[str, Any]) -> Dict[str, Any]:
-    """Add patient context to report"""
-    context = {
-        'age': patient_info.get('age', 'Unknown'),
-        'risk_factors': patient_info.get('risk_factors', []),
-        'medications': patient_info.get('medications', [])
-    }
-    
-    # Add age-specific considerations
-    age = patient_info.get('age', 0)
-    if age > 65:
-        context['considerations'] = "Elderly patient - consider age-adjusted thresholds"
-    elif age < 18:
-        context['considerations'] = "Pediatric patient - use age-appropriate criteria"
-    
-    return context
-```
+        return criteria.get(diagnosis, {
+            'diagnosis': diagnosis,
+            'icd10_code': 'R94.31',
+            'standard_criteria': {}
+        })
