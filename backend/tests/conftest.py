@@ -64,14 +64,26 @@ async def async_db_session(async_db_engine):
 
 
 @pytest_asyncio.fixture
-async def test_db(async_db_engine):
-    """Create test database session (alias for compatibility)."""
-    async_session = sessionmaker(
-        async_db_engine, class_=AsyncSession, expire_on_commit=False
+async def test_db():
+    """Create test database session."""
+    engine = create_async_engine(
+        "sqlite+aiosqlite:///:memory:", 
+        echo=False,
+        future=True
     )
-
+    
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    
+    async_session = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
+    
     async with async_session() as session:
         yield session
+        await session.close()
+    
+    await engine.dispose()
 
 
 @pytest.fixture
@@ -194,6 +206,38 @@ def mock_validation_service():
     validation_mock.create_validation = AsyncMock(return_value={"id": 1})
     validation_mock.assign_validator = AsyncMock(return_value=True)
     return validation_mock
+
+
+# Composite fixtures that depend on test_db
+@pytest_asyncio.fixture
+async def notification_service(test_db):
+    """Create notification service with test database."""
+    from app.services.notification_service import NotificationService
+    return NotificationService(db=test_db)
+
+
+@pytest_asyncio.fixture
+async def validation_service(test_db, notification_service):
+    """Create validation service with test database."""
+    from app.services.validation_service import ValidationService
+    return ValidationService(db=test_db, notification_service=notification_service)
+
+
+@pytest_asyncio.fixture
+async def user_service(test_db):
+    """Create user service with test database."""
+    from app.services.user_service import UserService
+    return UserService(db=test_db)
+
+
+@pytest_asyncio.fixture
+async def ecg_service(test_db, validation_service):
+    """Create ECG service with test database."""
+    from app.services.ecg_service import ECGAnalysisService
+    from app.services.ml_model_service import MLModelService
+    
+    ml_service = MLModelService()
+    return ECGAnalysisService(db=test_db, ml_service=ml_service, validation_service=validation_service)
 
 
 # Skip markers for different test categories
