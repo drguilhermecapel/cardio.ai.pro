@@ -5,7 +5,7 @@ Schemas Pydantic para validação de dados de ECG.
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, validator
-from app.core.constants import FileType, AnalysisStatus as ProcessingStatus, ClinicalUrgency, DiagnosisCategory as RhythmType
+from app.models.ecg import FileType, ProcessingStatus, ClinicalUrgency, RhythmType
 
 
 class ECGAnalysisBase(BaseModel):
