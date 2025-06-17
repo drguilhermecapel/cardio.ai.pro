@@ -82,6 +82,7 @@ class ClinicalUrgency(str, Enum):
 class FileType(str, Enum):
     """Supported file types."""
 
+    CSV = "csv"
     PDF = "application/pdf"
     JPEG = "image/jpeg"
     PNG = "image/png"
