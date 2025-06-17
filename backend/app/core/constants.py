@@ -10,11 +10,12 @@ class UserRoles(str, Enum):
 
     ADMIN = "admin"
     PHYSICIAN = "physician"
-    PATIENT = "patient"
     CARDIOLOGIST = "cardiologist"
     TECHNICIAN = "technician"
     RESEARCHER = "researcher"
     VIEWER = "viewer"
+    PATIENT = "patient"
+    NURSE = "nurse"
 
 
 class AnalysisStatus(str, Enum):
@@ -88,7 +89,7 @@ class FileType(str, Enum):
     TXT = "text/plain"
 
 
-ECG_FILE_EXTENSIONS = {".csv", ".txt", ".xml", ".dat", ".png", ".jpg", ".jpeg"}
+ECG_FILE_EXTENSIONS = {".csv", ".txt", ".xml", ".dat", ".png", ".jpg", ".jpeg", ".edf", ".hea"}
 
 
 class NotificationChannel(str, Enum):
@@ -117,11 +118,17 @@ class NotificationType(str, Enum):
 
     CRITICAL_FINDING = "critical_finding"
     ANALYSIS_COMPLETE = "analysis_complete"
+    ECG_ANALYSIS_COMPLETE = "ecg_analysis_complete"  # Adicionado
     VALIDATION_REMINDER = "validation_reminder"
+    VALIDATION_REQUIRED = "validation_required"  # Adicionado
+    VALIDATION_ASSIGNED = "validation_assigned"  # Adicionado
+    VALIDATION_COMPLETE = "validation_complete"  # Adicionado
     QUALITY_ALERT = "quality_alert"
     SYSTEM_ALERT = "system_alert"
     APPOINTMENT_REMINDER = "appointment_reminder"
     REPORT_READY = "report_ready"
+    URGENT_VALIDATION = "urgent_validation"  # Adicionado
+    NO_VALIDATOR_AVAILABLE = "no_validator_available"  # Adicionado
 
 
 class AuditEventType(str, Enum):
@@ -176,6 +183,8 @@ CRITICAL_CONDITIONS = [
     "Third Degree AV Block",
     "Ventricular Flutter",
     "Polymorphic Ventricular Tachycardia",
+    "VF",  # Abbreviation
+    "VT",  # Abbreviation
 ]
 
 ICD10_CODES = {
@@ -200,16 +209,7 @@ ICD10_CODES = {
 SCP_ECG_CATEGORIES = {
     "NORMAL": ["NORM"],
     "ARRHYTHMIA": ["AFIB", "AFLT", "SVTAC", "VTAC", "BIGU", "TRIGU", "PVC", "PAC"],
-    "CONDUCTION_DISORDER": [
-        "AVB1",
-        "AVB2",
-        "AVB3",
-        "RBBB",
-        "LBBB",
-        "LAFB",
-        "LPFB",
-        "WPW",
-    ],
+    "CONDUCTION_DISORDER": ["AVB1", "AVB2", "AVB3", "RBBB", "LBBB", "LAFB", "LPFB", "WPW"],
     "ISCHEMIA": ["STEMI", "NSTEMI", "UAP", "ISCH", "QWAVE", "TWAVE"],
     "HYPERTROPHY": ["LVH", "RVH", "LAE", "RAE", "BIAE"],
     "AXIS_DEVIATION": ["LAD", "RAD", "EAXIS"],
@@ -222,58 +222,6 @@ SCP_ECG_CATEGORIES = {
 SCP_ECG_PERFORMANCE_TARGETS = {
     "NORMAL": {"sensitivity": 0.99, "specificity": 0.95, "npv": 0.99},
     "ARRHYTHMIA": {"sensitivity": 0.95, "specificity": 0.90, "ppv": 0.85},
-    "CONDUCTION_DISORDER": {"sensitivity": 0.90, "specificity": 0.95, "auc": 0.92},
-    "ISCHEMIA": {"sensitivity": 0.98, "specificity": 0.85, "critical": True},
-    "HYPERTROPHY": {"sensitivity": 0.85, "specificity": 0.90, "auc": 0.90},
-    "AXIS_DEVIATION": {"sensitivity": 0.90, "specificity": 0.85, "auc": 0.88},
-    "REPOLARIZATION": {"sensitivity": 0.88, "specificity": 0.90, "auc": 0.89},
-    "PACEMAKER": {"sensitivity": 0.95, "specificity": 0.98, "auc": 0.96},
-    "BUNDLE_BRANCH_BLOCK": {"sensitivity": 0.92, "specificity": 0.95, "auc": 0.93},
+    "CONDUCTION_DISORDER": {"sensitivity": 0.90, "specificity": 0.95, "ppv": 0.90},
+    "ISCHEMIA": {"sensitivity": 0.98, "specificity": 0.85, "ppv": 0.80},
 }
-
-SCP_ECG_URGENCY_MAPPING = {
-    "CRITICAL": ["VTAC", "VFIB", "AVB3", "STEMI", "ASYS", "TORSADES"],
-    "HIGH": ["AFIB", "AFLT", "SVTAC", "NSTEMI", "UAP", "AVB2", "WPW"],
-    "MEDIUM": ["PVC", "PAC", "AVB1", "RBBB", "LBBB", "LVH", "RVH"],
-    "LOW": ["NORM", "SINUS", "LOWV", "MINOR"],
-}
-
-MEDICAL_DEVICE_STANDARD_IEC_60601_2_47 = (
-    "IEC_60601_2_47"  # International standard for ECG equipment
-)
-REGULATORY_COMPLIANCE_ANVISA_RDC_185 = (
-    "ANVISA_RDC_185"  # Brazilian regulatory compliance
-)
-DATA_PROTECTION_STANDARD_LGPD = "LGPD"  # Brazilian data protection law
-
-ECG_FILTER_DIAGNOSTIC_HIGHPASS_HZ = 0.05  # CRITICAL for ST segment preservation
-ECG_FILTER_DIAGNOSTIC_LOWPASS_HZ = 150.0  # Diagnostic bandwidth
-ECG_FILTER_MONITORING_HIGHPASS_HZ = 0.5  # For monitoring mode
-ECG_POWER_LINE_FREQUENCY_HZ = 60  # Brazil standard
-
-ECG_MIN_QUALITY_SCORE = 0.7
-ECG_QUALITY_REJECT_THRESHOLD = 0.6
-ECG_QUALITY_WARNING_THRESHOLD = 0.8
-
-PERFORMANCE_THRESHOLD_DEFAULT = 0.85
-MONITORING_BUFFER_SIZE_PREDICTIONS = 10000
-MONITORING_BUFFER_SIZE_QUALITY = 1000
-MONITORING_BUFFER_SIZE_ERRORS = 100
-
-ANVISA_RETENTION_YEARS = 7
-FDA_CFR_PART_11_REQUIRED = True
-LGPD_COMPLIANCE_REQUIRED = True
-HIPAA_COMPLIANCE_REQUIRED = True
-
-MAX_CONCURRENT_ANALYSES = 10
-MAX_FILE_SIZE_MB = 100
-MAX_BATCH_SIZE = 50
-CACHE_TTL_SECONDS = 3600
-
-RATE_LIMIT_PER_MINUTE = 100
-RATE_LIMIT_PER_HOUR = 1000
-RATE_LIMIT_PER_DAY = 10000
-
-
-# Alias para compatibilidade
-DiagnosisCode = DiagnosisCategory
