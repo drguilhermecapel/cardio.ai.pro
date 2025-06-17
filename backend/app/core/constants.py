@@ -162,6 +162,21 @@ class ModelStatus(str, Enum):
     DEPRECATED = "deprecated"
 
 
+class DiagnosisCode(str, Enum):
+    """Diagnosis codes enumeration."""
+    
+    NORMAL = "normal"
+    AFIB = "afib"
+    STEMI = "stemi"
+    NSTEMI = "nstemi"
+    AVB = "avb"
+    LBBB = "lbbb"
+    RBBB = "rbbb"
+    PAC = "pac"
+    PVC = "pvc"
+    OTHER = "other"
+
+
 ECG_SAMPLE_RATES = [250, 500, 1000]
 ECG_STANDARD_DURATION = 10  # seconds
 ECG_MINIMUM_DURATION = 5  # seconds
