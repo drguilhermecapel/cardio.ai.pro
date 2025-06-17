@@ -13,6 +13,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     """Application settings."""
+    BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:8000"]
 
     PROJECT_NAME: str = "CardioAI Pro"
     VERSION: str = "1.0.0"
@@ -250,6 +251,11 @@ class Settings(BaseSettings):
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }
+    ML_MODEL_PATH: str = "models"
+    ML_BATCH_SIZE: int = 32
+    ML_MAX_QUEUE_SIZE: int = 1000
+    UPLOAD_PATH: str = "uploads"
+    MAX_UPLOAD_SIZE: int = 104857600  # 100MB
 
 
 settings = Settings()
