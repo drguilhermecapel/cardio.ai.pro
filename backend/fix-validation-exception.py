@@ -14,7 +14,7 @@ def fix_validation_exception():
     exceptions_file = BACKEND_DIR / "app" / "core" / "exceptions.py"
     
     if not exceptions_file.exists():
-        print("❌ Arquivo exceptions.py não encontrado!")
+        print("[ERRO] Arquivo exceptions.py não encontrado!")
         return False
     
     print("Corrigindo ValidationException...")
@@ -85,7 +85,7 @@ def fix_validation_exception():
     with open(exceptions_file, 'w', encoding='utf-8') as f:
         f.write(content)
     
-    print("✅ ValidationException corrigida com sucesso!")
+    print("[OK] ValidationException corrigida com sucesso!")
     return True
 
 

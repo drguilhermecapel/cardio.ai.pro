@@ -96,15 +96,7 @@ class AuditLogger:
             audit=True,
         )
 
-    def log_data_access(
-        self,
-        user_id: int,
-        resource_type: str,
-        resource_id: str,
-        action: str,
-        ip_address: str | None = None,
-        additional_context: dict[str, Any] | None = None,
-    ) -> None:
+    def log_data_access(self, access_type, resource_type=None, resource_id=None, user_id=None, **kwargs) -> None:
         """Log data access event for audit trail and HIPAA compliance."""
         self._log_audit_event(
             event_type="DATA_ACCESS",

@@ -25,7 +25,7 @@ def fix_exceptions():
     exceptions_file = BACKEND_DIR / "app" / "core" / "exceptions.py"
     
     if not exceptions_file.exists():
-        print("❌ Arquivo exceptions.py não encontrado!")
+        print("[ERRO] Arquivo exceptions.py não encontrado!")
         return False
     
     with open(exceptions_file, 'r', encoding='utf-8') as f:
@@ -98,7 +98,7 @@ class ECGReaderException(CardioAIException):
     with open(exceptions_file, 'w', encoding='utf-8') as f:
         f.write(content)
     
-    print("✅ Exceções corrigidas com sucesso!")
+    print("[OK] Exceções corrigidas com sucesso!")
     return True
 
 
@@ -110,7 +110,7 @@ def fix_ecg_analysis_service():
     service_file = BACKEND_DIR / "app" / "services" / "ecg_service.py"
     
     if not service_file.exists():
-        print("❌ Arquivo ecg_service.py não encontrado!")
+        print("[ERRO] Arquivo ecg_service.py não encontrado!")
         return False
     
     with open(service_file, 'r', encoding='utf-8') as f:
@@ -168,7 +168,7 @@ def fix_ecg_analysis_service():
     with open(service_file, 'w', encoding='utf-8') as f:
         f.write(content)
     
-    print("✅ ECGAnalysisService corrigido!")
+    print("[OK] ECGAnalysisService corrigido!")
     return True
 
 
@@ -212,7 +212,7 @@ def fix_constants():
         with open(config_file, 'w', encoding='utf-8') as f:
             f.write(content)
     
-    print("✅ Constantes adicionadas!")
+    print("[OK] Constantes adicionadas!")
     return True
 
 
@@ -245,7 +245,7 @@ def fix_ecg_test_generator():
                 with open(test_file, 'w', encoding='utf-8') as f:
                     f.write(content)
                 
-                print(f"✅ Corrigido ECGTestGenerator em {test_file.name}")
+                print(f"[OK] Corrigido ECGTestGenerator em {test_file.name}")
         except Exception:
             pass
     
@@ -305,7 +305,7 @@ def add_missing_stubs():
         with open(service_file, 'w', encoding='utf-8') as f:
             f.write(content)
     
-    print("✅ Stubs adicionados!")
+    print("[OK] Stubs adicionados!")
     return True
 
 
@@ -351,7 +351,7 @@ def get_user_service():
                 with open(endpoint_file, 'w', encoding='utf-8') as f:
                     f.write(content)
                 
-                print(f"✅ Helpers adicionados em {endpoint_file.name}")
+                print(f"[OK] Helpers adicionados em {endpoint_file.name}")
         except Exception:
             pass
     
@@ -380,7 +380,7 @@ def fix_memory_monitor():
                 with open(util_file, 'w', encoding='utf-8') as f:
                     f.write(content)
                 
-                print(f"✅ MemoryMonitor corrigido em {util_file.name}")
+                print(f"[OK] MemoryMonitor corrigido em {util_file.name}")
         except Exception:
             pass
     
@@ -409,7 +409,7 @@ def fix_audit_logger():
                 with open(log_file, 'w', encoding='utf-8') as f:
                     f.write(content)
                 
-                print(f"✅ AuditLogger corrigido em {log_file.name}")
+                print(f"[OK] AuditLogger corrigido em {log_file.name}")
         except Exception:
             pass
     
@@ -530,7 +530,7 @@ def auth_headers():
     with open(conftest_file, 'w', encoding='utf-8') as f:
         f.write(conftest_content)
     
-    print("✅ Configuração de testes criada!")
+    print("[OK] Configuração de testes criada!")
     return True
 
 
@@ -559,20 +559,20 @@ def main():
             if func():
                 success_count += 1
         except Exception as e:
-            print(f"❌ Erro em {description}: {e}")
+            print(f"[ERRO] Erro em {description}: {e}")
     
     print(f"\n{'=' * 60}")
     print(f"CORREÇÕES APLICADAS: {success_count}/{len(steps)}")
     print(f"{'=' * 60}")
     
     if success_count == len(steps):
-        print("\n✅ TODAS AS CORREÇÕES FORAM APLICADAS COM SUCESSO!")
+        print("\n[OK] TODAS AS CORREÇÕES FORAM APLICADAS COM SUCESSO!")
         print("\nPróximos passos:")
         print("1. Execute os testes críticos: pytest tests/test_ecg_service_critical_coverage.py -v")
         print("2. Execute todos os testes: pytest --cov=app --cov-report=term-missing")
         print("3. Verifique a cobertura: deve estar acima de 80% global e 100% nos críticos")
     else:
-        print("\n⚠️  Algumas correções falharam. Verifique os erros acima.")
+        print("\n[AVISO]  Algumas correções falharam. Verifique os erros acima.")
     
     return success_count == len(steps)
 

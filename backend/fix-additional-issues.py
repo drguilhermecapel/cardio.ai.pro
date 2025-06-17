@@ -42,7 +42,7 @@ __all__ = [
         with open(init_file, 'w', encoding='utf-8') as f:
             f.write(init_content)
     
-    print("✅ Modelos verificados/criados")
+    print("[OK] Modelos verificados/criados")
     return True
 
 
@@ -154,7 +154,7 @@ class MLModelService:
         with open(ml_service_file, 'w', encoding='utf-8') as f:
             f.write(ml_service_content)
         
-        print("✅ MLModelService criado")
+        print("[OK] MLModelService criado")
     else:
         # Adicionar métodos faltantes se necessário
         with open(ml_service_file, 'r', encoding='utf-8') as f:
@@ -182,7 +182,7 @@ class MLModelService:
             with open(ml_service_file, 'w', encoding='utf-8') as f:
                 f.write(content)
             
-            print("✅ Métodos adicionados ao MLModelService")
+            print("[OK] Métodos adicionados ao MLModelService")
     
     return True
 
@@ -294,7 +294,7 @@ class ECGRepository:
         with open(ecg_repo_file, 'w', encoding='utf-8') as f:
             f.write(ecg_repo_content)
         
-        print("✅ ECGRepository criado")
+        print("[OK] ECGRepository criado")
     
     return True
 
@@ -375,7 +375,7 @@ class ECGProcessor:
         with open(processor_file, 'w', encoding='utf-8') as f:
             f.write(processor_content)
         
-        print("✅ ECGProcessor criado")
+        print("[OK] ECGProcessor criado")
     
     # SignalQualityAnalyzer
     quality_file = utils_dir / "signal_quality.py"
@@ -431,7 +431,7 @@ class SignalQualityAnalyzer:
         with open(quality_file, 'w', encoding='utf-8') as f:
             f.write(quality_content)
         
-        print("✅ SignalQualityAnalyzer criado")
+        print("[OK] SignalQualityAnalyzer criado")
     
     return True
 
@@ -555,7 +555,7 @@ class ECGTestGenerator:
     with open(test_utils_file, 'w', encoding='utf-8') as f:
         f.write(test_utils_content)
     
-    print("✅ Utilidades de teste criadas")
+    print("[OK] Utilidades de teste criadas")
     return True
 
 
@@ -563,7 +563,7 @@ def main():
     """Executa todas as correções adicionais."""
     os.chdir(BACKEND_DIR)
     
-    print("🔧 APLICANDO CORREÇÕES ADICIONAIS")
+    print("[CONFIG] APLICANDO CORREÇÕES ADICIONAIS")
     print("=" * 60)
     
     steps = [
@@ -581,13 +581,13 @@ def main():
             if func():
                 success_count += 1
         except Exception as e:
-            print(f"❌ Erro: {e}")
+            print(f"[ERRO] Erro: {e}")
     
     print(f"\n{'=' * 60}")
     print(f"CORREÇÕES ADICIONAIS APLICADAS: {success_count}/{len(steps)}")
     
     if success_count == len(steps):
-        print("\n✅ TODAS AS CORREÇÕES ADICIONAIS FORAM APLICADAS!")
+        print("\n[OK] TODAS AS CORREÇÕES ADICIONAIS FORAM APLICADAS!")
     
     return success_count == len(steps)
 

@@ -1,259 +1,100 @@
-"""Test configuration and fixtures."""
+"""
+Configuração global para testes do CardioAI Pro.
+Este arquivo configura mocks e fixtures comuns para todos os testes.
+"""
 
 import os
 import sys
+from pathlib import Path
+from unittest.mock import Mock, MagicMock
+
 import pytest
 import pytest_asyncio
-from pathlib import Path
-from unittest.mock import Mock, AsyncMock, MagicMock
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-# Add project root to path
+# Configurar variáveis de ambiente para testes
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
+os.environ["SECRET_KEY"] = "test-secret-key-for-cardioai-pro"
+os.environ["REDIS_URL"] = ""
+os.environ["CELERY_BROKER_URL"] = ""
+
+# Adicionar o diretório raiz ao path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Set test environment
-os.environ["ENVIRONMENT"] = "test"
-os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test.db"
-os.environ["SECRET_KEY"] = "test-secret-key"
-os.environ["ALGORITHM"] = "HS256"
-os.environ["REDIS_URL"] = "redis://localhost:6379/1"
-os.environ["MINIO_ENDPOINT"] = "localhost:9000"
-os.environ["MINIO_ACCESS_KEY"] = "minioadmin"
-os.environ["MINIO_SECRET_KEY"] = "minioadmin"
-
-# Import after setting environment
-from app.core.config import settings
-from app.models import Base
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create event loop for async tests."""
-    import asyncio
-
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest_asyncio.fixture
-async def async_db_engine():
-    """Create async database engine for tests."""
-    engine = create_async_engine(
-        "sqlite+aiosqlite:///:memory:", echo=False, future=True
-    )
-
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-    yield engine
-
-    await engine.dispose()
-
-
-@pytest_asyncio.fixture
-async def async_db_session(async_db_engine):
-    """Create async database session for tests."""
-    async_session = sessionmaker(
-        async_db_engine, class_=AsyncSession, expire_on_commit=False
-    )
-
-    async with async_session() as session:
-        yield session
-
-
-@pytest_asyncio.fixture
-async def test_db():
-    """Create test database session."""
-    engine = create_async_engine(
-        "sqlite+aiosqlite:///:memory:", 
-        echo=False,
-        future=True
-    )
-    
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    
-    async_session = sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
-    
-    async with async_session() as session:
-        yield session
-        await session.close()
-    
-    await engine.dispose()
+# Mock para módulos que podem não estar instalados
+sys.modules["redis"] = MagicMock()
+sys.modules["celery"] = MagicMock()
+sys.modules["minio"] = MagicMock()
+sys.modules["pyedflib"] = MagicMock()
+sys.modules["wfdb"] = MagicMock()
 
 
 @pytest.fixture
-def mock_db_session():
-    """Mock database session."""
-    return AsyncMock(spec=AsyncSession)
-
-
-@pytest.fixture
-def mock_redis():
-    """Mock Redis client."""
-    redis_mock = MagicMock()
-    redis_mock.get = AsyncMock(return_value=None)
-    redis_mock.set = AsyncMock(return_value=True)
-    redis_mock.delete = AsyncMock(return_value=1)
-    redis_mock.exists = AsyncMock(return_value=0)
-    return redis_mock
-
-
-@pytest.fixture
-def mock_minio():
-    """Mock MinIO client."""
-    minio_mock = MagicMock()
-    minio_mock.bucket_exists = Mock(return_value=True)
-    minio_mock.put_object = Mock()
-    minio_mock.get_object = Mock()
-    minio_mock.remove_object = Mock()
-    return minio_mock
+def mock_ecg_signal():
+    """Mock de sinal ECG para testes."""
+    import numpy as np
+    
+    # Sinal ECG simulado de 10 segundos a 360 Hz
+    duration = 10
+    sampling_rate = 360
+    t = np.linspace(0, duration, duration * sampling_rate)
+    
+    # Simular batimentos cardíacos
+    heart_rate = 72
+    ecg = np.zeros_like(t)
+    
+    # Adicionar picos R
+    r_peaks = []
+    for i in range(int(duration * heart_rate / 60)):
+        peak_time = i * 60 / heart_rate
+        peak_idx = int(peak_time * sampling_rate)
+        if peak_idx < len(ecg):
+            ecg[peak_idx] = 1.0
+            r_peaks.append(peak_idx)
+    
+    return ecg, r_peaks, sampling_rate
 
 
 @pytest.fixture
 def mock_ml_service():
-    """Mock ML model service."""
-    ml_mock = MagicMock()
-    ml_mock.predict_arrhythmia = AsyncMock(
-        return_value={
-            "prediction": "normal",
-            "confidence": 0.95,
-            "probabilities": {"normal": 0.95, "afib": 0.05},
-        }
-    )
-    ml_mock.predict_pathology = AsyncMock(
-        return_value={"predictions": [], "confidence": 0.90}
-    )
-    return ml_mock
+    """Mock do serviço de ML."""
+    service = Mock()
+    service.analyze_ecg = Mock(return_value={
+        "predictions": {"NORMAL": 0.95, "AFIB": 0.05},
+        "confidence": 0.95,
+        "features": {"heart_rate": 72, "pr_interval": 160}
+    })
+    service.load_model = Mock(return_value=True)
+    return service
 
 
-@pytest.fixture
-def mock_ecg_processor():
-    """Mock ECG processor."""
-    processor_mock = MagicMock()
-    processor_mock.load_ecg_file = AsyncMock()
-    processor_mock.preprocess_signal = AsyncMock()
-    processor_mock.extract_features = AsyncMock(
-        return_value={
-            "heart_rate": 72,
-            "pr_interval": 160,
-            "qrs_duration": 90,
-            "qt_interval": 400,
-        }
-    )
-    return processor_mock
-
-
-@pytest.fixture
-def sample_ecg_data():
-    """Sample ECG data for testing."""
-    import numpy as np
-
-    return {
-        "signal": np.random.randn(5000, 12),
-        "sampling_rate": 500,
-        "duration": 10.0,
-        "leads": [
-            "I",
-            "II",
-            "III",
-            "aVR",
-            "aVL",
-            "aVF",
-            "V1",
-            "V2",
-            "V3",
-            "V4",
-            "V5",
-            "V6",
-        ],
-    }
-
-
-@pytest.fixture
-def sample_user_data():
-    """Sample user data for testing."""
-    return {
-        "email": "test@example.com",
-        "password": "testpass123",
-        "full_name": "Test User",
-        "role": "physician",
-    }
-
-
-@pytest.fixture
-def sample_patient_data():
-    """Sample patient data for testing."""
-    return {
-        "name": "John Doe",
-        "birth_date": "1980-01-01",
-        "gender": "M",
-        "medical_record_number": "MRN123456",
-        "contact_info": {"phone": "+1234567890", "email": "john.doe@example.com"},
-    }
-
-
-# Mock validation service for tests
 @pytest.fixture
 def mock_validation_service():
-    """Mock validation service."""
-    validation_mock = MagicMock()
-    validation_mock.validate = AsyncMock(return_value={"valid": True})
-    validation_mock.create_validation = AsyncMock(return_value={"id": 1})
-    validation_mock.assign_validator = AsyncMock(return_value=True)
-    return validation_mock
-
-
-# Composite fixtures that depend on test_db
-@pytest_asyncio.fixture
-async def notification_service(test_db):
-    """Create notification service with test database."""
-    from app.services.notification_service import NotificationService
-    return NotificationService(db=test_db)
+    """Mock do serviço de validação."""
+    service = Mock()
+    service.validate_analysis = Mock(return_value=True)
+    service.create_validation = Mock(return_value={"id": 1, "status": "pending"})
+    return service
 
 
 @pytest_asyncio.fixture
-async def validation_service(test_db, notification_service):
-    """Create validation service with test database."""
-    from app.services.validation_service import ValidationService
-    return ValidationService(db=test_db, notification_service=notification_service)
-
-
-@pytest_asyncio.fixture
-async def user_service(test_db):
-    """Create user service with test database."""
-    from app.services.user_service import UserService
-    return UserService(db=test_db)
-
-
-@pytest_asyncio.fixture
-async def ecg_service(test_db, validation_service):
-    """Create ECG service with test database."""
-    from app.services.ecg_service import ECGAnalysisService
-    from app.services.ml_model_service import MLModelService
+async def test_db():
+    """Cria sessão de banco de dados para testes."""
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     
-    ml_service = MLModelService()
-    return ECGAnalysisService(db=test_db, ml_service=ml_service, validation_service=validation_service)
+    async_session_maker = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
+    
+    async with async_session_maker() as session:
+        yield session
+        await session.rollback()
+        await session.close()
 
 
-# Skip markers for different test categories
-skip_db_tests = pytest.mark.skipif(
-    os.getenv("SKIP_DB_TESTS", "").lower() == "true", reason="Database tests skipped"
-)
-
-skip_api_tests = pytest.mark.skipif(
-    os.getenv("SKIP_API_TESTS", "").lower() == "true", reason="API tests skipped"
-)
-
-skip_slow_tests = pytest.mark.skipif(
-    os.getenv("SKIP_SLOW_TESTS", "").lower() == "true", reason="Slow tests skipped"
-)
-
-skip_integration_tests = pytest.mark.skipif(
-    os.getenv("SKIP_INTEGRATION_TESTS", "").lower() == "true",
-    reason="Integration tests skipped",
-)
+@pytest.fixture
+def auth_headers():
+    """Headers de autenticação para testes."""
+    return {"Authorization": "Bearer test-token"}

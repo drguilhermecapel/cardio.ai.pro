@@ -71,6 +71,7 @@ class DiagnosisCategory(str, Enum):
 
 class ClinicalUrgency(str, Enum):
     """Clinical urgency levels."""
+    ROUTINE = "routine"
 
     LOW = "low"
     MEDIUM = "medium"

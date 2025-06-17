@@ -29,23 +29,23 @@ def print_header(text: str):
 
 def print_success(text: str):
     """Imprime mensagem de sucesso."""
-    print(f"{Colors.GREEN}✅ {text}{Colors.END}")
+    print(f"{Colors.GREEN}[OK] {text}{Colors.END}")
 
 def print_error(text: str):
     """Imprime mensagem de erro."""
-    print(f"{Colors.RED}❌ {text}{Colors.END}")
+    print(f"{Colors.RED}[ERRO] {text}{Colors.END}")
 
 def print_warning(text: str):
     """Imprime mensagem de aviso."""
-    print(f"{Colors.YELLOW}⚠️  {text}{Colors.END}")
+    print(f"{Colors.YELLOW}[AVISO]  {text}{Colors.END}")
 
 def print_info(text: str):
     """Imprime informação."""
-    print(f"{Colors.BLUE}📌 {text}{Colors.END}")
+    print(f"{Colors.BLUE}[INFO] {text}{Colors.END}")
 
 def run_command(cmd: str, description: str) -> Tuple[bool, str, str]:
     """Executa um comando e retorna sucesso, stdout e stderr."""
-    print(f"\n{Colors.BLUE}📌 {description}{Colors.END}")
+    print(f"\n{Colors.BLUE}[INFO] {description}{Colors.END}")
     print(f"   Comando: {cmd}")
     
     try:
@@ -158,14 +158,14 @@ def run_tests() -> Tuple[bool, Optional[float]]:
     print_header("EXECUTANDO TESTES")
     
     # 1. Testes críticos
-    print("\n🎯 Executando testes críticos...")
+    print("\n[ALVO] Executando testes críticos...")
     critical_success, _, _ = run_command(
         "pytest tests/test_ecg_service_critical_coverage.py -v --tb=short",
         "Testes críticos"
     )
     
     # 2. Todos os testes com cobertura
-    print("\n📊 Executando todos os testes com cobertura...")
+    print("\n[STATS] Executando todos os testes com cobertura...")
     coverage_success, stdout, _ = run_command(
         "pytest --cov=app --cov-report=term-missing --cov-report=html --cov-report=json -q",
         "Testes com cobertura"
@@ -180,7 +180,7 @@ def run_tests() -> Tuple[bool, Optional[float]]:
             with open(coverage_file, 'r') as f:
                 coverage_data = json.load(f)
                 coverage_percent = coverage_data['totals']['percent_covered']
-                print(f"\n{Colors.BOLD}📊 COBERTURA TOTAL: {coverage_percent:.1f}%{Colors.END}")
+                print(f"\n{Colors.BOLD}[STATS] COBERTURA TOTAL: {coverage_percent:.1f}%{Colors.END}")
                 
                 if coverage_percent >= 80:
                     print_success("META DE 80% ALCANÇADA!")
@@ -203,7 +203,7 @@ def generate_final_report(fix_results: dict, test_success: bool, coverage: Optio
     else:
         print_error("Algumas correções falharam:")
         for script, success in fix_results.items():
-            status = "✅" if success else "❌"
+            status = "[OK]" if success else "[ERRO]"
             print(f"   {status} {script}")
     
     # Verificar testes
@@ -219,13 +219,13 @@ def generate_final_report(fix_results: dict, test_success: bool, coverage: Optio
         print_warning(f"Cobertura precisa melhorar: {coverage:.1f}%")
     
     # Conclusão
-    print(f"\n{Colors.BOLD}📋 CONCLUSÃO:{Colors.END}")
+    print(f"\n{Colors.BOLD}[RELATORIO] CONCLUSÃO:{Colors.END}")
     
     if all_fixes_ok and test_success and coverage and coverage >= 80:
-        print(f"\n{Colors.GREEN}{Colors.BOLD}🎉 SUCESSO COMPLETO!{Colors.END}")
+        print(f"\n{Colors.GREEN}{Colors.BOLD}[SUCESSO] SUCESSO COMPLETO!{Colors.END}")
         print(f"{Colors.GREEN}O CardioAI Pro está com cobertura adequada e testes passando!{Colors.END}")
     else:
-        print(f"\n{Colors.YELLOW}📌 Ações necessárias:{Colors.END}")
+        print(f"\n{Colors.YELLOW}[INFO] Ações necessárias:{Colors.END}")
         
         if not all_fixes_ok:
             print("   1. Verifique os scripts de correção que falharam")
@@ -246,13 +246,13 @@ def generate_final_report(fix_results: dict, test_success: bool, coverage: Optio
 
 def main():
     """Função principal."""
-    print(f"{Colors.BOLD}{Colors.BLUE}🚀 APLICANDO TODAS AS CORREÇÕES DO CARDIOAI PRO{Colors.END}")
+    print(f"{Colors.BOLD}{Colors.BLUE}[INICIO] APLICANDO TODAS AS CORREÇÕES DO CARDIOAI PRO{Colors.END}")
     
     # Verificar diretório
     if not check_backend_directory():
         return 1
     
-    print(f"\n📁 Diretório de trabalho: {Path.cwd()}")
+    print(f"\n[DIR] Diretório de trabalho: {Path.cwd()}")
     
     # 1. Instalar dependências
     install_dependencies()

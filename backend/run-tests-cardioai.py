@@ -28,7 +28,7 @@ def run_command(cmd, cwd=None):
 
 def install_test_dependencies():
     """Instala dependências necessárias para os testes."""
-    print("📦 Instalando dependências de teste...")
+    print("[PACOTE] Instalando dependências de teste...")
     
     dependencies = [
         "pytest>=7.0.0",
@@ -42,22 +42,22 @@ def install_test_dependencies():
     for dep in dependencies:
         success, _, _ = run_command(f"pip install {dep}")
         if success:
-            print(f"  ✅ {dep}")
+            print(f"  [OK] {dep}")
         else:
-            print(f"  ❌ {dep}")
+            print(f"  [ERRO] {dep}")
 
 
 def run_critical_tests():
     """Executa apenas os testes críticos."""
-    print("\n🎯 Executando testes CRÍTICOS...")
+    print("\n[ALVO] Executando testes CRÍTICOS...")
     
     cmd = "pytest tests/test_ecg_service_critical_coverage.py -v --tb=short"
     success, stdout, stderr = run_command(cmd)
     
     if success:
-        print("✅ Testes críticos passaram!")
+        print("[OK] Testes críticos passaram!")
     else:
-        print("❌ Testes críticos falharam:")
+        print("[ERRO] Testes críticos falharam:")
         print(stdout)
         print(stderr)
     
@@ -66,7 +66,7 @@ def run_critical_tests():
 
 def run_all_tests_with_coverage():
     """Executa todos os testes com relatório de cobertura."""
-    print("\n📊 Executando TODOS os testes com cobertura...")
+    print("\n[STATS] Executando TODOS os testes com cobertura...")
     
     cmd = "pytest --cov=app --cov-report=term-missing --cov-report=html --cov-report=json -v"
     success, stdout, stderr = run_command(cmd)
@@ -85,12 +85,12 @@ def run_all_tests_with_coverage():
             for part in parts:
                 if part.endswith('%'):
                     coverage = float(part.rstrip('%'))
-                    print(f"\n📊 Cobertura Total: {coverage}%")
+                    print(f"\n[STATS] Cobertura Total: {coverage}%")
                     
                     if coverage >= 80:
-                        print("✅ Meta de 80% alcançada!")
+                        print("[OK] Meta de 80% alcançada!")
                     else:
-                        print(f"❌ Cobertura abaixo de 80% (atual: {coverage}%)")
+                        print(f"[ERRO] Cobertura abaixo de 80% (atual: {coverage}%)")
                     break
         except:
             pass
@@ -129,7 +129,7 @@ def run_specific_test_files():
                 "errors": errors
             }
             
-            status = "✅" if success else "❌"
+            status = "[OK]" if success else "[ERRO]"
             print(f"{status} {test_file}: {passed} passed, {failed} failed, {errors} errors")
     
     return results
@@ -137,7 +137,7 @@ def run_specific_test_files():
 
 def generate_test_report():
     """Gera relatório final dos testes."""
-    print("\n📝 RELATÓRIO FINAL DOS TESTES")
+    print("\n[DOC] RELATÓRIO FINAL DOS TESTES")
     print("=" * 60)
     
     # Verificar se existe relatório de cobertura em JSON
@@ -149,7 +149,7 @@ def generate_test_report():
             print(f"Cobertura Total: {total_coverage:.2f}%")
     
     # Sugestões de próximos passos
-    print("\n📋 Próximos Passos:")
+    print("\n[RELATORIO] Próximos Passos:")
     print("1. Se a cobertura está abaixo de 80%:")
     print("   - Verifique o relatório HTML: htmlcov/index.html")
     print("   - Identifique arquivos com baixa cobertura")
@@ -167,8 +167,8 @@ def main():
     """Função principal."""
     os.chdir(BACKEND_DIR)
     
-    print("🚀 EXECUTANDO TESTES DO CARDIOAI PRO")
-    print(f"📁 Diretório: {BACKEND_DIR}")
+    print("[INICIO] EXECUTANDO TESTES DO CARDIOAI PRO")
+    print(f"[DIR] Diretório: {BACKEND_DIR}")
     print("=" * 60)
     
     # 1. Instalar dependências

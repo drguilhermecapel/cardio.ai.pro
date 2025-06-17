@@ -35,7 +35,7 @@ class MemoryMonitor:
                 "process": {
                     "rss": process_memory.rss,
                     "vms": process_memory.vms,
-                    "percent": self.process.memory_percent(),
+                    "percent": self.process.memory_percent, "process_memory_mb": memory_mb(),
                 },
             }
         except Exception as e:
@@ -86,7 +86,7 @@ class MemoryMonitor:
             return {
                 "rss": memory_info.rss,
                 "vms": memory_info.vms,
-                "percent": memory_percent,
+                "percent": memory_percent, "process_memory_mb": memory_mb,
                 "rss_mb": memory_info.rss / 1024 / 1024,
                 "vms_mb": memory_info.vms / 1024 / 1024,
             }
