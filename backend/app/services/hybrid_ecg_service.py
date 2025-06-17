@@ -38,10 +38,13 @@ class UniversalECGReader:
     def __init__(self):
         self.supported_formats = {
             ".csv": self._read_csv,
-            ".txt": self._read_csv,
+            ".txt": self._read_text,
             ".dat": self._read_mitbih,
             ".hea": self._read_mitbih,
             ".edf": self._read_edf,
+            ".png": self._read_image,
+            ".jpg": self._read_image,
+            ".jpeg": self._read_image,
         }
 
     def read_ecg(self, file_path: str) -> Dict[str, Any]:
@@ -112,6 +115,30 @@ class UniversalECGReader:
             }
         except Exception as e:
             raise ECGProcessingException(f"EDF reading failed: {str(e)}")
+
+    def _read_text(self, file_path: str) -> Dict[str, Any]:
+        """Read text format ECG"""
+        try:
+            # Try to read as space/tab delimited text
+            data = np.loadtxt(file_path)
+            if data.ndim == 1:
+                data = data.reshape(-1, 1)
+            
+            return {
+                "signal": data.astype(np.float32),
+                "sampling_rate": 500,  # Default, should be provided
+                "labels": [f"Lead_{i}" for i in range(data.shape[1])],
+            }
+        except Exception as e:
+            raise ECGProcessingException(f"Text file reading failed: {str(e)}")
+
+    def _read_image(self, file_path: str) -> Dict[str, Any]:
+        """Read image format ECG - placeholder for OCR-based reading"""
+        # This would require OCR and signal extraction from images
+        # For now, return a placeholder
+        raise ECGProcessingException(
+            "Image ECG reading not yet implemented. Please use CSV, EDF, or MIT-BIH formats."
+        )
 
 
 class AdvancedPreprocessor:
@@ -198,6 +225,18 @@ class AdvancedPreprocessor:
         baseline = scipy_signal.medfilt(signal, kernel_size=int(len(signal) * 0.2) | 1)
         drift = np.std(baseline)
         return float(drift)
+
+    def _bandpass_filter(self, signal: np.ndarray, fs: float, lowcut: float = 0.5, highcut: float = 100.0) -> np.ndarray:
+        """Apply bandpass filter"""
+        nyquist = fs / 2
+        low = lowcut / nyquist
+        high = highcut / nyquist
+        b, a = scipy_signal.butter(4, [low, high], btype='band')
+        return scipy_signal.filtfilt(b, a, signal)
+
+    def _remove_baseline_wandering(self, signal: np.ndarray, fs: float) -> np.ndarray:
+        """Remove baseline wandering (alias for _remove_baseline_wander)"""
+        return self._remove_baseline_wander(signal, fs)
 
 
 class FeatureExtractor:
