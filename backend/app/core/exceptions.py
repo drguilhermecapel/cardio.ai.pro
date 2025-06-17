@@ -37,27 +37,48 @@ class CardioAIException(Exception):
 
 
 class ValidationException(CardioAIException):
-    """Validation exception."""
+    """Validation exception with flexible parameters."""
 
     def __init__(
         self,
         message: str = "Validation error",
         validation_errors: list[dict] = None,
+        errors: list[dict] = None,  # Alias para validation_errors
+        field: str = None,
+        details: dict = None,
         **kwargs
     ) -> None:
-        """Initialize validation exception.
+        """Initialize validation exception with flexible parameters.
         
         Args:
             message: Error message
             validation_errors: List of validation errors
-            **kwargs: Additional arguments passed to parent
+            errors: Alias for validation_errors
+            field: Field that failed validation
+            details: Additional error details
+            **kwargs: Additional arguments
         """
-        super().__init__(message, "VALIDATION_ERROR", 422)
-        self.validation_errors = validation_errors or []
-        # Store any additional kwargs
+        # Determinar detalhes
+        error_details = details or {}
+        
+        # Usar validation_errors ou errors
+        self.validation_errors = validation_errors or errors or []
+        self.errors = self.validation_errors  # Alias
+        
+        if field:
+            error_details['field'] = field
+            
+        if self.validation_errors:
+            error_details['validation_errors'] = self.validation_errors
+            
+        # Adicionar kwargs aos detalhes
         for key, value in kwargs.items():
-            setattr(self, key, value)
-
+            if key not in ['validation_errors', 'errors', 'field', 'details']:
+                error_details[key] = value
+                setattr(self, key, value)
+        
+        super().__init__(message, "VALIDATION_ERROR", 422, error_details)
+        self.field = field
 
 class AuthenticationException(CardioAIException):
     """Authentication exception."""
@@ -84,14 +105,34 @@ class NotFoundException(CardioAIException):
 
 
 class ECGProcessingException(CardioAIException):
-    """ECG processing exception."""
+    """ECG processing exception with flexible initialization."""
     
-    def __init__(self, message: str, ecg_id: str = None) -> None:
-        """Initialize ECG processing exception."""
-        details = {"ecg_id": ecg_id} if ecg_id else {}
-        super().__init__(message, "ECG_PROCESSING_ERROR", 422, details)
+    def __init__(self, message: str, *args, ecg_id: str = None, details: dict = None, detail: dict = None, **kwargs) -> None:
+        """Initialize ECG processing exception with flexible parameters.
+        
+        Args:
+            message: Error message
+            *args: Additional positional arguments
+            ecg_id: Optional ECG ID
+            details: Error details (preferred)
+            detail: Error details (alternative name for compatibility)
+            **kwargs: Additional keyword arguments
+        """
+        # Use details or detail, whichever is provided
+        error_details = details or detail or kwargs.get('details') or kwargs.get('detail') or {}
+        
+        # If ecg_id is provided, include it in details
+        if ecg_id:
+            error_details['ecg_id'] = ecg_id
+            
+        # Include any other kwargs in details
+        for key, value in kwargs.items():
+            if key not in ['details', 'detail']:
+                error_details[key] = value
+        
+        super().__init__(message, "ECG_PROCESSING_ERROR", 422, error_details)
         self.ecg_id = ecg_id
-
+        self.details = error_details
 
 # Exceções Not Found específicas
 class ECGNotFoundException(NotFoundException):
