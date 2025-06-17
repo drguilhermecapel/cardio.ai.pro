@@ -1,117 +1,69 @@
-"""
-Logging configuration for CardioAI Pro.
-"""
-
-import logging
-import sys
-from typing import Any
-
-import structlog
-from structlog.types import Processor
-
-from app.core.config import settings
-
-
-def configure_logging() -> None:
-    """Configure structured logging."""
-
-    logging.basicConfig(
-        format="%(message)s",
-        stream=sys.stdout,
-        level=getattr(logging, settings.LOG_LEVEL.upper()),
-    )
-
-    processors: list[Processor] = [
-        structlog.stdlib.filter_by_level,
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.processors.UnicodeDecoder(),
-    ]
-
-    if settings.ENVIRONMENT == "development":
-        processors.append(structlog.dev.ConsoleRenderer())
-    else:
-        processors.append(structlog.processors.JSONRenderer())
-
-    structlog.configure(
-        processors=processors,
-        wrapper_class=structlog.stdlib.BoundLogger,
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        cache_logger_on_first_use=True,
-    )
-
-
-def get_logger(name: str) -> Any:
-    """Get a structured logger."""
-    return structlog.get_logger(name)
-
+# Adicione estes métodos à classe AuditLogger em backend/app/core/logging.py
 
 class AuditLogger:
-    """Audit logger for regulatory compliance."""
-
-    def __init__(self) -> None:
-        self.logger = get_logger("audit")
-
-    def log_user_action(
-        self,
-        user_id: int,
-        action: str,
-        resource_type: str,
-        resource_id: str,
-        details: dict[str, Any],
-        ip_address: str,
-        user_agent: str,
-    ) -> None:
-        """Log user action for audit trail."""
-        self.logger.info(
-            "User action",
-            user_id=user_id,
-            action=action,
-            resource_type=resource_type,
-            resource_id=resource_id,
-            details=details,
-            ip_address=ip_address,
-            user_agent=user_agent,
-            audit=True,
-        )
-
-    def log_system_event(
-        self,
-        event_type: str,
-        description: str,
-        details: dict[str, Any],
-    ) -> None:
-        """Log system event for audit trail."""
-        self.logger.info(
-            "System event",
-            event_type=event_type,
-            description=description,
-            details=details,
-            audit=True,
-        )
-
+    # ... código existente ...
+    
     def log_data_access(
         self,
         user_id: int,
-        data_type: str,
-        data_id: str,
-        access_type: str,
-        ip_address: str,
+        resource_type: str,
+        resource_id: str,
+        action: str,
+        ip_address: str | None = None,
+        additional_context: dict | None = None,
     ) -> None:
-        """Log data access for compliance."""
-        self.logger.info(
-            "Data access",
+        """Log data access event for audit trail."""
+        self._log_audit_event(
+            event_type="DATA_ACCESS",
             user_id=user_id,
-            data_type=data_type,
-            data_id=data_id,
-            access_type=access_type,
-            ip_address=ip_address,
-            audit=True,
+            details={
+                "resource_type": resource_type,
+                "resource_id": resource_id,
+                "action": action,
+                "ip_address": ip_address,
+                "additional_context": additional_context or {},
+            },
         )
 
+    def log_medical_action(
+        self,
+        user_id: int,
+        action_type: str,
+        patient_id: int | None = None,
+        analysis_id: str | None = None,
+        details: dict | None = None,
+    ) -> None:
+        """Log medical action for compliance."""
+        self._log_audit_event(
+            event_type="MEDICAL_ACTION",
+            user_id=user_id,
+            details={
+                "action_type": action_type,
+                "patient_id": patient_id,
+                "analysis_id": analysis_id,
+                "details": details or {},
+            },
+        )
 
-audit_logger = AuditLogger()
+    def _log_audit_event(
+        self,
+        event_type: str,
+        user_id: int,
+        details: dict,
+    ) -> None:
+        """Internal method to log audit events."""
+        import json
+        from datetime import datetime
+        
+        audit_entry = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "event_type": event_type,
+            "user_id": user_id,
+            "details": details,
+        }
+        
+        # Log to structured logger
+        self.logger.info(
+            f"AUDIT: {event_type}",
+            extra={"audit_data": json.dumps(audit_entry)},
+        )
