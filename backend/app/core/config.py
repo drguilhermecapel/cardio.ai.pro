@@ -1,262 +1,212 @@
 """
-Application configuration settings.
+Core Configuration
+Central configuration for CardioAI Pro system
 """
 
-from typing import TYPE_CHECKING, Any
+import os
+from typing import Any, Dict, List, Optional, Union
+from pathlib import Path
 
-if TYPE_CHECKING:
-    pass
-
-from pydantic import ValidationInfo, field_validator
-from pydantic_settings import BaseSettings
+from pydantic import AnyHttpUrl, field_validator, PostgresDsn
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    DATABASE_POOL_SIZE: int = 10
-    """Application settings."""
-    BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:8000"]
-
-    PROJECT_NAME: str = "CardioAI Pro"
-    VERSION: str = "1.0.0"
-    ENVIRONMENT: str = "development"
-    DEBUG: bool = False
-    LOG_LEVEL: str = "INFO"
+    """Application settings"""
+    
+    # App Info
+    APP_NAME: str = "CardioAI Pro"
+    APP_VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
-
-    SECRET_KEY: str = "CHANGE_ME_IN_PRODUCTION_USE_STRONG_SECRET_KEY"
+    DEBUG: bool = True
+    
+    # Security
+    SECRET_KEY: str = "your-super-secret-key-change-this-in-production"
+    ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    ALGORITHM: str = "HS256"
-
-    POSTGRES_SERVER: str = "localhost"
-    POSTGRES_USER: str = "cardioai"
-    POSTGRES_PASSWORD: str = "cardioai_dev_password"
-    POSTGRES_DB: str = "cardioai_pro"
-    POSTGRES_PORT: int = 5432
-    DATABASE_URL: str = "sqlite+aiosqlite:///./cardioai.db"
-    TEST_DATABASE_URL: str = "sqlite+aiosqlite:///./cardioai_test.db"
-    STANDALONE_MODE: bool = True
-
-    @field_validator("DATABASE_URL", mode="before")
+    
+    # CORS
+    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
-    def assemble_db_connection(
-        cls: "type[Settings]", v: str | None, info: ValidationInfo
-    ) -> Any:
-        """Assemble database URL."""
-        values = info.data
-
-        if isinstance(v, str) and v != "sqlite+aiosqlite:///./cardioai.db":
-            return v
-
-        if values.get("STANDALONE_MODE", True):
-            return "sqlite+aiosqlite:///./cardioai.db"
-
-        if isinstance(v, str):
-            return v
-
-        user = values.get("POSTGRES_USER")
-        password = values.get("POSTGRES_PASSWORD")
-        host = values.get("POSTGRES_SERVER")
-        port = values.get("POSTGRES_PORT")
-        db = values.get("POSTGRES_DB")
-        return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"
-
-    @field_validator("TEST_DATABASE_URL", mode="before")
-    @classmethod
-    def assemble_test_db_connection(
-        cls: "type[Settings]", v: str | None, info: ValidationInfo
-    ) -> Any:
-        """Assemble test database URL."""
-        values = info.data
-
-        if values.get("STANDALONE_MODE", True):
-            return "sqlite+aiosqlite:///./cardioai_test.db"
-
-        if isinstance(v, str):
-            return v
-
-        user = values.get("POSTGRES_USER")
-        password = values.get("POSTGRES_PASSWORD")
-        host = values.get("POSTGRES_SERVER")
-        port = values.get("POSTGRES_PORT")
-        db = values.get("POSTGRES_DB")
-        return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}_test"
-
-    REDIS_HOST: str = "localhost"
-    REDIS_PORT: int = 6379
-    REDIS_PASSWORD: str | None = None
-    REDIS_DB: int = 0
-    REDIS_URL: str | None = None
-
-    @field_validator("REDIS_URL", mode="before")
-    @classmethod
-    def assemble_redis_connection(
-        cls: "type[Settings]", v: str | None, info: ValidationInfo
-    ) -> str:
-        """Assemble Redis URL."""
-        if isinstance(v, str):
-            return v
-
-        values = info.data
-
-        if values.get("STANDALONE_MODE", True):
-            return ""
-
-        password = values.get("REDIS_PASSWORD")
-        auth = f":{password}@" if password else ""
-
-        return (
-            f"redis://{auth}{values.get('REDIS_HOST')}:"
-            f"{values.get('REDIS_PORT')}/{values.get('REDIS_DB')}"
-        )
-
-    @field_validator("REDIS_URL", mode="after")
-    @classmethod
-    def validate_standalone_consistency(cls, v: str, info: ValidationInfo) -> str:
-        """Validate standalone mode consistency."""
-        values = info.data
-        if values.get("STANDALONE_MODE", True) and v:
-            import logging
-
-            logger = logging.getLogger(__name__)
-            logger.warning(
-                "STANDALONE_MODE=True but REDIS_URL is set. Ignoring Redis configuration."
-            )
-            return ""
-        return v
-
-    ALLOWED_HOSTS: list[str] = ["*"]
-
-    @field_validator("ALLOWED_HOSTS", mode="before")
-    @classmethod
-    def assemble_cors_origins(cls, v: str | list[str]) -> list[str] | str:
-        """Assemble CORS origins."""
+    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
-        elif isinstance(v, list | str):
+        elif isinstance(v, (list, str)):
             return v
         raise ValueError(v)
-
-    UPLOAD_DIR: str = "/app/uploads"
-    MAX_FILE_SIZE: int = 100 * 1024 * 1024  # 100MB
-    ALLOWED_FILE_TYPES: list[str] = [
-        "application/pdf",
-        "image/jpeg",
-        "image/png",
-        "application/dicom",
-        "text/plain",
-        "application/xml",
-    ]
-
-    MODELS_DIR: str = "/app/models"
-    MODEL_CACHE_SIZE: int = 3
-    INFERENCE_TIMEOUT: int = 30
-
-    ECG_SAMPLE_RATE: int = 500  # Minimum acceptable sampling rate
-    ECG_DURATION_SECONDS: int = 10
-    ECG_LEADS: list[str] = [
-        "I",
-        "II",
-        "III",
-        "aVR",
-        "aVL",
-        "aVF",
-        "V1",
-        "V2",
-        "V3",
-        "V4",
-        "V5",
-        "V6",
-    ]
-
-    ECG_FILTER_DIAGNOSTIC_HIGHPASS: float = (
-        0.05  # Hz - CRITICAL for ST segment preservation
-    )
-    ECG_FILTER_DIAGNOSTIC_LOWPASS: float = 150.0  # Hz - Diagnostic bandwidth
-    ECG_FILTER_MONITORING_HIGHPASS: float = 0.5  # Hz - For monitoring mode
-    ECG_POWER_LINE_FREQUENCY: int = 60  # Hz - Brazil standard
-
-    ECG_MIN_QUALITY_SCORE: float = 0.7
-    ECG_REJECT_LOW_QUALITY: bool = True
-    ECG_QUALITY_FEEDBACK: bool = True
-
-    MEDICAL_DEVICE_STANDARD: str = (
-        "IEC_60601_2_47"  # International standard for ECG equipment
-    )
-    REGULATORY_COMPLIANCE: str = "ANVISA_RDC_185"  # Brazilian regulatory compliance
-    DATA_PROTECTION_STANDARD: str = "LGPD"  # Brazilian data protection law
-
-    ENABLE_PRODUCTION_MONITORING: bool = True
-    PERFORMANCE_THRESHOLD: float = 0.85
-    MONITORING_ALERT_EMAIL: str = "team@cardioai.pro"
-
-    MIN_VALIDATION_SCORE: float = 0.8
-    REQUIRE_DOUBLE_VALIDATION_CRITICAL: bool = True
-    VALIDATION_EXPIRY_HOURS: int = 72
-    MIN_EXPERIENCE_YEARS_CRITICAL: int = 5
-
-    ENABLE_NOTIFICATIONS: bool = True
-    NOTIFICATION_RATE_LIMIT: int = 100
-    WEBSOCKET_HEARTBEAT_INTERVAL: int = 30
-
-    ENABLE_METRICS: bool = True
-    SENTRY_DSN: str | None = None
-
-    CELERY_BROKER_URL: str | None = None
-    CELERY_RESULT_BACKEND: str | None = None
-
-    @field_validator("CELERY_BROKER_URL", mode="before")
+    
+    # Database
+    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_USER: str = "cardioai"
+    POSTGRES_PASSWORD: str = "cardioai123"
+    POSTGRES_DB: str = "cardioai_db"
+    
+    DATABASE_URL: Optional[str] = None
+    DATABASE_SYNC_URL: Optional[str] = None
+    
+    @field_validator("DATABASE_URL", mode="before")
     @classmethod
-    def assemble_celery_broker(
-        cls: "type[Settings]", v: str | None, info: ValidationInfo
-    ) -> str:
-        """Assemble Celery broker URL."""
+    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
-        values = info.data
-
-        if values.get("STANDALONE_MODE", True):
-            return ""
-        redis_url = values.get("REDIS_URL")
-        return str(redis_url) if redis_url else "redis://localhost:6379/0"
-
-    @field_validator("CELERY_RESULT_BACKEND", mode="before")
+        return PostgresDsn.build(
+            scheme="postgresql+asyncpg",
+            username=values.data.get("POSTGRES_USER"),
+            password=values.data.get("POSTGRES_PASSWORD"),
+            host=values.data.get("POSTGRES_SERVER"),
+            port=values.data.get("POSTGRES_PORT"),
+            path=values.data.get("POSTGRES_DB") or "",
+        ).unicode_string()
+    
+    @field_validator("DATABASE_SYNC_URL", mode="before")  
     @classmethod
-    def assemble_celery_backend(
-        cls: "type[Settings]", v: str | None, info: ValidationInfo
-    ) -> str:
-        """Assemble Celery result backend URL."""
+    def assemble_sync_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
-        values = info.data
-
-        if values.get("STANDALONE_MODE", True):
-            return ""
-        redis_url = values.get("REDIS_URL")
-        return str(redis_url) if redis_url else "redis://localhost:6379/0"
-
-    AUDIT_LOG_RETENTION_DAYS: int = 2555  # 7 years
-    ENABLE_DIGITAL_SIGNATURES: bool = True
-    REQUIRE_AUDIT_TRAIL: bool = True
-
-    FIRST_SUPERUSER: str = "admin@cardioai.pro"
-    FIRST_SUPERUSER_EMAIL: str = "admin@cardioai.pro"
-    FIRST_SUPERUSER_PASSWORD: str = "CHANGE_ME_SECURE_PASSWORD_REQUIRED"
-
-    MAX_ECG_FILE_SIZE: int = 50 * 1024 * 1024  # 50MB
-    ECG_UPLOAD_DIR: str = "uploads/ecg"
-
-    model_config = {
-        "case_sensitive": True,
-        "env_file": ".env",
-        "env_file_encoding": "utf-8",
-        "extra": "ignore",
-    }
-    ML_MODEL_PATH: str = "models"
-    ML_BATCH_SIZE: int = 32
-    ML_MAX_QUEUE_SIZE: int = 1000
-    UPLOAD_PATH: str = "uploads"
+        return PostgresDsn.build(
+            scheme="postgresql",
+            username=values.data.get("POSTGRES_USER"),
+            password=values.data.get("POSTGRES_PASSWORD"),
+            host=values.data.get("POSTGRES_SERVER"),
+            port=values.data.get("POSTGRES_PORT"),
+            path=values.data.get("POSTGRES_DB") or "",
+        ).unicode_string()
+    
+    # Redis (optional)
+    REDIS_URL: Optional[str] = None
+    CACHE_EXPIRE_MINUTES: int = 60
+    
+    # File Upload
+    UPLOAD_DIR: str = "uploads"
     MAX_UPLOAD_SIZE: int = 104857600  # 100MB
+    ALLOWED_EXTENSIONS: List[str] = ["csv", "txt", "edf", "npy", "mat", "xml"]
+    CHUNK_SIZE: int = 1024 * 1024  # 1MB chunks
+    
+    # ML Models
+    MODEL_PATH: str = "app/ml/models"
+    MODEL_CACHE_SIZE: int = 5
+    MODEL_VERSION: str = "1.0.0"
+    
+    # ECG Processing
+    DEFAULT_SAMPLING_RATE: int = 500  # Hz
+    DEFAULT_LEADS: int = 12
+    MIN_SIGNAL_DURATION: float = 10.0  # seconds
+    MAX_SIGNAL_DURATION: float = 86400.0  # 24 hours
+    
+    # Analysis Settings
+    R_PEAK_DETECTION_METHOD: str = "pan_tompkins"
+    BASELINE_FILTER_CUTOFF: float = 0.5  # Hz
+    POWERLINE_FREQUENCIES: List[int] = [50, 60]  # Hz
+    BANDPASS_LOW: float = 0.5  # Hz
+    BANDPASS_HIGH: float = 150.0  # Hz
+    
+    # Clinical Thresholds
+    NORMAL_HR_MIN: int = 60
+    NORMAL_HR_MAX: int = 100
+    BRADYCARDIA_THRESHOLD: int = 60
+    TACHYCARDIA_THRESHOLD: int = 100
+    QTC_NORMAL_MAX: int = 450
+    QTC_PROLONGED: int = 500
+    PR_NORMAL_MIN: int = 120
+    PR_NORMAL_MAX: int = 200
+    QRS_NORMAL_MAX: int = 120
+    
+    # Monitoring
+    ENABLE_MONITORING: bool = True
+    MEMORY_CHECK_INTERVAL: int = 60  # seconds
+    MEMORY_THRESHOLD: float = 80.0  # percentage
+    PROCESS_MEMORY_THRESHOLD: float = 70.0  # percentage
+    LOG_LEVEL: str = "INFO"
+    
+    # Email (optional)
+    SMTP_TLS: bool = True
+    SMTP_PORT: Optional[int] = 587
+    SMTP_HOST: Optional[str] = None
+    SMTP_USER: Optional[str] = None
+    SMTP_PASSWORD: Optional[str] = None
+    EMAILS_FROM_EMAIL: Optional[str] = None
+    EMAILS_FROM_NAME: Optional[str] = None
+    
+    # Celery (optional)
+    CELERY_BROKER_URL: Optional[str] = None
+    CELERY_RESULT_BACKEND: Optional[str] = None
+    
+    # Paths
+    BASE_DIR: Path = Path(__file__).parent.parent.parent
+    STATIC_DIR: Path = BASE_DIR / "static"
+    TEMPLATES_DIR: Path = BASE_DIR / "templates"
+    LOGS_DIR: Path = BASE_DIR / "logs"
+    REPORTS_DIR: Path = BASE_DIR / "reports"
+    
+    # First user
+    FIRST_SUPERUSER_EMAIL: str = "admin@cardioai.com"
+    FIRST_SUPERUSER_PASSWORD: str = "admin123"
+    
+    # Other
+    SENTRY_DSN: Optional[str] = None
+    ENVIRONMENT: str = "development"
+    
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True
+    )
+    
+    def get_upload_path(self, filename: str) -> Path:
+        """Get full upload path for a file"""
+        upload_dir = self.BASE_DIR / self.UPLOAD_DIR
+        upload_dir.mkdir(exist_ok=True)
+        return upload_dir / filename
+    
+    def get_model_path(self, model_name: str) -> Path:
+        """Get full path for a model file"""
+        model_dir = self.BASE_DIR / self.MODEL_PATH
+        model_dir.mkdir(parents=True, exist_ok=True)
+        return model_dir / model_name
+    
+    def get_report_path(self, report_name: str) -> Path:
+        """Get full path for a report file"""
+        self.REPORTS_DIR.mkdir(exist_ok=True)
+        return self.REPORTS_DIR / report_name
+    
+    def get_log_path(self, log_name: str) -> Path:
+        """Get full path for a log file"""
+        self.LOGS_DIR.mkdir(exist_ok=True)
+        return self.LOGS_DIR / log_name
+    
+    @property
+    def is_production(self) -> bool:
+        """Check if running in production"""
+        return self.ENVIRONMENT.lower() == "production"
+    
+    @property
+    def is_development(self) -> bool:
+        """Check if running in development"""
+        return self.ENVIRONMENT.lower() == "development"
+    
+    def validate_file_extension(self, filename: str) -> bool:
+        """Validate file extension"""
+        ext = filename.split('.')[-1].lower()
+        return ext in self.ALLOWED_EXTENSIONS
+    
+    def validate_file_size(self, size: int) -> bool:
+        """Validate file size"""
+        return 0 < size <= self.MAX_UPLOAD_SIZE
 
 
+# Create settings instance
 settings = Settings()
+
+# Export commonly used values
+PROJECT_NAME = settings.APP_NAME
+API_V1_STR = settings.API_V1_STR
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+
+# Ensure required directories exist
+for directory in [settings.LOGS_DIR, settings.REPORTS_DIR, settings.STATIC_DIR]:
+    directory.mkdir(parents=True, exist_ok=True)
