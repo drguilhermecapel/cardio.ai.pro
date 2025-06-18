@@ -1,254 +1,215 @@
 """
-CardioAI Pro exception classes.
-
-This module defines custom exceptions used throughout the application.
+Core Exceptions
+Custom exception classes for CardioAI Pro
 """
 
 from typing import Any, Dict, Optional
 
 
 class CardioAIException(Exception):
-    """Base exception for all CardioAI custom exceptions."""
+    """Base exception for CardioAI Pro"""
     
     def __init__(
         self,
         message: str,
-        error_code: str = "CARDIOAI_ERROR",
-        status_code: int = 500,
+        error_code: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None
-    ) -> None:
-        """Initialize CardioAI exception.
-        
-        Args:
-            message: Error message
-            error_code: Internal error code
-            status_code: HTTP status code
-            details: Additional error details
-        """
-        super().__init__(message)
+    ):
         self.message = message
-        self.error_code = error_code
-        self.status_code = status_code
+        self.error_code = error_code or self.__class__.__name__
         self.details = details or {}
+        super().__init__(self.message)
     
-    def __str__(self) -> str:
-        """Return string representation."""
-        return self.message
-
-
-class ValidationException(CardioAIException):
-    """Validation exception with flexible parameters."""
-
-    def __init__(
-        self,
-        message: str = "Validation error",
-        validation_errors: list[dict] = None,
-        errors: list[dict] = None,  # Alias para validation_errors
-        field: str = None,
-        details: dict = None,
-        **kwargs
-    ) -> None:
-        """Initialize validation exception with flexible parameters.
-        
-        Args:
-            message: Error message
-            validation_errors: List of validation errors
-            errors: Alias for validation_errors
-            field: Field that failed validation
-            details: Additional error details
-            **kwargs: Additional arguments
-        """
-        # Determinar detalhes
-        error_details = details or {}
-        
-        # Usar validation_errors ou errors
-        self.validation_errors = validation_errors or errors or []
-        self.errors = self.validation_errors  # Alias
-        
-        if field:
-            error_details['field'] = field
-            
-        if self.validation_errors:
-            error_details['validation_errors'] = self.validation_errors
-            
-        # Adicionar kwargs aos detalhes
-        for key, value in kwargs.items():
-            if key not in ['validation_errors', 'errors', 'field', 'details']:
-                error_details[key] = value
-                setattr(self, key, value)
-        
-        super().__init__(message, "VALIDATION_ERROR", 422, error_details)
-        self.field = field
-
-class AuthenticationException(CardioAIException):
-    """Authentication exception."""
-    
-    def __init__(self, message: str = "Could not validate credentials") -> None:
-        """Initialize authentication exception."""
-        super().__init__(message, "AUTHENTICATION_ERROR", 401)
-
-
-class AuthorizationException(CardioAIException):
-    """Authorization exception."""
-    
-    def __init__(self, message: str = "Not authorized to access this resource") -> None:
-        """Initialize authorization exception."""
-        super().__init__(message, "AUTHORIZATION_ERROR", 403)
-
-
-class NotFoundException(CardioAIException):
-    """Not found exception."""
-    
-    def __init__(self, message: str = "Resource not found") -> None:
-        """Initialize not found exception."""
-        super().__init__(message, "NOT_FOUND", 404)
-
-
-class ECGProcessingException(CardioAIException):
-    """ECG processing exception with flexible initialization."""
-    
-    def __init__(self, message: str, *args, ecg_id: str = None, details: dict = None, detail: dict = None, **kwargs) -> None:
-        """Initialize ECG processing exception with flexible parameters.
-        
-        Args:
-            message: Error message
-            *args: Additional positional arguments
-            ecg_id: Optional ECG ID
-            details: Error details (preferred)
-            detail: Error details (alternative name for compatibility)
-            **kwargs: Additional keyword arguments
-        """
-        # Use details or detail, whichever is provided
-        error_details = details or detail or kwargs.get('details') or kwargs.get('detail') or {}
-        
-        # If ecg_id is provided, include it in details
-        if ecg_id:
-            error_details['ecg_id'] = ecg_id
-            
-        # Include any other kwargs in details
-        for key, value in kwargs.items():
-            if key not in ['details', 'detail']:
-                error_details[key] = value
-        
-        super().__init__(message, "ECG_PROCESSING_ERROR", 422, error_details)
-        self.ecg_id = ecg_id
-        self.details = error_details
-
-# Exceções Not Found específicas
-class ECGNotFoundException(NotFoundException):
-    """ECG not found exception."""
-    def __init__(self, ecg_id: str) -> None:
-        super().__init__(f"ECG {ecg_id} not found")
-
-
-class PatientNotFoundException(NotFoundException):
-    """Patient not found exception."""
-    def __init__(self, patient_id: str) -> None:
-        super().__init__(f"Patient {patient_id} not found")
-
-
-class UserNotFoundException(NotFoundException):
-    """User not found exception."""
-    def __init__(self, user_id: str) -> None:
-        super().__init__(f"User {user_id} not found")
-
-
-class ConflictException(CardioAIException):
-    """Exception for conflict errors."""
-    def __init__(self, message: str) -> None:
-        super().__init__(message, "CONFLICT_ERROR", 409)
-
-
-class PermissionDeniedException(CardioAIException):
-    """Exception for permission denied errors."""
-    def __init__(self, message: str) -> None:
-        super().__init__(message, "PERMISSION_DENIED", 403)
-
-
-class MLModelException(CardioAIException):
-    """ML Model exception."""
-    def __init__(self, message: str, model_name: str = None) -> None:
-        details = {"model_name": model_name} if model_name else {}
-        super().__init__(message, "ML_MODEL_ERROR", 500, details)
-
-
-class ValidationNotFoundException(NotFoundException):
-    """Validation not found."""
-    def __init__(self, validation_id: str) -> None:
-        super().__init__(f"Validation {validation_id} not found")
-
-
-class AnalysisNotFoundException(NotFoundException):
-    """Analysis not found."""
-    def __init__(self, analysis_id: str) -> None:
-        super().__init__(f"Analysis {analysis_id} not found")
-
-
-class ValidationAlreadyExistsException(ConflictException):
-    """Validation already exists."""
-    def __init__(self, analysis_id: str) -> None:
-        super().__init__(f"Validation for analysis {analysis_id} already exists")
-
-
-class InsufficientPermissionsException(PermissionDeniedException):
-    """Insufficient permissions."""
-    def __init__(self, required_permission: str) -> None:
-        super().__init__(f"Insufficient permissions. Required: {required_permission}")
-
-
-class RateLimitExceededException(CardioAIException):
-    """Rate limit exceeded."""
-    def __init__(self, message: str = "Rate limit exceeded") -> None:
-        super().__init__(message, "RATE_LIMIT_EXCEEDED", 429)
-
-
-class FileProcessingException(CardioAIException):
-    """File processing error."""
-    def __init__(self, message: str, filename: str = None) -> None:
-        details = {"filename": filename} if filename else {}
-        super().__init__(message, "FILE_PROCESSING_ERROR", 422, details)
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert exception to dictionary"""
+        return {
+            "error": self.error_code,
+            "message": self.message,
+            "details": self.details
+        }
 
 
 class DatabaseException(CardioAIException):
-    """Database error."""
-    def __init__(self, message: str) -> None:
-        super().__init__(message, "DATABASE_ERROR", 500)
+    """Database-related exceptions"""
+    pass
+
+
+class ResourceNotFoundException(CardioAIException):
+    """Resource not found exception"""
+    
+    def __init__(self, message: str, resource_type: Optional[str] = None, resource_id: Optional[str] = None):
+        details = {}
+        if resource_type:
+            details["resource_type"] = resource_type
+        if resource_id:
+            details["resource_id"] = resource_id
+        super().__init__(message, "RESOURCE_NOT_FOUND", details)
+
+
+class ValidationException(CardioAIException):
+    """Validation exception"""
+    
+    def __init__(self, message: str, field: Optional[str] = None, value: Optional[Any] = None):
+        details = {}
+        if field:
+            details["field"] = field
+        if value is not None:
+            details["value"] = str(value)
+        super().__init__(message, "VALIDATION_ERROR", details)
+
+
+class AuthenticationException(CardioAIException):
+    """Authentication exception"""
+    
+    def __init__(self, message: str = "Authentication failed"):
+        super().__init__(message, "AUTHENTICATION_FAILED")
+
+
+class AuthorizationException(CardioAIException):
+    """Authorization exception"""
+    
+    def __init__(self, message: str = "Insufficient permissions"):
+        super().__init__(message, "AUTHORIZATION_FAILED")
+
+
+class ECGProcessingException(CardioAIException):
+    """ECG processing exception"""
+    
+    def __init__(self, message: str, stage: Optional[str] = None, ecg_id: Optional[str] = None):
+        details = {}
+        if stage:
+            details["processing_stage"] = stage
+        if ecg_id:
+            details["ecg_id"] = ecg_id
+        super().__init__(message, "ECG_PROCESSING_ERROR", details)
+
+
+class MLModelException(CardioAIException):
+    """Machine learning model exception"""
+    
+    def __init__(self, message: str, model_name: Optional[str] = None, model_version: Optional[str] = None):
+        details = {}
+        if model_name:
+            details["model_name"] = model_name
+        if model_version:
+            details["model_version"] = model_version
+        super().__init__(message, "ML_MODEL_ERROR", details)
+
+
+class FileOperationException(CardioAIException):
+    """File operation exception"""
+    
+    def __init__(self, message: str, file_path: Optional[str] = None, operation: Optional[str] = None):
+        details = {}
+        if file_path:
+            details["file_path"] = file_path
+        if operation:
+            details["operation"] = operation
+        super().__init__(message, "FILE_OPERATION_ERROR", details)
+
+
+class ConfigurationException(CardioAIException):
+    """Configuration exception"""
+    
+    def __init__(self, message: str, config_key: Optional[str] = None):
+        details = {}
+        if config_key:
+            details["config_key"] = config_key
+        super().__init__(message, "CONFIGURATION_ERROR", details)
 
 
 class ExternalServiceException(CardioAIException):
-    """External service error."""
-    def __init__(self, message: str, service_name: str = None) -> None:
-        details = {"service_name": service_name} if service_name else {}
-        super().__init__(message, "EXTERNAL_SERVICE_ERROR", 502, details)
-
-
-class NonECGImageException(CardioAIException):
-    """Non-ECG image detected."""
-    def __init__(self) -> None:
-        super().__init__("Uploaded image is not an ECG", "NON_ECG_IMAGE", 422)
-
-
-class MultiPathologyException(CardioAIException):
-    """Exception for multi-pathology service errors."""
+    """External service exception"""
     
-    def __init__(self, message: str, pathologies: list[str] | None = None) -> None:
-        details = {"pathologies": pathologies} if pathologies else {}
-        super().__init__(
-            message=message,
-            error_code="MULTI_PATHOLOGY_ERROR",
-            status_code=500,
-            details=details,
-        )
+    def __init__(self, message: str, service_name: Optional[str] = None, status_code: Optional[int] = None):
+        details = {}
+        if service_name:
+            details["service_name"] = service_name
+        if status_code:
+            details["status_code"] = status_code
+        super().__init__(message, "EXTERNAL_SERVICE_ERROR", details)
 
 
-class ECGReaderException(CardioAIException):
-    """Exception for ECG file reading errors."""
+class RateLimitException(CardioAIException):
+    """Rate limit exceeded exception"""
     
-    def __init__(self, message: str, file_format: str | None = None) -> None:
-        details = {"file_format": file_format} if file_format else {}
-        super().__init__(
-            message=message,
-            error_code="ECG_READER_ERROR",
-            status_code=422,
-            details=details,
-        )
+    def __init__(self, message: str = "Rate limit exceeded", retry_after: Optional[int] = None):
+        details = {}
+        if retry_after:
+            details["retry_after_seconds"] = retry_after
+        super().__init__(message, "RATE_LIMIT_EXCEEDED", details)
+
+
+class DataIntegrityException(CardioAIException):
+    """Data integrity exception"""
+    
+    def __init__(self, message: str, entity_type: Optional[str] = None, entity_id: Optional[str] = None):
+        details = {}
+        if entity_type:
+            details["entity_type"] = entity_type
+        if entity_id:
+            details["entity_id"] = entity_id
+        super().__init__(message, "DATA_INTEGRITY_ERROR", details)
+
+
+class ConcurrencyException(CardioAIException):
+    """Concurrency/locking exception"""
+    
+    def __init__(self, message: str = "Resource is locked by another process"):
+        super().__init__(message, "CONCURRENCY_ERROR")
+
+
+class MemoryException(CardioAIException):
+    """Memory-related exception"""
+    
+    def __init__(self, message: str, available_memory: Optional[int] = None, required_memory: Optional[int] = None):
+        details = {}
+        if available_memory:
+            details["available_memory_mb"] = available_memory / (1024 * 1024)
+        if required_memory:
+            details["required_memory_mb"] = required_memory / (1024 * 1024)
+        super().__init__(message, "MEMORY_ERROR", details)
+
+
+# Error code mappings for HTTP status codes
+ERROR_CODE_TO_STATUS = {
+    "RESOURCE_NOT_FOUND": 404,
+    "VALIDATION_ERROR": 400,
+    "AUTHENTICATION_FAILED": 401,
+    "AUTHORIZATION_FAILED": 403,
+    "RATE_LIMIT_EXCEEDED": 429,
+    "CONCURRENCY_ERROR": 409,
+    "MEMORY_ERROR": 507,
+    "CONFIGURATION_ERROR": 500,
+    "DATABASE_ERROR": 500,
+    "ECG_PROCESSING_ERROR": 422,
+    "ML_MODEL_ERROR": 500,
+    "FILE_OPERATION_ERROR": 500,
+    "EXTERNAL_SERVICE_ERROR": 502,
+    "DATA_INTEGRITY_ERROR": 422,
+}
+
+
+def get_http_status_code(exception: CardioAIException) -> int:
+    """Get HTTP status code for exception"""
+    return ERROR_CODE_TO_STATUS.get(exception.error_code, 500)
+
+
+__all__ = [
+    "CardioAIException",
+    "DatabaseException",
+    "ResourceNotFoundException",
+    "ValidationException",
+    "AuthenticationException",
+    "AuthorizationException",
+    "ECGProcessingException",
+    "MLModelException",
+    "FileOperationException",
+    "ConfigurationException",
+    "ExternalServiceException",
+    "RateLimitException",
+    "DataIntegrityException",
+    "ConcurrencyException",
+    "MemoryException",
+    "get_http_status_code",
+]

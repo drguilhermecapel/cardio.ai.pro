@@ -1,194 +1,334 @@
 """
-ECG Analysis models.
+ECG Analysis Database Model
+SQLAlchemy model for ECG analysis records
 """
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import Optional, Dict, Any, List
+from uuid import UUID, uuid4
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import (
+    Column, String, Integer, Float, Boolean, DateTime, 
+    Text, JSON, ForeignKey, Enum as SQLEnum, Index
+)
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.ext.hybrid import hybrid_property
 
-from app.core.constants import AnalysisStatus, ClinicalUrgency, DiagnosisCategory
-from app.models.base import Base
-
-if TYPE_CHECKING:
-    from app.models.patient import Patient
-    from app.models.user import User
-    from app.models.validation import Validation
+from app.db.base import Base
+from app.schemas.ecg_analysis import ProcessingStatus, ClinicalUrgency
 
 
 class ECGAnalysis(Base):
-    """ECG Analysis model."""
-
+    """ECG Analysis database model"""
+    
     __tablename__ = "ecg_analyses"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-
-    analysis_id: Mapped[str] = mapped_column(
-        String(50), unique=True, index=True, nullable=False
+    
+    # Primary key
+    id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True), 
+        primary_key=True, 
+        default=uuid4,
+        index=True
     )
-
-    patient_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("patients.id"), nullable=False, index=True
+    
+    # Foreign keys
+    patient_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("patients.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
     )
-    created_by: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=False, index=True
+    
+    user_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True
     )
-
-    original_filename: Mapped[str] = mapped_column(String(255), nullable=False)
-    file_path: Mapped[str] = mapped_column(String(500), nullable=False)
-    file_hash: Mapped[str] = mapped_column(String(64), nullable=False)
-    file_size: Mapped[int] = mapped_column(Integer, nullable=False)
-
-    acquisition_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
+    
+    # Status and timestamps
+    status: Mapped[ProcessingStatus] = mapped_column(
+        SQLEnum(ProcessingStatus),
+        default=ProcessingStatus.PENDING,
+        nullable=False,
+        index=True
     )
-    sample_rate: Mapped[int] = mapped_column(Integer, nullable=False)
-    duration_seconds: Mapped[float] = mapped_column(Float, nullable=False)
-    leads_count: Mapped[int] = mapped_column(Integer, nullable=False)
-    leads_names: Mapped[list[str]] = mapped_column(JSON, nullable=False)
-
-    device_manufacturer: Mapped[str | None] = mapped_column(String(100))
-    device_model: Mapped[str | None] = mapped_column(String(100))
-    device_serial: Mapped[str | None] = mapped_column(String(50))
-
-    status: Mapped[AnalysisStatus] = mapped_column(
-        String(20), nullable=False, default=AnalysisStatus.PENDING
+    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+        index=True
     )
-    processing_started_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True)
+    
+    updated_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime,
+        onupdate=datetime.utcnow,
+        nullable=True
     )
-    processing_completed_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True)
+    
+    processed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime,
+        nullable=True,
+        index=True
     )
-    processing_duration_ms: Mapped[int | None] = mapped_column(Integer)
-
-    ai_confidence: Mapped[float | None] = mapped_column(Float)
-    ai_predictions: Mapped[dict[str, Any] | None] = mapped_column(JSON)
-    ai_interpretability: Mapped[dict[str, Any] | None] = mapped_column(JSON)
-
-    heart_rate_bpm: Mapped[int | None] = mapped_column(Integer)
-    rhythm: Mapped[str | None] = mapped_column(String(100))
-    pr_interval_ms: Mapped[int | None] = mapped_column(Integer)
-    qrs_duration_ms: Mapped[int | None] = mapped_column(Integer)
-    qt_interval_ms: Mapped[int | None] = mapped_column(Integer)
-    qtc_interval_ms: Mapped[int | None] = mapped_column(Integer)
-
-    primary_diagnosis: Mapped[str | None] = mapped_column(String(200))
-    secondary_diagnoses: Mapped[list[str] | None] = mapped_column(JSON)
-    diagnosis_category: Mapped[DiagnosisCategory | None] = mapped_column(String(50))
-    icd10_codes: Mapped[list[str] | None] = mapped_column(JSON)
-
-    clinical_urgency: Mapped[ClinicalUrgency] = mapped_column(
-        String(20), nullable=False, default=ClinicalUrgency.LOW
+    
+    # File information
+    file_info: Mapped[Dict[str, Any]] = mapped_column(
+        JSON,
+        default=dict,
+        nullable=False
     )
-    requires_immediate_attention: Mapped[bool] = mapped_column(
-        Boolean, default=False, nullable=False
+    
+    # Recording information
+    recording_date: Mapped[Optional[datetime]] = mapped_column(
+        DateTime,
+        nullable=True,
+        index=True
     )
-    clinical_notes: Mapped[str | None] = mapped_column(Text)
-    recommendations: Mapped[list[str] | None] = mapped_column(JSON)
-
-    signal_quality_score: Mapped[float | None] = mapped_column(Float)
-    noise_level: Mapped[float | None] = mapped_column(Float)
-    baseline_wander: Mapped[float | None] = mapped_column(Float)
-
-    is_validated: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    validation_required: Mapped[bool] = mapped_column(
-        Boolean, default=True, nullable=False
+    
+    device_info: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+        JSON,
+        nullable=True
     )
-
-    error_message: Mapped[str | None] = mapped_column(Text)
-    retry_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-
-    patient: Mapped["Patient"] = relationship("Patient", back_populates="analyses")
-    created_by_user: Mapped["User"] = relationship(
-        "User", back_populates="analyses", foreign_keys=[created_by]
+    
+    # Analysis results
+    measurements: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+        JSON,
+        nullable=True
     )
-    validations: Mapped[list["Validation"]] = relationship(
-        "Validation", back_populates="analysis", cascade="all, delete-orphan"
+    
+    annotations: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(
+        JSON,
+        nullable=True
     )
-    measurements: Mapped[list["ECGMeasurement"]] = relationship(
-        "ECGMeasurement", back_populates="analysis", cascade="all, delete-orphan"
+    
+    pathologies: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(
+        JSON,
+        nullable=True
     )
-
+    
+    clinical_urgency: Mapped[Optional[ClinicalUrgency]] = mapped_column(
+        SQLEnum(ClinicalUrgency),
+        nullable=True,
+        index=True
+    )
+    
+    # Clinical information
+    recommendations: Mapped[Optional[List[str]]] = mapped_column(
+        JSON,
+        nullable=True
+    )
+    
+    clinical_notes: Mapped[Optional[str]] = mapped_column(
+        Text,
+        nullable=True
+    )
+    
+    clinical_context: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+        JSON,
+        nullable=True
+    )
+    
+    # Quality metrics
+    quality_score: Mapped[Optional[float]] = mapped_column(
+        Float,
+        nullable=True,
+        index=True
+    )
+    
+    confidence_score: Mapped[Optional[float]] = mapped_column(
+        Float,
+        nullable=True,
+        index=True
+    )
+    
+    # Validation
+    validated: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False,
+        index=True
+    )
+    
+    validated_by: Mapped[Optional[UUID]] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True
+    )
+    
+    validation_date: Mapped[Optional[datetime]] = mapped_column(
+        DateTime,
+        nullable=True
+    )
+    
+    # Additional metadata
+    metadata: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+        JSON,
+        nullable=True
+    )
+    
+    error_message: Mapped[Optional[str]] = mapped_column(
+        Text,
+        nullable=True
+    )
+    
+    # Relationships
+    patient: Mapped["Patient"] = relationship(
+        "Patient",
+        back_populates="ecg_analyses",
+        lazy="joined"
+    )
+    
+    user: Mapped[Optional["User"]] = relationship(
+        "User",
+        foreign_keys=[user_id],
+        back_populates="ecg_analyses"
+    )
+    
+    validator: Mapped[Optional["User"]] = relationship(
+        "User",
+        foreign_keys=[validated_by]
+    )
+    
+    validations: Mapped[List["Validation"]] = relationship(
+        "Validation",
+        back_populates="ecg_analysis",
+        cascade="all, delete-orphan"
+    )
+    
+    # Hybrid properties
+    @hybrid_property
+    def is_urgent(self) -> bool:
+        """Check if analysis requires urgent attention"""
+        return self.clinical_urgency in [
+            ClinicalUrgency.HIGH,
+            ClinicalUrgency.CRITICAL
+        ]
+    
+    @hybrid_property
+    def is_completed(self) -> bool:
+        """Check if analysis is completed"""
+        return self.status == ProcessingStatus.COMPLETED
+    
+    @hybrid_property
+    def has_pathologies(self) -> bool:
+        """Check if pathologies were detected"""
+        return bool(self.pathologies) and len(self.pathologies) > 0
+    
+    @hybrid_property
+    def processing_duration(self) -> Optional[float]:
+        """Calculate processing duration in seconds"""
+        if self.processed_at and self.created_at:
+            return (self.processed_at - self.created_at).total_seconds()
+        return None
+    
+    @hybrid_property
+    def heart_rate(self) -> Optional[float]:
+        """Get heart rate from measurements"""
+        if self.measurements:
+            return self.measurements.get("heart_rate")
+        return None
+    
+    @hybrid_property
+    def primary_pathology(self) -> Optional[str]:
+        """Get primary detected pathology"""
+        if self.pathologies and len(self.pathologies) > 0:
+            # Sort by probability and return highest
+            sorted_pathologies = sorted(
+                self.pathologies,
+                key=lambda x: x.get("probability", 0),
+                reverse=True
+            )
+            return sorted_pathologies[0].get("condition")
+        return None
+    
+    # Methods
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary"""
+        return {
+            "id": str(self.id),
+            "patient_id": str(self.patient_id),
+            "user_id": str(self.user_id) if self.user_id else None,
+            "status": self.status.value,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "processed_at": self.processed_at.isoformat() if self.processed_at else None,
+            "file_info": self.file_info,
+            "recording_date": self.recording_date.isoformat() if self.recording_date else None,
+            "device_info": self.device_info,
+            "measurements": self.measurements,
+            "annotations": self.annotations,
+            "pathologies": self.pathologies,
+            "clinical_urgency": self.clinical_urgency.value if self.clinical_urgency else None,
+            "recommendations": self.recommendations,
+            "clinical_notes": self.clinical_notes,
+            "clinical_context": self.clinical_context,
+            "quality_score": self.quality_score,
+            "confidence_score": self.confidence_score,
+            "validated": self.validated,
+            "validated_by": str(self.validated_by) if self.validated_by else None,
+            "validation_date": self.validation_date.isoformat() if self.validation_date else None,
+            "metadata": self.metadata,
+            "error_message": self.error_message,
+            "is_urgent": self.is_urgent,
+            "is_completed": self.is_completed,
+            "has_pathologies": self.has_pathologies,
+            "processing_duration": self.processing_duration,
+            "heart_rate": self.heart_rate,
+            "primary_pathology": self.primary_pathology
+        }
+    
+    def update_measurements(self, measurements: Dict[str, Any]) -> None:
+        """Update measurements"""
+        self.measurements = measurements
+        self.updated_at = datetime.utcnow()
+    
+    def update_pathologies(self, pathologies: List[Dict[str, Any]]) -> None:
+        """Update detected pathologies"""
+        self.pathologies = pathologies
+        self.updated_at = datetime.utcnow()
+        
+        # Update clinical urgency based on pathologies
+        if pathologies:
+            max_severity = max(
+                p.get("severity", "low") for p in pathologies
+            )
+            if max_severity == "critical":
+                self.clinical_urgency = ClinicalUrgency.CRITICAL
+            elif max_severity == "high":
+                self.clinical_urgency = ClinicalUrgency.HIGH
+            elif max_severity == "moderate":
+                self.clinical_urgency = ClinicalUrgency.MODERATE
+    
+    def mark_as_validated(self, validator_id: UUID) -> None:
+        """Mark analysis as validated"""
+        self.validated = True
+        self.validated_by = validator_id
+        self.validation_date = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
+    
+    def add_clinical_note(self, note: str, append: bool = True) -> None:
+        """Add clinical note"""
+        if append and self.clinical_notes:
+            self.clinical_notes += f"\n\n{note}"
+        else:
+            self.clinical_notes = note
+        self.updated_at = datetime.utcnow()
+    
     def __repr__(self) -> str:
-        return f"<ECGAnalysis(id={self.id}, analysis_id='{self.analysis_id}', status='{self.status}')>"
-
-    @property
-    def is_critical(self) -> bool:
-        """Check if analysis indicates critical condition."""
+        """String representation"""
         return (
-            self.clinical_urgency == ClinicalUrgency.CRITICAL
-            or self.requires_immediate_attention
+            f"<ECGAnalysis(id={self.id}, "
+            f"patient_id={self.patient_id}, "
+            f"status={self.status.value}, "
+            f"urgency={self.clinical_urgency.value if self.clinical_urgency else 'N/A'})>"
         )
 
-    @property
-    def processing_time_seconds(self) -> float | None:
-        """Get processing time in seconds."""
-        if self.processing_duration_ms:
-            return self.processing_duration_ms / 1000
-        return None
 
-
-class ECGMeasurement(Base):
-    """ECG measurement model for storing detailed measurements."""
-
-    __tablename__ = "ecg_measurements"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    analysis_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("ecg_analyses.id"), nullable=False, index=True
-    )
-
-    measurement_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    lead_name: Mapped[str] = mapped_column(String(10), nullable=False)
-    value: Mapped[float] = mapped_column(Float, nullable=False)
-    unit: Mapped[str] = mapped_column(String(20), nullable=False)
-
-    start_time_ms: Mapped[float | None] = mapped_column(Float)
-    end_time_ms: Mapped[float | None] = mapped_column(Float)
-
-    confidence: Mapped[float | None] = mapped_column(Float)
-    is_normal: Mapped[bool | None] = mapped_column(Boolean)
-
-    normal_min: Mapped[float | None] = mapped_column(Float)
-    normal_max: Mapped[float | None] = mapped_column(Float)
-
-    source: Mapped[str] = mapped_column(String(20), nullable=False, default="algorithm")
-
-    analysis: Mapped["ECGAnalysis"] = relationship(
-        "ECGAnalysis", back_populates="measurements"
-    )
-
-    def __repr__(self) -> str:
-        return f"<ECGMeasurement(id={self.id}, type='{self.measurement_type}', value={self.value})>"
-
-
-class ECGAnnotation(Base):
-    """ECG annotation model for storing beat annotations and events."""
-
-    __tablename__ = "ecg_annotations"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    analysis_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("ecg_analyses.id"), nullable=False, index=True
-    )
-
-    annotation_type: Mapped[str] = mapped_column(
-        String(50), nullable=False
-    )  # beat, event, artifact
-    label: Mapped[str] = mapped_column(String(100), nullable=False)
-
-    time_ms: Mapped[float] = mapped_column(Float, nullable=False)
-    lead_name: Mapped[str | None] = mapped_column(String(10))
-
-    confidence: Mapped[float | None] = mapped_column(Float)
-    properties: Mapped[dict[str, Any] | None] = mapped_column(JSON)
-
-    source: Mapped[str] = mapped_column(
-        String(20), nullable=False
-    )  # ai, manual, algorithm
-    created_by: Mapped[int | None] = mapped_column(Integer, ForeignKey("users.id"))
-
-    def __repr__(self) -> str:
-        return f"<ECGAnnotation(id={self.id}, type='{self.annotation_type}', label='{self.label}')>"
+# Indexes for performance
+Index("idx_ecg_patient_created", ECGAnalysis.patient_id, ECGAnalysis.created_at.desc())
+Index("idx_ecg_user_created", ECGAnalysis.user_id, ECGAnalysis.created_at.desc())
+Index("idx_ecg_status_urgency", ECGAnalysis.status, ECGAnalysis.clinical_urgency)
+Index("idx_ecg_validated_date", ECGAnalysis.validated, ECGAnalysis.validation_date)
