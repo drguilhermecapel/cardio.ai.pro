@@ -242,16 +242,16 @@ async def test_comprehensive_coverage_boost():
 
     ecg_service = ECGAnalysisService(mock_db, Mock(), Mock())
 
-    ecg_service.repository.create_analysis = AsyncMock(
+    ecg_service_instance.repository.create_analysis = AsyncMock(
         side_effect=Exception("Create error")
     )
     try:
-        await ecg_service.create_analysis(1, "/tmp/test.txt", "test.txt", 1)
+        await ecg_service_instance.create_analysis(1, "/tmp/test.txt", "test.txt", 1)
     except Exception:
         pass
 
     try:
-        await ecg_service._calculate_file_info("/nonexistent/file.txt")
+        await ecg_service_instance._calculate_file_info("/nonexistent/file.txt")
     except Exception:
         pass
 

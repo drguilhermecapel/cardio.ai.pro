@@ -80,11 +80,11 @@ async def test_achieve_80_percent_medical_compliance():
 
     ecg_service = ECGAnalysisService(mock_db, Mock(), Mock())
 
-    ecg_service.repository.get_analysis_by_analysis_id = AsyncMock(
+    ecg_service_instance.repository.get_analysis_by_analysis_id = AsyncMock(
         side_effect=Exception("Analysis not found")
     )
     try:
-        await ecg_service.get_analysis_by_id("test123")
+        await ecg_service_instance.get_analysis_by_id("test123")
     except Exception:
         pass
 

@@ -43,7 +43,7 @@ class TestComprehensiveCoverage:
             mock_db.return_value = AsyncMock()
             
             # ECGService - mock completo
-            with patch('app.services.ecg_service.ECGAnalysisService') as mock_ecg:
+            with patch('app.services.ecg_service_instance.ECGAnalysisService') as mock_ecg:
                 mock_instance = MagicMock()
                 mock_ecg.return_value = mock_instance
                 

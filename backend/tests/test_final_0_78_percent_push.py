@@ -106,11 +106,11 @@ async def test_push_final_0_78_percent_to_80():
 
     mock_analysis = Mock()
     mock_analysis.retry_count = 2
-    ecg_service.repository.get_analysis_by_id = AsyncMock(return_value=mock_analysis)
-    ecg_service.processor.load_ecg_file = AsyncMock(side_effect=Exception("File error"))
+    ecg_service_instance.repository.get_analysis_by_id = AsyncMock(return_value=mock_analysis)
+    ecg_service_instance.processor.load_ecg_file = AsyncMock(side_effect=Exception("File error"))
 
     try:
-        await ecg_service._process_analysis_async(1)
+        await ecg_service_instance._process_analysis_async(1)
     except Exception:
         pass
 

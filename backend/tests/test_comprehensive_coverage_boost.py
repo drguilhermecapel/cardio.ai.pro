@@ -44,14 +44,14 @@ async def test_ecg_service_search_analyses(mock_db, mock_notification_service):
     validation_service = ValidationService(mock_db, mock_notification_service)
     ecg_service = ECGAnalysisService(mock_db, ml_service, validation_service)
 
-    ecg_service.repository = Mock()
-    ecg_service.repository.search_analyses = AsyncMock(return_value=([], 0))
+    ecg_service_instance.repository = Mock()
+    ecg_service_instance.repository.search_analyses = AsyncMock(return_value=([], 0))
 
     filters = {"patient_id": 1, "status": "completed"}
-    result = await ecg_service.search_analyses(filters, 10, 0)
+    result = await ecg_service_instance.search_analyses(filters, 10, 0)
 
     assert result == ([], 0)
-    ecg_service.repository.search_analyses.assert_called_once_with(filters, 10, 0)
+    ecg_service_instance.repository.search_analyses.assert_called_once_with(filters, 10, 0)
 
 
 @pytest.mark.asyncio
@@ -65,13 +65,13 @@ async def test_ecg_service_delete_analysis(mock_db, mock_notification_service):
     validation_service = ValidationService(mock_db, mock_notification_service)
     ecg_service = ECGAnalysisService(mock_db, ml_service, validation_service)
 
-    ecg_service.repository = Mock()
-    ecg_service.repository.delete_analysis = AsyncMock(return_value=True)
+    ecg_service_instance.repository = Mock()
+    ecg_service_instance.repository.delete_analysis = AsyncMock(return_value=True)
 
-    result = await ecg_service.delete_analysis(1)
+    result = await ecg_service_instance.delete_analysis(1)
 
     assert result is True
-    ecg_service.repository.delete_analysis.assert_called_once_with(1)
+    ecg_service_instance.repository.delete_analysis.assert_called_once_with(1)
 
 
 @pytest.mark.asyncio

@@ -434,7 +434,7 @@ class TestHybridECGAnalysisServiceComplete:
             )
             test_data.to_csv(f.name, index=False)
 
-            result = await ecg_service.analyze_ecg_comprehensive(
+            result = await ecg_service_instance.analyze_ecg_comprehensive(
                 file_path=f.name, patient_id=123, analysis_id="TEST_001"
             )
 
@@ -457,7 +457,7 @@ class TestHybridECGAnalysisServiceComplete:
         from app.core.exceptions import ECGProcessingException
 
         with pytest.raises(ECGProcessingException):
-            await ecg_service.analyze_ecg_comprehensive(
+            await ecg_service_instance.analyze_ecg_comprehensive(
                 file_path="/nonexistent/path.csv",
                 patient_id=123,
                 analysis_id="FAIL_001",
@@ -469,7 +469,7 @@ class TestHybridECGAnalysisServiceComplete:
         signal = np.random.randn(1000, 1).astype(np.float64)
         features = {"rr_mean": 800, "rr_std": 50, "hrv_rmssd": 30}
 
-        result = await ecg_service._run_simplified_analysis(signal, features)
+        result = await ecg_service_instance._run_simplified_analysis(signal, features)
         assert isinstance(result, dict)
         assert "predictions" in result
         assert "confidence" in result
@@ -490,21 +490,21 @@ class TestHybridECGAnalysisServiceComplete:
             "rr_mean": 800,
             "rr_std": 300,  # High irregularity
         }
-        result = await ecg_service._run_simplified_analysis(signal, features_af)
+        result = await ecg_service_instance._run_simplified_analysis(signal, features_af)
         assert result["predictions"]["atrial_fibrillation"] > 0.5
 
         features_tachy = {
             "rr_mean": 500,  # HR = 120 bpm
             "rr_std": 20,
         }
-        result = await ecg_service._run_simplified_analysis(signal, features_tachy)
+        result = await ecg_service_instance._run_simplified_analysis(signal, features_tachy)
         assert result["predictions"]["tachycardia"] > 0.5
 
         features_brady = {
             "rr_mean": 1200,  # HR = 50 bpm
             "rr_std": 20,
         }
-        result = await ecg_service._run_simplified_analysis(signal, features_brady)
+        result = await ecg_service_instance._run_simplified_analysis(signal, features_brady)
         assert result["predictions"]["bradycardia"] > 0.5
 
     @pytest.mark.asyncio
@@ -513,7 +513,7 @@ class TestHybridECGAnalysisServiceComplete:
         signal = np.random.randn(1000, 1).astype(np.float64)
         features = {"rr_mean": 800, "rr_std": 50, "qtc_bazett": 420}
 
-        pathologies = await ecg_service._detect_pathologies(signal, features)
+        pathologies = await ecg_service_instance._detect_pathologies(signal, features)
         assert isinstance(pathologies, dict)
         assert "atrial_fibrillation" in pathologies
         assert "long_qt_syndrome" in pathologies
@@ -532,7 +532,7 @@ class TestHybridECGAnalysisServiceComplete:
             "spectral_entropy": 0.5,
         }
 
-        score = ecg_service._detect_atrial_fibrillation(features)
+        score = ecg_service_instance._detect_atrial_fibrillation(features)
         assert isinstance(score, float)
         assert 0.0 <= score <= 1.0
         assert score < 0.5  # Should be low for normal
@@ -546,7 +546,7 @@ class TestHybridECGAnalysisServiceComplete:
             "spectral_entropy": 0.9,  # High entropy
         }
 
-        score = ecg_service._detect_atrial_fibrillation(features)
+        score = ecg_service_instance._detect_atrial_fibrillation(features)
         assert isinstance(score, float)
         assert score > 0.5  # Should be high for AF
 
@@ -554,7 +554,7 @@ class TestHybridECGAnalysisServiceComplete:
         """Test AF detection with empty features."""
         features = {}
 
-        score = ecg_service._detect_atrial_fibrillation(features)
+        score = ecg_service_instance._detect_atrial_fibrillation(features)
         assert isinstance(score, float)
         assert score == 0.0
 
@@ -565,7 +565,7 @@ class TestHybridECGAnalysisServiceComplete:
             "rr_std": 50,
         }
 
-        score = ecg_service._detect_atrial_fibrillation(features)
+        score = ecg_service_instance._detect_atrial_fibrillation(features)
         assert isinstance(score, float)
         assert score >= 0.0
 
@@ -573,7 +573,7 @@ class TestHybridECGAnalysisServiceComplete:
         """Test long QT detection with normal QTc."""
         features = {"qtc_bazett": 420}  # Normal QTc
 
-        score = ecg_service._detect_long_qt(features)
+        score = ecg_service_instance._detect_long_qt(features)
         assert isinstance(score, float)
         assert score == 0.0
 
@@ -581,7 +581,7 @@ class TestHybridECGAnalysisServiceComplete:
         """Test long QT detection with prolonged QTc."""
         features = {"qtc_bazett": 480}  # Prolonged QTc
 
-        score = ecg_service._detect_long_qt(features)
+        score = ecg_service_instance._detect_long_qt(features)
         assert isinstance(score, float)
         assert score > 0.0
 
@@ -589,7 +589,7 @@ class TestHybridECGAnalysisServiceComplete:
         """Test long QT detection with empty features."""
         features = {}
 
-        score = ecg_service._detect_long_qt(features)
+        score = ecg_service_instance._detect_long_qt(features)
         assert isinstance(score, float)
         assert score == 0.0
 
@@ -606,7 +606,7 @@ class TestHybridECGAnalysisServiceComplete:
         }
         features = {"rr_mean": 800, "rr_std": 50}
 
-        assessment = await ecg_service._generate_clinical_assessment(
+        assessment = await ecg_service_instance._generate_clinical_assessment(
             ai_results, pathology_results, features
         )
         assert isinstance(assessment, dict)
@@ -634,7 +634,7 @@ class TestHybridECGAnalysisServiceComplete:
         }
         features = {"rr_mean": 800, "rr_std": 300}
 
-        assessment = await ecg_service._generate_clinical_assessment(
+        assessment = await ecg_service_instance._generate_clinical_assessment(
             ai_results, pathology_results, features
         )
         assert assessment["primary_diagnosis"] == "Atrial Fibrillation"
@@ -653,7 +653,7 @@ class TestHybridECGAnalysisServiceComplete:
         }
         features = {"rr_mean": 800, "rr_std": 50}
 
-        assessment = await ecg_service._generate_clinical_assessment(
+        assessment = await ecg_service_instance._generate_clinical_assessment(
             ai_results, pathology_results, features
         )
         assert (
@@ -666,7 +666,7 @@ class TestHybridECGAnalysisServiceComplete:
         """Test signal quality assessment with normal signal."""
         normal_signal = np.random.randn(1000, 1).astype(np.float64) * 0.1
 
-        quality = await ecg_service._assess_signal_quality(normal_signal)
+        quality = await ecg_service_instance._assess_signal_quality(normal_signal)
         assert isinstance(quality, dict)
         assert "snr_db" in quality
         assert "baseline_stability" in quality
@@ -682,7 +682,7 @@ class TestHybridECGAnalysisServiceComplete:
         """Test signal quality assessment with zero noise."""
         constant_signal = np.ones((1000, 1), dtype=np.float64)
 
-        quality = await ecg_service._assess_signal_quality(constant_signal)
+        quality = await ecg_service_instance._assess_signal_quality(constant_signal)
         assert isinstance(quality, dict)
         assert "overall_score" in quality
 
@@ -691,7 +691,7 @@ class TestHybridECGAnalysisServiceComplete:
         """Test signal quality assessment with high power signal."""
         high_power_signal = np.random.randn(1000, 1).astype(np.float64) * 10
 
-        quality = await ecg_service._assess_signal_quality(high_power_signal)
+        quality = await ecg_service_instance._assess_signal_quality(high_power_signal)
         assert isinstance(quality, dict)
         assert (
             quality["overall_score"] >= 0.6
@@ -702,7 +702,7 @@ class TestHybridECGAnalysisServiceComplete:
         """Test signal quality assessment with low power signal."""
         low_power_signal = np.random.randn(1000, 1).astype(np.float64) * 1e-8
 
-        quality = await ecg_service._assess_signal_quality(low_power_signal)
+        quality = await ecg_service_instance._assess_signal_quality(low_power_signal)
         assert isinstance(quality, dict)
         assert "overall_score" in quality
 
@@ -719,7 +719,7 @@ class TestECGMedicalSafety:
         """Test signal quality validation with NaN values."""
         nan_signal = np.full((1000, 1), np.nan, dtype=np.float64)
 
-        quality = await ecg_service._assess_signal_quality(nan_signal)
+        quality = await ecg_service_instance._assess_signal_quality(nan_signal)
         assert isinstance(quality, dict)
         assert "overall_score" in quality
 
@@ -728,7 +728,7 @@ class TestECGMedicalSafety:
         """Test signal quality validation with infinite values."""
         inf_signal = np.full((1000, 1), np.inf, dtype=np.float64)
 
-        quality = await ecg_service._assess_signal_quality(inf_signal)
+        quality = await ecg_service_instance._assess_signal_quality(inf_signal)
         assert isinstance(quality, dict)
         assert "overall_score" in quality
 
@@ -761,7 +761,7 @@ class TestECGMedicalSafety:
             test_data.to_csv(f.name, index=False)
 
             start_time = time.time()
-            result = await ecg_service.analyze_ecg_comprehensive(
+            result = await ecg_service_instance.analyze_ecg_comprehensive(
                 file_path=f.name, patient_id=123, analysis_id="PERF_001"
             )
             elapsed_time = time.time() - start_time
@@ -792,7 +792,7 @@ class TestECGMedicalSafety:
             )
             test_data.to_csv(f.name, index=False)
 
-            result = await ecg_service.analyze_ecg_comprehensive(
+            result = await ecg_service_instance.analyze_ecg_comprehensive(
                 file_path=f.name, patient_id=123, analysis_id="METADATA_001"
             )
 

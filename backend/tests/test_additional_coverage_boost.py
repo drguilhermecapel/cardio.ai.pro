@@ -278,7 +278,7 @@ async def test_ecg_service_get_analyses_by_patient(ecg_service):
         ]
         mock_get.return_value = mock_analyses
 
-        analyses = await ecg_service.get_analyses_by_patient(
+        analyses = await ecg_service_instance.get_analyses_by_patient(
             patient_id=1, limit=10, offset=0
         )
 
@@ -293,7 +293,7 @@ async def test_ecg_service_delete_analysis(ecg_service):
     ) as mock_delete:
         mock_delete.return_value = True
 
-        result = await ecg_service.delete_analysis(analysis_id=1)
+        result = await ecg_service_instance.delete_analysis(analysis_id=1)
 
         assert result is True
 
@@ -367,7 +367,7 @@ async def test_ecg_service_error_handling(ecg_service):
         mock_create.side_effect = Exception("Database error")
 
         with pytest.raises(Exception):
-            await ecg_service.create_analysis(
+            await ecg_service_instance.create_analysis(
                 patient_id=1,
                 file_path="/tmp/nonexistent.txt",
                 original_filename="nonexistent.txt",

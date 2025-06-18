@@ -114,7 +114,7 @@ def test_instantiate_key_classes():
         # Testar utils
         from app.utils.memory_monitor import MemoryMonitor
         monitor = MemoryMonitor()
-        memory_info = monitor.get_memory_info()
+        memory_info = monitor.get_memory_stats()
         assert "percent" in memory_info
         
     assert True

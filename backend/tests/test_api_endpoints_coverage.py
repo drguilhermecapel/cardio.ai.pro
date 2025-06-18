@@ -84,10 +84,10 @@ def mock_services():
             )
         )
 
-        mock_ecg_service.return_value.create_analysis = AsyncMock(
+        mock_ecg_service_instance.return_value.create_analysis = AsyncMock(
             return_value={"id": 1, "analysis_id": "ECG001", "status": "completed"}
         )
-        mock_ecg_service.return_value.get_analyses_by_patient = AsyncMock(
+        mock_ecg_service_instance.return_value.get_analyses_by_patient = AsyncMock(
             return_value=(
                 [{"id": 1, "analysis_id": "ECG001", "status": "completed"}],
                 1,
@@ -107,7 +107,7 @@ def mock_services():
         yield {
             "user": mock_user_service.return_value,
             "patient": mock_patient_service.return_value,
-            "ecg": mock_ecg_service.return_value,
+            "ecg": mock_ecg_service_instance.return_value,
             "validation": mock_validation_service.return_value,
             "notification": mock_notification_service.return_value,
         }

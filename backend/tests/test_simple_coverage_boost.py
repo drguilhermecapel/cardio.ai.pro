@@ -292,7 +292,7 @@ async def test_ecg_service_basic():
     """Test ECG service basic functionality."""
     from app.services.ecg_service import ECGAnalysisService
 
-    with patch("app.services.ecg_service.ECGRepository") as mock_repo_class:
+    with patch("app.services.ecg_service_instance.ECGRepository") as mock_repo_class:
         mock_repo = Mock()
         mock_repo_class.return_value = mock_repo
 

@@ -191,7 +191,7 @@ async def test_get_analysis_by_id(ecg_service, test_db):
     await test_db.commit()
     await test_db.refresh(analysis)
 
-    result = await ecg_service.get_analysis_by_id(analysis.id)
+    result = await ecg_service_instance.get_analysis_by_id(analysis.id)
 
     assert result is not None
     assert result.id == analysis.id
@@ -201,7 +201,7 @@ async def test_get_analysis_by_id(ecg_service, test_db):
 @pytest.mark.asyncio
 async def test_get_analysis_by_id_not_found(ecg_service):
     """Test retrieving non-existent ECG analysis."""
-    result = await ecg_service.get_analysis_by_id(99999)
+    result = await ecg_service_instance.get_analysis_by_id(99999)
     assert result is None
 
 
@@ -246,7 +246,7 @@ async def test_get_analyses_by_patient(ecg_service, test_db):
 
     await test_db.commit()
 
-    results = await ecg_service.get_analyses_by_patient(patient_id)
+    results = await ecg_service_instance.get_analyses_by_patient(patient_id)
 
     assert len(results) == 3
     assert all(r.patient_id == patient_id for r in results)
@@ -297,7 +297,7 @@ async def test_delete_analysis(ecg_service, test_db):
     await test_db.commit()
     await test_db.refresh(analysis)
 
-    success = await ecg_service.delete_analysis(analysis.id)
+    success = await ecg_service_instance.delete_analysis(analysis.id)
     assert success is True
 
 
@@ -375,9 +375,9 @@ async def test_generate_report(ecg_service, test_db):
     await test_db.refresh(analysis)
 
     with patch.object(
-        ecg_service.repository, "get_measurements_by_analysis"
+        ecg_service_instance.repository, "get_measurements_by_analysis"
     ) as mock_measurements, patch.object(
-        ecg_service.repository, "get_annotations_by_analysis"
+        ecg_service_instance.repository, "get_annotations_by_analysis"
     ) as mock_annotations:
 
         mock_measurements.return_value = [
@@ -402,7 +402,7 @@ async def test_generate_report(ecg_service, test_db):
             )
         ]
 
-        report = await ecg_service.generate_report(analysis.id)
+        report = await ecg_service_instance.generate_report(analysis.id)
 
     assert report is not None
     assert "report_id" in report
@@ -493,7 +493,7 @@ async def test_calculate_file_info(ecg_service):
         f.write("test ECG data content")
 
     try:
-        file_hash, file_size = await ecg_service._calculate_file_info(file_path)
+        file_hash, file_size = await ecg_service_instance._calculate_file_info(file_path)
 
         assert isinstance(file_hash, str)
         assert isinstance(file_size, int)
@@ -515,7 +515,7 @@ async def test_extract_measurements(ecg_service):
     with patch("scipy.signal.find_peaks") as mock_find_peaks:
         mock_find_peaks.return_value = (np.array([100, 600, 1100, 1600]), {})
 
-        measurements = ecg_service._extract_measurements(ecg_data, sample_rate)
+        measurements = ecg_service_instance._extract_measurements(ecg_data, sample_rate)
 
     assert "heart_rate" in measurements
     assert "qrs_duration" in measurements
@@ -544,7 +544,7 @@ async def test_generate_annotations(ecg_service):
     with patch("scipy.signal.find_peaks") as mock_find_peaks:
         mock_find_peaks.return_value = (np.array([100, 600, 1100]), {})
 
-        annotations = ecg_service._generate_annotations(
+        annotations = ecg_service_instance._generate_annotations(
             ecg_data, ai_results, sample_rate
         )
 
@@ -566,7 +566,7 @@ async def test_assess_clinical_urgency_critical(ecg_service):
     }
     measurements = {"heart_rate": 180, "qt_interval": 500, "qrs_duration": 150}
 
-    assessment = ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service_instance._assess_clinical_urgency(ai_results)
 
     assert assessment["urgency"] == ClinicalUrgency.CRITICAL
     assert assessment["critical"] == True
@@ -582,7 +582,7 @@ async def test_assess_clinical_urgency_high(ecg_service):
         "qrs_duration": 100,
     }
 
-    assessment = ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service_instance._assess_clinical_urgency(ai_results)
 
     assert assessment["urgency"] == ClinicalUrgency.HIGH
     assert assessment["critical"] == False
@@ -594,7 +594,7 @@ async def test_assess_clinical_urgency_normal(ecg_service):
     ai_results = {"predictions": {"normal": 0.95, "sinus_rhythm": 0.9}}
     measurements = {"heart_rate": 75, "qt_interval": 400, "qrs_duration": 100}
 
-    assessment = ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service_instance._assess_clinical_urgency(ai_results)
 
     assert assessment["urgency"] == ClinicalUrgency.LOW
     assert assessment["critical"] == False
@@ -604,19 +604,19 @@ async def test_assess_clinical_urgency_normal(ecg_service):
 async def test_get_normal_range(ecg_service):
     """Test getting normal ranges for measurements."""
     # Test amplitude measurement
-    range_v1 = ecg_service._get_normal_range("amplitude", "V1")
+    range_v1 = ecg_service_instance._get_normal_range("amplitude", "V1")
     assert range_v1["min"] == -1.0
     assert range_v1["max"] == 3.0
     assert range_v1["unit"] == "mV"
 
     # Test heart rate measurement
-    range_hr = ecg_service._get_normal_range("heart_rate", "")
+    range_hr = ecg_service_instance._get_normal_range("heart_rate", "")
     assert range_hr["min"] == 60
     assert range_hr["max"] == 100
     assert range_hr["unit"] == "bpm"
 
     # Test unknown measurement
-    range_unknown = ecg_service._get_normal_range("unknown_type", "")
+    range_unknown = ecg_service_instance._get_normal_range("unknown_type", "")
     assert range_unknown["min"] == 0
     assert range_unknown["max"] == 0
     assert range_unknown["unit"] == "unknown"
@@ -630,7 +630,7 @@ async def test_assess_quality_issues(ecg_service):
     analysis.noise_level = 0.4  # High noise
     analysis.baseline_wander = 0.3  # High baseline wander
 
-    issues = ecg_service._assess_quality_issues(analysis)
+    issues = ecg_service_instance._assess_quality_issues(analysis)
 
     assert "Low overall signal quality" in issues
     assert "High noise level detected" in issues
@@ -648,7 +648,7 @@ async def test_generate_clinical_interpretation_normal(ecg_service):
     analysis.primary_diagnosis = "Normal ECG"
     analysis.clinical_urgency = ClinicalUrgency.LOW
 
-    interpretation = ecg_service._generate_clinical_interpretation(analysis)
+    interpretation = ecg_service_instance._generate_clinical_interpretation(analysis)
 
     assert "Normal heart rate of 75 bpm" in interpretation
     assert "Normal sinus rhythm" in interpretation
@@ -665,7 +665,7 @@ async def test_generate_clinical_interpretation_abnormal(ecg_service):
     analysis.primary_diagnosis = "Atrial Fibrillation"
     analysis.clinical_urgency = ClinicalUrgency.HIGH
 
-    interpretation = ecg_service._generate_clinical_interpretation(analysis)
+    interpretation = ecg_service_instance._generate_clinical_interpretation(analysis)
 
     assert "Bradycardia" in interpretation
     assert "atrial_fibrillation" in interpretation
@@ -684,7 +684,7 @@ async def test_generate_medical_recommendations_normal(ecg_service):
     analysis.signal_quality_score = 0.9
     analysis.clinical_urgency = ClinicalUrgency.LOW
 
-    recommendations = ecg_service._generate_medical_recommendations(analysis)
+    recommendations = ecg_service_instance._generate_medical_recommendations(analysis)
 
     assert "Continue routine monitoring" in recommendations
     assert len(recommendations) >= 1
@@ -700,7 +700,7 @@ async def test_generate_medical_recommendations_critical(ecg_service):
     analysis.signal_quality_score = 0.9
     analysis.clinical_urgency = ClinicalUrgency.CRITICAL
 
-    recommendations = ecg_service._generate_medical_recommendations(analysis)
+    recommendations = ecg_service_instance._generate_medical_recommendations(analysis)
 
     assert "Consider pacemaker evaluation for severe bradycardia" in recommendations
     assert "Monitor for torsades de pointes risk" in recommendations
@@ -712,26 +712,26 @@ async def test_generate_medical_recommendations_critical(ecg_service):
 async def test_search_analyses_with_filters(ecg_service):
     """Test searching analyses with various filters."""
     mock_analyses = [Mock(), Mock()]
-    ecg_service.repository.search_analyses = AsyncMock(return_value=(mock_analyses, 2))
+    ecg_service_instance.repository.search_analyses = AsyncMock(return_value=(mock_analyses, 2))
 
     filters = {"patient_id": 1, "status": "completed", "diagnosis_category": "normal"}
 
-    result, total = await ecg_service.search_analyses(filters, 50, 0)
+    result, total = await ecg_service_instance.search_analyses(filters, 50, 0)
 
     assert len(result) == 2
     assert total == 2
-    ecg_service.repository.search_analyses.assert_called_once_with(filters, 50, 0)
+    ecg_service_instance.repository.search_analyses.assert_called_once_with(filters, 50, 0)
 
 
 @pytest.mark.asyncio
 async def test_create_analysis_error_handling(ecg_service):
     """Test error handling in create_analysis method."""
-    ecg_service.repository.create_analysis = AsyncMock(
+    ecg_service_instance.repository.create_analysis = AsyncMock(
         side_effect=Exception("Database error")
     )
 
     with pytest.raises(ECGProcessingException):
-        await ecg_service.create_analysis(
+        await ecg_service_instance.create_analysis(
             patient_id=1,
             file_path="/tmp/test.txt",
             original_filename="test.txt",
@@ -742,10 +742,10 @@ async def test_create_analysis_error_handling(ecg_service):
 @pytest.mark.asyncio
 async def test_generate_report_not_found(ecg_service):
     """Test generate_report when analysis is not found."""
-    ecg_service.repository.get_analysis_by_id = AsyncMock(return_value=None)
+    ecg_service_instance.repository.get_analysis_by_id = AsyncMock(return_value=None)
 
     with pytest.raises(ECGProcessingException, match="Analysis 999 not found"):
-        await ecg_service.generate_report(999)
+        await ecg_service_instance.generate_report(999)
 
 
 @pytest.mark.asyncio
@@ -760,23 +760,23 @@ async def test_process_analysis_async_success(ecg_service):
     mock_analysis.status = AnalysisStatus.PENDING
     mock_analysis.retry_count = 0
 
-    ecg_service.repository.get_analysis_by_id = AsyncMock(return_value=mock_analysis)
-    ecg_service.repository.update_analysis = AsyncMock(return_value=mock_analysis)
+    ecg_service_instance.repository.get_analysis_by_id = AsyncMock(return_value=mock_analysis)
+    ecg_service_instance.repository.update_analysis = AsyncMock(return_value=mock_analysis)
 
-    ecg_service.processor.load_ecg_data = AsyncMock(
+    ecg_service_instance.processor.load_ecg_data = AsyncMock(
         return_value=np.random.rand(5000, 12)
     )
-    ecg_service.ml_service.analyze_ecg = AsyncMock(
+    ecg_service_instance.ml_service.analyze_ecg = AsyncMock(
         return_value={"predictions": {"normal": 0.8}, "events": []}
     )
 
     with patch("scipy.signal.find_peaks") as mock_find_peaks:
         mock_find_peaks.return_value = (np.array([100, 600, 1100]), {})
 
-        await ecg_service._process_analysis_async(analysis_id)
+        await ecg_service_instance._process_analysis_async(analysis_id)
 
-    ecg_service.repository.get_analysis_by_id.assert_called_once_with(analysis_id)
-    assert ecg_service.repository.update_analysis.call_count >= 1
+    ecg_service_instance.repository.get_analysis_by_id.assert_called_once_with(analysis_id)
+    assert ecg_service_instance.repository.update_analysis.call_count >= 1
 
 
 @pytest.mark.asyncio
@@ -784,13 +784,13 @@ async def test_process_analysis_async_not_found(ecg_service):
     """Test async analysis processing when analysis not found."""
     analysis_id = "nonexistent_analysis"
 
-    ecg_service.repository.get_analysis_by_id = AsyncMock(return_value=None)
-    ecg_service.repository.update_analysis_status = AsyncMock()
-    ecg_service.repository.update_analysis = AsyncMock()
+    ecg_service_instance.repository.get_analysis_by_id = AsyncMock(return_value=None)
+    ecg_service_instance.repository.update_analysis_status = AsyncMock()
+    ecg_service_instance.repository.update_analysis = AsyncMock()
 
-    await ecg_service._process_analysis_async(analysis_id)
+    await ecg_service_instance._process_analysis_async(analysis_id)
 
-    ecg_service.repository.update_analysis.assert_called_once()
+    ecg_service_instance.repository.update_analysis.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -805,16 +805,16 @@ async def test_process_analysis_async_error_handling(ecg_service):
     mock_analysis.status = AnalysisStatus.PENDING
     mock_analysis.retry_count = 0
 
-    ecg_service.repository.get_analysis_by_id = AsyncMock(return_value=mock_analysis)
-    ecg_service.repository.update_analysis = AsyncMock(return_value=mock_analysis)
+    ecg_service_instance.repository.get_analysis_by_id = AsyncMock(return_value=mock_analysis)
+    ecg_service_instance.repository.update_analysis = AsyncMock(return_value=mock_analysis)
 
-    ecg_service.processor.load_ecg_data = AsyncMock(
+    ecg_service_instance.processor.load_ecg_data = AsyncMock(
         side_effect=Exception("File processing error")
     )
 
-    await ecg_service._process_analysis_async(analysis_id)
+    await ecg_service_instance._process_analysis_async(analysis_id)
 
-    update_calls = ecg_service.repository.update_analysis.call_args_list
+    update_calls = ecg_service_instance.repository.update_analysis.call_args_list
     assert len(update_calls) >= 1
     last_call_args = update_calls[-1][0]
     last_call_update_dict = update_calls[-1][0][1]
@@ -830,7 +830,7 @@ async def test_extract_measurements_edge_cases(ecg_service):
     with patch("scipy.signal.find_peaks") as mock_find_peaks:
         mock_find_peaks.return_value = (np.array([50]), {})  # Single peak
 
-        measurements = ecg_service._extract_measurements(ecg_data, sample_rate)
+        measurements = ecg_service_instance._extract_measurements(ecg_data, sample_rate)
 
     assert "detailed_measurements" in measurements
     assert len(measurements["detailed_measurements"]) > 0
@@ -838,7 +838,7 @@ async def test_extract_measurements_edge_cases(ecg_service):
     with patch("scipy.signal.find_peaks") as mock_find_peaks:
         mock_find_peaks.return_value = (np.array([]), {})  # No peaks
 
-        measurements = ecg_service._extract_measurements(ecg_data, sample_rate)
+        measurements = ecg_service_instance._extract_measurements(ecg_data, sample_rate)
 
     assert "detailed_measurements" in measurements
 
@@ -854,7 +854,7 @@ async def test_generate_annotations_edge_cases(ecg_service):
     with patch("scipy.signal.find_peaks") as mock_find_peaks:
         mock_find_peaks.return_value = (np.array([100, 300, 500]), {})
 
-        annotations = ecg_service._generate_annotations(
+        annotations = ecg_service_instance._generate_annotations(
             ecg_data, ai_results, sample_rate
         )
 
@@ -876,7 +876,7 @@ async def test_generate_annotations_edge_cases(ecg_service):
     with patch("scipy.signal.find_peaks") as mock_find_peaks:
         mock_find_peaks.return_value = (np.array([100, 300, 500]), {})
 
-        annotations = ecg_service._generate_annotations(
+        annotations = ecg_service_instance._generate_annotations(
             ecg_data, ai_results, sample_rate
         )
 
@@ -890,7 +890,7 @@ async def test_generate_annotations_edge_cases(ecg_service):
 async def test_assess_clinical_urgency_edge_cases(ecg_service):
     """Test clinical urgency assessment with edge cases."""
     ai_results = {"predictions": {}}
-    assessment = ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service_instance._assess_clinical_urgency(ai_results)
     assert assessment["urgency"] == ClinicalUrgency.LOW
     assert assessment["critical"] == False
 
@@ -901,7 +901,7 @@ async def test_assess_clinical_urgency_edge_cases(ecg_service):
             "cardiac_arrest": 0.7,
         }
     }
-    assessment = ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service_instance._assess_clinical_urgency(ai_results)
     assert assessment["urgency"] == ClinicalUrgency.CRITICAL
     assert assessment["critical"] == True
 
@@ -911,7 +911,7 @@ async def test_assess_clinical_urgency_edge_cases(ecg_service):
             "normal": 0.5,
         }
     }
-    assessment = ecg_service._assess_clinical_urgency(ai_results)
+    assessment = ecg_service_instance._assess_clinical_urgency(ai_results)
     assert assessment["urgency"] in [ClinicalUrgency.LOW, ClinicalUrgency.MEDIUM]
 
 
@@ -921,7 +921,7 @@ async def test_get_normal_range_comprehensive(ecg_service):
     leads = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
 
     for lead in leads:
-        range_info = ecg_service._get_normal_range("amplitude", lead)
+        range_info = ecg_service_instance._get_normal_range("amplitude", lead)
         assert "min" in range_info
         assert "max" in range_info
         assert "unit" in range_info
@@ -936,7 +936,7 @@ async def test_get_normal_range_comprehensive(ecg_service):
     ]
 
     for measurement_type in measurement_types:
-        range_info = ecg_service._get_normal_range(measurement_type, "")
+        range_info = ecg_service_instance._get_normal_range(measurement_type, "")
         assert "min" in range_info
         assert "max" in range_info
         assert "unit" in range_info
@@ -952,7 +952,7 @@ async def test_assess_quality_issues_comprehensive(ecg_service):
     analysis.noise_level = 0.0
     analysis.baseline_wander = 0.0
 
-    issues = ecg_service._assess_quality_issues(analysis)
+    issues = ecg_service_instance._assess_quality_issues(analysis)
     assert len(issues) == 0
 
     analysis = Mock()
@@ -960,7 +960,7 @@ async def test_assess_quality_issues_comprehensive(ecg_service):
     analysis.noise_level = 0.6  # High noise
     analysis.baseline_wander = 0.4  # High baseline wander
 
-    issues = ecg_service._assess_quality_issues(analysis)
+    issues = ecg_service_instance._assess_quality_issues(analysis)
     assert len(issues) >= 3
     assert any("Low overall signal quality" in issue for issue in issues)
     assert any("High noise level detected" in issue for issue in issues)
@@ -978,7 +978,7 @@ async def test_generate_medical_recommendations_comprehensive(ecg_service):
     analysis.signal_quality_score = 0.9
     analysis.clinical_urgency = ClinicalUrgency.LOW
 
-    recommendations = ecg_service._generate_medical_recommendations(analysis)
+    recommendations = ecg_service_instance._generate_medical_recommendations(analysis)
     assert "Continue current medication" in recommendations
     assert "Follow up in 6 months" in recommendations
 
@@ -989,7 +989,7 @@ async def test_generate_medical_recommendations_comprehensive(ecg_service):
     analysis.signal_quality_score = 0.4  # Poor quality
     analysis.clinical_urgency = ClinicalUrgency.CRITICAL
 
-    recommendations = ecg_service._generate_medical_recommendations(analysis)
+    recommendations = ecg_service_instance._generate_medical_recommendations(analysis)
     assert len(recommendations) >= 4
     assert any("pacemaker" in rec.lower() for rec in recommendations)
     assert any("torsades" in rec.lower() for rec in recommendations)

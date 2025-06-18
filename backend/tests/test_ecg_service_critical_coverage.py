@@ -115,7 +115,7 @@ class TestECGServiceCriticalPaths:
             metadata=sample_ecg_data["metadata"],
         )
 
-        result = await ecg_service.create_analysis(
+        result = await ecg_service_instance.create_analysis(
             analysis_data=analysis_data, user_id=1
         )
 
@@ -139,7 +139,7 @@ class TestECGServiceCriticalPaths:
         }
 
         for file_type, data in formats_data.items():
-            with patch("app.services.ecg_service.ECGProcessor") as MockProcessor:
+            with patch("app.services.ecg_service_instance.ECGProcessor") as MockProcessor:
                 mock_processor = Mock()
                 mock_processor.load_ecg.return_value = (
                     np.random.randn(5000, 12),
@@ -148,7 +148,7 @@ class TestECGServiceCriticalPaths:
                 )
                 MockProcessor.return_value = mock_processor
 
-                result = await ecg_service._process_ecg_file(
+                result = await ecg_service_instance._process_ecg_file(
                     file_path=f"/test/ecg.{file_type.value}", file_type=file_type
                 )
 
@@ -187,7 +187,7 @@ class TestECGServiceCriticalPaths:
         ]
 
         for case in test_cases:
-            result = await ecg_service._validate_signal_quality(case["signal"])
+            result = await ecg_service_instance._validate_signal_quality(case["signal"])
 
             assert result["is_valid"] == case["expected_valid"]
             if case["expected_issues"]:
@@ -216,7 +216,7 @@ class TestECGServiceCriticalPaths:
             )
 
             # Test urgency assessment
-            urgency = await ecg_service._assess_clinical_urgency(
+            urgency = await ecg_service_instance._assess_clinical_urgency(
                 diagnosis=condition, confidence=0.95, features={"heart_rate": 180}
             )
 
@@ -224,7 +224,7 @@ class TestECGServiceCriticalPaths:
 
             # Test critical alert would be sent
             with patch.object(ecg_service, "_send_critical_alert") as mock_alert:
-                await ecg_service._handle_critical_findings(mock_analysis)
+                await ecg_service_instance._handle_critical_findings(mock_analysis)
                 mock_alert.assert_called_once()
 
     @pytest.mark.asyncio
@@ -243,7 +243,7 @@ class TestECGServiceCriticalPaths:
         }
 
         # Should fall back to multi-pathology service
-        result = await ecg_service._run_ml_analysis(
+        result = await ecg_service_instance._run_ml_analysis(
             signal=np.random.randn(5000, 12),
             features={"heart_rate": 75},
             preprocessing_quality={"snr": 20},
@@ -276,7 +276,7 @@ class TestECGServiceCriticalPaths:
 
         # Process concurrently
         tasks = [
-            ecg_service.process_analysis_async(f"CONCURRENT_{i}")
+            ecg_service_instance.process_analysis_async(f"CONCURRENT_{i}")
             for i in range(num_concurrent)
         ]
 
@@ -306,7 +306,7 @@ class TestECGServiceCriticalPaths:
 
             for i in range(0, len(large_signal), chunk_size):
                 chunk = large_signal[i : i + chunk_size]
-                result = await ecg_service._validate_signal_quality(chunk)
+                result = await ecg_service_instance._validate_signal_quality(chunk)
                 results.append(result)
 
             # Verify chunked processing worked
@@ -355,7 +355,7 @@ class TestECGServiceCriticalPaths:
         )
 
         # Generate report
-        report = await ecg_service.generate_report("REPORT_TEST")
+        report = await ecg_service_instance.generate_report("REPORT_TEST")
 
         # Verify comprehensive report
         assert report["analysis_id"] == "REPORT_TEST"
@@ -402,7 +402,7 @@ class TestECGServiceCriticalPaths:
 
             # Create service with preprocessor
             service = ECGAnalysisService(
-                db=ecg_service.db, ecg_repository=ecg_service.ecg_repository
+                db=ecg_service_instance.db, ecg_repository=ecg_service_instance.ecg_repository
             )
 
             # Mock the preprocessor attribute
@@ -423,7 +423,7 @@ class TestECGServiceMedicalCompliance:
     async def test_fda_compliant_validation(self, ecg_service):
         """Test FDA-compliant validation requirements"""
         # Test required measurements
-        measurements = await ecg_service._extract_measurements(
+        measurements = await ecg_service_instance._extract_measurements(
             features={
                 "heart_rate": 75,
                 "pr_interval": 160,
@@ -472,7 +472,7 @@ class TestECGServiceMedicalCompliance:
         ]
 
         for scenario in test_scenarios:
-            recommendations = await ecg_service._generate_medical_recommendations(
+            recommendations = await ecg_service_instance._generate_medical_recommendations(
                 diagnosis=scenario["diagnosis"],
                 confidence=0.95,
                 features=scenario["features"],
@@ -516,7 +516,7 @@ class TestECGServiceMedicalCompliance:
                 id=1, analysis_id="AUDIT123", status=AnalysisStatus.COMPLETED
             )
 
-            result = await ecg_service.create_analysis(analysis_data, user_id=1)
+            result = await ecg_service_instance.create_analysis(analysis_data, user_id=1)
 
             # Verify audit trail created
             # Note: Actual implementation would call these

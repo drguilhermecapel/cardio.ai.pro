@@ -63,7 +63,7 @@ async def test_ecg_endpoints_missing_lines_90_107():
         mock_user = Mock(id=2, is_superuser=False)
         mock_user_service.return_value.get_current_user.return_value = mock_user
 
-        mock_ecg_service.return_value.repository.get_analysis_by_analysis_id.return_value = (
+        mock_ecg_service_instance.return_value.repository.get_analysis_by_analysis_id.return_value = (
             None
         )
 
@@ -73,7 +73,7 @@ async def test_ecg_endpoints_missing_lines_90_107():
         assert response.status_code in [401, 404]
 
         mock_analysis = Mock(created_by=1)  # Different user
-        mock_ecg_service.return_value.repository.get_analysis_by_analysis_id.return_value = (
+        mock_ecg_service_instance.return_value.repository.get_analysis_by_analysis_id.return_value = (
             mock_analysis
         )
 

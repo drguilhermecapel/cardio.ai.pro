@@ -252,7 +252,7 @@ async def test_ecg_endpoints_comprehensive(client, auth_headers):
         return_value=mock_user,
     ):
         # Test upload ECG
-        with patch("app.services.ecg_service.ECGAnalysisService") as mock_service_class:
+        with patch("app.services.ecg_service_instance.ECGAnalysisService") as mock_service_class:
             mock_service = Mock()
             mock_service_class.return_value = mock_service
 
@@ -471,7 +471,7 @@ async def test_comprehensive_workflow(client, auth_headers):
         "app.api.v1.endpoints.ecg_analysis.get_current_active_user",
         return_value=mock_user,
     ):
-        with patch("app.services.ecg_service.ECGAnalysisService") as mock_service_class:
+        with patch("app.services.ecg_service_instance.ECGAnalysisService") as mock_service_class:
             mock_service = Mock()
             mock_service_class.return_value = mock_service
 

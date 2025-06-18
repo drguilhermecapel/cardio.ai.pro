@@ -73,7 +73,7 @@ async def test_ecg_service_error_handling():
         db=mock_db, ml_service=mock_ml, validation_service=mock_validation
     )
 
-    with patch("app.services.ecg_service.ECGRepository") as mock_repo_class:
+    with patch("app.services.ecg_service_instance.ECGRepository") as mock_repo_class:
         mock_repo = Mock()
         mock_repo_class.return_value = mock_repo
         mock_repo.get_analysis_by_id = AsyncMock(return_value=None)
@@ -364,7 +364,7 @@ async def test_ecg_service_additional_methods():
         db=mock_db, ml_service=mock_ml, validation_service=mock_validation
     )
 
-    with patch("app.services.ecg_service.ECGRepository") as mock_repo_class:
+    with patch("app.services.ecg_service_instance.ECGRepository") as mock_repo_class:
         mock_repo = Mock()
         mock_repo_class.return_value = mock_repo
         service.repository = mock_repo

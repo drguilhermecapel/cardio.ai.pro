@@ -32,7 +32,7 @@ def test_ecg_upload_file_validation_comprehensive():
     with patch(
         "app.services.user_service.UserService.get_current_user"
     ) as mock_get_user, patch(
-        "app.services.ecg_service.ECGAnalysisService"
+        "app.services.ecg_service_instance.ECGAnalysisService"
     ) as mock_ecg_service:
 
         mock_user = Mock()
@@ -57,7 +57,7 @@ def test_ecg_get_analysis_authorization():
     with patch(
         "app.services.user_service.UserService.get_current_user"
     ) as mock_get_user, patch(
-        "app.services.ecg_service.ECGAnalysisService"
+        "app.services.ecg_service_instance.ECGAnalysisService"
     ) as mock_ecg_service:
 
         mock_user = Mock()
@@ -65,7 +65,7 @@ def test_ecg_get_analysis_authorization():
         mock_user.is_superuser = False
         mock_get_user.return_value = mock_user
 
-        mock_ecg_service.return_value.repository.get_analysis_by_analysis_id.return_value = (
+        mock_ecg_service_instance.return_value.repository.get_analysis_by_analysis_id.return_value = (
             None
         )
 
@@ -82,7 +82,7 @@ def test_ecg_search_with_comprehensive_filters():
     with patch(
         "app.services.user_service.UserService.get_current_user"
     ) as mock_get_user, patch(
-        "app.services.ecg_service.ECGAnalysisService"
+        "app.services.ecg_service_instance.ECGAnalysisService"
     ) as mock_ecg_service:
 
         mock_user = Mock()
@@ -90,7 +90,7 @@ def test_ecg_search_with_comprehensive_filters():
         mock_user.is_superuser = False
         mock_get_user.return_value = mock_user
 
-        mock_ecg_service.return_value.search_analyses.return_value = ([], 0)
+        mock_ecg_service_instance.return_value.search_analyses.return_value = ([], 0)
 
         search_data = {
             "patient_id": 1,
@@ -118,7 +118,7 @@ def test_ecg_measurements_and_annotations_endpoints():
     with patch(
         "app.services.user_service.UserService.get_current_user"
     ) as mock_get_user, patch(
-        "app.services.ecg_service.ECGAnalysisService"
+        "app.services.ecg_service_instance.ECGAnalysisService"
     ) as mock_ecg_service:
 
         mock_user = Mock()
@@ -129,14 +129,14 @@ def test_ecg_measurements_and_annotations_endpoints():
         mock_analysis = Mock()
         mock_analysis.id = 1
         mock_analysis.created_by = 1
-        mock_ecg_service.return_value.repository.get_analysis_by_analysis_id.return_value = (
+        mock_ecg_service_instance.return_value.repository.get_analysis_by_analysis_id.return_value = (
             mock_analysis
         )
 
-        mock_ecg_service.return_value.repository.get_measurements_by_analysis.return_value = (
+        mock_ecg_service_instance.return_value.repository.get_measurements_by_analysis.return_value = (
             []
         )
-        mock_ecg_service.return_value.repository.get_annotations_by_analysis.return_value = (
+        mock_ecg_service_instance.return_value.repository.get_annotations_by_analysis.return_value = (
             []
         )
 
@@ -154,7 +154,7 @@ def test_ecg_delete_analysis_endpoint():
     with patch(
         "app.services.user_service.UserService.get_current_user"
     ) as mock_get_user, patch(
-        "app.services.ecg_service.ECGAnalysisService"
+        "app.services.ecg_service_instance.ECGAnalysisService"
     ) as mock_ecg_service:
 
         mock_user = Mock()
@@ -165,10 +165,10 @@ def test_ecg_delete_analysis_endpoint():
         mock_analysis = Mock()
         mock_analysis.id = 1
         mock_analysis.created_by = 1
-        mock_ecg_service.return_value.repository.get_analysis_by_analysis_id.return_value = (
+        mock_ecg_service_instance.return_value.repository.get_analysis_by_analysis_id.return_value = (
             mock_analysis
         )
-        mock_ecg_service.return_value.delete_analysis.return_value = True
+        mock_ecg_service_instance.return_value.delete_analysis.return_value = True
 
         response = client.delete(
             "/api/v1/ecg/test123", headers={"Authorization": "Bearer token"}
@@ -183,7 +183,7 @@ def test_ecg_critical_pending_analyses():
     with patch(
         "app.services.user_service.UserService.get_current_user"
     ) as mock_get_user, patch(
-        "app.services.ecg_service.ECGAnalysisService"
+        "app.services.ecg_service_instance.ECGAnalysisService"
     ) as mock_ecg_service:
 
         mock_user = Mock()
@@ -191,7 +191,7 @@ def test_ecg_critical_pending_analyses():
         mock_user.role = "physician"
         mock_get_user.return_value = mock_user
 
-        mock_ecg_service.return_value.repository.get_critical_analyses.return_value = []
+        mock_ecg_service_instance.return_value.repository.get_critical_analyses.return_value = []
 
         response = client.get(
             "/api/v1/ecg/critical/pending", headers={"Authorization": "Bearer token"}

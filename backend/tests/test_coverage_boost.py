@@ -295,9 +295,9 @@ class TestAsyncComponents:
 
         # ECG Service
         ecg_service = ECGAnalysisService(mock_db, Mock(), Mock())
-        with patch("app.services.ecg_service.ECGProcessor"):
-            with patch("app.services.ecg_service.ECGRepository"):
-                result = await ecg_service.analyze_ecg(mock_file, 1)
+        with patch("app.services.ecg_service_instance.ECGProcessor"):
+            with patch("app.services.ecg_service_instance.ECGRepository"):
+                result = await ecg_service_instance.analyze_ecg(mock_file, 1)
 
         # ML Model Service
         ml_service = MLModelService()

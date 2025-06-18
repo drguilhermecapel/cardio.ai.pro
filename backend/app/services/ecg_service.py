@@ -1004,7 +1004,7 @@ class ECGAnalysisService:
     
     async def create_analysis(self, data: dict, user_id: int):
         """Create new analysis."""
-        return {"id": 1, "status": "
+        return {"id": 1, "status": "completed"}
 
     async def get_analyses_by_patient(self, patient_id: int, limit: int = 50, offset: int = 0):
         """Recupera análises de ECG por paciente."""

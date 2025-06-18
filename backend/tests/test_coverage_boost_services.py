@@ -79,7 +79,7 @@ def user_service(test_db):
 async def test_ecg_service_create_analysis_comprehensive(ecg_service, test_db):
     """Test comprehensive ECG analysis creation."""
     with patch("app.utils.ecg_processor.ECGProcessor") as mock_processor, patch(
-        "app.services.ecg_service.ECGAnalysisService._calculate_file_info"
+        "app.services.ecg_service_instance.ECGAnalysisService._calculate_file_info"
     ) as mock_file_info, patch("os.path.exists", return_value=True):
 
         mock_file_info.return_value = ("test_hash", 1024)
@@ -103,7 +103,7 @@ async def test_ecg_service_create_analysis_comprehensive(ecg_service, test_db):
             ],
         }
 
-        result = await ecg_service.create_analysis(
+        result = await ecg_service_instance.create_analysis(
             patient_id=1,
             file_path="/tmp/test_ecg.txt",
             original_filename="test_ecg.txt",
@@ -153,7 +153,7 @@ async def test_ecg_service_search_analyses_comprehensive(ecg_service, test_db):
 
     await test_db.commit()
 
-    results, total = await ecg_service.search_analyses(
+    results, total = await ecg_service_instance.search_analyses(
         filters={"status": "completed"}, limit=10, offset=0
     )
 
@@ -200,7 +200,7 @@ async def test_ecg_service_get_analysis_statistics(ecg_service, test_db):
 
     await test_db.commit()
 
-    analyses = await ecg_service.get_analyses_by_patient(
+    analyses = await ecg_service_instance.get_analyses_by_patient(
         patient_id=1, limit=10, offset=0
     )
 

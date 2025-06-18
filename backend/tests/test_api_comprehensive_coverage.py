@@ -146,7 +146,7 @@ async def test_patients_endpoints_comprehensive(client, auth_headers):
 @pytest.mark.asyncio
 async def test_ecg_analysis_endpoints_comprehensive(client, auth_headers):
     """Test all ECG analysis endpoints for coverage."""
-    with patch("app.services.ecg_service.ECGAnalysisService") as mock_service:
+    with patch("app.services.ecg_service_instance.ECGAnalysisService") as mock_service:
         mock_analysis = {"id": 1, "analysis_id": "ECG001", "status": "completed"}
 
         mock_service.return_value.create_analysis = AsyncMock(

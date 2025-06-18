@@ -328,7 +328,7 @@ class TestServices:
         mock_file.filename = "test.csv"
         mock_file.file.read = AsyncMock(return_value=b"ecg,data")
 
-        with patch("app.services.ecg_service.ECGProcessor") as mock_processor:
+        with patch("app.services.ecg_service_instance.ECGProcessor") as mock_processor:
             processor_instance = Mock()
             processor_instance.load_ecg_file = AsyncMock()
             processor_instance.preprocess_signal = AsyncMock(
@@ -344,7 +344,7 @@ class TestServices:
             )
 
             # Mock repository
-            with patch("app.services.ecg_service.ECGRepository") as mock_repo:
+            with patch("app.services.ecg_service_instance.ECGRepository") as mock_repo:
                 repo_instance = Mock()
                 repo_instance.create_analysis = AsyncMock(return_value=Mock(id=1))
                 mock_repo.return_value = repo_instance

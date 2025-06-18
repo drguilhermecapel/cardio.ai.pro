@@ -45,7 +45,7 @@ async def test_ecg_endpoints_missing_coverage(client, auth_headers):
         assert response.status_code in [400, 401, 422]
 
         mock_analysis = Mock(created_by=999)  # Different user
-        mock_ecg_service.return_value.repository.get_analysis_by_analysis_id.return_value = (
+        mock_ecg_service_instance.return_value.repository.get_analysis_by_analysis_id.return_value = (
             mock_analysis
         )
 

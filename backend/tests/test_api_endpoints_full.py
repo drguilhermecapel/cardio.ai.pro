@@ -269,7 +269,7 @@ async def test_ecg_endpoints_comprehensive(client, auth_headers):
         return_value=mock_user,
     ):
         # Test upload ECG
-        with patch("app.services.ecg_service.ECGAnalysisService") as mock_service_class:
+        with patch("app.services.ecg_service_instance.ECGAnalysisService") as mock_service_class:
             mock_service = Mock()
             mock_service_class.return_value = mock_service
 
@@ -294,7 +294,7 @@ async def test_ecg_endpoints_comprehensive(client, auth_headers):
                 assert response.status_code in [200, 201]
 
         # Test get analysis
-        with patch("app.services.ecg_service.ECGAnalysisService") as mock_service_class:
+        with patch("app.services.ecg_service_instance.ECGAnalysisService") as mock_service_class:
             mock_service = Mock()
             mock_service_class.return_value = mock_service
             mock_service.get_analysis = AsyncMock(return_value=mock_analysis)
@@ -309,7 +309,7 @@ async def test_ecg_endpoints_comprehensive(client, auth_headers):
                 assert response.status_code == 200
 
         # Test list analyses
-        with patch("app.services.ecg_service.ECGAnalysisService") as mock_service_class:
+        with patch("app.services.ecg_service_instance.ECGAnalysisService") as mock_service_class:
             mock_service = Mock()
             mock_service_class.return_value = mock_service
             mock_service.get_analyses = AsyncMock(return_value=[])
@@ -583,7 +583,7 @@ async def test_comprehensive_workflow(client, auth_headers):
         "app.api.v1.endpoints.ecg_analysis.get_current_active_user",
         return_value=mock_user,
     ):
-        with patch("app.services.ecg_service.ECGAnalysisService") as mock_service_class:
+        with patch("app.services.ecg_service_instance.ECGAnalysisService") as mock_service_class:
             mock_service = Mock()
             mock_service_class.return_value = mock_service
 

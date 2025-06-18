@@ -123,7 +123,7 @@ class TestImportantModulesCoverage:
     
     def test_ecg_service_missing_methods(self):
         """Testa métodos faltantes do ECGService (50.76% -> 80%+)"""
-        with patch('app.services.ecg_service.ECGAnalysisService') as mock_service:
+        with patch('app.services.ecg_service_instance.ECGAnalysisService') as mock_service:
             mock_instance = MagicMock()
             mock_service.return_value = mock_instance
             

@@ -293,11 +293,11 @@ async def test_async_service_methods():
         validation_service = ValidationService(mock_db, mock_notification_service)
         assert validation_service is not None
 
-        ecg_service.repository.get_analysis_by_id = AsyncMock(
+        ecg_service_instance.repository.get_analysis_by_id = AsyncMock(
             side_effect=Exception("DB error")
         )
         try:
-            await ecg_service.get_analysis_by_id(999)
+            await ecg_service_instance.get_analysis_by_id(999)
         except Exception:
             pass
 

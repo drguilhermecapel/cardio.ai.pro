@@ -47,15 +47,15 @@ async def test_ecg_service_comprehensive_coverage(mock_db, mock_notification_ser
     validation_service = ValidationService(mock_db, mock_notification_service)
     ecg_service = ECGAnalysisService(mock_db, ml_service, validation_service)
 
-    ecg_service.repository = Mock()
-    ecg_service.repository.create_analysis = AsyncMock(return_value=Mock(id=1))
-    ecg_service.repository.get_analysis_by_id = AsyncMock(return_value=Mock(id=1))
-    ecg_service.repository.get_analyses_by_patient = AsyncMock(
+    ecg_service_instance.repository = Mock()
+    ecg_service_instance.repository.create_analysis = AsyncMock(return_value=Mock(id=1))
+    ecg_service_instance.repository.get_analysis_by_id = AsyncMock(return_value=Mock(id=1))
+    ecg_service_instance.repository.get_analyses_by_patient = AsyncMock(
         return_value=([Mock()], 1)
     )
-    ecg_service.repository.search_analyses = AsyncMock(return_value=([Mock()], 1))
-    ecg_service.repository.update_analysis = AsyncMock(return_value=Mock(id=1))
-    ecg_service.repository.delete_analysis = AsyncMock(return_value=True)
+    ecg_service_instance.repository.search_analyses = AsyncMock(return_value=([Mock()], 1))
+    ecg_service_instance.repository.update_analysis = AsyncMock(return_value=Mock(id=1))
+    ecg_service_instance.repository.delete_analysis = AsyncMock(return_value=True)
 
     with patch("app.utils.ecg_processor.ECGProcessor") as mock_processor, patch.object(
         ecg_service, "_calculate_file_info", return_value=("mock_hash", 1024)
@@ -69,7 +69,7 @@ async def test_ecg_service_comprehensive_coverage(mock_db, mock_notification_ser
             "leads_count": 12,
         }
 
-        result = await ecg_service.create_analysis(
+        result = await ecg_service_instance.create_analysis(
             patient_id=1,
             file_path="/test/path.txt",
             original_filename="test.txt",
@@ -77,20 +77,20 @@ async def test_ecg_service_comprehensive_coverage(mock_db, mock_notification_ser
         )
     assert result is not None
 
-    result = await ecg_service.get_analysis_by_id(1)
+    result = await ecg_service_instance.get_analysis_by_id(1)
     assert result is not None
 
-    result = await ecg_service.get_analyses_by_patient(1, limit=10, offset=0)
+    result = await ecg_service_instance.get_analyses_by_patient(1, limit=10, offset=0)
     assert len(result) == 2  # (analyses, total)
 
     filters = {"status": "completed"}
-    result = await ecg_service.search_analyses(filters, limit=10, offset=0)
+    result = await ecg_service_instance.search_analyses(filters, limit=10, offset=0)
     assert len(result) == 2
 
-    result = await ecg_service.get_analysis_by_id(1)
+    result = await ecg_service_instance.get_analysis_by_id(1)
     assert result is not None
 
-    result = await ecg_service.delete_analysis(1)
+    result = await ecg_service_instance.delete_analysis(1)
     assert result is True
 
 
