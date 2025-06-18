@@ -213,3 +213,37 @@ __all__ = [
     "MemoryException",
     "get_http_status_code",
 ]
+
+class MultiPathologyException(Exception):
+    """Custom exception."""
+    pass
+
+class PermissionDeniedException(Exception):
+    """Custom exception."""
+    pass
+class BaseException(Exception):
+    pass
+
+class MultiPathologyException(BaseException):
+    pass
+
+class NotFoundException(BaseException):
+    pass
+
+class PermissionDeniedException(BaseException):
+    pass
+
+class ValidationException(BaseException):
+    pass
+
+class ECGProcessingException(BaseException):
+    pass
+
+class ConflictException(Exception):
+    pass
+
+class UnauthorizedException(Exception):
+    pass
+
+class BadRequestException(Exception):
+    pass

@@ -1,4 +1,4 @@
-"""
+﻿"""
 Core Configuration
 Central configuration for CardioAI Pro system
 """
@@ -12,7 +12,18 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    STANDALONE_MODE: bool = True
     """Application settings"""
+    # Testing
+    # Standalone mode
+    STANDALONE_MODE: bool = True
+
+    TESTING: bool = False
+    
+    # JWT Settings
+    JWT_SECRET_KEY: str = 'your-jwt-secret-key'
+    JWT_ALGORITHM: str = 'HS256'
+
     
     # App Info
     APP_NAME: str = "CardioAI Pro"
@@ -210,3 +221,4 @@ ALGORITHM = settings.ALGORITHM
 # Ensure required directories exist
 for directory in [settings.LOGS_DIR, settings.REPORTS_DIR, settings.STATIC_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
+

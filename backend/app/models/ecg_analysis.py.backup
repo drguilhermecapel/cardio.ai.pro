@@ -163,8 +163,8 @@ class ECGAnalysis(Base):
         nullable=True
     )
     
-    # Additional analysis_metadata
-    analysis_metadata: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+    # Additional metadata
+    metadata: Mapped[Optional[Dict[str, Any]]] = mapped_column(
         JSON,
         nullable=True
     )
@@ -270,7 +270,7 @@ class ECGAnalysis(Base):
             "validated": self.validated,
             "validated_by": str(self.validated_by) if self.validated_by else None,
             "validation_date": self.validation_date.isoformat() if self.validation_date else None,
-            "analysis_metadata": self.analysis_metadata,
+            "metadata": self.metadata,
             "error_message": self.error_message,
             "is_urgent": self.is_urgent,
             "is_completed": self.is_completed,
