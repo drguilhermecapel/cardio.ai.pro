@@ -5,6 +5,10 @@ from typing import Tuple
 import unittest
 from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 class ECGTestGenerator:
     """Gerador de ECG sintético corrigido para testes"""

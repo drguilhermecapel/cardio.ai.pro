@@ -1,6 +1,10 @@
 import pytest
 from app.core.config import settings
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 def test_config_initialization():
     """Test configuration initialization."""

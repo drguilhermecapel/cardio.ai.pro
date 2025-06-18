@@ -2,6 +2,10 @@
 Medical-Grade Tests for Celery Configuration Module
 Target: 70%+ Coverage for Auxiliary Module
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 Focus Areas:
 - Celery app configuration and initialization
 - Task routing and serialization settings

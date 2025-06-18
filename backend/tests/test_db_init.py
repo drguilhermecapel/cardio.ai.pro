@@ -2,6 +2,10 @@ import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 from app.core.config import settings
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 if settings.STANDALONE_MODE:
     pytest.skip(
         "Database init tests skipped in standalone mode", allow_module_level=True

@@ -4,6 +4,10 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 import numpy as np
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 class TestLowCoverageModules:
     """Testes para módulos com menos de 30% de cobertura"""

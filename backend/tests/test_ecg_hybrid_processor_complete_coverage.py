@@ -3,6 +3,10 @@ Medical-Grade Tests for ECG Hybrid Processor - 85%+ Coverage Target
 Regulatory Compliance: FDA, ISO 13485, EU MDR, ANVISA
 """
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 import asyncio
 from unittest.mock import Mock, patch, AsyncMock

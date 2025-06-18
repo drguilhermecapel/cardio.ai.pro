@@ -10,6 +10,10 @@ from app.core.constants import (
     ECGLeads,
 )
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 def test_user_roles_enum():
     """Test UserRoles enum values."""

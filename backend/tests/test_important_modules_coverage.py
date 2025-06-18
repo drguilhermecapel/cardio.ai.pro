@@ -5,6 +5,10 @@ from unittest.mock import Mock, patch, MagicMock, AsyncMock
 import numpy as np
 from datetime import datetime
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 class TestImportantModulesCoverage:
     """Testes para módulos críticos do sistema"""

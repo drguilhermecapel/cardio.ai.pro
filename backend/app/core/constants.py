@@ -83,6 +83,7 @@ class FileType(str, Enum):
     """Supported file types."""
 
     CSV = "csv"
+    EDF = "edf"
     PDF = "application/pdf"
     JPEG = "image/jpeg"
     PNG = "image/png"

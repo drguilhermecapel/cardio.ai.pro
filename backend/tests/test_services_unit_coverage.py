@@ -1,5 +1,9 @@
 """Unit Tests for Services - Focus on 80%+ Coverage."""
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 import pytest_asyncio
 from unittest.mock import Mock, AsyncMock, patch

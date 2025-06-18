@@ -30,7 +30,7 @@ def get_memory_usage() -> dict:
         return {
             "rss_mb": memory_info.rss / 1024 / 1024,
             "vms_mb": memory_info.vms / 1024 / 1024,
-            "percent": process.memory_percent(),
+            "percent": process.memory_percent, "process_memory_mb": memory_mb(),
             "available_mb": psutil.virtual_memory().available / 1024 / 1024
         }
     except ImportError:

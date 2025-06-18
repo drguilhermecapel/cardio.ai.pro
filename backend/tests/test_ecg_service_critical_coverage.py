@@ -2,6 +2,10 @@
 Critical tests for ECG Service to achieve 100% coverage on critical paths
 """
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 import numpy as np
 from unittest.mock import Mock, AsyncMock, patch, MagicMock

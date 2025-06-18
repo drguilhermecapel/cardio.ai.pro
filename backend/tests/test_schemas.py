@@ -6,6 +6,10 @@ from app.schemas.ecg_analysis import ECGAnalysisCreate, ECGAnalysisUpdate
 from app.schemas.notification import NotificationCreate, NotificationUpdate
 from app.schemas.validation import ValidationCreate, ValidationUpdate
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 def test_user_create_schema():
     """Test UserCreate schema validation."""

@@ -1,5 +1,9 @@
 """Comprehensive test coverage boost for services to reach 80%."""
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 from datetime import datetime, date, timezone
 from unittest.mock import Mock, AsyncMock, patch

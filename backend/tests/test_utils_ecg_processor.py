@@ -3,6 +3,10 @@ import numpy as np
 from unittest.mock import patch, MagicMock, AsyncMock
 from app.utils.ecg_processor import ECGProcessor
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 def test_ecg_processor_initialization():
     """Test ECG processor initialization."""

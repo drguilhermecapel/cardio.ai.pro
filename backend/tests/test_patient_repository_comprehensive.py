@@ -6,6 +6,10 @@ from app.models.patient import Patient
 from app.schemas.patient import PatientCreate, PatientUpdate
 from datetime import date
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 class TestPatientRepositoryComprehensive:
     """Comprehensive test coverage for PatientRepository to reach 80% coverage"""

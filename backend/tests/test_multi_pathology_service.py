@@ -3,6 +3,10 @@ Comprehensive tests for MultiPathologyService
 Tests hierarchical pathology detection with 71 SCP-ECG conditions
 """
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 import numpy as np
 from unittest.mock import Mock, patch

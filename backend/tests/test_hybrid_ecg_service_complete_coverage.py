@@ -4,6 +4,10 @@ Target: 95%+ coverage for critical medical module
 Compliance: FDA CFR 21 Part 820, ISO 13485, EU MDR 2017/745, ANVISA RDC 185/2001
 """
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 import numpy as np
 import pandas as pd

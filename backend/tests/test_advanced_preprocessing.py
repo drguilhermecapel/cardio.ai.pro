@@ -2,6 +2,10 @@
 Test suite for advanced ECG preprocessing pipeline
 """
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import numpy as np
 import pytest
 from app.preprocessing import AdvancedECGPreprocessor, EnhancedSignalQualityAnalyzer

@@ -1,5 +1,9 @@
 """Test patient service."""
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 from datetime import date
 from unittest.mock import AsyncMock, Mock

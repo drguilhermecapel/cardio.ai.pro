@@ -1,5 +1,9 @@
 """Testes para garantir cobertura das exceções personalizadas."""
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 from app.core.exceptions import (
     CardioAIException,

@@ -5,6 +5,10 @@ from unittest.mock import Mock, patch, MagicMock, mock_open
 import os
 import sys
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 class TestZeroCoverageModules:
     """Testes para aumentar cobertura de módulos com 0%"""
     

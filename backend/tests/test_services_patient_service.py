@@ -3,6 +3,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from datetime import date
 from app.core.config import settings
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 if settings.STANDALONE_MODE:
     pytest.skip(
         "Patient service tests skipped in standalone mode", allow_module_level=True

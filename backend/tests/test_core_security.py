@@ -3,6 +3,10 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta
 from app.core.config import settings
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 if settings.STANDALONE_MODE:
     pytest.skip("Security tests skipped in standalone mode", allow_module_level=True)
 

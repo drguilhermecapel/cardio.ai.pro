@@ -2,6 +2,10 @@
 Utilidades para testes do CardioAI Pro
 """
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import numpy as np
 from typing import Tuple, List
 import scipy.signal as signal

@@ -1,6 +1,10 @@
 """
 Suite de Testes Completa para Validação do Pipeline de Pré-processamento ECG
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 Testes baseados em cenários clínicos reais e métricas científicas.
 """
 

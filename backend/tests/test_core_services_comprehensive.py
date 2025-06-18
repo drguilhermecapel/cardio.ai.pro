@@ -3,6 +3,10 @@ import numpy as np
 from unittest.mock import Mock, patch, AsyncMock, MagicMock
 import sys
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 torch_mock = MagicMock()
 torch_mock.nn = MagicMock()
 torch_mock.optim = MagicMock()

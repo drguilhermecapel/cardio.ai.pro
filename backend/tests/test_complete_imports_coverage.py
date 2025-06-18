@@ -4,6 +4,10 @@ import sys
 import os
 from unittest.mock import patch, MagicMock
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 # Garantir que conseguimos importar
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

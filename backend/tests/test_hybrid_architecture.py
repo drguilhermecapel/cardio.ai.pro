@@ -3,6 +3,10 @@ Comprehensive tests for Hybrid CNN-BiLSTM-Transformer Architecture
 Tests deep learning components and integrated dataset functionality
 """
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 import numpy as np
 from unittest.mock import Mock, patch, MagicMock

@@ -6,6 +6,10 @@ from app.services.interpretability_service import (
     ExplanationResult,
 )
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 class TestInterpretabilityServiceComprehensive:
     """Comprehensive test coverage for InterpretabilityService to reach 80% coverage"""

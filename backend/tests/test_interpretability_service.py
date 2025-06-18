@@ -3,6 +3,10 @@ Comprehensive tests for InterpretabilityService
 Tests SHAP/LIME explanations validation and clinical text generation
 """
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 import numpy as np
 from unittest.mock import Mock, patch, MagicMock

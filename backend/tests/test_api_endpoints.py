@@ -1,5 +1,9 @@
 """Comprehensive API endpoint tests with proper authentication"""
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import Mock, patch, AsyncMock

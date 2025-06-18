@@ -5,6 +5,10 @@ from unittest.mock import Mock, patch, MagicMock, mock_open
 import sys
 import os
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 # Adicionar o diretório app ao path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

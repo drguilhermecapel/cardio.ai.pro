@@ -1,5 +1,9 @@
 """Mock pyedflib module for tests to avoid import errors."""
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import sys
 from unittest.mock import MagicMock
 

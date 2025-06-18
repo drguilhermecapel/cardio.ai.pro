@@ -6,6 +6,10 @@ from app.models.ecg_analysis import ECGAnalysis
 from app.models.notification import Notification
 from app.models.validation import Validation
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 def test_user_model_creation():
     """Test User model creation."""

@@ -1,5 +1,9 @@
 """Focused ML model service tests for actual methods."""
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 import pytest
 from unittest.mock import AsyncMock, Mock, patch
 import numpy as np

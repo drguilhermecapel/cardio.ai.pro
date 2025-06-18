@@ -5,6 +5,10 @@ from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
 import os
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 class TestAuditTrail:
     """Testes para o módulo audit_trail com mocks completos"""

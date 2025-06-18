@@ -2,6 +2,10 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 
+import os
+os.environ["ENVIRONMENT"] = "test"
+os.environ["DATABASE_URL"] = "sqlite:///test.db"
+
 
 def test_health_endpoint():
     """Test health check endpoint."""
