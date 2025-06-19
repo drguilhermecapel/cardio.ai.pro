@@ -315,7 +315,7 @@ export class PDFReportGenerator {
     this.doc.setFont('helvetica', 'normal')
     const confidenceColor = ecg.aiConfidence >= 0.9 ? [34, 197, 94] : 
                            ecg.aiConfidence >= 0.7 ? [251, 191, 36] : [239, 68, 68]
-    this.doc.setTextColor(...confidenceColor)
+    this.doc.setTextColor(confidenceColor[0], confidenceColor[1], confidenceColor[2])
     this.doc.text(`${(ecg.aiConfidence * 100).toFixed(1)}%`, this.margin + 30, this.currentY)
     this.doc.setTextColor(0, 0, 0)
     this.currentY += 10
@@ -326,7 +326,7 @@ export class PDFReportGenerator {
       this.doc.text(`${labels.abnormalities}:`, this.margin, this.currentY)
       this.currentY += 5
 
-      ecg.abnormalities.forEach((abnormality: string, index: number) => {
+      ecg.abnormalities.forEach((abnormality: string, _index: number) => {
         this.doc.setFont('helvetica', 'normal')
         this.doc.text(`• ${abnormality}`, this.margin + 5, this.currentY)
         this.currentY += 5

@@ -1,7 +1,7 @@
 // Medical APIs Integration for CardioAI Pro
 // Integração com APIs médicas reais para dados de pacientes e ECG
 
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 // Types
 interface Patient {
@@ -296,7 +296,7 @@ class FHIRClient {
   private transformFHIRObservations(entries: any[]): VitalSigns[] {
     // Transform FHIR observations to VitalSigns format
     return entries.map(entry => {
-      const obs = entry.resource
+      const _obs = entry.resource
       // Implementation depends on specific FHIR observation structure
       return {} as VitalSigns
     })

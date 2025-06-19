@@ -191,7 +191,7 @@ export function validateECGSignal(
 export function validateHeartRate(
   heartRate: number,
   age: number,
-  sex: 'M' | 'F',
+  _sex: 'M' | 'F',
   options?: { athlete?: boolean }
 ): HeartRateValidationResult {
   const warnings: string[] = [];
@@ -294,8 +294,8 @@ export function validateHeartRate(
 export function validateBloodPressure(
   systolic: number,
   diastolic: number,
-  age: number,
-  sex: 'M' | 'F'
+  _age: number,
+  _sex: 'M' | 'F'
 ): BloodPressureValidationResult {
   const warnings: string[] = [];
   const alerts: string[] = [];
@@ -378,7 +378,7 @@ export function validateQTInterval(
   qtInterval: number,
   heartRate: number,
   sex: 'M' | 'F',
-  age: number,
+  _age: number,
   options?: {
     formula?: 'Bazett' | 'Fridericia' | 'Framingham' | 'Hodges';
     medications?: string[];
@@ -843,7 +843,7 @@ export function checkDrugInteractions(
 export function validateDiagnosisConsistency(
   diagnosis: any,
   ecgFindings: any,
-  clinicalData: any
+  _clinicalData: any
 ): { consistent: boolean; conflicts: string[]; recommendations: string[] } {
   const conflicts: string[] = [];
   const recommendations: string[] = [];
@@ -872,7 +872,7 @@ export function validateDiagnosisConsistency(
 // Validação de diretrizes clínicas
 export function validateClinicalGuidelines(
   diagnosis: any,
-  guidelineVersion: string
+  _guidelineVersion: string
 ): GuidelineValidationResult {
   const gaps: string[] = [];
   const recommendations: string[] = [];
