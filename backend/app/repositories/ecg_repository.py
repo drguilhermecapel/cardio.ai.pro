@@ -10,7 +10,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
 from app.core.constants import AnalysisStatus
-from app.models.ecg_analysis import ECGAnalysis, ECGAnnotation, ECGMeasurement
+from app.models.ecg_analysis import ECGAnalysis
 
 
 class ECGRepository:
@@ -183,7 +183,7 @@ class ECGRepository:
             is not None
         )
 
-    async def create_measurement(self, measurement: ECGMeasurement) -> ECGMeasurement:
+    async def create_measurement(self, measurement: dict) -> dict:
         """Create ECG measurement."""
         self.db.add(measurement)
         await self.db.commit()
@@ -192,17 +192,17 @@ class ECGRepository:
 
     async def get_measurements_by_analysis(
         self, analysis_id: int
-    ) -> list[ECGMeasurement]:
+    ) -> list[dict]:
         """Get measurements by analysis ID."""
         stmt = (
-            select(ECGMeasurement)
-            .where(ECGMeasurement.analysis_id == analysis_id)
-            .order_by(ECGMeasurement.measurement_type, ECGMeasurement.lead_name)
+            select(dict)
+            .where(dict.analysis_id == analysis_id)
+            .order_by(dict.measurement_type, dict.lead_name)
         )
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
-    async def create_annotation(self, annotation: ECGAnnotation) -> ECGAnnotation:
+    async def create_annotation(self, annotation: dict) -> dict:
         """Create ECG annotation."""
         self.db.add(annotation)
         await self.db.commit()
@@ -211,12 +211,12 @@ class ECGRepository:
 
     async def get_annotations_by_analysis(
         self, analysis_id: int
-    ) -> list[ECGAnnotation]:
+    ) -> list[dict]:
         """Get annotations by analysis ID."""
         stmt = (
-            select(ECGAnnotation)
-            .where(ECGAnnotation.analysis_id == analysis_id)
-            .order_by(ECGAnnotation.time_ms)
+            select(dict)
+            .where(dict.analysis_id == analysis_id)
+            .order_by(dict.time_ms)
         )
         result = await self.db.execute(stmt)
         return list(result.scalars().all())

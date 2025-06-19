@@ -1,7 +1,7 @@
 """Database models."""
 
 from app.models.base import Base
-from app.models.ecg_analysis import ECGAnalysis, ECGAnnotation, ECGMeasurement
+from app.models.ecg_analysis import ECGAnalysis
 from app.models.notification import (
     Notification,
     NotificationPreference,
@@ -24,8 +24,6 @@ __all__ = [
     "Patient",
     "PatientNote",
     "ECGAnalysis",
-    "ECGMeasurement",
-    "ECGAnnotation",
     "Validation",
     "ValidationRule",
     "ValidationResult",
