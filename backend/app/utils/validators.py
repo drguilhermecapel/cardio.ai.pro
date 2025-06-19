@@ -1,13 +1,17 @@
+"""
+Validadores para o sistema CardioAI
+"""
 import re
-from typing import Optional, Union
+from typing import Optional, Union, Dict, Any
 from datetime import datetime
+
 
 def validate_email(email: str) -> bool:
     """
-    Valida formato de email
+    Valida formato de email.
     
     Args:
-        email (str): Email a ser validado
+        email: Email a ser validado
         
     Returns:
         bool: True se o email for válido, False caso contrário
@@ -19,12 +23,13 @@ def validate_email(email: str) -> bool:
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return bool(re.match(pattern, email.strip()))
 
+
 def validate_cpf(cpf: str) -> bool:
     """
-    Valida CPF brasileiro
+    Valida CPF brasileiro.
     
     Args:
-        cpf (str): CPF a ser validado (com ou sem formatação)
+        cpf: CPF a ser validado (com ou sem formatação)
         
     Returns:
         bool: True se o CPF for válido, False caso contrário
@@ -56,12 +61,13 @@ def validate_cpf(cpf: str) -> bool:
     # Verifica se os dígitos calculados conferem
     return cpf[-2:] == f"{digito1}{digito2}"
 
+
 def validate_phone(phone: str) -> bool:
     """
-    Valida número de telefone brasileiro
+    Valida número de telefone brasileiro.
     
     Args:
-        phone (str): Telefone a ser validado
+        phone: Telefone a ser validado
         
     Returns:
         bool: True se o telefone for válido, False caso contrário
@@ -81,114 +87,191 @@ def validate_phone(phone: str) -> bool:
     if ddd < 11 or ddd > 99:
         return False
     
-    # Para celular (11 dígitos), o primeiro dígito após o DDD deve ser 9
-    if len(phone) == 11 and phone[2] != '9':
-        return False
-    
     return True
 
-def validate_patient_id(patient_id: Union[int, str]) -> bool:
+
+def validate_date(date_str: str, format: str = "%Y-%m-%d") -> bool:
     """
-    Valida ID de paciente
+    Valida formato de data.
     
     Args:
-        patient_id: ID do paciente a ser validado
+        date_str: String de data
+        format: Formato esperado
         
     Returns:
-        bool: True se o ID for válido, False caso contrário
+        bool: True se a data for válida
     """
     try:
-        pid = int(patient_id)
-        return pid > 0
+        datetime.strptime(date_str, format)
+        return True
     except (ValueError, TypeError):
         return False
 
-def validate_ecg_data(ecg_data: dict) -> tuple[bool, list]:
+
+def validate_ecg_file(file_path: str) -> bool:
     """
-    Valida dados de ECG
+    Valida arquivo de ECG.
     
     Args:
-        ecg_data (dict): Dados do ECG a serem validados
+        file_path: Caminho do arquivo
         
     Returns:
-        tuple: (is_valid, list_of_errors)
+        bool: True se o arquivo for válido
     """
-    errors = []
+    if not file_path:
+        return False
     
-    if not isinstance(ecg_data, dict):
-        errors.append("ECG data must be a dictionary")
-        return False, errors
+    # Extensões válidas para ECG
+    valid_extensions = {'.pdf', '.jpg', '.jpeg', '.png', '.dicom', '.edf', '.xml'}
+    
+    # Verifica extensão
+    import os
+    _, ext = os.path.splitext(file_path.lower())
+    return ext in valid_extensions
+
+
+def validate_patient_data(data: Dict[str, Any]) -> bool:
+    """
+    Valida dados do paciente.
+    
+    Args:
+        data: Dicionário com dados do paciente
+        
+    Returns:
+        bool: True se os dados forem válidos
+    """
+    if not data or not isinstance(data, dict):
+        return False
     
     # Campos obrigatórios
-    required_fields = ['leads', 'duration', 'sample_rate']
+    required_fields = ['name', 'birth_date']
+    
+    # Verifica campos obrigatórios
     for field in required_fields:
-        if field not in ecg_data:
-            errors.append(f"Missing required field: {field}")
+        if field not in data or not data[field]:
+            return False
     
-    # Validação específica dos campos
-    if 'leads' in ecg_data:
-        if not isinstance(ecg_data['leads'], list) or len(ecg_data['leads']) == 0:
-            errors.append("Leads must be a non-empty list")
+    # Valida nome (mínimo 2 caracteres)
+    if len(data['name']) < 2:
+        return False
     
-    if 'duration' in ecg_data:
-        try:
-            duration = float(ecg_data['duration'])
-            if duration <= 0:
-                errors.append("Duration must be positive")
-        except (ValueError, TypeError):
-            errors.append("Duration must be a number")
+    # Valida data de nascimento
+    if not validate_date(str(data['birth_date'])):
+        return False
     
-    if 'sample_rate' in ecg_data:
-        try:
-            sample_rate = int(ecg_data['sample_rate'])
-            if sample_rate <= 0:
-                errors.append("Sample rate must be positive")
-        except (ValueError, TypeError):
-            errors.append("Sample rate must be an integer")
+    # Valida CPF se presente
+    if 'cpf' in data and data['cpf']:
+        if not validate_cpf(data['cpf']):
+            return False
     
-    return len(errors) == 0, errors
+    # Valida email se presente
+    if 'email' in data and data['email']:
+        if not validate_email(data['email']):
+            return False
+    
+    return True
 
-def validate_date_range(start_date: str, end_date: str) -> bool:
+
+def validate_ecg_signal(signal: Any) -> bool:
     """
-    Valida intervalo de datas
+    Valida sinal de ECG.
     
     Args:
-        start_date (str): Data de início (formato ISO)
-        end_date (str): Data de fim (formato ISO)
+        signal: Dados do sinal de ECG
         
     Returns:
-        bool: True se o intervalo for válido, False caso contrário
+        bool: True se o sinal for válido
+    """
+    if signal is None:
+        return False
+    
+    # Se for numpy array
+    try:
+        import numpy as np
+        if isinstance(signal, np.ndarray):
+            # Verifica se tem dados
+            if signal.size == 0:
+                return False
+            # Verifica se não tem NaN
+            if np.isnan(signal).any():
+                return False
+            return True
+    except ImportError:
+        pass
+    
+    # Se for lista
+    if isinstance(signal, list):
+        return len(signal) > 0
+    
+    return False
+
+
+def validate_phone_number(phone: str) -> bool:
+    """Alias para validate_phone para compatibilidade."""
+    return validate_phone(phone)
+
+
+def validate_medical_record_number(mrn: str) -> bool:
+    """
+    Valida número de prontuário médico.
+    
+    Args:
+        mrn: Número do prontuário
+        
+    Returns:
+        bool: True se válido
+    """
+    if not mrn or not isinstance(mrn, str):
+        return False
+    
+    # Remove espaços e caracteres especiais
+    mrn_clean = re.sub(r'[^A-Za-z0-9]', '', mrn)
+    
+    # Deve ter pelo menos 4 caracteres
+    return len(mrn_clean) >= 4
+
+
+def validate_heart_rate(rate: Union[int, float]) -> bool:
+    """
+    Valida frequência cardíaca.
+    
+    Args:
+        rate: Frequência cardíaca em bpm
+        
+    Returns:
+        bool: True se a frequência for válida
     """
     try:
-        start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
-        end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
-        return start <= end
-    except (ValueError, AttributeError):
+        rate = float(rate)
+        # Frequência normal: 30-250 bpm
+        return 30 <= rate <= 250
+    except (ValueError, TypeError):
         return False
 
-def sanitize_filename(filename: str) -> str:
+
+def validate_blood_pressure(systolic: Union[int, float], diastolic: Union[int, float]) -> bool:
     """
-    Sanitiza nome de arquivo removendo caracteres perigosos
+    Valida pressão arterial.
     
     Args:
-        filename (str): Nome do arquivo a ser sanitizado
+        systolic: Pressão sistólica
+        diastolic: Pressão diastólica
         
     Returns:
-        str: Nome do arquivo sanitizado
+        bool: True se os valores forem válidos
     """
-    if not filename:
-        return "unnamed_file"
-    
-    # Remove caracteres perigosos
-    sanitized = re.sub(r'[<>:"/\\|?*]', '_', filename)
-    
-    # Remove espaços extras e pontos no início/fim
-    sanitized = sanitized.strip('. ')
-    
-    # Limita o tamanho
-    if len(sanitized) > 255:
-        name, ext = sanitized.rsplit('.', 1) if '.' in sanitized else (sanitized, '')
-        sanitized = name[:250] + ('.' + ext if ext else '')
-    
-    return sanitized or "unnamed_file"
-
+    try:
+        sys = float(systolic)
+        dia = float(diastolic)
+        
+        # Validações básicas
+        if sys <= dia:  # Sistólica deve ser maior que diastólica
+            return False
+        if sys < 50 or sys > 300:  # Limites razoáveis
+            return False
+        if dia < 30 or dia > 200:  # Limites razoáveis
+            return False
+            
+        return True
+    except (ValueError, TypeError):
+        return False
