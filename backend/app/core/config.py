@@ -56,36 +56,9 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "cardioai123"
     POSTGRES_DB: str = "cardioai_db"
     
-    DATABASE_URL: Optional[str] = None
-    DATABASE_SYNC_URL: Optional[str] = None
-    
-    @field_validator("DATABASE_URL", mode="before")
-    @classmethod
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
-        if isinstance(v, str):
-            return v
-        return PostgresDsn.build(
-            scheme="postgresql+asyncpg",
-            username=values.data.get("POSTGRES_USER"),
-            password=values.data.get("POSTGRES_PASSWORD"),
-            host=values.data.get("POSTGRES_SERVER"),
-            port=values.data.get("POSTGRES_PORT"),
-            path=values.data.get("POSTGRES_DB") or "",
-        ).unicode_string()
-    
-    @field_validator("DATABASE_SYNC_URL", mode="before")  
-    @classmethod
-    def assemble_sync_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
-        if isinstance(v, str):
-            return v
-        return PostgresDsn.build(
-            scheme="postgresql",
-            username=values.data.get("POSTGRES_USER"),
-            password=values.data.get("POSTGRES_PASSWORD"),
-            host=values.data.get("POSTGRES_SERVER"),
-            port=values.data.get("POSTGRES_PORT"),
-            path=values.data.get("POSTGRES_DB") or "",
-        ).unicode_string()
+    # Database - Use SQLite for standalone mode
+    DATABASE_URL: str = "sqlite+aiosqlite:///./cardioai.db"
+    DATABASE_SYNC_URL: str = "sqlite:///./cardioai.db"
     
     # Redis (optional)
     REDIS_URL: Optional[str] = None
