@@ -3,16 +3,13 @@
 
 import React, { useState, useEffect } from 'react'
 import { 
-  Grid, 
   Card, 
-  CardContent, 
-  Typography, 
   Button, 
+  Typography, 
   Badge, 
   AIGlow,
   HeartbeatIndicator,
-  StatusIndicator,
-  Box
+  StatusIndicator
 } from '../components/ui/BasicComponents'
 import ModernHeader from '../components/layout/ModernHeader'
 import ModernSidebar from '../components/layout/ModernSidebar'
@@ -95,7 +92,7 @@ const samplePatients = [
 
 const DashboardPage: React.FC = () => {
   const dispatch = useAppDispatch()
-  const { analyses, isLoading } = useAppSelector(state => state.ecg)
+  const { isLoading } = useAppSelector(state => state.ecg)
   const { unreadCount } = useAppSelector(state => state.notification)
   
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -165,12 +162,11 @@ const DashboardPage: React.FC = () => {
           </div>
 
           {/* Key Metrics */}
-          <Grid container spacing={6} className="mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             
             {/* Total Patients */}
-            <Grid item xs={12} sm={6} lg={3}>
-              <Card variant="medical" className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+            <Card variant="medical" className="hover:shadow-lg transition-shadow">
+              <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <Typography variant="caption" className="text-gray-600 mb-1">
@@ -184,35 +180,32 @@ const DashboardPage: React.FC = () => {
                       <span className="text-white text-xl">👥</span>
                     </div>
                   </div>
-                </CardContent>
+                </div>
               </Card>
-            </Grid>
 
             {/* Active Monitoring */}
-            <Grid item xs={12} sm={6} lg={3}>
-              <Card variant="medical" className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Typography variant="caption" className="text-gray-600 mb-1">
-                        Monitoramento Ativo
-                      </Typography>
-                      <Typography variant="h3" className="font-bold text-green-600">
-                        {realTimeData.activeMonitoring}
-                      </Typography>
-                    </div>
-                    <div className="w-12 h-12 bg-gradient-secondary rounded-lg flex items-center justify-center">
-                      <HeartbeatIndicator className="w-6 h-6" />
-                    </div>
+            <Card variant="medical" className="hover:shadow-lg transition-shadow">
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Typography variant="caption" className="text-gray-600 mb-1">
+                      Monitoramento Ativo
+                    </Typography>
+                    <Typography variant="h3" className="font-bold text-green-600">
+                      {realTimeData.activeMonitoring}
+                    </Typography>
                   </div>
-                </CardContent>
-              </Card>
-            </Grid>
+                  <div className="w-12 h-12 bg-gradient-secondary rounded-lg flex items-center justify-center">
+                    <HeartbeatIndicator className="w-6 h-6" />
+                  </div>
+                </div>
+              </div>
+            </Card>
 
             {/* Critical Alerts */}
-            <Grid item xs={12} sm={6} lg={3}>
+            
               <Card variant="critical" className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+                <div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Typography variant="caption" className="text-gray-600 mb-1">
@@ -226,15 +219,15 @@ const DashboardPage: React.FC = () => {
                       <span className="text-white text-xl">🚨</span>
                     </div>
                   </div>
-                </CardContent>
+                </div>
               </Card>
-            </Grid>
+            
 
             {/* AI Analyses */}
-            <Grid item xs={12} sm={6} lg={3}>
+            
               <AIGlow active={true}>
                 <Card variant="ai" className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
+                  <div>
                     <div className="flex items-center justify-between">
                       <div>
                         <Typography variant="caption" className="text-gray-600 mb-1">
@@ -248,17 +241,19 @@ const DashboardPage: React.FC = () => {
                         <span className="text-white text-xl">🧠</span>
                       </div>
                     </div>
-                  </CardContent>
+                  </div>
                 </Card>
               </AIGlow>
-            </Grid>
-          </Grid>
+            
+          </div>
 
           {/* Main Dashboard Grid */}
-          <Grid container spacing={6}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
             
             {/* Left Column */}
-            <Grid item xs={12} lg={8}>
+            <div className="lg:col-span-8">
+            
               
               {/* ECG Visualization */}
               <div className="mb-6">
@@ -273,7 +268,7 @@ const DashboardPage: React.FC = () => {
 
               {/* Recent Patients */}
               <Card variant="medical">
-                <CardContent className="p-6">
+                <div>
                   <div className="flex items-center justify-between mb-6">
                     <Typography variant="h5" className="font-bold text-gray-900">
                       Pacientes Recentes
@@ -292,12 +287,13 @@ const DashboardPage: React.FC = () => {
                       />
                     ))}
                   </div>
-                </CardContent>
+                </div>
               </Card>
-            </Grid>
+            </div>
 
             {/* Right Column */}
-            <Grid item xs={12} lg={4}>
+            <div className="lg:col-span-4">
+            
               
               {/* Real-time Heartbeat Monitor */}
               <div className="mb-6">
@@ -311,7 +307,7 @@ const DashboardPage: React.FC = () => {
 
               {/* System Status */}
               <Card variant="medical" className="mb-6">
-                <CardContent className="p-6">
+                <div>
                   <Typography variant="h6" className="font-bold text-gray-900 mb-4">
                     Status do Sistema
                   </Typography>
@@ -347,13 +343,13 @@ const DashboardPage: React.FC = () => {
                       <Badge variant="warning">{realTimeData.systemLoad}%</Badge>
                     </div>
                   </div>
-                </CardContent>
+                </div>
               </Card>
 
               {/* AI Processing */}
               <AIGlow active={true}>
                 <Card variant="ai">
-                  <CardContent className="p-6">
+                  <div>
                     <Typography variant="h6" className="font-bold text-purple-700 mb-4">
                       Processamento IA
                     </Typography>
@@ -368,13 +364,13 @@ const DashboardPage: React.FC = () => {
                     <Typography variant="body2" className="text-purple-600 text-center">
                       Analisando padrões cardíacos...
                     </Typography>
-                  </CardContent>
+                  </div>
                 </Card>
               </AIGlow>
 
               {/* Quick Actions */}
               <Card variant="medical" className="mt-6">
-                <CardContent className="p-6">
+                <div>
                   <Typography variant="h6" className="font-bold text-gray-900 mb-4">
                     Ações Rápidas
                   </Typography>
@@ -393,10 +389,10 @@ const DashboardPage: React.FC = () => {
                       ⚙️ Configurações
                     </Button>
                   </div>
-                </CardContent>
+                </div>
               </Card>
-            </Grid>
-          </Grid>
+            </div>
+          </div>
 
           {/* Footer Stats */}
           <div className="mt-8 pt-6 border-t border-gray-200">
