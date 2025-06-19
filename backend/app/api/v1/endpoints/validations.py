@@ -1,156 +1,113 @@
-"""
-Validation endpoints.
-"""
-
-from typing import Any
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, Query, status, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.constants import UserRoles
 from app.db.session import get_db
+from app.core.security import get_current_user
 from app.models.user import User
-from app.schemas.validation import (
-    Validation,
-    ValidationCreate,
-    ValidationList,
-    ValidationSubmit,
+from app.core.exceptions import (
+    NotFoundException, 
+    ValidationException, 
+    UnauthorizedException
 )
-from app.services.notification_service import NotificationService
-from app.services.user_service import UserService
+
+from app.schemas.validation import (
+    ValidationCreate,
+    Validation,
+    ValidationSubmit
+)
 from app.services.validation_service import ValidationService
+from app.repositories.validation_repository import ValidationRepository
+from app.repositories.ecg_repository import ECGRepository
+from app.repositories.notification_repository import NotificationRepository
+from app.services.notification_service import NotificationService
+from app.models.user import UserRoles
 
-router = APIRouter()
-
+router = APIRouter(prefix="/validations", tags=["validations"])
 
 @router.post("/", response_model=Validation)
 async def create_validation(
     validation_data: ValidationCreate,
-    current_user: User = Depends(UserService.get_current_user),
-    db: AsyncSession = Depends(get_db),
-) -> Any:
-    """Create validation assignment."""
-    if current_user.role not in [UserRoles.ADMIN, UserRoles.CARDIOLOGIST]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to assign validations",
-        )
-
-    notification_service = NotificationService(db)
-    validation_service = ValidationService(db, notification_service)
-
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Create a new validation request"""
+    validation_repo = ValidationRepository(db)
+    ecg_repo = ECGRepository(db)
+    notification_repo = NotificationRepository(db)
+    notification_service = NotificationService(db, notification_repo)
+    
+    validation_service = ValidationService(
+        db=db,
+        validation_repository=validation_repo,
+        ecg_repository=ecg_repo,
+        notification_service=notification_service
+    )
+    
     validation = await validation_service.create_validation(
-        analysis_id=validation_data.analysis_id,
-        validator_id=validation_data.validator_id,
-        validator_role=current_user.role,
-        validator_experience_years=current_user.experience_years,
+        validation_data,
+        current_user.id
     )
-
     return validation
 
-
-@router.get("/my-validations", response_model=ValidationList)
-async def get_my_validations(
-    limit: int = 50,
-    offset: int = 0,
-    current_user: User = Depends(UserService.get_current_user),
-    db: AsyncSession = Depends(get_db),
-) -> Any:
-    """Get validations assigned to current user."""
-    notification_service = NotificationService(db)
-    validation_service = ValidationService(db, notification_service)
-
-    validations = await validation_service.repository.get_validations_by_validator(
-        current_user.id, limit, offset
+@router.get("/pending", response_model=List[Validation])
+async def get_pending_validations(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=100),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get pending validations for current user"""
+    if current_user.role not in [UserRoles.PHYSICIAN, UserRoles.CARDIOLOGIST, UserRoles.ADMIN]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    validation_repo = ValidationRepository(db)
+    validations = await validation_repo.get_pending_validations_for_user(
+        current_user.id,
+        skip=skip,
+        limit=limit
     )
-
-    validations_schemas = [Validation.from_orm(v) for v in validations]
-    return ValidationList(
-        validations=validations_schemas,
-        total=len(validations),  # Simplified
-        page=offset // limit + 1,
-        size=limit,
-    )
-
-
-@router.post("/{validation_id}/submit", response_model=Validation)
-async def submit_validation(
-    validation_id: int,
-    validation_data: ValidationSubmit,
-    current_user: User = Depends(UserService.get_current_user),
-    db: AsyncSession = Depends(get_db),
-) -> Any:
-    """Submit validation results."""
-    notification_service = NotificationService(db)
-    validation_service = ValidationService(db, notification_service)
-
-    validation = await validation_service.submit_validation(
-        validation_id=validation_id,
-        validator_id=current_user.id,
-        validation_data=validation_data.dict(),
-    )
-
-    return validation
-
+    return validations
 
 @router.get("/{validation_id}", response_model=Validation)
 async def get_validation(
     validation_id: int,
-    current_user: User = Depends(UserService.get_current_user),
-    db: AsyncSession = Depends(get_db),
-) -> Any:
-    """Get validation by ID."""
-    notification_service = NotificationService(db)
-    validation_service = ValidationService(db, notification_service)
-
-    validation = await validation_service.repository.get_validation_by_id(validation_id)
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get validation by ID"""
+    validation_repo = ValidationRepository(db)
+    validation = await validation_repo.get_validation_by_id(validation_id)
+    
     if not validation:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Validation not found"
-        )
-
-    if (
-        not current_user.is_superuser
-        and validation.validator_id != current_user.id
-        and validation.analysis.created_by != current_user.id
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view this validation",
-        )
-
+        raise HTTPException(status_code=404, detail="Validation not found")
+    
     return validation
 
-
-@router.get("/pending/critical", response_model=list[Validation])
-async def get_pending_critical_validations(
-    limit: int = 20,
-    current_user: User = Depends(UserService.get_current_user),
-    db: AsyncSession = Depends(get_db),
-) -> Any:
-    """Get pending critical validations."""
-    if not current_user.is_physician:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
-        )
-
-    notification_service = NotificationService(db)
-    validation_service = ValidationService(db, notification_service)
-
-    from app.services.ecg_service import ECGAnalysisService
-    from app.services.ml_model_service import MLModelService
-
-    ml_service = MLModelService()
-    ecg_service = ECGAnalysisService(db, ml_service, validation_service)
-
-    critical_analyses = await ecg_service.repository.get_critical_analyses(limit)
-
-    validations = []
-    for analysis in critical_analyses:
-        existing_validation = (
-            await validation_service.repository.get_validation_by_analysis(analysis.id)
-        )
-        if existing_validation:
-            validations.append(existing_validation)
-
-    return validations
+@router.post("/{validation_id}/submit", response_model=Validation)
+async def submit_validation(
+    validation_id: int,
+    submission: ValidationSubmit,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Submit validation results"""
+    validation_repo = ValidationRepository(db)
+    ecg_repo = ECGRepository(db)
+    notification_repo = NotificationRepository(db)
+    notification_service = NotificationService(db, notification_repo)
+    
+    validation_service = ValidationService(
+        db=db,
+        validation_repository=validation_repo,
+        ecg_repository=ecg_repo,
+        notification_service=notification_service
+    )
+    
+    validation = await validation_service.submit_validation(
+        validation_id,
+        submission,
+        current_user.id
+    )
+    return validation
