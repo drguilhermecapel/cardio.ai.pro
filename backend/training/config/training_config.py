@@ -5,13 +5,8 @@ Configuração principal da plataforma de treinamento ECG AI
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 from pydantic import Field
-from pydantic_settings import BaseSettingsimport torch
-import os
-
-# Importa configurações do sistema existente
-import sys
-sys.path.append(str(Path(__file__).parent.parent.parent))
-from app.core.config import settings as app_settings
+from pydantic_settings import BaseSettings
+import torch
 
 
 class TrainingConfig(BaseSettings):
@@ -71,4 +66,3 @@ class TrainingConfig(BaseSettings):
 
 # Instância global de configuração
 training_config = TrainingConfig()
-
