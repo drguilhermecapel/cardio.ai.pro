@@ -1,1 +1,2 @@
-"""CardioAI Pro Backend Application."""
+# Arquivo __init__.py vazio para tornar app um pacote Python
+

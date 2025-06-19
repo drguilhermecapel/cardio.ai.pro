@@ -1,12 +1,10 @@
-"""Database base configuration."""
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import declarative_base
 
+# Usar importação correta para SQLAlchemy 2.0
 Base = declarative_base()
 
-class DatabaseBase:
-    """Base class for database models."""
-    __abstract__ = True
+# Importar todos os modelos aqui para garantir que sejam registrados
+from app.models.ecg_analysis import ECGAnalysis, AnalysisStatus
 
-# For compatibility
-metadata = Base.metadata
+__all__ = ["Base", "ECGAnalysis", "AnalysisStatus"]
+

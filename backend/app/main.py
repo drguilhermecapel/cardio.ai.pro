@@ -1,95 +1,86 @@
-"""
-CardioAI Pro - Standalone FastAPI Application
-Simplified ECG Analysis System for Desktop
-"""
-
-import logging
-import sys
-from pathlib import Path
-
-if getattr(sys, "frozen", False):
-    bundle_dir = Path(getattr(sys, "_MEIPASS", ""))
-    app_dir = bundle_dir / "app"
-    if app_dir.exists():
-        sys.path.insert(0, str(app_dir))
-
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+from typing import Dict, Any
 
-from app.api.v1.api import api_router
-from app.db.init_db import ensure_database_ready
+# Substituir @app.on_event deprecated
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    print("Starting up CardioAI...")
+    yield
+    # Shutdown
+    print("Shutting down CardioAI...")
 
-logger = logging.getLogger(__name__)
+app = FastAPI(
+    title="CardioAI",
+    description="Sistema de Análise de ECG",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
-
-# Simplified startup for standalone version
-def create_app() -> FastAPI:
-    """Create FastAPI application."""
-    app = FastAPI(
-        title="CardioAI Pro",  # Corrigido aqui - removido "API"
-        description="Standalone ECG Analysis System",
-        version="1.0.0",
-        docs_url="/api/v1/docs",
-        redoc_url="/api/v1/redoc",
-        openapi_url="/api/v1/openapi.json",
-    )
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],  # Allow all origins for standalone
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-
-    app.include_router(api_router, prefix="/api/v1")
-
-    @app.on_event("startup")
-    async def startup_event() -> None:
-        """Initialize database on startup."""
-        try:
-            logger.info("Starting CardioAI Pro backend...")
-            await ensure_database_ready()
-            logger.info("Database initialization completed")
-        except Exception as e:
-            logger.error(f"Failed to initialize database: {str(e)}")
-            raise
-
-    @app.on_event("shutdown")
-    async def shutdown_event() -> None:
-        """Cleanup on shutdown."""
-        logger.info("Shutting down CardioAI Pro backend...")
-
-    return app
-
-
-app = create_app()
-
-
-@app.get("/health")
-async def health_check() -> dict[str, str]:
-    """Health check endpoint."""
-    return {"status": "healthy", "service": "cardioai-pro-standalone"}
-
-
-@app.get("/")
-async def root() -> dict[str, str]:
-    """Root endpoint."""
+# Adicionar funções faltantes
+async def get_app_info() -> Dict[str, Any]:
+    """Retorna informações da aplicação"""
     return {
-        "message": "CardioAI Pro Standalone API",
+        "name": "CardioAI",
         "version": "1.0.0",
-        "docs": "/docs",
-        "status": "running",
+        "description": "ECG Analysis System",
+        "status": "running"
     }
 
+async def health_check() -> Dict[str, str]:
+    """Endpoint de health check"""
+    return {"status": "healthy", "service": "CardioAI"}
+
+class CardioAIApp:
+    """Classe principal da aplicação CardioAI"""
+    
+    def __init__(self):
+        self.name = "CardioAI"
+        self.version = "1.0.0"
+        self.description = "Sistema de Análise de ECG"
+        self.status = "initialized"
+    
+    def get_info(self) -> Dict[str, str]:
+        """Retorna informações da aplicação"""
+        return {
+            "name": self.name,
+            "version": self.version,
+            "description": self.description,
+            "status": self.status
+        }
+    
+    def start(self):
+        """Inicia a aplicação"""
+        self.status = "running"
+        print(f"{self.name} v{self.version} iniciado com sucesso")
+    
+    def stop(self):
+        """Para a aplicação"""
+        self.status = "stopped"
+        print(f"{self.name} parado")
+
+# Endpoints da API
+@app.get("/")
+async def root():
+    """Endpoint raiz"""
+    return await get_app_info()
+
+@app.get("/health")
+async def health():
+    """Endpoint de health check"""
+    return await health_check()
+
+@app.get("/info")
+async def info():
+    """Endpoint de informações da aplicação"""
+    return await get_app_info()
+
+# Instância global da aplicação
+cardio_app = CardioAIApp()
 
 if __name__ == "__main__":
     import uvicorn
+    cardio_app.start()
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
-    uvicorn.run(
-        app,  # Pass the app object directly instead of string reference
-        host="0.0.0.0",
-        port=8000,
-        reload=False,  # Disabled for standalone
-        log_level="info",
-    )
