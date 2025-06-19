@@ -1,37 +1,46 @@
 # Core ML/DL
-numpy>=1.21.0
-pandas>=1.3.0
-scikit-learn>=1.0.0
-torch>=1.10.0
-tensorflow>=2.7.0
-xgboost>=1.5.0
+numpy==1.24.3
+pandas==2.0.3
+scikit-learn==1.3.0
+torch==2.0.1
+torchvision==0.15.2
+torchaudio==2.0.2
 
-# Data processing
-scipy>=1.7.0
-wfdb>=3.4.0  # Para dados ECG
-pyedflib>=0.1.0  # Para arquivos EDF
-biosppy>=0.7.0  # Processamento de sinais biomédicos
-heartpy>=1.2.0  # Análise de frequência cardíaca
+# ECG Signal Processing
+scipy==1.11.1
+wfdb==4.1.2  # PTB-XL dataset
+pyedflib==0.1.32  # EDF files
+biosppy==0.8.0  # Biosignal processing
+heartpy==1.2.7  # HRV analysis
+neurokit2==0.2.5  # Advanced ECG analysis
+
+# Configuration
+pydantic==2.4.2
+pydantic-settings==2.0.3
 
 # Visualization
-matplotlib>=3.4.0
-seaborn>=0.11.0
-plotly>=5.0.0
+matplotlib==3.7.2
+seaborn==0.12.2
+plotly==5.16.1
 
-# ML utilities
-optuna>=2.10.0  # Otimização de hiperparâmetros
-mlflow>=1.20.0  # Tracking de experimentos
-wandb>=0.12.0  # Tracking alternativo
+# ML Experiment Tracking
+mlflow==2.7.1
+wandb==0.15.11
+tensorboard==2.14.0  # Para PyTorch
 
-# Medical imaging (se aplicável)
-# opencv-python>=4.5.0
-# pydicom>=2.2.0
-# SimpleITK>=2.1.0
+# Optimization
+optuna==3.3.0
 
-# Utils
-tqdm>=4.62.0
-pyyaml>=5.4.0
-jupyter>=1.0.0
-pytest>=6.2.0
-black>=21.0.0
-flake8>=3.9.0
+# Development Tools
+tqdm==4.66.1
+pyyaml==6.0.1
+jupyter==1.0.0
+ipywidgets==8.1.0  # Para notebooks interativos
+pytest==7.4.2
+black==23.7.0
+flake8==6.1.0
+mypy==1.5.1  # Type checking
+
+# Data Augmentation for ECG
+audiomentations==0.30.0  # Pode ser útil para sinais 1D
+albumentations==1.3.1  # Se converter ECG para imagens

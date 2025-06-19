@@ -4,8 +4,8 @@ Configuração principal da plataforma de treinamento ECG AI
 
 from pathlib import Path
 from typing import Dict, List, Optional, Union
-from pydantic import BaseSettings, Field
-import torch
+from pydantic import Field
+from pydantic_settings import BaseSettingsimport torch
 import os
 
 # Importa configurações do sistema existente
