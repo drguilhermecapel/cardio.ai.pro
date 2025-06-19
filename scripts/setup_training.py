@@ -82,23 +82,59 @@ def install_requirements(venv_path):
     print("\n📦 Instalando dependências...")
     
     pip_cmd = get_pip_command(venv_path)
+    python_cmd = get_python_command(venv_path)
     requirements_file = Path(__file__).parent.parent / "requirements.txt"
     
     if not requirements_file.exists():
         print("   ⚠️  requirements.txt não encontrado. Criando arquivo base...")
         create_basic_requirements(requirements_file)
     
+    # Atualiza pip (método compatível com Windows)
     try:
-        # Atualiza pip
-        subprocess.run([pip_cmd, "install", "--upgrade", "pip"], check=True)
-        print("   ✓ pip atualizado")
+        if platform.system() == "Windows":
+            # No Windows, usar python -m pip para evitar conflitos
+            subprocess.run([python_cmd, "-m", "pip", "install", "--upgrade", "pip"], 
+                         capture_output=True, text=True)
+        else:
+            subprocess.run([pip_cmd, "install", "--upgrade", "pip"], check=True)
+        print("   ✓ pip atualizado (ou já está atualizado)")
+    except subprocess.CalledProcessError:
+        print("   ⚠️  Não foi possível atualizar pip, continuando com versão atual...")
+    
+    # Instala requirements
+    try:
+        print("   📥 Instalando pacotes (isso pode levar alguns minutos)...")
         
-        # Instala requirements
-        subprocess.run([pip_cmd, "install", "-r", str(requirements_file)], check=True)
-        print("   ✓ Dependências instaladas")
-    except subprocess.CalledProcessError as e:
-        print(f"   ❌ Erro ao instalar dependências: {e}")
-        sys.exit(1)
+        # Instala pacotes em grupos para melhor controle de erro
+        essential_packages = [
+            "numpy>=1.21.0",
+            "pandas>=1.3.0",
+            "scikit-learn>=1.0.0",
+            "matplotlib>=3.4.0"
+        ]
+        
+        # Primeiro instala pacotes essenciais
+        for package in essential_packages:
+            try:
+                subprocess.run([pip_cmd, "install", package], 
+                             capture_output=True, text=True, check=True)
+                print(f"   ✓ {package.split('>=')[0]} instalado")
+            except subprocess.CalledProcessError as e:
+                print(f"   ⚠️  Erro ao instalar {package}: continuando...")
+        
+        # Depois instala o resto do requirements
+        result = subprocess.run([pip_cmd, "install", "-r", str(requirements_file)], 
+                              capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            print("   ✓ Todas as dependências instaladas com sucesso!")
+        else:
+            print("   ⚠️  Algumas dependências podem não ter sido instaladas.")
+            print("   💡 Você pode tentar instalar manualmente depois.")
+            
+    except Exception as e:
+        print(f"   ❌ Erro inesperado: {e}")
+        print("   💡 Tente instalar as dependências manualmente após ativar o ambiente.")
 
 def create_basic_requirements(requirements_file):
     """Cria arquivo requirements.txt básico para projetos de ML cardíaco"""
