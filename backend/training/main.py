@@ -19,7 +19,7 @@ from backend.training.utils.data_utils import split_dataset
 from backend.training.utils.model_utils import get_device, count_parameters
 
 # Configuração de logging
-logging.basicConfig(level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 def main(args):
