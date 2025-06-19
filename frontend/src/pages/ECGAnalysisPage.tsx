@@ -6,26 +6,8 @@ import {
   Typography,
   Button,
   Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  LinearProgress,
   Alert,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from '@mui/material'
-import { CloudUpload, Visibility } from '@mui/icons-material'
+} from '../components/ui/BasicComponents'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { uploadECG, fetchAnalyses, clearError } from '../store/slices/ecgSlice'
 import { fetchPatients } from '../store/slices/patientSlice'
@@ -44,14 +26,14 @@ const ECGAnalysisPage: React.FC = () => {
     dispatch(fetchPatients({}))
   }, [dispatch])
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       setSelectedFile(file)
     }
   }
 
-  const handleUpload = async (): Promise<void> => {
+  const handleUpload = async () => {
     if (selectedFile && selectedPatientId) {
       dispatch(clearError())
       await dispatch(
@@ -67,174 +49,181 @@ const ECGAnalysisPage: React.FC = () => {
     }
   }
 
-  const getStatusColor = (
-    status: string
-  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
       case 'completed':
-        return 'success'
+        return 'bg-green-100 text-green-800'
       case 'processing':
-        return 'info'
+        return 'bg-blue-100 text-blue-800'
       case 'pending':
-        return 'warning'
+        return 'bg-yellow-100 text-yellow-800'
       case 'failed':
-        return 'error'
+        return 'bg-red-100 text-red-800'
       default:
-        return 'default'
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
-  const getUrgencyColor = (
-    urgency: string
-  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  const getUrgencyColor = (urgency: string): string => {
     switch (urgency) {
       case 'critical':
-        return 'error'
+        return 'bg-red-100 text-red-800'
       case 'high':
-        return 'warning'
+        return 'bg-yellow-100 text-yellow-800'
       case 'medium':
-        return 'info'
+        return 'bg-blue-100 text-blue-800'
       case 'low':
-        return 'success'
+        return 'bg-green-100 text-green-800'
       default:
-        return 'default'
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <div className="flex justify-between items-center mb-6">
         <Typography variant="h4">ECG Analysis</Typography>
         <Button
           variant="contained"
-          startIcon={<CloudUpload />}
           onClick={() => setUploadDialogOpen(true)}
+          className="flex items-center space-x-2"
         >
-          Upload ECG
+          <span>☁️</span>
+          <span>Upload ECG</span>
         </Button>
-      </Box>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity="error" className="mb-4">
           {error}
         </Alert>
       )}
 
-      {isLoading && <LinearProgress sx={{ mb: 2 }} />}
+      {isLoading && (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+          <div className="bg-blue-600 h-2.5 rounded-full animate-pulse" style={{width: '45%'}}></div>
+        </div>
+      )}
 
       <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" className="mb-4">
             ECG Analyses
           </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Analysis ID</TableCell>
-                  <TableCell>Patient ID</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Diagnosis</TableCell>
-                  <TableCell>Urgency</TableCell>
-                  <TableCell>Confidence</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Analysis ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Diagnosis</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Urgency</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
                 {analyses.map(analysis => (
-                  <TableRow key={analysis.id}>
-                    <TableCell>{analysis.analysisId}</TableCell>
-                    <TableCell>{analysis.patientId}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={analysis.status}
-                        color={getStatusColor(analysis.status)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>{analysis.diagnosis || 'Pending'}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={analysis.clinicalUrgency}
-                        color={getUrgencyColor(analysis.clinicalUrgency)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
+                  <tr key={analysis.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{analysis.analysisId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{analysis.patientId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(analysis.status)}`}>
+                        {analysis.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{analysis.diagnosis || 'Pending'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(analysis.clinicalUrgency)}`}>
+                        {analysis.clinicalUrgency}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {analysis.confidence ? `${(analysis.confidence * 100).toFixed(1)}%` : 'N/A'}
-                    </TableCell>
-                    <TableCell>{new Date(analysis.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <Button size="small" startIcon={<Visibility />} onClick={() => {}}>
-                        View
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(analysis.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <Button variant="outlined" onClick={() => {}} className="flex items-center space-x-1">
+                        <span>👁️</span>
+                        <span>View</span>
                       </Button>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
-      <Dialog
-        open={uploadDialogOpen}
-        onClose={() => setUploadDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Upload ECG File</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Select Patient</InputLabel>
-                <Select
-                  value={selectedPatientId}
-                  onChange={e => setSelectedPatientId(e.target.value as number)}
-                  label="Select Patient"
-                >
-                  {patients.map(patient => (
-                    <MenuItem key={patient.id} value={patient.id}>
-                      {patient.firstName} {patient.lastName} ({patient.patientId})
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="outlined" component="label" fullWidth sx={{ height: 56 }}>
-                {selectedFile ? selectedFile.name : 'Choose ECG File'}
-                <input
-                  type="file"
-                  hidden
-                  accept=".csv,.txt,.xml,.dat"
-                  onChange={handleFileSelect}
-                />
-              </Button>
-            </Grid>
-            {uploadProgress > 0 && uploadProgress < 100 && (
+      {uploadDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <Typography variant="h6" className="mb-4">Upload ECG File</Typography>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
-                <LinearProgress variant="determinate" value={uploadProgress} />
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Uploading... {uploadProgress}%
-                </Typography>
+                <div className="w-full">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Patient</label>
+                  <select
+                    value={selectedPatientId}
+                    onChange={(e) => setSelectedPatientId(e.target.value as any)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select a patient</option>
+                    {patients.map(patient => (
+                      <option key={patient.id} value={patient.id}>
+                        {patient.firstName} {patient.lastName} ({patient.patientId})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </Grid>
-            )}
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setUploadDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleUpload}
-            variant="contained"
-            disabled={!selectedFile || !selectedPatientId || isLoading}
-          >
-            Upload
-          </Button>
-        </DialogActions>
-      </Dialog>
+              <Grid item xs={12}>
+                <label className="block w-full">
+                  <div className="w-full px-3 py-4 border-2 border-dashed border-gray-300 rounded-md text-center cursor-pointer hover:border-blue-500">
+                    {selectedFile ? selectedFile.name : 'Choose ECG File (.csv, .txt, .xml, .dat)'}
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept=".csv,.txt,.xml,.dat"
+                    onChange={handleFileSelect}
+                  />
+                </label>
+              </Grid>
+              {uploadProgress > 0 && uploadProgress < 100 && (
+                <Grid item xs={12}>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div 
+                      className="bg-blue-600 h-2.5 rounded-full" 
+                      style={{width: `${uploadProgress}%`}}
+                    ></div>
+                  </div>
+                  <Typography variant="body2" className="text-gray-600 mt-1">
+                    Uploading... {uploadProgress}%
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+            <div className="flex justify-end space-x-3 mt-6">
+              <Button variant="outlined" onClick={() => setUploadDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpload}
+                variant="contained"
+                disabled={!selectedFile || !selectedPatientId || isLoading}
+              >
+                Upload
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Box>
   )
 }

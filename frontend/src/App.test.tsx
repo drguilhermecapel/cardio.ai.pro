@@ -1,8 +1,6 @@
-import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { configureStore } from '@reduxjs/toolkit'
 import App from './App'
 
@@ -13,15 +11,11 @@ const mockStore = configureStore({
   },
 })
 
-const theme = createTheme()
-
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <Provider store={mockStore}>
       <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          {children}
-        </ThemeProvider>
+        {children}
       </BrowserRouter>
     </Provider>
   )

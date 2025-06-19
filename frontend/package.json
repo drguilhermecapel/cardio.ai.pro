@@ -107,9 +107,6 @@
     ],
     "*.{json,md,yml}": "prettier --write"
   },
-  "jest": {
-    "preset": "./jest.config.js"
-  },
   "browserslist": {
     "production": [
       ">0.2%",

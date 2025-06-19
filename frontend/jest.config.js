@@ -8,7 +8,7 @@ module.exports = {
   // Setup files
   setupFilesAfterEnv: [
     '<rootDir>/src/setupTests.ts',
-    '<rootDir>/jest.setup.js'
+    '<rootDir>/jest-setup.js'
   ],
   
   // Transformações

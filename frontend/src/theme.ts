@@ -1,81 +1,140 @@
-import { createTheme } from '@mui/material/styles'
+// Theme configuration for CardioAI Pro
+// Using CSS custom properties for modern theming
 
-export const theme = createTheme({
-  palette: {
+export const theme = {
+  colors: {
+    // Cores primárias - Fusão Cardiologia + IA
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
+      blue: '#0066FF',
+      blueLight: '#00AAFF',
+      blueLighter: '#66CCFF',
     },
-    secondary: {
-      main: '#dc004e',
-      light: '#ff5983',
-      dark: '#9a0036',
+    cardiac: {
+      red: '#FF3366',
+      redLight: '#FF6B9D',
+      redLighter: '#FFB3C6',
     },
-    background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
+    tech: {
+      cyan: '#00FFFF',
+      cyanLight: '#66FFFF',
+      cyanLighter: '#B3FFFF',
     },
-    success: {
-      main: '#2e7d32',
+    // Cores secundárias
+    neutral: {
+      dark: '#1A1A1A',
+      medium: '#2D2D2D',
+      light: '#404040',
+      white: '#FFFFFF',
+      offWhite: '#F8F9FA',
+      lighter: '#E9ECEF',
     },
-    warning: {
-      main: '#ed6c02',
-    },
-    error: {
-      main: '#d32f2f',
+    status: {
+      success: '#00FF88',
+      successLight: '#66FFAA',
+      warning: '#FFD700',
+      warningLight: '#FFED4E',
+      error: '#FF3366',
+      errorLight: '#FF6B9D',
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontSize: '2.5rem',
-      fontWeight: 500,
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    sizes: {
+      xs: '0.75rem',
+      sm: '0.875rem',
+      base: '1rem',
+      lg: '1.125rem',
+      xl: '1.25rem',
+      '2xl': '1.5rem',
+      '3xl': '1.875rem',
+      '4xl': '2.25rem',
+      '5xl': '3rem',
     },
-    h2: {
-      fontSize: '2rem',
-      fontWeight: 500,
-    },
-    h3: {
-      fontSize: '1.75rem',
-      fontWeight: 500,
-    },
-    h4: {
-      fontSize: '1.5rem',
-      fontWeight: 500,
-    },
-    h5: {
-      fontSize: '1.25rem',
-      fontWeight: 500,
-    },
-    h6: {
-      fontSize: '1rem',
-      fontWeight: 500,
+    weights: {
+      light: 300,
+      normal: 400,
+      medium: 500,
+      semibold: 600,
+      bold: 700,
     },
   },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          borderRadius: 8,
-        },
-      },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    '2xl': '3rem',
+    '3xl': '4rem',
+  },
+  borderRadius: {
+    sm: '0.25rem',
+    md: '0.5rem',
+    lg: '0.75rem',
+    xl: '1rem',
+    '2xl': '1.5rem',
+    full: '9999px',
+  },
+  shadows: {
+    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    md: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+    xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+    glow: '0 0 20px rgba(0, 102, 255, 0.3)',
+    cardiacGlow: '0 0 20px rgba(255, 51, 102, 0.3)',
+  },
+  animations: {
+    duration: {
+      fast: '150ms',
+      normal: '300ms',
+      slow: '500ms',
     },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
+    easing: {
+      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
+      easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
     },
   },
-})
+  breakpoints: {
+    sm: '640px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1280px',
+    '2xl': '1536px',
+  },
+}
+
+// CSS Custom Properties for runtime theme switching
+export const cssVariables = {
+  '--color-primary': theme.colors.primary.blue,
+  '--color-primary-light': theme.colors.primary.blueLight,
+  '--color-cardiac': theme.colors.cardiac.red,
+  '--color-cardiac-light': theme.colors.cardiac.redLight,
+  '--color-tech': theme.colors.tech.cyan,
+  '--color-tech-light': theme.colors.tech.cyanLight,
+  '--color-neutral-dark': theme.colors.neutral.dark,
+  '--color-neutral-medium': theme.colors.neutral.medium,
+  '--color-neutral-light': theme.colors.neutral.light,
+  '--color-white': theme.colors.neutral.white,
+  '--color-success': theme.colors.status.success,
+  '--color-warning': theme.colors.status.warning,
+  '--color-error': theme.colors.status.error,
+  '--font-family': theme.typography.fontFamily,
+  '--border-radius': theme.borderRadius.md,
+  '--shadow-glow': theme.shadows.glow,
+  '--shadow-cardiac-glow': theme.shadows.cardiacGlow,
+  '--animation-duration': theme.animations.duration.normal,
+  '--animation-easing': theme.animations.easing.easeInOut,
+}
+
+// Apply CSS variables to document root
+export const applyTheme = () => {
+  if (typeof document !== 'undefined') {
+    const root = document.documentElement
+    Object.entries(cssVariables).forEach(([property, value]) => {
+      root.style.setProperty(property, value)
+    })
+  }
+}
+
+export default theme

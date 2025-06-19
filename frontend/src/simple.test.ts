@@ -1,5 +1,3 @@
-import { describe, it, expect } from 'vitest'
-
 describe('Teste de Verificação', () => {
   it('deve executar um teste simples', () => {
     expect(1 + 1).toBe(2)

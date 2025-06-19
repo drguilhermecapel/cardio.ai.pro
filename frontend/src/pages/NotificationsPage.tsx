@@ -4,16 +4,9 @@ import {
   Card,
   CardContent,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Chip,
-  LinearProgress,
   Alert,
-  IconButton,
-} from '@mui/material'
-import { Notifications, Warning, Info, CheckCircle, MarkEmailRead } from '@mui/icons-material'
+  Button,
+} from '../components/ui/BasicComponents'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchNotifications, markAsRead } from '../store/slices/notificationSlice'
 
@@ -29,109 +22,115 @@ const NotificationsPage: React.FC = () => {
     dispatch(markAsRead(notificationId))
   }
 
-  const getPriorityColor = (
-    priority: string
-  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  const getPriorityColor = (priority: string): string => {
     switch (priority) {
       case 'critical':
-        return 'error'
+        return 'bg-red-100 text-red-800'
       case 'high':
-        return 'warning'
+        return 'bg-yellow-100 text-yellow-800'
       case 'medium':
-        return 'info'
+        return 'bg-blue-100 text-blue-800'
       case 'low':
-        return 'success'
+        return 'bg-green-100 text-green-800'
       default:
-        return 'default'
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
-  const getNotificationIcon = (type: string): React.ReactNode => {
+  const getNotificationIcon = (type: string): string => {
     switch (type) {
       case 'validation_assignment':
-        return <CheckCircle />
+        return '✅'
       case 'urgent_alert':
-        return <Warning />
+        return '⚠️'
       case 'completion_notification':
-        return <Info />
+        return 'ℹ️'
       default:
-        return <Notifications />
+        return '🔔'
     }
   }
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" className="mb-6">
         Notifications
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity="error" className="mb-4">
           {error}
         </Alert>
       )}
 
-      {isLoading && <LinearProgress sx={{ mb: 2 }} />}
+      {isLoading && (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+          <div className="bg-blue-600 h-2.5 rounded-full animate-pulse" style={{width: '45%'}}></div>
+        </div>
+      )}
 
       <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" className="mb-4">
             Recent Notifications
           </Typography>
-          <List>
+          <div className="space-y-3">
             {notifications.map(notification => (
-              <ListItem
+              <div
                 key={notification.id}
-                sx={{
-                  border: '1px solid #eee',
-                  borderRadius: 1,
-                  mb: 1,
-                  backgroundColor: notification.isRead ? 'transparent' : '#f5f5f5',
-                }}
-                secondaryAction={
-                  !notification.isRead && (
-                    <IconButton
-                      edge="end"
-                      aria-label="mark as read"
-                      onClick={() => handleMarkAsRead(notification.id)}
-                    >
-                      <MarkEmailRead />
-                    </IconButton>
-                  )
-                }
+                className={`border border-gray-200 rounded-lg p-4 ${
+                  notification.isRead ? 'bg-white' : 'bg-gray-50'
+                }`}
               >
-                <ListItemIcon>{getNotificationIcon(notification.notificationType)}</ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="subtitle1">{notification.title}</Typography>
-                      <Chip
-                        label={notification.priority}
-                        color={getPriorityColor(notification.priority)}
-                        size="small"
-                      />
-                      {!notification.isRead && <Chip label="New" color="primary" size="small" />}
-                    </Box>
-                  }
-                  secondary={
-                    <Box>
-                      <Typography variant="body2" sx={{ mb: 1 }}>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3">
+                    <span className="text-2xl">
+                      {getNotificationIcon(notification.notificationType)}
+                    </span>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <Typography variant="h6" className="font-medium">
+                          {notification.title}
+                        </Typography>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(notification.priority)}`}>
+                          {notification.priority}
+                        </span>
+                        {!notification.isRead && (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            New
+                          </span>
+                        )}
+                      </div>
+                      <Typography variant="body2" className="text-gray-600 mb-2">
                         {notification.message}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" className="text-gray-500">
                         {new Date(notification.createdAt).toLocaleString()}
                       </Typography>
-                    </Box>
-                  }
-                />
-              </ListItem>
+                    </div>
+                  </div>
+                  {!notification.isRead && (
+                    <Button
+                      variant="outlined"
+                      onClick={() => handleMarkAsRead(notification.id)}
+                      className="ml-4"
+                    >
+                      Mark as Read
+                    </Button>
+                  )}
+                </div>
+              </div>
             ))}
             {notifications.length === 0 && !isLoading && (
-              <ListItem>
-                <ListItemText primary="No notifications" secondary="You're all caught up!" />
-              </ListItem>
+              <div className="text-center py-8">
+                <Typography variant="body1" className="text-gray-600">
+                  No notifications
+                </Typography>
+                <Typography variant="body2" className="text-gray-500">
+                  You're all caught up!
+                </Typography>
+              </div>
             )}
-          </List>
+          </div>
         </CardContent>
       </Card>
     </Box>

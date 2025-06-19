@@ -123,17 +123,17 @@ afterEach(() => {
 });
 
 // Configurações adicionais para componentes médicos
-jest.mock('@/services/ecg/analysis', () => ({
-  analyzeECG: jest.fn(),
-  detectArrhythmia: jest.fn(),
-  calculateHeartRate: jest.fn(),
-}));
+// jest.mock('@/services/ecg/analysis', () => ({
+//   analyzeECG: jest.fn(),
+//   detectArrhythmia: jest.fn(),
+//   calculateHeartRate: jest.fn(),
+// }));
 
-jest.mock('@/services/diagnosis/engine', () => ({
-  generateDiagnosis: jest.fn(),
-  assessSeverity: jest.fn(),
-  getRecommendations: jest.fn(),
-}));
+// jest.mock('@/services/diagnosis/engine', () => ({
+//   generateDiagnosis: jest.fn(),
+//   assessSeverity: jest.fn(),
+//   getRecommendations: jest.fn(),
+// }));
 
 // Mock de bibliotecas de gráficos
 jest.mock('recharts', () => ({

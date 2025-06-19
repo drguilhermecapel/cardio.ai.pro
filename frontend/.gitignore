@@ -36,3 +36,7 @@ Thumbs.db
 
 # IMPORTANTE: NÃO ignorar package-lock.json
 # package-lock.json deve ser commitado
+
+# Jest cache
+.jest-cache/
+

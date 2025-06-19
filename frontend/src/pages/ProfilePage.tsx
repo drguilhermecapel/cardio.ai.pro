@@ -7,12 +7,9 @@ import {
   TextField,
   Button,
   Grid,
-  Avatar,
-  Divider,
   Alert,
   CircularProgress,
-} from '@mui/material'
-import { AccountCircle, Save } from '@mui/icons-material'
+} from '../components/ui/BasicComponents'
 import { useAppSelector } from '../hooks/redux'
 
 interface ProfileFormData {
@@ -94,12 +91,12 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" className="mb-6">
         Profile
       </Typography>
 
       {message && (
-        <Alert severity={message.type} sx={{ mb: 2 }}>
+        <Alert severity={message.type} className="mb-4">
           {message.text}
         </Alert>
       )}
@@ -107,17 +104,17 @@ const ProfilePage: React.FC = () => {
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
           <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Avatar sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }}>
-                {user?.firstName?.[0] || <AccountCircle sx={{ fontSize: 60 }} />}
-              </Avatar>
-              <Typography variant="h6" gutterBottom>
+            <CardContent className="text-center">
+              <div className="w-24 h-24 mx-auto mb-4 bg-gray-300 rounded-full flex items-center justify-center text-2xl font-bold text-gray-600">
+                {user?.firstName?.[0] || '👤'}
+              </div>
+              <Typography variant="h6" className="mb-2">
                 {user?.firstName} {user?.lastName}
               </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography variant="body2" className="text-gray-600 mb-1">
                 {user?.role}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" className="text-gray-600">
                 {user?.email}
               </Typography>
             </CardContent>
@@ -127,7 +124,7 @@ const ProfilePage: React.FC = () => {
         <Grid item xs={12} md={8}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" className="mb-4">
                 Personal Information
               </Typography>
               <Grid container spacing={2}>
@@ -171,23 +168,24 @@ const ProfilePage: React.FC = () => {
                 <Grid item xs={12}>
                   <Button
                     variant="contained"
-                    startIcon={isLoading ? <CircularProgress size={20} /> : <Save />}
                     onClick={handleUpdateProfile}
                     disabled={isLoading}
+                    className="flex items-center space-x-2"
                   >
-                    Update Profile
+                    {isLoading ? <CircularProgress size={20} /> : <span>💾</span>}
+                    <span>Update Profile</span>
                   </Button>
                 </Grid>
               </Grid>
             </CardContent>
           </Card>
 
-          <Card sx={{ mt: 3 }}>
+          <Card className="mt-6">
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" className="mb-4">
                 Change Password
               </Typography>
-              <Divider sx={{ mb: 2 }} />
+              <div className="border-b border-gray-200 mb-4"></div>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
@@ -223,7 +221,6 @@ const ProfilePage: React.FC = () => {
                   <Button
                     variant="contained"
                     color="secondary"
-                    startIcon={isLoading ? <CircularProgress size={20} /> : <Save />}
                     onClick={handleChangePassword}
                     disabled={
                       isLoading ||
@@ -231,8 +228,10 @@ const ProfilePage: React.FC = () => {
                       !formData.newPassword ||
                       !formData.confirmPassword
                     }
+                    className="flex items-center space-x-2"
                   >
-                    Change Password
+                    {isLoading ? <CircularProgress size={20} /> : <span>💾</span>}
+                    <span>Change Password</span>
                   </Button>
                 </Grid>
               </Grid>

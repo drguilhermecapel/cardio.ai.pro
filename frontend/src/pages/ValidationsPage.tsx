@@ -4,19 +4,9 @@ import {
   Card,
   CardContent,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Chip,
   Button,
-  LinearProgress,
   Alert,
-} from '@mui/material'
-import { Assignment, CheckCircle } from '@mui/icons-material'
+} from '../components/ui/BasicComponents'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchMyValidations } from '../store/slices/validationSlice'
 
@@ -28,112 +18,108 @@ const ValidationsPage: React.FC = () => {
     dispatch(fetchMyValidations({}))
   }, [dispatch])
 
-  const getStatusColor = (
-    status: string
-  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
       case 'completed':
-        return 'success'
+        return 'bg-green-100 text-green-800'
       case 'pending':
-        return 'warning'
+        return 'bg-yellow-100 text-yellow-800'
       case 'in_progress':
-        return 'info'
+        return 'bg-blue-100 text-blue-800'
       default:
-        return 'default'
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" className="mb-6">
         Validations
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity="error" className="mb-4">
           {error}
         </Alert>
       )}
 
-      {isLoading && <LinearProgress sx={{ mb: 2 }} />}
+      {isLoading && (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+          <div className="bg-blue-600 h-2.5 rounded-full animate-pulse" style={{width: '45%'}}></div>
+        </div>
+      )}
 
       <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" className="mb-4">
             My Validation Assignments
           </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Validation ID</TableCell>
-                  <TableCell>Analysis ID</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Approved</TableCell>
-                  <TableCell>Clinical Notes</TableCell>
-                  <TableCell>Created Date</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Validation ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Analysis ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clinical Notes</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
                 {validations.map(validation => (
-                  <TableRow key={validation.id}>
-                    <TableCell>{validation.id}</TableCell>
-                    <TableCell>{validation.analysisId}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={validation.status}
-                        color={getStatusColor(validation.status)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
+                  <tr key={validation.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{validation.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{validation.analysisId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(validation.status)}`}>
+                        {validation.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {validation.approved !== undefined ? (
-                        <Chip
-                          label={validation.approved ? 'Yes' : 'No'}
-                          color={validation.approved ? 'success' : 'error'}
-                          size="small"
-                        />
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          validation.approved ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {validation.approved ? 'Yes' : 'No'}
+                        </span>
                       ) : (
                         'Pending'
                       )}
-                    </TableCell>
-                    <TableCell>
-                      {validation.clinicalNotes ? (
-                        <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-                          {validation.clinicalNotes}
-                        </Typography>
-                      ) : (
-                        'No notes'
-                      )}
-                    </TableCell>
-                    <TableCell>{new Date(validation.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 max-w-xs truncate">
+                      {validation.clinicalNotes || 'No notes'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(validation.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {validation.status === 'pending' ? (
                         <Button
-                          size="small"
                           variant="contained"
-                          startIcon={<Assignment />}
                           onClick={() => {}}
+                          className="flex items-center space-x-1"
                         >
-                          Review
+                          <span>📋</span>
+                          <span>Review</span>
                         </Button>
                       ) : (
                         <Button
-                          size="small"
                           variant="outlined"
-                          startIcon={<CheckCircle />}
                           onClick={() => {}}
+                          className="flex items-center space-x-1"
                         >
-                          View
+                          <span>✅</span>
+                          <span>View</span>
                         </Button>
                       )}
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </Box>

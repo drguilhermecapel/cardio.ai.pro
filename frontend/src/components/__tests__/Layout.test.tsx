@@ -2,24 +2,21 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
-import { ThemeProvider } from '@mui/material/styles'
-import { describe, it, expect, vi } from 'vitest'
 import { store } from '../../store'
-import { theme } from '../../theme'
 import { AuthProvider } from '../../contexts/AuthContext'
 import Layout from '../Layout'
 
-vi.mock('../../hooks/useAuth', () => ({
-  useAuth: vi.fn(() => ({
+jest.mock('../../hooks/useAuth', () => ({
+  useAuth: jest.fn(() => ({
     user: { username: 'Test User' },
     isAuthenticated: true,
-    login: vi.fn(),
-    logout: vi.fn(),
+    login: jest.fn(),
+    logout: jest.fn(),
   })),
 }))
 
-vi.mock('../../hooks/redux', () => ({
-  useAppSelector: vi.fn(() => ({
+jest.mock('../../hooks/redux', () => ({
+  useAppSelector: jest.fn(() => ({
     auth: {
       isAuthenticated: true,
       user: { firstName: 'Test', lastName: 'User', role: 'physician' },
@@ -32,16 +29,14 @@ vi.mock('../../hooks/redux', () => ({
       unreadCount: 0,
     },
   })),
-  useAppDispatch: vi.fn(() => vi.fn()),
+  useAppDispatch: jest.fn(() => jest.fn()),
 }))
 
 const renderWithProviders = (component: React.ReactElement): ReturnType<typeof render> => {
   return render(
     <Provider store={store}>
       <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <AuthProvider>{component}</AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>{component}</AuthProvider>
       </BrowserRouter>
     </Provider>
   )

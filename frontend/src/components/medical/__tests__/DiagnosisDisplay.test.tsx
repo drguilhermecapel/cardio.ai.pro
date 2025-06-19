@@ -111,7 +111,7 @@ const mockDiagnosis: Diagnosis = {
 };
 
 // Mock do serviço
-jest.mock('@/services/diagnosis/engine');
+// jest.mock('@/services/diagnosis/engine');
 
 describe('DiagnosisDisplay Component - 100% Coverage', () => {
   let store: any;

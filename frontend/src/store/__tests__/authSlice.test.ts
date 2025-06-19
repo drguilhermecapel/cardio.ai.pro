@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest'
 import authReducer, { login, logout } from '../slices/authSlice'
 
 describe('authSlice', () => {

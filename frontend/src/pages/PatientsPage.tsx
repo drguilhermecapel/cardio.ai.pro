@@ -1,32 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Card,
   CardContent,
   Typography,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Alert,
-  LinearProgress,
-  SelectChangeEvent,
-} from '@mui/material'
-import { Add, Edit } from '@mui/icons-material'
+} from '../components/ui/BasicComponents'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchPatients, createPatient, clearError } from '../store/slices/patientSlice'
 
@@ -61,21 +43,21 @@ const PatientsPage: React.FC = () => {
 
   const handleInputChange =
     (field: keyof PatientFormData) =>
-    (event: React.ChangeEvent<HTMLInputElement>): void => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormData(prev => ({
         ...prev,
         [field]: event.target.value,
       }))
     }
 
-  const handleGenderChange = (event: SelectChangeEvent<string>): void => {
+  const handleGenderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
-      gender: event.target.value as string,
+      gender: event.target.value,
     }))
   }
 
-  const handleCreatePatient = async (): Promise<void> => {
+  const handleCreatePatient = async () => {
     dispatch(clearError())
     await dispatch(createPatient(formData))
     setCreateDialogOpen(false)
@@ -100,150 +82,157 @@ const PatientsPage: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <div className="flex justify-between items-center mb-6">
         <Typography variant="h4">Patients</Typography>
-        <Button variant="contained" startIcon={<Add />} onClick={() => setCreateDialogOpen(true)}>
-          Add Patient
+        <Button variant="contained" onClick={() => setCreateDialogOpen(true)} className="flex items-center space-x-2">
+          <span>➕</span>
+          <span>Add Patient</span>
         </Button>
-      </Box>
+      </div>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity="error" className="mb-4">
           {error}
         </Alert>
       )}
 
-      {isLoading && <LinearProgress sx={{ mb: 2 }} />}
+      {isLoading && (
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+          <div className="bg-blue-600 h-2.5 rounded-full animate-pulse" style={{width: '45%'}}></div>
+        </div>
+      )}
 
       <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" className="mb-4">
             Patient List
           </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Patient ID</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Date of Birth</TableCell>
-                  <TableCell>Gender</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date of Birth</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
                 {patients.map(patient => (
-                  <TableRow key={patient.id}>
-                    <TableCell>{patient.patientId}</TableCell>
-                    <TableCell>
+                  <tr key={patient.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.patientId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {patient.firstName} {patient.lastName}
-                    </TableCell>
-                    <TableCell>{new Date(patient.dateOfBirth).toLocaleDateString()}</TableCell>
-                    <TableCell>{patient.gender}</TableCell>
-                    <TableCell>{patient.phone || 'N/A'}</TableCell>
-                    <TableCell>{patient.email || 'N/A'}</TableCell>
-                    <TableCell>
-                      <Button size="small" startIcon={<Edit />} onClick={() => {}}>
-                        Edit
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(patient.dateOfBirth).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.gender}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.phone || 'N/A'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{patient.email || 'N/A'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <Button variant="outlined" onClick={() => {}} className="flex items-center space-x-1">
+                        <span>✏️</span>
+                        <span>Edit</span>
                       </Button>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
-      <Dialog
-        open={createDialogOpen}
-        onClose={() => setCreateDialogOpen(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>Add New Patient</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Patient ID"
-                value={formData.patientId}
-                onChange={handleInputChange('patientId')}
-                required
-              />
+      {createDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <Typography variant="h6" className="mb-4">Add New Patient</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Patient ID"
+                  value={formData.patientId}
+                  onChange={handleInputChange('patientId')}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <div className="w-full">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                  <select
+                    value={formData.gender}
+                    onChange={handleGenderChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="First Name"
+                  value={formData.firstName}
+                  onChange={handleInputChange('firstName')}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Last Name"
+                  value={formData.lastName}
+                  onChange={handleInputChange('lastName')}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Date of Birth"
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={handleInputChange('dateOfBirth')}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Phone"
+                  value={formData.phone}
+                  onChange={handleInputChange('phone')}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange('email')}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth required>
-                <InputLabel>Gender</InputLabel>
-                <Select value={formData.gender} onChange={handleGenderChange} label="Gender">
-                  <MenuItem value="male">Male</MenuItem>
-                  <MenuItem value="female">Female</MenuItem>
-                  <MenuItem value="other">Other</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="First Name"
-                value={formData.firstName}
-                onChange={handleInputChange('firstName')}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Last Name"
-                value={formData.lastName}
-                onChange={handleInputChange('lastName')}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Date of Birth"
-                type="date"
-                value={formData.dateOfBirth}
-                onChange={handleInputChange('dateOfBirth')}
-                InputLabelProps={{ shrink: true }}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Phone"
-                value={formData.phone}
-                onChange={handleInputChange('phone')}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange('email')}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCreateDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleCreatePatient}
-            variant="contained"
-            disabled={!isFormValid || isLoading}
-          >
-            Create Patient
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <div className="flex justify-end space-x-3 mt-6">
+              <Button variant="outlined" onClick={() => setCreateDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreatePatient}
+                variant="contained"
+                disabled={!isFormValid || isLoading}
+              >
+                Create Patient
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Box>
   )
 }
