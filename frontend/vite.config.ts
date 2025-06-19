@@ -33,6 +33,20 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'router-vendor': ['react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          'chart-vendor': ['chart.js', 'react-chartjs-2'],
+          'utils-vendor': ['axios', 'date-fns', 'clsx']
+        }
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
