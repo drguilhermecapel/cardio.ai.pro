@@ -222,3 +222,17 @@ def verify_2fa_token(user_token: str, stored_token: str, window: int = 1) -> boo
     """Verify 2FA token with time window."""
     # Simple implementation - in production, use TOTP
     return constant_time_compare(user_token, stored_token)
+
+
+# OAuth2 scheme for token extraction
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
+# Simple dependency function for getting current user
+def get_current_user():
+    """Get current authenticated user - simplified version."""
+    # This is a simplified placeholder
+    # In real usage, this would be properly implemented with dependency injection
+    return {"id": 1, "email": "admin@cardioai.pro", "name": "Admin"}
+
