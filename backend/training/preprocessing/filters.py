@@ -20,7 +20,7 @@ class ECGFilters:
         nyq = 0.5 * self.sampling_rate
         low = lowcut / nyq
         high = highcut / nyq
-        b, a = butter(order, [low, high], btype=\'band\')
+        b, a = butter(order, [low, high], btype='band')
         return b, a
 
     def bandpass_filter(self, data, lowcut=0.5, highcut=40.0, order=5):
@@ -44,5 +44,3 @@ class ECGFilters:
         logger.debug(f"Sinal reamostrado de {original_sampling_rate}Hz para {target_sampling_rate}Hz. "
                      f"De {signal.shape[-1]} para {resampled_signal.shape[-1]} amostras.")
         return resampled_signal
-
-
