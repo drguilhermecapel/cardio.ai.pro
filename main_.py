@@ -62,7 +62,8 @@ def main(args):
         normalize=True,
         augment=True,
         filter_noise=True,
-        cache_data=False # Pode ser True para datasets pequenos
+        cache_data=False, # Pode ser True para datasets pequenos
+        sample_limit=100 # Limita o número de amostras para testes rápidos
     )
     
     # Dividir o dataset
