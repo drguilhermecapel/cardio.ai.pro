@@ -6,6 +6,7 @@ Implementação do dataset PTB-XL ECG Database
 import wfdb
 import numpy as np
 import pandas as pd
+import os
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Union
 import logging
@@ -22,8 +23,9 @@ class PTBXLDataset(BaseECGDataset):
     def __init__(self, data_path: Union[str, Path], **kwargs):
         super().__init__(data_path, **kwargs)
         self.dataset_config = get_dataset_config("ptbxl")
-        self._check_data_path()
         self.sampling_rate = kwargs.get("sampling_rate", self.dataset_config.sampling_rate)
+        self.download_data() # Adiciona esta linha para baixar os dados se necessário
+        self.load_metadata() # Garante que metadados sejam carregados após o download
         
     def load_metadata(self):
         """Carrega metadados do dataset PTB-XL"""
@@ -34,11 +36,12 @@ class PTBXLDataset(BaseECGDataset):
         if not metadata_path.exists():
             raise FileNotFoundError(f"Arquivo de metadados ptbxl_database.csv não encontrado em {self.data_path}")
             
-        self.raw_metadata = pd.read_csv(metadata_path, index_col=\"ecg_id\")
+        self.raw_metadata = pd.read_csv(metadata_path, index_col='ecg_id')
         self.raw_metadata.scp_codes = self.raw_metadata.scp_codes.apply(lambda x: eval(x))
         
         # Filtrar por taxa de amostragem se especificado
-        self.metadata = self.raw_metadata[self.raw_metadata["sampling_frequency"] == self.sampling_rate]
+        # self.metadata = self.raw_metadata[self.raw_metadata["sampling_frequency"] == self.sampling_rate]
+        self.metadata = self.raw_metadata.copy()
         
         # Mapeamento de diagnósticos para superclasses (5 superclasses)
         # Ref: https://physionet.org/content/ptb-xl/1.0.3/doc/scp_statements.html
@@ -81,8 +84,8 @@ class PTBXLDataset(BaseECGDataset):
         
         # Caminho para o arquivo WFDB
         # Ex: records100/00001_hr.dat
-        path_parts = list(row["filename_hr"].split(Path.sep))
-        record_path = self.data_path / Path(*path_parts)
+        path_parts = list(row["filename_hr"].split(os.sep))
+        record_path = self.data_path / "physionet.org" / "files" / "ptb-xl" / "1.0.3" / Path(*path_parts)
         
         try:
             record = wfdb.rdrecord(str(record_path))
@@ -118,3 +121,18 @@ class PTBXLDataset(BaseECGDataset):
             return np.zeros((self.num_leads, self.target_length)), {"error": str(e)}
 
 
+
+
+    def download_data(self):
+        """Baixa o dataset PTB-XL se não estiver presente."""
+        if not (self.data_path / "ptbxl_database.csv").exists():
+            logger.info(f"Baixando dataset PTB-XL para {self.data_path}...")
+            try:
+                wfdb.dl_database(
+                    "ptb-xl",
+                    dl_dir=str(self.data_path)
+                )
+                logger.info("Download do dataset PTB-XL concluído.")
+            except Exception as e:
+                logger.error(f"Erro ao baixar o dataset PTB-XL: {e}")
+                raise
