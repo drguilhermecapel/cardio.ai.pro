@@ -30,7 +30,7 @@ class HeartBEiT(BaseModel):
         norm_layer: nn.Module = nn.LayerNorm,
         **kwargs
     ):
-        super().__init__(num_classes, in_chans)
+        super().__init__(num_classes=num_classes, input_channels=in_chans)
         self.config = config
         
         self.num_features = self.embed_dim = config.embed_dim
@@ -66,7 +66,7 @@ class HeartBEiT(BaseModel):
                 num_heads=config.num_heads,
                 mlp_ratio=config.mlp_ratio,
                 qkv_bias=config.qkv_bias,
-                drop=drop_rate,
+                proj_drop=drop_rate,
                 attn_drop=attn_drop_rate,
                 drop_path=dpr[i],
                 norm_layer=norm_layer
@@ -108,5 +108,6 @@ class HeartBEiT(BaseModel):
         x = self.forward_features(x)
         x = self.head(x)
         return x
+
 
 
