@@ -3,7 +3,8 @@
 Fábrica para criação de instâncias de datasets de ECG
 """
 
-from typing import Union, Path
+from pathlib import Path
+from typing import Union
 from .base_dataset import BaseECGDataset
 from .mitbih_dataset import MITBIHDataset
 from .ptbxl_dataset import PTBXLDataset
@@ -45,8 +46,7 @@ class DatasetFactory:
         elif dataset_name == "cpsc2018":
             return CPSC2018Dataset(data_path=data_path, split=split, **kwargs)
         else:
-            raise ValueError(f"Dataset 
-{dataset_name} não suportado. "
+            raise ValueError(f"Dataset {dataset_name} não suportado. "
                             f"Datasets disponíveis: mitbih, ptbxl, cpsc2018")
 
 

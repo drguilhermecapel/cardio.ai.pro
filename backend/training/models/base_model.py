@@ -17,10 +17,9 @@ class BaseModel(nn.Module, ABC):
         self.num_classes = num_classes
         self.input_channels = input_channels
         
-    @abstractmethod
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass do modelo."""
-        pass
+        raise NotImplementedError("O método forward deve ser implementado pela subclasse.")
         
     def load_pretrained(self, path: str):
         """Carrega pesos pré-treinados no modelo."""

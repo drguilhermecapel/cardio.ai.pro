@@ -7,6 +7,8 @@ from typing import Dict, List, Optional, Union
 from pydantic import Field
 from pydantic_settings import BaseSettings
 import torch
+from pydantic_settings import BaseSettings
+import torch
 import os
 
 # Importa configurações do sistema existente
@@ -72,4 +74,3 @@ class TrainingConfig(BaseSettings):
 
 # Instância global de configuração
 training_config = TrainingConfig()
-

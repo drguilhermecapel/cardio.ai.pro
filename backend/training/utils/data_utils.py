@@ -6,6 +6,7 @@ Utilitários para manipulação de dados
 from torch.utils.data import Dataset, random_split
 from typing import Tuple
 import logging
+import torch
 
 logger = logging.getLogger(__name__)
 

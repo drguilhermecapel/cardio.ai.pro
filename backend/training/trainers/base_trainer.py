@@ -63,9 +63,7 @@ class BaseTrainer(ABC):
             train_metrics = self._train_epoch(epoch)
             val_metrics = self._validate_epoch(epoch)
             
-            logger.info(f"Epoch {epoch+1}/{self.epochs} - "
-                       f"Train Loss: {train_metrics["loss"]:.4f}, "
-                       f"Val Loss: {val_metrics["loss"]:.4f}")
+            logger.info(f'Epoch {epoch+1}/{self.epochs} - ' f'Train Loss: {train_metrics["loss"]:.4f}, ' f'Val Loss: {val_metrics["loss"]:.4f}')
                        
             # Early stopping
             if val_metrics["loss"] < self.best_val_loss:

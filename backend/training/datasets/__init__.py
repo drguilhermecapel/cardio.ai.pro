@@ -6,7 +6,6 @@ from .base_dataset import BaseECGDataset
 from .mitbih_dataset import MITBIHDataset
 from .ptbxl_dataset import PTBXLDataset
 from .cpsc2018_dataset import CPSC2018Dataset
-from .dataset_factory import DatasetFactory
 
 __all__ = [
     "BaseECGDataset",
