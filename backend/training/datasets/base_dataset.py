@@ -4,6 +4,7 @@ Dataset base para todos os datasets de ECG
 """
 
 import numpy as np
+import os
 import torch
 from torch.utils.data import Dataset
 from typing import Dict, List, Tuple, Optional, Union
@@ -75,6 +76,13 @@ class BaseECGDataset(Dataset, ABC):
         logger.info(f"Dataset {self.__class__.__name__} inicializado: "
                    f"{len(self.samples)} amostras no split '{split}'")
     
+    def load_npy_signal(self, file_path: Union[str, Path]) -> np.ndarray:
+        """Carrega um sinal ECG de um arquivo .npy"""
+        if os.path.exists(file_path):
+            return np.load(file_path)
+        else:
+            raise FileNotFoundError(f"Arquivo não encontrado: {file_path}")
+
     @abstractmethod
     def load_metadata(self):
         """Carrega metadados do dataset (paths, labels, etc)"""
