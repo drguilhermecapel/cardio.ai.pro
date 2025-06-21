@@ -1,4 +1,3 @@
-
 """
 Implementação do dataset MIT-BIH Arrhythmia Database
 """
@@ -82,11 +81,15 @@ class MITBIHDataset(BaseECGDataset):
     def load_signal(self, idx: int) -> Tuple[np.ndarray, Dict]:
         """Carrega sinal ECG do registro especificado"""
         record_name = self.samples[idx]
-        record_path = self.data_path / record_name
+        npy_path = self.data_path / f"{record_name}.npy"
         
         try:
-            record = wfdb.rdrecord(str(record_path))
-            signal = record.p_signal.T  # Transpõe para (num_leads, num_samples)
+            if npy_path.exists():
+                signal = self.load_npy_signal(npy_path)
+            else:
+                record_path = self.data_path / record_name
+                record = wfdb.rdrecord(str(record_path))
+                signal = record.p_signal.T  # Transpõe para (num_leads, num_samples)
             
             metadata = {
                 "record_name": record_name,
@@ -113,5 +116,3 @@ class MITBIHDataset(BaseECGDataset):
             logger.error(f"Erro ao carregar sinal para {record_name}: {e}")
             # Retorna um sinal de zeros e metadados vazios em caso de erro
             return np.zeros((self.num_leads, self.target_length)), {"error": str(e)}
-
-
