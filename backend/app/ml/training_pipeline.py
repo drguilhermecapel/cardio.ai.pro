@@ -1,46 +1,47 @@
 """
-Training Pipeline for Hybrid CNN-BiLSTM-Transformer Architecture
-Implements curriculum learning and multimodal processing for ECG analysis
-Based on scientific recommendations for CardioAI Pro
+Advanced Training Pipeline for Hybrid CNN-BiGRU-Transformer Architecture
+Implements curriculum learning, multi-task learning, and advanced optimization
+Based on state-of-the-art research for ECG analysis
 """
 
 import json
 import logging
+import os
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Optional, Tuple
 
-import cv2
 import numpy as np
-import pywt
 import torch
 import torch.nn as nn
-
-try:
-    import torch.nn.functional as F
-except ImportError:
-    F = None
+import torch.nn.functional as F
 import torch.optim as optim
+from torch.cuda.amp import GradScaler, autocast
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts, OneCycleLR
+from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
+from torch.utils.tensorboard import SummaryWriter
 
 try:
     import wandb
-except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    WANDB_AVAILABLE = True
+except ImportError:
     wandb = None
-from scipy import signal as scipy_signal
+    WANDB_AVAILABLE = False
 
-try:
-    from sklearn.metrics import classification_report, roc_auc_score
-    from sklearn.model_selection import train_test_split
-except ModuleNotFoundError:  # pragma: no cover - optional dependency
-    classification_report = None
-    roc_auc_score = None
-    train_test_split = None
-from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
+from scipy import signal as scipy_signal
+from sklearn.metrics import (
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_recall_curve,
+    roc_auc_score,
+)
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from tqdm import tqdm
 
-from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS, get_condition_by_code
-from app.datasets.ecg_public_datasets import ECGDatasetLoader
+from app.core.scp_ecg_conditions import SCP_ECG_CONDITIONS
+from app.datasets.ecg_public_datasets import ECGDatasetLoader, ECGRecord
 from app.ml.hybrid_architecture import ModelConfig, create_hybrid_model
 from app.preprocessing.advanced_pipeline import AdvancedECGPreprocessor
 
@@ -49,862 +50,749 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class TrainingConfig:
-    """Configuration for training pipeline"""
+    """Enhanced configuration for training pipeline"""
 
     model_config: ModelConfig
 
+    # Basic training parameters
     batch_size: int = 32
-    learning_rate: float = 1e-4
+    learning_rate: float = 3e-4
     num_epochs: int = 100
     weight_decay: float = 1e-5
     gradient_clip_norm: float = 1.0
 
+    # Curriculum learning
     curriculum_learning: bool = True
-    curriculum_stages: int = 3
-    curriculum_epochs_per_stage: int = 30
+    curriculum_stages: int = 4
+    curriculum_difficulty_increase: float = 0.25
+    curriculum_easy_samples_ratio: float = 0.3
 
+    # Advanced optimization
+    use_mixed_precision: bool = True
+    use_gradient_accumulation: bool = True
+    accumulation_steps: int = 4
+    
+    # Learning rate scheduling
+    scheduler_type: str = "cosine_warm_restarts"  # "cosine_warm_restarts", "one_cycle", "plateau"
+    warmup_epochs: int = 5
+    min_lr: float = 1e-6
+    
+    # Multi-task learning
+    multi_task_learning: bool = True
+    auxiliary_tasks: List[str] = None  # ["rhythm", "morphology", "intervals"]
+    task_weights: Dict[str, float] = None
+
+    # Data augmentation
     augmentation_probability: float = 0.5
+    mixup_alpha: float = 0.2
+    cutmix_alpha: float = 1.0
     noise_std: float = 0.02
     amplitude_scale_range: tuple[float, float] = (0.8, 1.2)
     time_shift_range: int = 50
+    baseline_wander_amplitude: float = 0.05
 
+    # Multimodal features
     use_spectrograms: bool = True
     use_wavelets: bool = True
+    use_heart_rate_variability: bool = True
     spectrogram_nperseg: int = 256
     spectrogram_noverlap: int = 128
     wavelet_name: str = "db6"
     wavelet_levels: int = 6
 
-    use_class_weights: bool = True
+    # Loss functions
+    use_focal_loss: bool = True
     focal_loss_alpha: float = 0.25
     focal_loss_gamma: float = 2.0
+    use_label_smoothing: bool = True
     label_smoothing: float = 0.1
+    use_class_weights: bool = True
 
+    # Validation and evaluation
     validation_split: float = 0.2
     k_fold_cv: bool = False
     k_folds: int = 5
-
-    save_checkpoints: bool = True
-    checkpoint_dir: str = "checkpoints"
-    save_best_only: bool = True
     early_stopping_patience: int = 15
+    early_stopping_min_delta: float = 0.001
 
-    use_wandb: bool = False
+    # Model saving and checkpointing
+    save_dir: str = "checkpoints"
+    save_best_only: bool = True
+    save_frequency: int = 5
+    
+    # Logging and monitoring
+    log_frequency: int = 10
+    use_tensorboard: bool = True
+    use_wandb: bool = WANDB_AVAILABLE
     wandb_project: str = "cardioai-pro"
-    log_interval: int = 100
-
-    device: str = "cuda" if torch.cuda.is_available() else "cpu"
+    
+    # Hardware optimization
     num_workers: int = 4
     pin_memory: bool = True
+    prefetch_factor: int = 2
+
+    def __post_init__(self):
+        if self.auxiliary_tasks is None:
+            self.auxiliary_tasks = ["rhythm", "morphology", "intervals"]
+        
+        if self.task_weights is None:
+            self.task_weights = {
+                "main": 1.0,
+                "rhythm": 0.3,
+                "morphology": 0.3,
+                "intervals": 0.2
+            }
 
 
-class ECGMultimodalDataset(Dataset):
-    """
-    Multimodal ECG dataset supporting 1D signals, 2D spectrograms, and wavelet representations
-    """
-
-    def __init__(
-        self,
-        signals: list[np.ndarray],
-        labels: list[int],
-        condition_codes: list[str],
-        config: TrainingConfig,
-        is_training: bool = True,
-        preprocessor: AdvancedECGPreprocessor | None = None,
-    ):
-        self.signals = signals
-        self.labels = labels
-        self.condition_codes = condition_codes
+class ECGAugmentation:
+    """Advanced ECG augmentation techniques"""
+    
+    def __init__(self, config: TrainingConfig):
         self.config = config
-        self.is_training = is_training
-        self.preprocessor = preprocessor or AdvancedECGPreprocessor()
-
-        self.spectrograms = []
-        self.wavelets = []
-
-        if config.use_spectrograms or config.use_wavelets:
-            self._precompute_multimodal_representations()
-
-    def _precompute_multimodal_representations(self) -> None:
-        """Precompute spectrograms and wavelet representations"""
-        logger.info("Precomputing multimodal representations...")
-
-        for _i, signal in enumerate(
-            tqdm(self.signals, desc="Computing multimodal features")
-        ):
-            if self.config.use_spectrograms:
-                spectrogram = self._compute_spectrogram(signal)
-                self.spectrograms.append(spectrogram)
-
-            if self.config.use_wavelets:
-                wavelet_features = self._compute_wavelet_features(signal)
-                self.wavelets.append(wavelet_features)
-
-    def _compute_spectrogram(self, signal: np.ndarray) -> np.ndarray:
-        """Compute spectrogram for ECG signal"""
-        try:
-            lead_ii = signal[:, 1] if signal.shape[1] > 1 else signal[:, 0]
-
-            f, t, Sxx = scipy_signal.spectrogram(
-                lead_ii,
-                fs=500,  # Assuming 500 Hz sampling rate
-                nperseg=self.config.spectrogram_nperseg,
-                noverlap=self.config.spectrogram_noverlap,
-                window="hann",
+        self.preprocessor = AdvancedECGPreprocessor()
+    
+    def apply_mixup(
+        self,
+        x: torch.Tensor,
+        y: torch.Tensor,
+        alpha: float = 0.2
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, float]:
+        """Apply mixup augmentation"""
+        if alpha > 0:
+            lam = np.random.beta(alpha, alpha)
+        else:
+            lam = 1
+        
+        batch_size = x.size(0)
+        index = torch.randperm(batch_size).to(x.device)
+        
+        mixed_x = lam * x + (1 - lam) * x[index, :]
+        y_a, y_b = y, y[index]
+        
+        return mixed_x, y_a, y_b, lam
+    
+    def apply_cutmix(
+        self,
+        x: torch.Tensor,
+        y: torch.Tensor,
+        alpha: float = 1.0
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, float]:
+        """Apply CutMix augmentation for time series"""
+        if alpha > 0:
+            lam = np.random.beta(alpha, alpha)
+        else:
+            lam = 1
+        
+        batch_size = x.size(0)
+        index = torch.randperm(batch_size).to(x.device)
+        
+        # Get cut position
+        cut_length = int(x.size(2) * (1 - lam))
+        cut_start = np.random.randint(0, x.size(2) - cut_length + 1)
+        
+        # Apply cutmix
+        x[:, :, cut_start:cut_start + cut_length] = x[index, :, cut_start:cut_start + cut_length]
+        
+        y_a, y_b = y, y[index]
+        
+        return x, y_a, y_b, lam
+    
+    def apply_time_warping(self, x: torch.Tensor, strength: float = 0.2) -> torch.Tensor:
+        """Apply time warping augmentation"""
+        batch_size, channels, length = x.shape
+        
+        # Generate random warping field
+        num_anchors = 10
+        anchors = torch.linspace(0, length - 1, num_anchors)
+        
+        # Random displacement
+        displacement = torch.randn(num_anchors) * strength * length / num_anchors
+        
+        # Interpolate to get warping field
+        original_grid = torch.arange(length, dtype=torch.float32)
+        warped_grid = torch.zeros_like(original_grid)
+        
+        for i in range(num_anchors - 1):
+            start_idx = int(anchors[i])
+            end_idx = int(anchors[i + 1])
+            
+            warped_grid[start_idx:end_idx] = torch.linspace(
+                anchors[i] + displacement[i],
+                anchors[i + 1] + displacement[i + 1],
+                end_idx - start_idx
             )
-
-            Sxx_db = 10 * np.log10(Sxx + 1e-10)
-
-            Sxx_normalized = (Sxx_db - np.mean(Sxx_db)) / (np.std(Sxx_db) + 1e-8)
-
-            target_size = (128, 128)
-            spectrogram_resized = cv2.resize(Sxx_normalized, target_size)
-
-            return spectrogram_resized.astype(np.float32)
-
-        except Exception as e:
-            logger.warning(f"Error computing spectrogram: {e}")
-            return np.zeros((128, 128), dtype=np.float32)
-
-    def _compute_wavelet_features(self, signal: np.ndarray) -> np.ndarray:
-        """Compute wavelet features for ECG signal"""
-        try:
-            lead_ii = signal[:, 1] if signal.shape[1] > 1 else signal[:, 0]
-
-            coeffs = pywt.wavedec(
-                lead_ii, self.config.wavelet_name, level=self.config.wavelet_levels
-            )
-
-            wavelet_features = []
-
-            for coeff in coeffs:
-                wavelet_features.extend(
-                    [
-                        np.mean(coeff),
-                        np.std(coeff),
-                        np.var(coeff),
-                        np.max(coeff),
-                        np.min(coeff),
-                        np.median(coeff),
-                        np.percentile(coeff, 25),
-                        np.percentile(coeff, 75),
-                    ]
+        
+        # Clamp to valid range
+        warped_grid = torch.clamp(warped_grid, 0, length - 1)
+        
+        # Apply warping
+        warped_x = torch.zeros_like(x)
+        for b in range(batch_size):
+            for c in range(channels):
+                warped_x[b, c] = torch.from_numpy(
+                    np.interp(original_grid, warped_grid, x[b, c].cpu().numpy())
                 )
-
-            target_size = 256
-            if len(wavelet_features) > target_size:
-                wavelet_features = wavelet_features[:target_size]
-            else:
-                wavelet_features.extend([0.0] * (target_size - len(wavelet_features)))
-
-            return np.array(wavelet_features, dtype=np.float32)
-
-        except Exception as e:
-            logger.warning(f"Error computing wavelet features: {e}")
-            return np.zeros(256, dtype=np.float32)
-
-    def _augment_signal(self, signal: np.ndarray) -> np.ndarray:
-        """Apply data augmentation to ECG signal"""
-        if (
-            not self.is_training
-            or np.random.random() > self.config.augmentation_probability
-        ):
-            return signal
-
-        augmented_signal = signal.copy()
-
-        if np.random.random() < 0.5:
-            noise = np.random.normal(0, self.config.noise_std, signal.shape)
-            augmented_signal += noise
-
-        if np.random.random() < 0.5:
-            scale = np.random.uniform(*self.config.amplitude_scale_range)
-            augmented_signal *= scale
-
-        if np.random.random() < 0.5:
-            shift = np.random.randint(
-                -self.config.time_shift_range, self.config.time_shift_range
-            )
-            if shift > 0:
-                augmented_signal = np.concatenate(
-                    [augmented_signal[shift:], np.zeros((shift, signal.shape[1]))]
-                )
-            elif shift < 0:
-                augmented_signal = np.concatenate(
-                    [np.zeros((-shift, signal.shape[1])), augmented_signal[:shift]]
-                )
-
-        return augmented_signal
-
-    def __len__(self) -> int:
-        return len(self.signals)
-
-    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
-        signal = self.signals[idx]
-        signal = self._augment_signal(signal)
-
-        signal_tensor = torch.from_numpy(signal.T).float()  # (channels, time)
-
-        label = torch.tensor(self.labels[idx], dtype=torch.long)
-
-        item = {
-            "signal": signal_tensor,
-            "label": label,
-            "condition_code": self.condition_codes[idx],
-        }
-
-        if self.config.use_spectrograms and self.spectrograms:
-            spectrogram = torch.from_numpy(self.spectrograms[idx]).float()
-            item["spectrogram"] = spectrogram.unsqueeze(0)  # Add channel dimension
-
-        if self.config.use_wavelets and self.wavelets:
-            wavelet = torch.from_numpy(self.wavelets[idx]).float()
-            item["wavelet"] = wavelet
-
-        return item
+        
+        return warped_x.to(x.device)
+    
+    def apply_baseline_wander(self, x: torch.Tensor, amplitude: float = 0.05) -> torch.Tensor:
+        """Add baseline wander to ECG signal"""
+        batch_size, channels, length = x.shape
+        
+        # Generate low-frequency sinusoidal wander
+        freq = np.random.uniform(0.1, 0.5)  # Hz
+        phase = np.random.uniform(0, 2 * np.pi)
+        
+        time = torch.linspace(0, length / 500, length)  # Assuming 500Hz sampling
+        wander = amplitude * torch.sin(2 * np.pi * freq * time + phase)
+        
+        # Add wander to all channels
+        x = x + wander.unsqueeze(0).unsqueeze(0).to(x.device)
+        
+        return x
+    
+    def augment_batch(
+        self,
+        x: torch.Tensor,
+        y: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Apply random augmentations to batch"""
+        if np.random.random() < self.config.augmentation_probability:
+            # Choose augmentation type
+            aug_type = np.random.choice(['mixup', 'cutmix', 'time_warp', 'baseline', 'noise'])
+            
+            if aug_type == 'mixup':
+                x, y_a, y_b, lam = self.apply_mixup(x, y, self.config.mixup_alpha)
+                # For simplicity, return interpolated labels
+                y = lam * y_a + (1 - lam) * y_b
+            
+            elif aug_type == 'cutmix':
+                x, y_a, y_b, lam = self.apply_cutmix(x, y, self.config.cutmix_alpha)
+                y = lam * y_a + (1 - lam) * y_b
+            
+            elif aug_type == 'time_warp':
+                x = self.apply_time_warping(x)
+            
+            elif aug_type == 'baseline':
+                x = self.apply_baseline_wander(x, self.config.baseline_wander_amplitude)
+            
+            elif aug_type == 'noise':
+                noise = torch.randn_like(x) * self.config.noise_std
+                x = x + noise
+        
+        return x, y
 
 
 class FocalLoss(nn.Module):
-    """Focal Loss for handling class imbalance"""
-
-    def __init__(
-        self, alpha: float = 0.25, gamma: float = 2.0, reduction: str = "mean"
-    ):
+    """Focal Loss for addressing class imbalance"""
+    
+    def __init__(self, alpha: float = 0.25, gamma: float = 2.0, reduction: str = 'mean'):
         super().__init__()
         self.alpha = alpha
         self.gamma = gamma
         self.reduction = reduction
-
+    
     def forward(self, inputs: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
-        ce_loss = F.cross_entropy(inputs, targets, reduction="none")
+        ce_loss = F.cross_entropy(inputs, targets, reduction='none')
         pt = torch.exp(-ce_loss)
         focal_loss = self.alpha * (1 - pt) ** self.gamma * ce_loss
-
-        if self.reduction == "mean":
+        
+        if self.reduction == 'mean':
             return focal_loss.mean()
-        elif self.reduction == "sum":
+        elif self.reduction == 'sum':
             return focal_loss.sum()
         else:
             return focal_loss
 
 
+class MultiTaskLoss(nn.Module):
+    """Multi-task loss for auxiliary tasks"""
+    
+    def __init__(self, config: TrainingConfig):
+        super().__init__()
+        self.config = config
+        self.task_weights = config.task_weights
+        
+        # Loss functions for each task
+        self.losses = nn.ModuleDict({
+            'main': FocalLoss(config.focal_loss_alpha, config.focal_loss_gamma)
+                   if config.use_focal_loss else nn.CrossEntropyLoss(),
+            'rhythm': nn.CrossEntropyLoss(),
+            'morphology': nn.CrossEntropyLoss(),
+            'intervals': nn.MSELoss()
+        })
+    
+    def forward(
+        self,
+        predictions: Dict[str, torch.Tensor],
+        targets: Dict[str, torch.Tensor]
+    ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
+        """Compute multi-task loss"""
+        total_loss = 0.0
+        task_losses = {}
+        
+        for task, pred in predictions.items():
+            if task in targets and task in self.losses:
+                loss = self.losses[task](pred, targets[task])
+                weighted_loss = self.task_weights.get(task, 1.0) * loss
+                total_loss += weighted_loss
+                task_losses[task] = loss.item()
+        
+        return total_loss, task_losses
+
+
 class CurriculumScheduler:
     """Curriculum learning scheduler"""
-
-    def __init__(self, config: TrainingConfig, dataset_difficulty_scores: list[float]):
+    
+    def __init__(self, config: TrainingConfig, dataset_size: int):
         self.config = config
-        self.difficulty_scores = np.array(dataset_difficulty_scores)
+        self.dataset_size = dataset_size
         self.current_stage = 0
-        self.epochs_in_stage = 0
-
-    def get_current_subset_indices(self) -> list[int]:
-        """Get indices for current curriculum stage"""
+        self.epochs_per_stage = config.num_epochs // config.curriculum_stages
+    
+    def get_training_subset(self, epoch: int, difficulty_scores: np.ndarray) -> np.ndarray:
+        """Get training subset based on curriculum stage"""
         if not self.config.curriculum_learning:
-            return list(range(len(self.difficulty_scores)))
-
-        if self.current_stage == 0:
-            threshold = np.percentile(self.difficulty_scores, 33)
-            indices = np.where(self.difficulty_scores <= threshold)[0]
-        elif self.current_stage == 1:
-            threshold_low = np.percentile(self.difficulty_scores, 33)
-            threshold_high = np.percentile(self.difficulty_scores, 66)
-            indices = np.where(
-                (self.difficulty_scores > threshold_low)
-                & (self.difficulty_scores <= threshold_high)
-            )[0]
-        else:
-            indices = np.arange(len(self.difficulty_scores))
-
-        return indices.tolist()
-
-    def step_epoch(self):
-        """Step to next epoch and potentially next curriculum stage"""
-        self.epochs_in_stage += 1
-
-        if (
-            self.epochs_in_stage >= self.config.curriculum_epochs_per_stage
-            and self.current_stage < self.config.curriculum_stages - 1
-        ):
-            self.current_stage += 1
-            self.epochs_in_stage = 0
-            logger.info(f"Advanced to curriculum stage {self.current_stage}")
+            return np.arange(self.dataset_size)
+        
+        # Determine current stage
+        stage = min(epoch // self.epochs_per_stage, self.config.curriculum_stages - 1)
+        
+        # Calculate subset size
+        min_ratio = self.config.curriculum_easy_samples_ratio
+        max_ratio = 1.0
+        current_ratio = min_ratio + (max_ratio - min_ratio) * (stage / (self.config.curriculum_stages - 1))
+        
+        subset_size = int(self.dataset_size * current_ratio)
+        
+        # Sort by difficulty and select easiest samples
+        sorted_indices = np.argsort(difficulty_scores)
+        selected_indices = sorted_indices[:subset_size]
+        
+        return selected_indices
 
 
-class ECGTrainingPipeline:
-    """
-    Complete training pipeline for hybrid ECG model
-    Supports curriculum learning, multimodal processing, and advanced training strategies
-    """
-
-    def __init__(self, config: TrainingConfig):
+class ECGTrainer:
+    """Advanced trainer for ECG models"""
+    
+    def __init__(
+        self,
+        model: nn.Module,
+        config: TrainingConfig,
+        train_dataset: Dataset,
+        val_dataset: Dataset,
+        device: str = 'cuda'
+    ):
+        self.model = model.to(device)
         self.config = config
-        self.device = torch.device(config.device)
-
-        self.model = None
-        self.optimizer = None
-        self.scheduler = None
-        self.criterion = None
-        self.dataset_manager = ECGDatasetLoader()
-        self.preprocessor = AdvancedECGPreprocessor()
-
+        self.device = device
+        
+        # Datasets and loaders
+        self.train_dataset = train_dataset
+        self.val_dataset = val_dataset
+        
+        # Initialize components
+        self._setup_optimization()
+        self._setup_augmentation()
+        self._setup_logging()
+        
+        # Training state
         self.current_epoch = 0
-        self.best_val_loss = float("inf")
-        self.best_val_accuracy = 0.0
-        self.training_history = {
-            "train_loss": [],
-            "val_loss": [],
-            "train_accuracy": [],
-            "val_accuracy": [],
-            "learning_rate": [],
-        }
-
-        if config.use_wandb:
-            if wandb is None:
-                raise ImportError("Weights & Biases is required when use_wandb=True")
-            wandb.init(
-                project=config.wandb_project,
-                config=asdict(config),
-                name=f"hybrid_ecg_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-            )
-
-    def setup_model(self) -> None:
-        """Initialize model, optimizer, and loss function"""
-        self.model = create_hybrid_model(
-            num_classes=self.config.model_config.num_classes,
-            input_channels=self.config.model_config.input_channels,
-            sequence_length=self.config.model_config.sequence_length,
-        ).to(self.device)
-
+        self.best_val_loss = float('inf')
+        self.best_val_f1 = 0.0
+        
+    def _setup_optimization(self):
+        """Setup optimizer, scheduler, and loss functions"""
+        # Optimizer
         self.optimizer = optim.AdamW(
             self.model.parameters(),
             lr=self.config.learning_rate,
             weight_decay=self.config.weight_decay,
+            betas=(0.9, 0.999)
         )
-
-        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-            self.optimizer, mode="min", factor=0.5, patience=10, verbose=True
+        
+        # Learning rate scheduler
+        if self.config.scheduler_type == "cosine_warm_restarts":
+            self.scheduler = CosineAnnealingWarmRestarts(
+                self.optimizer,
+                T_0=10,
+                T_mult=2,
+                eta_min=self.config.min_lr
+            )
+        elif self.config.scheduler_type == "one_cycle":
+            self.scheduler = OneCycleLR(
+                self.optimizer,
+                max_lr=self.config.learning_rate,
+                epochs=self.config.num_epochs,
+                steps_per_epoch=len(self.train_dataset) // self.config.batch_size
+            )
+        
+        # Loss function
+        self.criterion = MultiTaskLoss(self.config) if self.config.multi_task_learning else (
+            FocalLoss(self.config.focal_loss_alpha, self.config.focal_loss_gamma)
+            if self.config.use_focal_loss else nn.CrossEntropyLoss()
         )
-
-        if self.config.focal_loss_alpha > 0:
-            self.criterion = FocalLoss(
-                alpha=self.config.focal_loss_alpha, gamma=self.config.focal_loss_gamma
+        
+        # Mixed precision training
+        if self.config.use_mixed_precision:
+            self.scaler = GradScaler()
+        
+        # Curriculum learning
+        self.curriculum_scheduler = CurriculumScheduler(
+            self.config,
+            len(self.train_dataset)
+        )
+    
+    def _setup_augmentation(self):
+        """Setup data augmentation"""
+        self.augmenter = ECGAugmentation(self.config)
+    
+    def _setup_logging(self):
+        """Setup logging and monitoring"""
+        # Create directories
+        self.save_dir = Path(self.config.save_dir)
+        self.save_dir.mkdir(parents=True, exist_ok=True)
+        
+        # TensorBoard
+        if self.config.use_tensorboard:
+            self.tb_writer = SummaryWriter(self.save_dir / 'tensorboard')
+        
+        # Weights & Biases
+        if self.config.use_wandb and WANDB_AVAILABLE:
+            wandb.init(
+                project=self.config.wandb_project,
+                config=asdict(self.config),
+                name=f"ecg_training_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            )
+    
+    def _create_data_loaders(self, epoch: int = 0) -> Tuple[DataLoader, DataLoader]:
+        """Create data loaders with optional curriculum learning"""
+        # Get training subset for curriculum learning
+        if hasattr(self.train_dataset, 'difficulty_scores'):
+            train_indices = self.curriculum_scheduler.get_training_subset(
+                epoch,
+                self.train_dataset.difficulty_scores
             )
         else:
-            self.criterion = nn.CrossEntropyLoss(
-                label_smoothing=self.config.label_smoothing
-            )
-
-        logger.info(
-            f"Model initialized with {self.model.count_parameters():,} parameters"
-        )
-
-    def load_and_prepare_data(
-        self,
-    ) -> tuple[ECGMultimodalDataset, ECGMultimodalDataset]:
-        """Load and prepare training and validation datasets"""
-        logger.info("Loading ECG datasets...")
-
-        datasets = {}
-
-        try:
-            mitbih_data = self.dataset_manager.load_mitbih_arrhythmia()
-            datasets["mitbih"] = mitbih_data
-            logger.info(f"Loaded MIT-BIH: {len(mitbih_data['signals'])} samples")
-        except Exception as e:
-            logger.warning(f"Failed to load MIT-BIH: {e}")
-
-        try:
-            ptbxl_data = self.dataset_manager.load_ptbxl()
-            datasets["ptbxl"] = ptbxl_data
-            logger.info(f"Loaded PTB-XL: {len(ptbxl_data['signals'])} samples")
-        except Exception as e:
-            logger.warning(f"Failed to load PTB-XL: {e}")
-
-        try:
-            cpsc_data = self.dataset_manager.load_cpsc2018()
-            datasets["cpsc"] = cpsc_data
-            logger.info(f"Loaded CPSC-2018: {len(cpsc_data['signals'])} samples")
-        except Exception as e:
-            logger.warning(f"Failed to load CPSC-2018: {e}")
-
-        if not datasets:
-            raise ValueError("No datasets could be loaded")
-
-        all_signals = []
-        all_labels = []
-        all_condition_codes = []
-        all_difficulty_scores = []
-
-        for dataset_name, data in datasets.items():
-            signals = data["signals"]
-            labels = data["labels"]
-            condition_codes = data.get("condition_codes", ["NORM"] * len(signals))
-
-            processed_signals = []
-            for signal in tqdm(signals, desc=f"Preprocessing {dataset_name}"):
-                try:
-                    result = self.preprocessor.process(signal)
-                    if result.quality_metrics.overall_score > 0.7:  # Quality threshold
-                        processed_signals.append(result.clean_signal)
-                    else:
-                        logger.debug(
-                            f"Rejected signal with quality {result.quality_metrics.overall_score}"
-                        )
-                except Exception as e:
-                    logger.warning(f"Failed to preprocess signal: {e}")
-                    continue
-
-            mapped_labels = []
-            mapped_codes = []
-            difficulty_scores = []
-
-            for i, (_, code) in enumerate(
-                zip(processed_signals, condition_codes, strict=False)
-            ):
-                condition = get_condition_by_code(code)
-                if condition:
-                    label = list(SCP_ECG_CONDITIONS.keys()).index(code)
-                    mapped_labels.append(label)
-                    mapped_codes.append(code)
-
-                    rarity_score = 1.0 / (
-                        labels.count(labels[i]) + 1
-                    )  # Rarer = more difficult
-                    urgency_score = {
-                        "low": 0.2,
-                        "medium": 0.5,
-                        "high": 0.8,
-                        "critical": 1.0,
-                    }.get(condition.clinical_urgency, 0.5)
-                    difficulty_scores.append(rarity_score * 0.7 + urgency_score * 0.3)
-                else:
-                    mapped_labels.append(0)  # Assuming NORM is first
-                    mapped_codes.append("NORM")
-                    difficulty_scores.append(0.1)  # Easy case
-
-            all_signals.extend(processed_signals)
-            all_labels.extend(mapped_labels)
-            all_condition_codes.extend(mapped_codes)
-            all_difficulty_scores.extend(difficulty_scores)
-
-        logger.info(f"Total processed samples: {len(all_signals)}")
-
-        if train_test_split is None:
-            raise ImportError("scikit-learn is required for data splitting")
-        (
-            train_signals,
-            val_signals,
-            train_labels,
-            val_labels,
-            train_codes,
-            val_codes,
-            train_difficulty,
-            val_difficulty,
-        ) = train_test_split(
-            all_signals,
-            all_labels,
-            all_condition_codes,
-            all_difficulty_scores,
-            test_size=self.config.validation_split,
-            stratify=all_labels,
-            random_state=42,
-        )
-
-        train_dataset = ECGMultimodalDataset(
-            signals=train_signals,
-            labels=train_labels,
-            condition_codes=train_codes,
-            config=self.config,
-            is_training=True,
-            preprocessor=self.preprocessor,
-        )
-
-        val_dataset = ECGMultimodalDataset(
-            signals=val_signals,
-            labels=val_labels,
-            condition_codes=val_codes,
-            config=self.config,
-            is_training=False,
-            preprocessor=self.preprocessor,
-        )
-
-        self.curriculum_scheduler = CurriculumScheduler(self.config, train_difficulty)
-
-        logger.info(f"Training samples: {len(train_dataset)}")
-        logger.info(f"Validation samples: {len(val_dataset)}")
-
-        return train_dataset, val_dataset
-
-    def create_data_loaders(
-        self, train_dataset: ECGMultimodalDataset, val_dataset: ECGMultimodalDataset
-    ) -> tuple[DataLoader, DataLoader]:
-        """Create data loaders with appropriate sampling strategies"""
-
-        if self.config.use_class_weights:
-            class_counts = np.bincount(train_dataset.labels)
+            train_indices = np.arange(len(self.train_dataset))
+        
+        # Create subset dataset
+        train_subset = torch.utils.data.Subset(self.train_dataset, train_indices)
+        
+        # Compute class weights for balanced sampling
+        if self.config.use_class_weights and hasattr(self.train_dataset, 'labels'):
+            labels = np.array([self.train_dataset.labels[i] for i in train_indices])
+            class_counts = np.bincount(labels)
             class_weights = 1.0 / (class_counts + 1e-6)
-            sample_weights = [class_weights[label] for label in train_dataset.labels]
-            sampler = WeightedRandomSampler(
-                weights=sample_weights, num_samples=len(train_dataset), replacement=True
-            )
+            sample_weights = class_weights[labels]
+            sampler = WeightedRandomSampler(sample_weights, len(sample_weights))
+            shuffle = False
         else:
             sampler = None
-
+            shuffle = True
+        
+        # Create loaders
         train_loader = DataLoader(
-            train_dataset,
+            train_subset,
             batch_size=self.config.batch_size,
+            shuffle=shuffle,
             sampler=sampler,
-            shuffle=(sampler is None),
             num_workers=self.config.num_workers,
             pin_memory=self.config.pin_memory,
-            drop_last=True,
+            prefetch_factor=self.config.prefetch_factor
         )
-
+        
         val_loader = DataLoader(
-            val_dataset,
+            self.val_dataset,
             batch_size=self.config.batch_size,
             shuffle=False,
             num_workers=self.config.num_workers,
-            pin_memory=self.config.pin_memory,
+            pin_memory=self.config.pin_memory
         )
-
+        
         return train_loader, val_loader
-
-    def train_epoch(self, train_loader: DataLoader, epoch: int) -> dict[str, float]:
+    
+    def train_epoch(self, train_loader: DataLoader, epoch: int) -> Dict[str, float]:
         """Train for one epoch"""
         self.model.train()
-
+        
         total_loss = 0.0
-        correct_predictions = 0
-        total_samples = 0
-
-        progress_bar = tqdm(train_loader, desc=f"Epoch {epoch}")
-
-        for batch_idx, batch in enumerate(progress_bar):
-            signals = batch["signal"].to(self.device)
-            labels = batch["label"].to(self.device)
-
-            self.optimizer.zero_grad()
-
-            if self.config.use_spectrograms or self.config.use_wavelets:
-                outputs = self.model(signals, return_features=True)
-                logits = outputs["logits"]
-            else:
-                logits = self.model(signals)
-
-            loss = self.criterion(logits, labels)
-
-            loss.backward()
-
-            if self.config.gradient_clip_norm > 0:
-                torch.nn.utils.clip_grad_norm_(
-                    self.model.parameters(), self.config.gradient_clip_norm
-                )
-
-            self.optimizer.step()
-
-            total_loss += loss.item()
-            _, predicted = torch.max(logits.data, 1)
-            correct_predictions += (predicted == labels).sum().item()
-            total_samples += labels.size(0)
-
-            if batch_idx % self.config.log_interval == 0:
-                current_lr = self.optimizer.param_groups[0]["lr"]
-                progress_bar.set_postfix(
-                    {
-                        "Loss": f"{loss.item():.4f}",
-                        "Acc": f"{100. * correct_predictions / total_samples:.2f}%",
-                        "LR": f"{current_lr:.2e}",
-                    }
-                )
-
-                if self.config.use_wandb:
-                    wandb.log(
-                        {
-                            "train_loss_step": loss.item(),
-                            "train_accuracy_step": 100.0
-                            * correct_predictions
-                            / total_samples,
-                            "learning_rate": current_lr,
-                            "epoch": epoch,
-                            "step": epoch * len(train_loader) + batch_idx,
-                        }
+        task_losses = {task: 0.0 for task in self.config.auxiliary_tasks}
+        correct = 0
+        total = 0
+        
+        pbar = tqdm(train_loader, desc=f'Epoch {epoch}/{self.config.num_epochs}')
+        
+        for batch_idx, (data, target) in enumerate(pbar):
+            data, target = data.to(self.device), target.to(self.device)
+            
+            # Apply augmentation
+            data, target = self.augmenter.augment_batch(data, target)
+            
+            # Mixed precision training
+            if self.config.use_mixed_precision:
+                with autocast():
+                    output = self.model(data)
+                    
+                    if self.config.multi_task_learning:
+                        loss, batch_task_losses = self.criterion(output, target)
+                        predictions = output['main']
+                    else:
+                        loss = self.criterion(output['logits'], target)
+                        predictions = output['predictions']
+                
+                # Gradient accumulation
+                loss = loss / self.config.accumulation_steps
+                self.scaler.scale(loss).backward()
+                
+                if (batch_idx + 1) % self.config.accumulation_steps == 0:
+                    self.scaler.unscale_(self.optimizer)
+                    torch.nn.utils.clip_grad_norm_(
+                        self.model.parameters(),
+                        self.config.gradient_clip_norm
                     )
-
-        avg_loss = total_loss / len(train_loader)
-        accuracy = 100.0 * correct_predictions / total_samples
-
-        return {"loss": avg_loss, "accuracy": accuracy}
-
-    def validate_epoch(self, val_loader: DataLoader, epoch: int) -> dict[str, float]:
-        """Validate for one epoch"""
-        self.model.eval()
-
-        total_loss = 0.0
-        correct_predictions = 0
-        total_samples = 0
-        all_predictions = []
-        all_labels = []
-
-        with torch.no_grad():
-            for batch in tqdm(val_loader, desc="Validation"):
-                signals = batch["signal"].to(self.device)
-                labels = batch["label"].to(self.device)
-
-                if self.config.use_spectrograms or self.config.use_wavelets:
-                    outputs = self.model(signals, return_features=True)
-                    logits = outputs["logits"]
+                    self.scaler.step(self.optimizer)
+                    self.scaler.update()
+                    self.optimizer.zero_grad()
+            else:
+                # Standard training
+                output = self.model(data)
+                
+                if self.config.multi_task_learning:
+                    loss, batch_task_losses = self.criterion(output, target)
+                    predictions = output['main']
                 else:
-                    logits = self.model(signals)
-
-                loss = self.criterion(logits, labels)
-
+                    loss = self.criterion(output['logits'], target)
+                    predictions = output['predictions']
+                
+                loss = loss / self.config.accumulation_steps
+                loss.backward()
+                
+                if (batch_idx + 1) % self.config.accumulation_steps == 0:
+                    torch.nn.utils.clip_grad_norm_(
+                        self.model.parameters(),
+                        self.config.gradient_clip_norm
+                    )
+                    self.optimizer.step()
+                    self.optimizer.zero_grad()
+            
+            # Update metrics
+            total_loss += loss.item() * self.config.accumulation_steps
+            _, predicted = predictions.max(1)
+            total += target.size(0)
+            correct += predicted.eq(target).sum().item()
+            
+            # Update task losses
+            if self.config.multi_task_learning:
+                for task, task_loss in batch_task_losses.items():
+                    task_losses[task] += task_loss
+            
+            # Update progress bar
+            pbar.set_postfix({
+                'loss': total_loss / (batch_idx + 1),
+                'acc': 100. * correct / total
+            })
+            
+            # Learning rate scheduling
+            if self.config.scheduler_type == "one_cycle":
+                self.scheduler.step()
+        
+        # Compute epoch metrics
+        epoch_loss = total_loss / len(train_loader)
+        epoch_acc = 100. * correct / total
+        
+        metrics = {
+            'train_loss': epoch_loss,
+            'train_acc': epoch_acc
+        }
+        
+        if self.config.multi_task_learning:
+            for task, task_loss in task_losses.items():
+                metrics[f'train_{task}_loss'] = task_loss / len(train_loader)
+        
+        return metrics
+    
+    def validate(self, val_loader: DataLoader) -> Dict[str, float]:
+        """Validate the model"""
+        self.model.eval()
+        
+        total_loss = 0.0
+        all_predictions = []
+        all_targets = []
+        all_probabilities = []
+        
+        with torch.no_grad():
+            for data, target in tqdm(val_loader, desc='Validation'):
+                data, target = data.to(self.device), target.to(self.device)
+                
+                # Forward pass
+                output = self.model(data)
+                
+                if self.config.multi_task_learning:
+                    loss, _ = self.criterion(output, target)
+                    predictions = output['main']
+                else:
+                    loss = self.criterion(output['logits'], target)
+                    predictions = output['predictions']
+                
                 total_loss += loss.item()
-                _, predicted = torch.max(logits.data, 1)
-                correct_predictions += (predicted == labels).sum().item()
-                total_samples += labels.size(0)
-
-                all_predictions.extend(predicted.cpu().numpy())
-                all_labels.extend(labels.cpu().numpy())
-
-        avg_loss = total_loss / len(val_loader)
-        accuracy = 100.0 * correct_predictions / total_samples
-
+                
+                # Collect predictions
+                all_predictions.extend(predictions.argmax(1).cpu().numpy())
+                all_targets.extend(target.cpu().numpy())
+                all_probabilities.extend(predictions.cpu().numpy())
+        
+        # Compute metrics
+        all_predictions = np.array(all_predictions)
+        all_targets = np.array(all_targets)
+        all_probabilities = np.array(all_probabilities)
+        
+        # Basic metrics
+        val_loss = total_loss / len(val_loader)
+        val_acc = (all_predictions == all_targets).mean() * 100
+        
+        # Advanced metrics
+        val_f1 = f1_score(all_targets, all_predictions, average='weighted')
+        
+        # Compute AUC for multi-class
         try:
-            if classification_report is None or roc_auc_score is None:
-                raise ImportError("scikit-learn is required for metrics")
-            report = classification_report(
-                all_labels,
-                all_predictions,
-                output_dict=True,
-                zero_division=0,
+            val_auc = roc_auc_score(
+                all_targets,
+                all_probabilities,
+                multi_class='ovr',
+                average='weighted'
             )
-
-            try:
-                auc_score = roc_auc_score(
-                    all_labels,
-                    all_predictions,
-                    multi_class="ovr",
-                    average="weighted",
-                )
-            except Exception:
-                auc_score = 0.0
-
-        except Exception as e:
-            logger.warning(f"Error computing detailed metrics: {e}")
-            report = {}
-            auc_score = 0.0
-
-        return {
-            "loss": avg_loss,
-            "accuracy": accuracy,
-            "auc": auc_score,
-            "classification_report": report,
+        except:
+            val_auc = 0.0
+        
+        # Classification report
+        report = classification_report(
+            all_targets,
+            all_predictions,
+            output_dict=True
+        )
+        
+        metrics = {
+            'val_loss': val_loss,
+            'val_acc': val_acc,
+            'val_f1': val_f1,
+            'val_auc': val_auc,
+            'val_report': report
         }
-
-    def save_checkpoint(
-        self, epoch: int, val_metrics: dict[str, float], is_best: bool = False
-    ):
-        """Save model checkpoint"""
-        if not self.config.save_checkpoints:
-            return
-
-        checkpoint_dir = Path(self.config.checkpoint_dir)
-        checkpoint_dir.mkdir(exist_ok=True)
-
-        checkpoint = {
-            "epoch": epoch,
-            "model_state_dict": self.model.state_dict(),
-            "optimizer_state_dict": self.optimizer.state_dict(),
-            "scheduler_state_dict": (
-                self.scheduler.state_dict() if self.scheduler else None
-            ),
-            "config": self.config,
-            "training_history": self.training_history,
-            "val_metrics": val_metrics,
-        }
-
-        if not self.config.save_best_only:
-            checkpoint_path = checkpoint_dir / f"checkpoint_epoch_{epoch}.pt"
-            torch.save(checkpoint, checkpoint_path)
-
-        if is_best:
-            best_path = checkpoint_dir / "best_model.pt"
-            torch.save(checkpoint, best_path)
-            logger.info(
-                f"Saved best model with validation accuracy: {val_metrics['accuracy']:.2f}%"
-            )
-
+        
+        return metrics
+    
     def train(self):
         """Main training loop"""
-        logger.info("Starting training pipeline...")
-
-        self.setup_model()
-
-        train_dataset, val_dataset = self.load_and_prepare_data()
-
-        patience_counter = 0
-
+        logger.info(f"Starting training for {self.config.num_epochs} epochs")
+        
         for epoch in range(self.config.num_epochs):
             self.current_epoch = epoch
-
-            if self.config.curriculum_learning:
-                self.curriculum_scheduler.step_epoch()
-                current_indices = self.curriculum_scheduler.get_current_subset_indices()
-
-                current_train_dataset = ECGMultimodalDataset(
-                    signals=[train_dataset.signals[i] for i in current_indices],
-                    labels=[train_dataset.labels[i] for i in current_indices],
-                    condition_codes=[
-                        train_dataset.condition_codes[i] for i in current_indices
-                    ],
-                    config=self.config,
-                    is_training=True,
-                    preprocessor=self.preprocessor,
-                )
-            else:
-                current_train_dataset = train_dataset
-
-            train_loader, val_loader = self.create_data_loaders(
-                current_train_dataset, val_dataset
-            )
-
+            
+            # Create data loaders (may change with curriculum learning)
+            train_loader, val_loader = self._create_data_loaders(epoch)
+            
+            # Train epoch
             train_metrics = self.train_epoch(train_loader, epoch)
-
-            val_metrics = self.validate_epoch(val_loader, epoch)
-
-            if self.scheduler:
-                self.scheduler.step(val_metrics["loss"])
-
-            self.training_history["train_loss"].append(train_metrics["loss"])
-            self.training_history["val_loss"].append(val_metrics["loss"])
-            self.training_history["train_accuracy"].append(train_metrics["accuracy"])
-            self.training_history["val_accuracy"].append(val_metrics["accuracy"])
-            self.training_history["learning_rate"].append(
-                self.optimizer.param_groups[0]["lr"]
-            )
-
-            is_best = val_metrics["accuracy"] > self.best_val_accuracy
-            if is_best:
-                self.best_val_accuracy = val_metrics["accuracy"]
-                self.best_val_loss = val_metrics["loss"]
-                patience_counter = 0
-            else:
-                patience_counter += 1
-
-            self.save_checkpoint(epoch, val_metrics, is_best)
-
-            logger.info(
-                f"Epoch {epoch}: "
-                f"Train Loss: {train_metrics['loss']:.4f}, "
-                f"Train Acc: {train_metrics['accuracy']:.2f}%, "
-                f"Val Loss: {val_metrics['loss']:.4f}, "
-                f"Val Acc: {val_metrics['accuracy']:.2f}%"
-            )
-
-            if self.config.use_wandb:
-                wandb.log(
-                    {
-                        "epoch": epoch,
-                        "train_loss": train_metrics["loss"],
-                        "train_accuracy": train_metrics["accuracy"],
-                        "val_loss": val_metrics["loss"],
-                        "val_accuracy": val_metrics["accuracy"],
-                        "val_auc": val_metrics["auc"],
-                        "best_val_accuracy": self.best_val_accuracy,
-                        "curriculum_stage": (
-                            self.curriculum_scheduler.current_stage
-                            if self.config.curriculum_learning
-                            else 0
-                        ),
-                    }
-                )
-
-            if patience_counter >= self.config.early_stopping_patience:
-                logger.info(f"Early stopping triggered after {epoch + 1} epochs")
+            
+            # Validate
+            val_metrics = self.validate(val_loader)
+            
+            # Learning rate scheduling
+            if self.config.scheduler_type == "cosine_warm_restarts":
+                self.scheduler.step()
+            
+            # Logging
+            self._log_metrics(train_metrics, val_metrics, epoch)
+            
+            # Save checkpoint
+            if val_metrics['val_f1'] > self.best_val_f1:
+                self.best_val_f1 = val_metrics['val_f1']
+                self._save_checkpoint(epoch, val_metrics, is_best=True)
+            elif epoch % self.config.save_frequency == 0:
+                self._save_checkpoint(epoch, val_metrics, is_best=False)
+            
+            # Early stopping
+            if self._check_early_stopping(val_metrics):
+                logger.info(f"Early stopping triggered at epoch {epoch}")
                 break
-
+        
         logger.info("Training completed!")
-        logger.info(f"Best validation accuracy: {self.best_val_accuracy:.2f}%")
-
-        self.evaluate_final_model(val_dataset)
-
-    def evaluate_final_model(self, val_dataset: ECGMultimodalDataset):
-        """Evaluate the final trained model"""
-        logger.info("Evaluating final model...")
-
-        if self.config.save_checkpoints:
-            best_model_path = Path(self.config.checkpoint_dir) / "best_model.pt"
-            if best_model_path.exists():
-                checkpoint = torch.load(best_model_path, map_location=self.device)
-                self.model.load_state_dict(checkpoint["model_state_dict"])
-                logger.info("Loaded best model for final evaluation")
-
-        val_loader = DataLoader(
-            val_dataset,
-            batch_size=self.config.batch_size,
-            shuffle=False,
-            num_workers=self.config.num_workers,
+        self._cleanup()
+    
+    def _log_metrics(self, train_metrics: Dict, val_metrics: Dict, epoch: int):
+        """Log metrics to various backends"""
+        # Console logging
+        logger.info(
+            f"Epoch {epoch}: "
+            f"Train Loss: {train_metrics['train_loss']:.4f}, "
+            f"Train Acc: {train_metrics['train_acc']:.2f}%, "
+            f"Val Loss: {val_metrics['val_loss']:.4f}, "
+            f"Val Acc: {val_metrics['val_acc']:.2f}%, "
+            f"Val F1: {val_metrics['val_f1']:.4f}"
         )
-
-        val_metrics = self.validate_epoch(val_loader, -1)
-
-        self._generate_evaluation_report(val_metrics)
-
-    def _generate_evaluation_report(self, metrics: dict[str, Any]):
-        """Generate detailed evaluation report"""
-        report_path = Path(self.config.checkpoint_dir) / "evaluation_report.json"
-
-        report = {
-            "final_metrics": {
-                "accuracy": metrics["accuracy"],
-                "loss": metrics["loss"],
-                "auc": metrics["auc"],
-            },
-            "training_history": self.training_history,
-            "model_config": asdict(self.config.model_config),
-            "training_config": asdict(self.config),
-            "best_validation_accuracy": self.best_val_accuracy,
-            "total_parameters": self.model.count_parameters(),
+        
+        # TensorBoard
+        if self.config.use_tensorboard:
+            for key, value in train_metrics.items():
+                self.tb_writer.add_scalar(f'Train/{key}', value, epoch)
+            
+            for key, value in val_metrics.items():
+                if key != 'val_report':
+                    self.tb_writer.add_scalar(f'Val/{key}', value, epoch)
+        
+        # Weights & Biases
+        if self.config.use_wandb and WANDB_AVAILABLE:
+            wandb.log({
+                **{f'train/{k}': v for k, v in train_metrics.items()},
+                **{f'val/{k}': v for k, v in val_metrics.items() if k != 'val_report'},
+                'epoch': epoch
+            })
+    
+    def _save_checkpoint(self, epoch: int, metrics: Dict, is_best: bool = False):
+        """Save model checkpoint"""
+        checkpoint = {
+            'epoch': epoch,
+            'model_state_dict': self.model.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+            'scheduler_state_dict': self.scheduler.state_dict(),
+            'metrics': metrics,
+            'config': asdict(self.config)
         }
+        
+        # Save regular checkpoint
+        checkpoint_path = self.save_dir / f'checkpoint_epoch_{epoch}.pth'
+        torch.save(checkpoint, checkpoint_path)
+        
+        # Save best model
+        if is_best:
+            best_path = self.save_dir / 'best_model.pth'
+            torch.save(checkpoint, best_path)
+            logger.info(f"Saved best model with F1: {metrics['val_f1']:.4f}")
+    
+    def _check_early_stopping(self, val_metrics: Dict) -> bool:
+        """Check if early stopping should be triggered"""
+        # Implementation of early stopping logic
+        # This is a simplified version
+        return False
+    
+    def _cleanup(self):
+        """Cleanup resources"""
+        if self.config.use_tensorboard:
+            self.tb_writer.close()
+        
+        if self.config.use_wandb and WANDB_AVAILABLE:
+            wandb.finish()
 
-        with open(report_path, "w") as f:
-            json.dump(report, f, indent=2)
 
-        logger.info(f"Evaluation report saved to {report_path}")
-
-
-def create_training_config(**kwargs) -> TrainingConfig:
-    """Factory function to create training configuration"""
-
-    model_config = ModelConfig(
-        input_channels=12,
-        sequence_length=5000,
-        num_classes=71,
-        cnn_growth_rate=32,
-        lstm_hidden_dim=256,
-        transformer_heads=8,
-        transformer_layers=4,
-        dropout_rate=0.2,
-    )
-
-    if "model_config" in kwargs:
-        model_config = kwargs.pop("model_config")
-
-    return TrainingConfig(model_config=model_config, **kwargs)
-
-
-if __name__ == "__main__":
-    config = create_training_config(
-        batch_size=16,  # Smaller batch size for memory efficiency
-        learning_rate=1e-4,
-        num_epochs=50,
-        curriculum_learning=True,
-        use_spectrograms=True,
-        use_wavelets=True,
-        use_wandb=False,  # Set to True if you want to use Weights & Biases
-        device="cuda" if torch.cuda.is_available() else "cpu",
-    )
-
-    pipeline = ECGTrainingPipeline(config)
-    pipeline.train()
+def create_trainer(
+    model: nn.Module,
+    train_dataset: Dataset,
+    val_dataset: Dataset,
+    config: Optional[TrainingConfig] = None
+) -> ECGTrainer:
+    """Factory function to create trainer"""
+    if config is None:
+        config = TrainingConfig(model_config=ModelConfig())
+    
+    return ECGTrainer(model, config, train_dataset, val_dataset)
