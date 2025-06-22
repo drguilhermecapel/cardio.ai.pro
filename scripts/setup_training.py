@@ -434,18 +434,24 @@ def main():
 def setup_ptb_xl_training():
     """Configura e inicia o treinamento usando o dataset PTB-XL"""
     print("[INFO] Iniciando configuração do treinamento para o dataset PTB-XL...")
-    # Esta função deve ser implementada para configurar e iniciar o treinamento
-    # com o dataset PTB-XL. Isso inclui:
-    # 1. Carregar o dataset PTB-XL
-    # 2. Preparar os dados para treinamento (pré-processamento, divisão de datasets, etc.)
-    # 3. Definir o modelo
-    # 4. Configurar o treinamento (definir otimizador, função de perda, métricas, etc.)
-    # 5. Executar o treinamento e avaliação
-    # Exemplo:
-    # dataset = load_ptb_xl_dataset()
-    # model = define_model()
-    # train_model(model, dataset)
-    print("[INFO] Treinamento para o dataset PTB-XL configurado. (Implementação pendente)")
+    from backend.training.data_loader import PTBXLLoader
+    from backend.training.models import ECGModel
+    from backend.training.train import train
+
+    # Carregar configuração do dataset PTB-XL
+    config = get_dataset_config('ptbxl')
+
+    # Carregar o dataset PTB-XL
+    loader = PTBXLLoader(config)
+    train_data, val_data, test_data = loader.load_data()
+
+    # Definir o modelo
+    model = ECGModel(input_shape=config.input_shape, num_classes=len(config.classes))
+
+    # Configurar e executar o treinamento
+    train(model, train_data, val_data, config)
+
+    print("[INFO] Treinamento para o dataset PTB-XL concluído com sucesso.")
 
 if __name__ == "__main__":
     main()
