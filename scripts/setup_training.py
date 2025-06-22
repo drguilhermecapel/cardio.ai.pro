@@ -404,6 +404,8 @@ def print_next_steps():
     print("         pip install tensorflow")
     print("         pip install wfdb biosppy heartpy")
 
+from backend.training.config.dataset_configs import get_dataset_config
+
 def main():
     """Função principal"""
     print("[CARDIO.AI.PRO] Setup de Ambiente de Treinamento")
@@ -412,16 +414,31 @@ def main():
     # Verificações
     check_python_version()
     
+
+    # Verificações
+    check_python_version()
+
     # Setup
     create_directories()
     venv_path = create_venv()
     install_requirements(venv_path)
     create_config_templates()
+    setup_ptb_xl_training()
     create_example_scripts()
     create_activation_script()
+
     
     # Finalização
     print_next_steps()
+
+def setup_ptb_xl_training():
+    """Configura e inicia o treinamento usando o dataset PTB-XL"""
+    dataset_config = get_dataset_config('ptbxl')
+    print(f"[INFO] Iniciando treinamento com o dataset {dataset_config.name}")
+    # Aqui você adicionaria o código para carregar o dataset PTB-XL
+    # e iniciar o processo de treinamento, por exemplo:
+    # train_model(dataset_config)
+    # Nota: A função train_model() seria onde você define a lógica de treinamento
 
 if __name__ == "__main__":
     main()
