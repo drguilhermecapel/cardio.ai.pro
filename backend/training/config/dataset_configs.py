@@ -1,147 +1,69 @@
-
-"""
-Configurações e metadados dos datasets públicos de ECG
-"""
+# backend/training/dataset_configs.py
 
 from dataclasses import dataclass
-from typing import List, Dict, Optional
-from pathlib import Path
-
+import os
 
 @dataclass
 class DatasetConfig:
-    """Configuração base para datasets"""
     name: str
-    url: str
+    description: str
     download_size: str
-    num_samples: int
+    url: str
+    classes: list
     sampling_rate: int
     num_leads: int
-    duration: float  # em segundos
-    classes: List[str]
-    format: str  # WFDB, MAT, CSV, etc
-    description: str
-    citation: str
-    
 
-# Configurações dos datasets públicos
 DATASET_CONFIGS = {
+    "ptbxl": DatasetConfig(
+        name="PTB-XL",
+        description="A large publicly available electrocardiography dataset",
+        download_size="~3 GB",
+        url="https://physionet.org/content/ptb-xl/1.0.3/",
+        classes=["NORM", "MI", "STTC", "CD", "HYP"],
+        sampling_rate=100,
+        num_leads=12
+    ),
     "mitbih": DatasetConfig(
         name="MIT-BIH Arrhythmia Database",
+        description="Recordings of two-channel ambulatory ECGs",
+        download_size="~100 MB",
         url="https://physionet.org/content/mitdb/1.0.0/",
-        download_size="104.3 MB",
-        num_samples=48,
+        classes=["N", "SVEB", "VEB", "F", "Q"],
         sampling_rate=360,
-        num_leads=2,
-        duration=1800.0,  # 30 minutos
-        classes=["N", "S", "V", "F", "Q"],  # Normal, Supraventricular, Ventricular, Fusion, Unknown
-        format="WFDB",
-        description="48 registros de 30 minutos com anotações de arritmias",
-        citation="Moody GB, Mark RG. MIT-BIH Arrhythmia Database. 1980."
+        num_leads=2
     ),
-    
-    "ptbxl": DatasetConfig(
-        name="PTB-XL ECG Database", 
-        url="https://physionet.org/content/ptb-xl/1.0.3/",
-        download_size="3.0 GB",
-        num_samples=21837,
-        sampling_rate=500,
-        num_leads=12,
-        duration=10.0,
-        classes=["NORM", "MI", "STTC", "CD", "HYP"],  # 5 superclasses
-        format="WFDB",
-        description="21.837 ECGs de 12 derivações com 71 diagnósticos",
-        citation="Wagner P, et al. PTB-XL, a large publicly available ECG dataset. 2020."
-    ),
-    
     "cpsc2018": DatasetConfig(
-        name="China Physiological Signal Challenge 2018",
-        url="http://2018.icbeb.org/Challenge.html",
-        download_size="1.2 GB",
-        num_samples=6877,
+        name="CPSC2018",
+        description="China Physiological Signal Challenge 2018",
+        download_size="~2 GB",
+        url="http://2018.challenge.physionet.org/",
+        classes=["Normal", "AF", "I-AVB", "LBBB", "RBBB", "PAC", "PVC", "STD", "STE"],
         sampling_rate=500,
-        num_leads=12,
-        duration=10.0,
-        classes=["AF", "I-AVB", "LBBB", "RBBB", "PAC", "PVC", "STD", "STE", "Normal"],
-        format="MAT",
-        description="6.877 ECGs de 11 hospitais chineses",
-        citation="Liu F, et al. China Physiological Signal Challenge 2018."
-    ),
-    
-    "mimic_ecg": DatasetConfig(
-        name="MIMIC-IV ECG Database",
-        url="https://physionet.org/content/mimic-iv-ecg/1.0/",
-        download_size="~50 GB",
-        num_samples=800000,
-        sampling_rate=500,
-        num_leads=12,
-        duration=10.0,
-        classes=["Multiple diagnostic codes"],
-        format="WFDB",
-        description="~800k ECGs de pacientes de UTI com dados clínicos",
-        citation="Gow B, et al. MIMIC-IV-ECG: Diagnostic ECG Database. 2023."
-    ),
-    
-    "icentia11k": DatasetConfig(
-        name="Icentia11k Single Lead ECG",
-        url="https://physionet.org/content/icentia11k-continuous-ecg/1.0/",
-        download_size="150 GB",
-        num_samples=11000,
-        sampling_rate=250,
-        num_leads=1,
-        duration=604800.0,  # ~7 dias
-        classes=["Normal", "AF", "AFL", "Others"],
-        format="HDF5",
-        description="11k pacientes com ~2 bilhões de batimentos anotados",
-        citation="Tan S, et al. Icentia11k ECG Dataset. 2022."
-    ),
-    
-    "physionet2017": DatasetConfig(
-        name="PhysioNet Challenge 2017",
-        url="https://physionet.org/content/challenge-2017/1.0.0/",
-        download_size="150 MB",
-        num_samples=8528,
-        sampling_rate=300,
-        num_leads=1,
-        duration=30.0,
-        classes=["Normal", "AF", "Other", "Noise"],
-        format="MAT",
-        description="ECGs single-lead para classificação de ritmo",
-        citation="Clifford GD, et al. PhysioNet Challenge 2017."
+        num_leads=12
     )
 }
 
-
-def get_dataset_config(dataset_name: str) -> DatasetConfig:
-    """Retorna configuração do dataset"""
-    if dataset_name not in DATASET_CONFIGS:
-        raise ValueError(f"Dataset {dataset_name} não encontrado. "
-                        f"Disponíveis: {list(DATASET_CONFIGS.keys())}")
-    return DATASET_CONFIGS[dataset_name]
-
-
-# Links diretos para download
 DOWNLOAD_LINKS = {
+    "ptbxl": {
+        "data": "https://physionet.org/static/published-projects/ptb-xl/ptb-xl-a-large-publicly-available-electrocardiography-dataset-1.0.3.zip",
+        "metadata": "https://physionet.org/files/ptb-xl/1.0.3/ptbxl_database.csv"
+    },
     "mitbih": {
         "data": "https://physionet.org/files/mitdb/1.0.0/",
-        "annotations": "https://physionet.org/files/mitdb/1.0.0/mitdbdir",
-        "requires_auth": False
-    },
-    "ptbxl": {
-        "data": "https://physionet.org/files/ptb-xl/1.0.3/",
-        "metadata": "https://physionet.org/files/ptb-xl/1.0.3/ptbxl_database.csv",
-        "requires_auth": False
+        "instructions": "Use wfdb.dl_database(\'mitdb\', ...) to download"
     },
     "cpsc2018": {
-        "data": "http://2018.icbeb.org/file/REFERENCE.csv",
-        "training": "http://hhbucket.oss-cn-hongkong.aliyuncs.com/train_ecg.zip",
-        "requires_auth": False
-    },
-    "mimic_ecg": {
-        "data": "https://physionet.org/files/mimic-iv-ecg/1.0/",
-        "requires_auth": True,  # Requer credenciamento PhysioNet
-        "instructions": "Necessário criar conta e aceitar DUA em physionet.org"
+        "data": "http://2018.challenge.physionet.org/",
+        "training": "http://2018.challenge.physionet.org/TrainingSet.zip",
+        "test": "http://2018.challenge.physionet.org/TestSet.zip",
+        "instructions": "Download manually from the challenge website"
     }
 }
+
+def get_dataset_config(dataset_name: str) -> DatasetConfig:
+    """Retorna a configuração de um dataset específico."""
+    if dataset_name not in DATASET_CONFIGS:
+        raise ValueError(f"Dataset {dataset_name} não suportado.")
+    return DATASET_CONFIGS[dataset_name]
 
 
