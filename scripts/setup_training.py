@@ -433,27 +433,19 @@ def main():
 
 def setup_ptb_xl_training():
     """Configura e inicia o treinamento usando o dataset PTB-XL"""
-    from backend.training.data_loader import DataLoader
-    from backend.training.model import Model
-    from backend.training.trainer import Trainer
-
-    # Carrega a configuração do dataset PTB-XL
-    dataset_config = get_dataset_config("ptbxl")
-    print(f"[INFO] Configurando treinamento para o dataset: {dataset_config.name}")
-
-    # Carrega os dados
-    data_loader = DataLoader(dataset_config)
-    train_data, val_data, test_data = data_loader.load_data()
-
-    # Cria o modelo
-    model = Model(input_shape=dataset_config.input_shape, num_classes=len(dataset_config.classes))
-
-    # Configura e executa o treinador
-    trainer = Trainer(model=model, train_data=train_data, val_data=val_data, test_data=test_data, config=dataset_config)
-    trainer.train()
-    trainer.evaluate()
-
-    print("[INFO] Treinamento concluído com sucesso!")
+    print("[INFO] Iniciando configuração do treinamento para o dataset PTB-XL...")
+    # Esta função deve ser implementada para configurar e iniciar o treinamento
+    # com o dataset PTB-XL. Isso inclui:
+    # 1. Carregar o dataset PTB-XL
+    # 2. Preparar os dados para treinamento (pré-processamento, divisão de datasets, etc.)
+    # 3. Definir o modelo
+    # 4. Configurar o treinamento (definir otimizador, função de perda, métricas, etc.)
+    # 5. Executar o treinamento e avaliação
+    # Exemplo:
+    # dataset = load_ptb_xl_dataset()
+    # model = define_model()
+    # train_model(model, dataset)
+    print("[INFO] Treinamento para o dataset PTB-XL configurado. (Implementação pendente)")
 
 if __name__ == "__main__":
     main()
