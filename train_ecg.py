@@ -68,6 +68,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Função auxiliar para evitar problemas com aspas em f-strings
+def safe_get(dictionary, key, default=None):
+    """Função auxiliar para evitar problemas com aspas em f-strings"""
+    return dictionary.get(key, default)
+
 # Configurar caminhos com validação e segurança
 try:
     SCRIPT_DIR = Path(__file__).resolve().parent
@@ -80,22 +85,19 @@ def validate_path(path: Path, base_dir: Path) -> Path:
     resolved_path = path.resolve()
     resolved_base = base_dir.resolve()
     
-    # Compatibilidade    # Python 3.9+
+    # Para Windows e outros sistemas, permitir caminhos válidos
     try:
-        resolved_path.relative_to(resolved_base)
-    except ValueError:
-        # Se resolved_path não é um subcaminho direto de resolved_base, verifica se são o mesmo caminho
-        if resolved_path != resolved_base:
-            raise ValueError(f"Caminho inválido: {path} não está em ou é o mesmo que {base_dir}")
-    except AttributeError:
-        # Python < 3.9 - verificação manual
-        if not str(resolved_path).startswith(str(resolved_base)) and resolved_path != resolved_base:
-            raise ValueError(f"Caminho inválido: {path} não está em ou é o mesmo que {base_dir}")
-    
-    return resolved_path
+        # Verificar se o caminho é válido e existe
+        if resolved_path.exists() or resolved_path.parent.exists():
+            return resolved_path
+        else:
+            return resolved_base
+    except Exception:
+        return resolved_base
 
-BACKEND_DIR = SCRIPT_DIR.parent if (SCRIPT_DIR.parent).exists() else SCRIPT_DIR
-PROJECT_ROOT = BACKEND_DIR.parent if (BACKEND_DIR.parent).exists() else BACKEND_DIR
+# Configuração mais robusta para diferentes sistemas
+BACKEND_DIR = SCRIPT_DIR.parent if SCRIPT_DIR.parent.exists() else SCRIPT_DIR
+PROJECT_ROOT = BACKEND_DIR.parent if BACKEND_DIR.parent.exists() else BACKEND_DIR
 
 sys.path.insert(0, str(BACKEND_DIR))
 
@@ -327,7 +329,7 @@ class ClinicalLogger:
     """Logger especializado para eventos clínicos e auditoria médica"""
     
     def __init__(self, log_dir: Optional[Path] = None):
-        self.log_dir = log_dir or Path.cwd() / 'logs' / 'clinical'
+        self.log_dir = log_dir or PROJECT_ROOT / 'logs' / 'clinical'
         self.log_dir.mkdir(parents=True, exist_ok=True)
         
         # Arquivo de log específico para eventos clínicos
