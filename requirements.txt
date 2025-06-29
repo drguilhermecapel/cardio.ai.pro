@@ -42,6 +42,13 @@ mypy==1.5.1  # Type checking
 audiomentations==0.30.0  # Pode ser útil para sinais 1D
 albumentations==1.3.1  # Se converter ECG para imagens
 
+# Image Processing for ECG
+opencv-python>=4.8.0
+Pillow>=10.0.0
+pdf2image>=1.16.0
+pytesseract>=0.3.10
+scikit-image>=0.20.0
+
 
 # Transformer models
 audiomentations==0.30.0

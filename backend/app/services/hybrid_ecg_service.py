@@ -45,6 +45,10 @@ class UniversalECGReader:
             ".png": self._read_image,
             ".jpg": self._read_image,
             ".jpeg": self._read_image,
+            ".pdf": self._read_pdf,
+            ".bmp": self._read_image,
+            ".tiff": self._read_image,
+            ".tif": self._read_image,
         }
 
     def read_ecg(self, file_path: str) -> Dict[str, Any]:
@@ -133,12 +137,28 @@ class UniversalECGReader:
             raise ECGProcessingException(f"Text file reading failed: {str(e)}")
 
     def _read_image(self, file_path: str) -> Dict[str, Any]:
-        """Read image format ECG - placeholder for OCR-based reading"""
-        # This would require OCR and signal extraction from images
-        # For now, return a placeholder
-        raise ECGProcessingException(
-            "Image ECG reading not yet implemented. Please use CSV, EDF, or MIT-BIH formats."
-        )
+        """Read image format ECG using advanced image processing"""
+        from app.services.ecg_image_extractor import ECGImageExtractor
+        
+        try:
+            # Use the specialized ECG image extractor
+            extractor = ECGImageExtractor()
+            return extractor.extract_from_file(file_path)
+        except Exception as e:
+            logger.error(f"Image ECG reading failed: {str(e)}")
+            raise ECGProcessingException(f"Image ECG reading failed: {str(e)}")
+            
+    def _read_pdf(self, file_path: str) -> Dict[str, Any]:
+        """Read PDF format ECG using advanced image processing"""
+        from app.services.ecg_image_extractor import ECGImageExtractor
+        
+        try:
+            # Use the specialized ECG image extractor
+            extractor = ECGImageExtractor()
+            return extractor.extract_from_file(file_path)
+        except Exception as e:
+            logger.error(f"PDF ECG reading failed: {str(e)}")
+            raise ECGProcessingException(f"PDF ECG reading failed: {str(e)}")
 
 
 class AdvancedPreprocessor:
