@@ -351,6 +351,22 @@ Execute o script de correção conforme descrito no Passo 6 ou consulte o arquiv
 
 Execute o script `create_favicon.py` conforme descrito no Passo 5 ou consulte o arquivo CORRECAO_ERRO_FAVICON.md para instruções detalhadas.
 
+### Erro 404 Not Found ao tentar fazer login
+
+Se você receber um erro 404 ao tentar fazer login, há duas soluções possíveis:
+
+1. **Solução no Frontend**: Execute o script `fix_api_routes.js` na pasta frontend:
+
+   ```powershell
+   cd C:\caminho\para\cardio.ai.pro\frontend
+   node fix_api_routes.js
+   npm run dev
+   ```
+
+2. **Solução no Backend**: Reinicie o backend após a atualização mais recente que adiciona rotas de compatibilidade.
+
+Para instruções detalhadas, consulte o arquivo CORRECAO_ERRO_LOGIN.md.
+
 ### Erro de CORS no frontend
 
 - Verifique se o backend está rodando na porta 8000
