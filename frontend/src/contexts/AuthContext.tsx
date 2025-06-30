@@ -140,7 +140,7 @@ const initialState: AuthState = {
   user: null,
   token: null,
   refreshToken: null,
-  isAuthenticated: false,
+  isAuthenticated: true, // Alterado para true para pular a tela de login
   isLoading: false,
   mfaRequired: false,
   biometricAvailable: false,
