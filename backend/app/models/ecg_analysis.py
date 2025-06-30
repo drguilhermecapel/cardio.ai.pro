@@ -33,7 +33,7 @@ class ECGAnalysis(Base):
     
     # Metadados
     notes = Column(String, nullable=True)
-    metadata = Column(JSON, nullable=True)
+    ecg_metadata = Column(JSON, nullable=True)  # Renomeado de 'metadata' para evitar conflito com SQLAlchemy
     
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
