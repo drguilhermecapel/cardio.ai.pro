@@ -130,8 +130,18 @@ try:
     from app.api.v1.api import api_router
     app.include_router(api_router, prefix="/api/v1")
     logger.info("API v1 router incluído com sucesso")
-except ImportError:
-    logger.warning("API v1 router não encontrado")
+    
+    # Adicionar rotas de compatibilidade para o frontend
+    # Isso permite que o frontend acesse as rotas em /api/auth/ em vez de /api/v1/auth/
+    from app.api.v1.endpoints import auth as auth_endpoints
+    
+    # Criar router de compatibilidade
+    compat_router = APIRouter()
+    compat_router.include_router(auth_endpoints.router, prefix="/auth", tags=["auth-compat"])
+    app.include_router(compat_router, prefix="/api")
+    logger.info("Rotas de compatibilidade adicionadas com sucesso")
+except ImportError as e:
+    logger.warning(f"API v1 router não encontrado: {e}")
 
 # Configurar arquivos estáticos
 static_dir = Path(__file__).parent / "static"
