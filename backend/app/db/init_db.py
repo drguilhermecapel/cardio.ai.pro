@@ -5,6 +5,7 @@ Database initialization utilities for standalone CardioAI Pro.
 import asyncio
 import logging
 from pathlib import Path
+from typing import Optional, Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -40,7 +41,7 @@ async def init_db() -> None:
         raise
 
 
-async def create_admin_user(session: AsyncSession) -> User | None:
+async def create_admin_user(session: AsyncSession) -> Optional[User]:
     """Create default admin user if it doesn't exist."""
     try:
         from sqlalchemy.future import select

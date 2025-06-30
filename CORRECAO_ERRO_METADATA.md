@@ -266,6 +266,157 @@ Após aplicar a correção, você deve poder inicializar o banco de dados sem er
 python init_database.py
 ```
 
+## 3. Erro de Sintaxe de Tipos (User | None)
+
+### Descrição do Problema
+
+Este erro ocorre porque o arquivo `init_db.py` usa a sintaxe de união de tipos (`User | None`) que é específica do Python 3.10+. Se você estiver usando uma versão anterior do Python, isso causará um erro de sintaxe.
+
+### Solução Passo a Passo
+
+#### Opção 1: Usando o Script de Correção Automática
+
+1. **Crie o script de correção**:
+
+   Navegue até a pasta do backend e crie um arquivo chamado `fix_type_annotations.py`:
+
+   ```powershell
+   cd C:\caminho\para\cardio.ai.pro\backend
+   notepad fix_type_annotations.py
+   ```
+
+2. **Cole o seguinte código**:
+
+   ```python
+   #!/usr/bin/env python3
+   """
+   Script para corrigir anotações de tipo incompatíveis com versões mais antigas do Python.
+   Este script substitui a sintaxe de união de tipos (Type | None) pela sintaxe compatível (Optional[Type]).
+   """
+
+   import os
+   import sys
+   import re
+   from pathlib import Path
+
+   def fix_type_annotations():
+       """Corrige anotações de tipo incompatíveis."""
+       try:
+           # Caminho para o arquivo init_db.py
+           init_db_path = Path(__file__).parent / "app" / "db" / "init_db.py"
+           
+           if not init_db_path.exists():
+               print(f"❌ Arquivo init_db.py não encontrado: {init_db_path}")
+               return False
+           
+           # Ler o conteúdo do arquivo
+           content = init_db_path.read_text(encoding="utf-8")
+           
+           # Verificar se a importação de Optional já existe
+           if "from typing import" in content and "Optional" not in content.split("from typing import")[1].split("\n")[0]:
+               # Adicionar Optional à importação de typing
+               if "from typing import" in content:
+                   content = re.sub(
+                       r"from typing import (.*)",
+                       r"from typing import \1, Optional",
+                       content
+                   )
+               else:
+                   # Adicionar a importação se não existir
+                   content = "from typing import Optional\n" + content
+           
+           # Substituir a sintaxe de união de tipos pela sintaxe Optional
+           content = re.sub(
+               r"-> ([A-Za-z0-9_]+) \| None:",
+               r"-> Optional[\1]:",
+               content
+           )
+           
+           # Salvar o arquivo modificado
+           init_db_path.write_text(content, encoding="utf-8")
+           print(f"✅ Anotações de tipo corrigidas em {init_db_path}")
+           return True
+               
+       except Exception as e:
+           print(f"❌ Erro ao corrigir anotações de tipo: {e}")
+           import traceback
+           traceback.print_exc()
+           return False
+
+   if __name__ == "__main__":
+       print("🔧 Corrigindo anotações de tipo incompatíveis...")
+       success = fix_type_annotations()
+       sys.exit(0 if success else 1)
+   ```
+
+3. **Execute o script de correção**:
+
+   ```powershell
+   python fix_type_annotations.py
+   ```
+
+4. **Inicialize o banco de dados novamente**:
+
+   ```powershell
+   python init_database.py
+   ```
+
+#### Opção 2: Correção Manual
+
+Se preferir corrigir manualmente, siga estes passos:
+
+1. **Abra o arquivo init_db.py**:
+
+   ```powershell
+   notepad app\db\init_db.py
+   ```
+
+2. **Adicione a importação de Optional**:
+
+   Procure pela seção de importações e adicione `Optional`:
+
+   ```python
+   from typing import Optional
+   ```
+
+   Ou, se já existir uma importação de `typing`, adicione `Optional` à lista:
+
+   ```python
+   from typing import Dict, Any, Optional
+   ```
+
+3. **Substitua a sintaxe de união de tipos**:
+
+   Procure por esta linha (aproximadamente linha 43):
+
+   ```python
+   async def create_admin_user(session: AsyncSession) -> User | None:
+   ```
+
+   E substitua por:
+
+   ```python
+   async def create_admin_user(session: AsyncSession) -> Optional[User]:
+   ```
+
+4. **Salve o arquivo e inicialize o banco de dados novamente**:
+
+   ```powershell
+   python init_database.py
+   ```
+
+### Explicação Técnica
+
+A sintaxe de união de tipos usando o operador pipe (`|`) foi introduzida no Python 3.10. Para manter a compatibilidade com versões anteriores do Python, é necessário usar a classe `Optional` do módulo `typing`, que é equivalente a `Union[Type, None]`.
+
+### Verificação
+
+Após aplicar a correção, você deve poder inicializar o banco de dados sem erros:
+
+```powershell
+python init_database.py
+```
+
 ## Próximos Passos
 
 Após corrigir este erro, você pode continuar com a configuração do CardioAI Pro seguindo o guia principal de instalação.

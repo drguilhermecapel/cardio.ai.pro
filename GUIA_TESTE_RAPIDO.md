@@ -108,9 +108,150 @@ python fix_metadata_field.py
 python -m pip install -r requirements.txt
 ```
 
-## Passo 4: Inicializar o Banco de Dados
+## Passo 4: Corrigir Erros Adicionais e Inicializar o Banco de Dados
+
+### Corrigir Erro "name 'List' is not defined"
+
+Crie um arquivo `fix_list_import.py`:
 
 ```powershell
+notepad fix_list_import.py
+```
+
+Cole o seguinte código:
+
+```python
+#!/usr/bin/env python3
+"""
+Script para corrigir o erro 'name 'List' is not defined' no arquivo exceptions.py.
+Este script adiciona a importação do tipo List do módulo typing.
+"""
+
+import os
+import sys
+from pathlib import Path
+
+def fix_list_import():
+    """Corrige a importação do tipo List no arquivo exceptions.py."""
+    try:
+        # Caminho para o arquivo de exceções
+        exceptions_path = Path(__file__).parent / "app" / "core" / "exceptions.py"
+        
+        if not exceptions_path.exists():
+            print(f"❌ Arquivo de exceções não encontrado: {exceptions_path}")
+            return False
+        
+        # Ler o conteúdo do arquivo
+        content = exceptions_path.read_text(encoding="utf-8")
+        
+        # Verificar se a importação de List já existe
+        if "from typing import" in content and "List" not in content.split("from typing import")[1].split("\n")[0]:
+            # Adicionar List à importação de typing
+            new_content = content.replace(
+                "from typing import Dict, Any, Optional, Union",
+                "from typing import Dict, Any, Optional, Union, List"
+            )
+            
+            # Salvar o arquivo modificado
+            exceptions_path.write_text(new_content, encoding="utf-8")
+            print(f"✅ Importação de List adicionada em {exceptions_path}")
+            return True
+        else:
+            print("ℹ️ A importação de List já existe ou o padrão de importação é diferente.")
+            return True
+            
+    except Exception as e:
+        print(f"❌ Erro ao corrigir a importação de List: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+if __name__ == "__main__":
+    print("🔧 Corrigindo importação de List no arquivo exceptions.py...")
+    success = fix_list_import()
+    sys.exit(0 if success else 1)
+```
+
+### Corrigir Erro de Sintaxe de Tipos (User | None)
+
+Crie um arquivo `fix_type_annotations.py`:
+
+```powershell
+notepad fix_type_annotations.py
+```
+
+Cole o seguinte código:
+
+```python
+#!/usr/bin/env python3
+"""
+Script para corrigir anotações de tipo incompatíveis com versões mais antigas do Python.
+Este script substitui a sintaxe de união de tipos (Type | None) pela sintaxe compatível (Optional[Type]).
+"""
+
+import os
+import sys
+import re
+from pathlib import Path
+
+def fix_type_annotations():
+    """Corrige anotações de tipo incompatíveis."""
+    try:
+        # Caminho para o arquivo init_db.py
+        init_db_path = Path(__file__).parent / "app" / "db" / "init_db.py"
+        
+        if not init_db_path.exists():
+            print(f"❌ Arquivo init_db.py não encontrado: {init_db_path}")
+            return False
+        
+        # Ler o conteúdo do arquivo
+        content = init_db_path.read_text(encoding="utf-8")
+        
+        # Verificar se a importação de Optional já existe
+        if "from typing import" in content and "Optional" not in content.split("from typing import")[1].split("\n")[0]:
+            # Adicionar Optional à importação de typing
+            if "from typing import" in content:
+                content = re.sub(
+                    r"from typing import (.*)",
+                    r"from typing import \1, Optional",
+                    content
+                )
+            else:
+                # Adicionar a importação se não existir
+                content = "from typing import Optional\n" + content
+        
+        # Substituir a sintaxe de união de tipos pela sintaxe Optional
+        content = re.sub(
+            r"-> ([A-Za-z0-9_]+) \| None:",
+            r"-> Optional[\1]:",
+            content
+        )
+        
+        # Salvar o arquivo modificado
+        init_db_path.write_text(content, encoding="utf-8")
+        print(f"✅ Anotações de tipo corrigidas em {init_db_path}")
+        return True
+            
+    except Exception as e:
+        print(f"❌ Erro ao corrigir anotações de tipo: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+if __name__ == "__main__":
+    print("🔧 Corrigindo anotações de tipo incompatíveis...")
+    success = fix_type_annotations()
+    sys.exit(0 if success else 1)
+```
+
+### Executar Todos os Scripts de Correção e Inicializar o Banco de Dados
+
+```powershell
+# Execute os scripts de correção
+python fix_metadata_field.py
+python fix_list_import.py
+python fix_type_annotations.py
+
 # Inicializar o banco de dados
 python init_database.py
 ```
@@ -161,9 +302,16 @@ python -m ensurepip --upgrade
 python -m pip install -r requirements.txt
 ```
 
-### Erro "Attribute name 'metadata' is reserved"
+### Erros Comuns de Inicialização do Banco de Dados
 
-Execute o script de correção conforme descrito no Passo 2.
+Para corrigir erros comuns durante a inicialização do banco de dados, execute os scripts de correção conforme descrito no Passo 4:
+
+```powershell
+cd backend
+python fix_metadata_field.py  # Corrige erro "Attribute name 'metadata' is reserved"
+python fix_list_import.py     # Corrige erro "name 'List' is not defined"
+python fix_type_annotations.py  # Corrige erro de sintaxe de tipos (User | None)
+```
 
 ### Erro ao instalar pacotes com requisitos de compilação
 
