@@ -367,10 +367,28 @@ Se você receber um erro 404 ao tentar fazer login, há duas soluções possíve
 
 Para instruções detalhadas, consulte o arquivo CORRECAO_ERRO_LOGIN.md.
 
+### Erro "Manifest: Line: 1, column: 1, Syntax error"
+
+Este erro ocorre no console do navegador. Execute o script para criar o arquivo manifest.json:
+
+```powershell
+cd C:\caminho\para\cardio.ai.pro\frontend
+node create_manifest.js
+npm run dev
+```
+
+Para instruções detalhadas, consulte o arquivo CORRECAO_ERRO_MANIFEST.md.
+
 ### Erro de CORS no frontend
 
 - Verifique se o backend está rodando na porta 8000
-- Verifique se o arquivo vite.config.ts está configurado corretamente para proxy
+- Execute o script para corrigir a configuração do proxy:
+
+```powershell
+cd C:\caminho\para\cardio.ai.pro\frontend
+node fix_vite_config.js
+npm run dev
+```
 
 ## Notas Importantes
 
