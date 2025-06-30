@@ -58,8 +58,19 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
+        rewrite: (path) => {
+          // Redirecionar /api/auth/* para /api/v1/auth/*
+          if (path.startsWith('/api/auth/')) {
+            return path.replace('/api/auth/', '/api/v1/auth/');
+          }
+          return path;
+        },
       },
     },
+    host: true,
+    port: 5173,
+    strictPort: true,
+    cors: true,
   },
   test: {
     globals: true,
