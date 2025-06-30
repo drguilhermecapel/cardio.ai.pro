@@ -2,6 +2,10 @@
 from typing import Dict, Any, Optional, List
 import numpy as np
 from datetime import datetime
+
+class ECGService:
+    """Service for ECG data operations."""
+    
     async def get_analyses_by_patient(self, patient_id: int, limit: int = 50, offset: int = 0):
         """Recupera análises de ECG por paciente."""
         if hasattr(self, 'repository') and self.repository:
@@ -17,6 +21,7 @@ from datetime import datetime
             result = await self.db.execute(query)
             return result.scalars().all()
         return []
+        
     async def get_pathologies_distribution(self):
         """Retorna distribuição de patologias."""
         if hasattr(self, 'repository') and self.repository:
@@ -28,18 +33,21 @@ from datetime import datetime
             "ischemia": 0.2,
             "other": 0.1
         }
+        
     async def search_analyses(self, query: str, filters: Optional[Dict[str, Any]] = None):
         """Busca análises por critérios."""
         if hasattr(self, 'repository') and self.repository:
             return await self.repository.search_analyses(query, filters)
         # Implementação básica
         return []
+        
     async def update_patient_risk(self, patient_id: int, risk_data: Dict[str, Any]):
         """Atualiza dados de risco do paciente."""
         if hasattr(self, 'repository') and self.repository:
             return await self.repository.update_patient_risk(patient_id, risk_data)
         # Implementação básica
         return {"patient_id": patient_id, "risk_updated": True, **risk_data}
+        
     async def validate_analysis(self, analysis_id: int, validation_data: Dict[str, Any]):
         """Valida uma análise de ECG."""
         # Implementação de validação
@@ -49,6 +57,7 @@ from datetime import datetime
             "validated_at": datetime.utcnow().isoformat(),
             **validation_data
         }
+        
     async def create_validation(self, analysis_id: int, user_id: int, notes: str):
         """Cria uma validação para análise."""
         return {
