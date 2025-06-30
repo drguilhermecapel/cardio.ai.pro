@@ -16,7 +16,7 @@ from app.schemas.user import UserCreate, User, Token
 from app.services.user_service import UserService
 from app.repositories.user_repository import UserRepository
 
-router = APIRouter(prefix="/auth", tags=["authentication"])
+router = APIRouter(tags=["authentication"])
 
 @router.post("/register", response_model=User)
 async def register(
