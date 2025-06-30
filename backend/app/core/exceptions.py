@@ -1,7 +1,7 @@
 """
 Sistema completo de exceções customizadas para CardioAI Pro
 """
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional, Union, List
 from fastapi import HTTPException
 
 class CardioAIException(Exception):
