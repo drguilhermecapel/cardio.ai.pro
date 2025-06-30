@@ -29,7 +29,7 @@ interface AuthState {
   sessionExpiry: number | null
 }
 
-interface AuthContextType extends AuthState {
+export interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<LoginResult>
   loginWithBiometric: () => Promise<LoginResult>
   logout: () => void
@@ -148,7 +148,7 @@ const initialState: AuthState = {
 }
 
 // Auth Context
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Auth Provider
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
