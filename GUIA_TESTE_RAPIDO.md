@@ -279,9 +279,18 @@ cd frontend
 # Instale as dependências Node.js
 npm install
 
+# Corrija o erro de autenticação (se necessário)
+# Crie o script de correção
+notepad fix_auth_context.js
+# Cole o conteúdo do script (ver CORRECAO_ERRO_FRONTEND.md)
+# Execute o script
+node fix_auth_context.js
+
 # Inicie o servidor de desenvolvimento
 npm run dev
 ```
+
+Se você encontrar o erro "useAuth must be used within an AuthProvider", consulte o arquivo CORRECAO_ERRO_FRONTEND.md para instruções detalhadas sobre como corrigir.
 
 ## Passo 7: Acessar o CardioAI Pro
 
@@ -328,6 +337,10 @@ pip install --only-binary=:all: -r requirements.txt
 # Execute o PowerShell como administrador e defina a política de execução
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
+
+### Erro "useAuth must be used within an AuthProvider"
+
+Execute o script de correção conforme descrito no Passo 6 ou consulte o arquivo CORRECAO_ERRO_FRONTEND.md para instruções detalhadas.
 
 ### Erro de CORS no frontend
 
