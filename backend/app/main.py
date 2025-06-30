@@ -2,9 +2,13 @@
 Aplicação principal CardioAI Pro
 """
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 import logging
+import os
+from pathlib import Path
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -128,6 +132,21 @@ try:
     logger.info("API v1 router incluído com sucesso")
 except ImportError:
     logger.warning("API v1 router não encontrado")
+
+# Configurar arquivos estáticos
+static_dir = Path(__file__).parent / "static"
+if static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+    logger.info(f"Arquivos estáticos configurados em {static_dir}")
+
+# Rota para o favicon
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    """Serve o favicon."""
+    favicon_path = static_dir / "favicon.ico"
+    if favicon_path.exists():
+        return FileResponse(favicon_path)
+    logger.warning("Favicon não encontrado")
 
 
 if __name__ == "__main__":

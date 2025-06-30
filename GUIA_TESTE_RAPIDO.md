@@ -256,12 +256,17 @@ python fix_type_annotations.py
 python init_database.py
 ```
 
-## Passo 5: Iniciar o Servidor Backend
+## Passo 5: Criar Favicon e Iniciar o Servidor Backend
 
 ```powershell
+# Criar um favicon para evitar erros 404
+python create_favicon.py
+
 # Iniciar o servidor backend
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
+
+Se você ver o erro `Failed to load resource: the server responded with a status of 404 (Not Found)` relacionado ao favicon.ico, consulte o arquivo CORRECAO_ERRO_FAVICON.md para instruções detalhadas.
 
 ## Passo 6: Configurar e Executar o Frontend (em outro terminal)
 
@@ -341,6 +346,10 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ### Erro "useAuth must be used within an AuthProvider"
 
 Execute o script de correção conforme descrito no Passo 6 ou consulte o arquivo CORRECAO_ERRO_FRONTEND.md para instruções detalhadas.
+
+### Erro 404 para favicon.ico
+
+Execute o script `create_favicon.py` conforme descrito no Passo 5 ou consulte o arquivo CORRECAO_ERRO_FAVICON.md para instruções detalhadas.
 
 ### Erro de CORS no frontend
 
