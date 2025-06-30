@@ -4,6 +4,15 @@ Sistema completo de exceções customizadas para CardioAI Pro
 from typing import Dict, Any, Optional, Union, List
 from fastapi import HTTPException
 
+
+class UnauthorizedException(Exception):
+    """Exceção para usuário não autorizado"""
+    
+    def __init__(self, message: str = "Não autorizado"):
+        super().__init__(message)
+        self.message = message
+        self.status_code = 401
+
 class CardioAIException(Exception):
     """Exceção base para o sistema CardioAI"""
     
