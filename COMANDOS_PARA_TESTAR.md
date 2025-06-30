@@ -2,6 +2,14 @@
 
 Este documento fornece os comandos essenciais para testar o sistema CardioAI Pro em seu computador.
 
+## Correções Recentes
+
+Foram adicionadas correções para os seguintes erros:
+
+1. **Erro de importação no backend**: Corrigido o erro `cannot import name 'UnauthorizedException'` - veja [CORRECAO_ERRO_BACKEND.md](CORRECAO_ERRO_BACKEND.md)
+2. **Erro de manifest no frontend**: Corrigido o erro `Manifest: Line: 1, column: 1, Syntax error` - veja [CORRECAO_ERRO_MANIFEST.md](CORRECAO_ERRO_MANIFEST.md)
+3. **Erro 404 nas rotas de login**: Corrigido o erro de acesso às rotas de autenticação - veja [GUIA_TESTE_PASSO_A_PASSO.md](GUIA_TESTE_PASSO_A_PASSO.md)
+
 ## Comandos Rápidos
 
 ### Backend
